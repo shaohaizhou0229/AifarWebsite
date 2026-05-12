@@ -1,0 +1,17 @@
+{
+  "name": "aifar-website",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Next.js product launch website for Aifar.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "validate": "node validate-site.js"
+  },
+  "dependencies": {
+    "next": "^15.3.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

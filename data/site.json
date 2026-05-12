@@ -1,0 +1,7 @@
+{
+  "product": "Aifar",
+  "positioning": "Lightweight Standard Collaboration for Government and Enterprise Teams",
+  "capabilities": ["Chat", "Meeting", "Email", "Contact", "Documents", "Workflow", "Forms"],
+  "clients": ["PC", "iOS", "Android Phone", "Android Pad", "Mac Preview"],
+  "futureIntegrations": ["Aifar Forms", "Aifar Workflow", "Aifar Docs", "Aifar Chat", "Aifar Meeting", "Aifar Email", "Aifar Contact"]
+}
