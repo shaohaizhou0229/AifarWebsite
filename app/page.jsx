@@ -66,7 +66,7 @@ export default function HomePage() {
           </div>
           <div>
             <strong>SEO</strong>
-            <span>Structured for global discovery</span>
+            <span>Micro-lightweight, ready out of the box</span>
           </div>
         </div>
       </section>

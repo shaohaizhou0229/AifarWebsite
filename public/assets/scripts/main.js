@@ -157,11 +157,11 @@
           fr: "Structure prête pour l'assistance"
         },
         "SEO": { "zh-CN": "SEO", "zh-HK": "SEO", ar: "SEO", fr: "SEO" },
-        "Structured for global discovery": {
-          "zh-CN": "面向全球发现优化",
-          "zh-HK": "面向全球搜尋優化",
-          ar: "منظم للاكتشاف العالمي",
-          fr: "Structuré pour la visibilité mondiale"
+        "Micro-lightweight, ready out of the box": {
+          "zh-CN": "微轻量化开箱即用",
+          "zh-HK": "微輕量化，開箱即用",
+          ar: "خفيف جدا وجاهز للاستخدام فورا",
+          fr: "Très léger et prêt à l'emploi"
         },
         "One workspace for standard collaboration": {
           "zh-CN": "一个标准协同工作区",

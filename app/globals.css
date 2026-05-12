@@ -248,7 +248,8 @@ h3 {
 .hero-media img {
   width: 100%;
   aspect-ratio: 16 / 10;
-  object-fit: cover;
+  background: #edf4fb;
+  object-fit: contain;
 }
 
 .trust-row {
