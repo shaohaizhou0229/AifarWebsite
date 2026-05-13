@@ -1,4 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
+import { redirect } from "next/navigation";
 import { Card } from "@/components/Card";
 import { Release } from "@/components/Rows";
 import { getPageMessages } from "@/i18n/messages";
@@ -19,8 +20,18 @@ export async function generateMetadata({ params }) {
   });
 }
 
-export default async function HomePage({ params }) {
+export default async function HomePage({ params, searchParams }) {
   const { locale } = await params;
+  const query = await searchParams;
+  const code = query?.code;
+
+  if (code) {
+    const callbackUrl = new URL("/api/auth/callback/", "http://localhost");
+    callbackUrl.searchParams.set("code", code);
+    callbackUrl.searchParams.set("next", localizedPath(locale, "/account/"));
+    redirect(`${callbackUrl.pathname}${callbackUrl.search}`);
+  }
+
   setRequestLocale(locale);
   const page = await getPageMessages(locale, "home");
   const schema = {
