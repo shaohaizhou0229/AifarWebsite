@@ -1,0 +1,11 @@
+node_modules/
+.git/
+.next/
+.netlify/
+.env
+.env.local
+.env.*.local
+.idea/
+*.log
+tmp-logo-images/
+tmp-ui-images/
