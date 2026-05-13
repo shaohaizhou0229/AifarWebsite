@@ -24,6 +24,7 @@
 ## 项目定位
 
 - 项目名称：Aifar Website。
+- GitHub 仓库地址：https://github.com/shaohaizhou0229/AifarWebsite.git。
 - 产品：Aifar。
 - 当前定位：面向政府和企业团队的轻量级标准协同平台。
 - 官网目标：作为 Aifar 对外产品介绍、客户端下载、更新公告、文档、技术支持、联系咨询和安全说明的入口。
