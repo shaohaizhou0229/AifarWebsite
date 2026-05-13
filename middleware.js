@@ -4,24 +4,32 @@ import { routing } from "./i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
 
-function getLocaleHomeCallback(request) {
+function sanitizeNextPath(value, locale) {
+  if (!value || !value.startsWith("/") || value.startsWith("//")) {
+    return `/${locale}/account/`;
+  }
+
+  return value;
+}
+
+function getLocaleOAuthCallback(request) {
   const { pathname, searchParams } = request.nextUrl;
-  const [, locale, rest] = pathname.split("/");
-  const isLocaleHome = routing.locales.includes(locale) && (!rest || rest === "");
+  const [, locale] = pathname.split("/");
+  const hasLocale = routing.locales.includes(locale);
   const code = searchParams.get("code");
 
-  if (!isLocaleHome || !code) {
+  if (!hasLocale || !code) {
     return null;
   }
 
   const callbackUrl = new URL("/api/auth/callback/", request.url);
   callbackUrl.searchParams.set("code", code);
-  callbackUrl.searchParams.set("next", `/${locale}/account/`);
+  callbackUrl.searchParams.set("next", sanitizeNextPath(searchParams.get("next"), locale));
   return callbackUrl;
 }
 
 export default function middleware(request) {
-  const callbackUrl = getLocaleHomeCallback(request);
+  const callbackUrl = getLocaleOAuthCallback(request);
 
   if (callbackUrl) {
     return NextResponse.redirect(callbackUrl);
