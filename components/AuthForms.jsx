@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 
-export function AuthForm({ mode, labels, localePath, initialError = "" }) {
+export function AuthForm({ mode, labels, accountPath, loginPath, registerPath, initialError = "" }) {
   const isRegister = mode === "register";
-  const googleUrl = `/api/auth/google/?next=${encodeURIComponent(localePath("/account/"))}`;
+  const googleUrl = `/api/auth/google/?next=${encodeURIComponent(accountPath)}`;
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -44,7 +44,7 @@ export function AuthForm({ mode, labels, localePath, initialError = "" }) {
         return;
       }
 
-      window.location.assign(localePath("/account/"));
+      window.location.assign(accountPath);
     } catch (error) {
       setStatus({ type: "error", message: error.message });
     } finally {
@@ -86,7 +86,7 @@ export function AuthForm({ mode, labels, localePath, initialError = "" }) {
       </button>
       <p className="muted-line">
         {isRegister ? labels.auth.alreadyHaveAccount : labels.auth.needAccount}
-        <a href={localePath(isRegister ? "/login/" : "/register/")}>{isRegister ? labels.auth.signIn : labels.auth.register}</a>
+        <a href={isRegister ? loginPath : registerPath}>{isRegister ? labels.auth.signIn : labels.auth.register}</a>
       </p>
     </form>
   );

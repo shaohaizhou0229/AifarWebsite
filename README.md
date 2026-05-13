@@ -26,6 +26,14 @@ Copy `.env.example` to `.env.local` and configure:
 - `NEXT_PUBLIC_SUPABASE_URL` for Supabase Auth.
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` for Supabase Auth REST requests.
 
+## Google sign-in
+
+Google sign-in uses Supabase Auth. In the Supabase dashboard, enable the Google provider and configure the Google Cloud OAuth client. For local testing, allow:
+
+- Origin: `http://127.0.0.1:3000`
+- App callback: `http://127.0.0.1:3000/api/auth/callback/`
+- Supabase provider callback: `https://<project-ref>.supabase.co/auth/v1/callback`
+
 ## Database migrations
 
 Migration files live in `supabase/migrations/`. To apply a specific migration after confirming the target database environment:

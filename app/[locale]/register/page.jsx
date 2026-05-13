@@ -34,7 +34,9 @@ export default async function RegisterPage({ params, searchParams }) {
           <AuthForm
             mode="register"
             labels={messages.forms}
-            localePath={(path) => localizedPath(locale, path)}
+            accountPath={localizedPath(locale, "/account/")}
+            loginPath={localizedPath(locale, "/login/")}
+            registerPath={localizedPath(locale, "/register/")}
             initialError={typeof query?.error === "string" ? query.error : ""}
           />
         </div>
