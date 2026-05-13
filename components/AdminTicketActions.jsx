@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export function AdminTicketActions({ ticket }) {
+export function AdminTicketActions({ ticket, labels }) {
   const [status, setStatus] = useState(ticket.status);
   const [message, setMessage] = useState("");
   const [feedback, setFeedback] = useState({ type: "idle", message: "" });
@@ -18,19 +18,19 @@ export function AdminTicketActions({ ticket }) {
     const result = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      setFeedback({ type: "error", message: result.error || "Unable to update status." });
+      setFeedback({ type: "error", message: result.error || labels.statusFailure });
       return;
     }
 
     setStatus(result.ticket.status);
-    setFeedback({ type: "success", message: "Ticket status updated." });
+    setFeedback({ type: "success", message: labels.statusUpdated });
   }
 
   async function sendReply(event) {
     event.preventDefault();
 
     if (!message.trim()) {
-      setFeedback({ type: "error", message: "Reply message is required." });
+      setFeedback({ type: "error", message: labels.replyRequired });
       return;
     }
 
@@ -45,7 +45,7 @@ export function AdminTicketActions({ ticket }) {
     const result = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      setFeedback({ type: "error", message: result.error || "Unable to send reply." });
+      setFeedback({ type: "error", message: result.error || labels.replyFailure });
       setIsSubmitting(false);
       return;
     }
@@ -55,23 +55,23 @@ export function AdminTicketActions({ ticket }) {
 
   return (
     <div className="admin-actions">
-      <div className="status-actions" aria-label="Ticket status actions">
+      <div className="status-actions" aria-label={labels.statusActions}>
         <span className="pill">{status.replace("_", " ")}</span>
         <button className="button secondary" type="button" onClick={() => updateStatus("in_progress")} disabled={status === "in_progress"}>
-          Mark in progress
+          {labels.markInProgress}
         </button>
         <button className="button secondary" type="button" onClick={() => updateStatus("closed")} disabled={status === "closed"}>
-          Close ticket
+          {labels.closeTicket}
         </button>
       </div>
       <form className="form-shell" onSubmit={sendReply}>
         <div className="field">
-          <label htmlFor="reply">Reply</label>
+          <label htmlFor="reply">{labels.reply}</label>
           <textarea id="reply" value={message} onChange={(event) => setMessage(event.target.value)} />
         </div>
         {feedback.message ? <p className={`form-message ${feedback.type}`} role="status">{feedback.message}</p> : null}
         <button className="button primary" type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Sending..." : "Send reply"}
+          {isSubmitting ? labels.sending : labels.sendReply}
         </button>
       </form>
     </div>

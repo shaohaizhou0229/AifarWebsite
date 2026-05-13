@@ -2,18 +2,18 @@
 
 import { useState } from "react";
 
-export function SignOutButton() {
+export function SignOutButton({ labels, redirectTo = "/" }) {
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   async function signOut() {
     setIsSigningOut(true);
     await fetch("/api/auth/logout/", { method: "POST" }).catch(() => {});
-    window.location.assign("/");
+    window.location.assign(redirectTo);
   }
 
   return (
     <button className="nav-action" type="button" onClick={signOut} disabled={isSigningOut}>
-      {isSigningOut ? "Signing out..." : "Sign out"}
+      {isSigningOut ? labels.signingOut : labels.signOut}
     </button>
   );
 }

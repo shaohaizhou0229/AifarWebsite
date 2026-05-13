@@ -1,45 +1,48 @@
 import { getCurrentUser } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
+import { localizedPath } from "@/i18n/routing";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { MobileMenuButton } from "@/components/MobileMenu";
 import { SignOutButton } from "@/components/SignOutButton";
 
 const navLinks = [
-  { href: "/product/", label: "Product" },
-  { href: "/downloads/", label: "Downloads" },
-  { href: "/whats-new/", label: "What's New" },
-  { href: "/docs/", label: "Docs" },
-  { href: "/support/", label: "Support" },
-  { href: "/contact/", label: "Contact" }
+  ["product", "/product/"],
+  ["downloads", "/downloads/"],
+  ["whatsNew", "/whats-new/"],
+  ["docs", "/docs/"],
+  ["support", "/support/"],
+  ["contact", "/contact/"]
 ];
 
-export async function SiteHeader() {
+export async function SiteHeader({ locale, messages }) {
   const user = await getCurrentUser();
   const profile = user?.id ? await getProfile(user.id) : null;
+  const nav = messages.layout.nav;
 
   return (
     <header className="site-header">
       <div className="nav-wrap">
-        <a className="brand" href="/">
+        <a className="brand" href={localizedPath(locale, "/")}>
           <span className="brand-mark">A</span>
-          <span>Aifar</span>
+          <span>{messages.layout.brand}</span>
         </a>
-        <button className="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" data-menu-toggle>
-          <span />
-        </button>
-        <nav className="nav-links" data-nav>
-          {navLinks.map((link) => (
-            <a key={link.href} href={link.href}>
-              {link.label}
+        <MobileMenuButton label={messages.layout.menu} />
+        <nav id="site-navigation" className="nav-links" data-nav>
+          {navLinks.map(([key, href]) => (
+            <a key={href} href={localizedPath(locale, href)}>
+              {nav[key]}
             </a>
           ))}
-          {profile?.role === "admin" ? <a href="/admin/tickets/">Admin</a> : null}
+          {profile?.role === "admin" ? <a href={localizedPath(locale, "/admin/tickets/")}>{nav.admin}</a> : null}
           {user ? (
             <>
-              <a href="/account/">Account</a>
-              <SignOutButton />
+              <a href={localizedPath(locale, "/account/")}>{nav.account}</a>
+              <SignOutButton labels={messages.layout.auth} redirectTo={localizedPath(locale, "/")} />
             </>
           ) : (
-            <a href="/login/">Sign in</a>
+            <a href={localizedPath(locale, "/login/")}>{nav.signIn}</a>
           )}
+          <LanguageSwitcher locale={locale} label={messages.layout.language} />
         </nav>
       </div>
     </header>

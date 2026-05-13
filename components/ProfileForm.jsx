@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export function ProfileForm({ profile }) {
+export function ProfileForm({ profile, labels }) {
   const [form, setForm] = useState({
     displayName: profile?.display_name || "",
     organization: profile?.organization || "",
@@ -32,10 +32,10 @@ export function ProfileForm({ profile }) {
       const result = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(result.error || "Profile update failed.");
+        throw new Error(result.error || labels.profile.failure);
       }
 
-      setStatus({ type: "success", message: "Profile updated." });
+      setStatus({ type: "success", message: labels.profile.success });
     } catch (error) {
       setStatus({ type: "error", message: error.message });
     } finally {
@@ -46,32 +46,32 @@ export function ProfileForm({ profile }) {
   return (
     <form className="form-shell" onSubmit={handleSubmit}>
       <div className="field">
-        <label>Email</label>
+        <label>{labels.common.email}</label>
         <input value={profile?.email || ""} disabled readOnly />
       </div>
       <div className="field">
-        <label htmlFor="displayName">Name</label>
+        <label htmlFor="displayName">{labels.common.name}</label>
         <input id="displayName" name="displayName" value={form.displayName} onChange={updateField} autoComplete="name" />
       </div>
       <div className="field">
-        <label htmlFor="organization">Organization</label>
+        <label htmlFor="organization">{labels.common.organization}</label>
         <input id="organization" name="organization" value={form.organization} onChange={updateField} autoComplete="organization" />
       </div>
       <div className="field">
-        <label htmlFor="jobTitle">Job title</label>
+        <label htmlFor="jobTitle">{labels.profile.jobTitle}</label>
         <input id="jobTitle" name="jobTitle" value={form.jobTitle} onChange={updateField} />
       </div>
       <div className="field">
-        <label htmlFor="countryRegion">Country / Region</label>
+        <label htmlFor="countryRegion">{labels.profile.countryRegion}</label>
         <input id="countryRegion" name="countryRegion" value={form.countryRegion} onChange={updateField} />
       </div>
       <div className="field">
-        <label htmlFor="phone">Phone</label>
+        <label htmlFor="phone">{labels.profile.phone}</label>
         <input id="phone" name="phone" value={form.phone} onChange={updateField} autoComplete="tel" />
       </div>
       {status.message ? <p className={`form-message ${status.type}`} role="status">{status.message}</p> : null}
       <button className="button primary" type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Saving..." : "Save profile"}
+        {isSubmitting ? labels.profile.saving : labels.profile.save}
       </button>
     </form>
   );

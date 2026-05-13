@@ -126,6 +126,9 @@ a {
 }
 
 .language-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 34px;
   height: 32px;
   border: 0;
@@ -143,6 +146,18 @@ a {
 .language-option[aria-pressed="true"] {
   background: var(--ink);
   color: white;
+}
+
+.sr-only {
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 }
 
 .menu-toggle {
@@ -345,6 +360,26 @@ h3 {
   border-radius: 8px;
   background: var(--surface);
   padding: 24px;
+}
+
+.oauth-button {
+  width: 100%;
+}
+
+.auth-divider {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  height: 1px;
+  background: var(--line);
 }
 
 .card-actions {

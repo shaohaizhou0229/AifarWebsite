@@ -20,19 +20,19 @@ const requestTypes = [
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function validateForm(form) {
+function validateForm(form, labels) {
   if (!form.name.trim() || !form.workEmail.trim() || !form.requestType || !form.message.trim()) {
-    return "Please fill in your name, work email, request type, and message.";
+    return labels.validation;
   }
 
   if (!EMAIL_PATTERN.test(form.workEmail.trim())) {
-    return "Please enter a valid work email.";
+    return labels.invalidEmail;
   }
 
   return "";
 }
 
-export function ContactForm({ initialData = {}, isLoggedIn = false }) {
+export function ContactForm({ initialData = {}, isLoggedIn = false, labels }) {
   const [form, setForm] = useState({
     ...initialForm,
     ...initialData
@@ -48,7 +48,7 @@ export function ContactForm({ initialData = {}, isLoggedIn = false }) {
   async function handleSubmit(event) {
     event.preventDefault();
 
-    const validationMessage = validateForm(form);
+    const validationMessage = validateForm(form, labels.contact);
 
     if (validationMessage) {
       setStatus({ type: "error", message: validationMessage });
@@ -74,7 +74,7 @@ export function ContactForm({ initialData = {}, isLoggedIn = false }) {
 
       if (!response.ok) {
         const result = await response.json().catch(() => ({}));
-        throw new Error(result.error || "Submit failed");
+        throw new Error(result.error || labels.contact.submitFailed);
       }
 
       setForm({
@@ -85,12 +85,12 @@ export function ContactForm({ initialData = {}, isLoggedIn = false }) {
       });
       setStatus({
         type: "success",
-        message: "Your request has been submitted. The Aifar team will follow up soon."
+        message: labels.contact.success
       });
     } catch {
       setStatus({
         type: "error",
-        message: "We could not submit your request right now. Please try again later."
+        message: labels.contact.error
       });
     } finally {
       setIsSubmitting(false);
@@ -100,7 +100,7 @@ export function ContactForm({ initialData = {}, isLoggedIn = false }) {
   return (
     <form className="form-shell" onSubmit={handleSubmit} noValidate>
       <div className="field">
-        <label htmlFor="name">Name</label>
+        <label htmlFor="name">{labels.common.name}</label>
         <input
           id="name"
           name="name"
@@ -111,7 +111,7 @@ export function ContactForm({ initialData = {}, isLoggedIn = false }) {
         />
       </div>
       <div className="field">
-        <label htmlFor="workEmail">Work email</label>
+        <label htmlFor="workEmail">{labels.common.workEmail}</label>
         <input
           id="workEmail"
           name="workEmail"
@@ -124,7 +124,7 @@ export function ContactForm({ initialData = {}, isLoggedIn = false }) {
         />
       </div>
       <div className="field">
-        <label htmlFor="organization">Organization</label>
+        <label htmlFor="organization">{labels.common.organization}</label>
         <input
           id="organization"
           name="organization"
@@ -134,7 +134,7 @@ export function ContactForm({ initialData = {}, isLoggedIn = false }) {
         />
       </div>
       <div className="field">
-        <label htmlFor="subject">Subject</label>
+        <label htmlFor="subject">{labels.contact.subject}</label>
         <input
           id="subject"
           name="subject"
@@ -143,7 +143,7 @@ export function ContactForm({ initialData = {}, isLoggedIn = false }) {
         />
       </div>
       <div className="field">
-        <label htmlFor="requestType">Request type</label>
+        <label htmlFor="requestType">{labels.contact.requestType}</label>
         <select
           id="requestType"
           name="requestType"
@@ -151,15 +151,15 @@ export function ContactForm({ initialData = {}, isLoggedIn = false }) {
           onChange={updateField}
           required
         >
-          {requestTypes.map(([value, label]) => (
+          {requestTypes.map(([value]) => (
             <option key={value} value={value}>
-              {label}
+              {labels.contact.requestTypes[value]}
             </option>
           ))}
         </select>
       </div>
       <div className="field">
-        <label htmlFor="message">Message</label>
+        <label htmlFor="message">{labels.contact.message}</label>
         <textarea
           id="message"
           name="message"
@@ -174,7 +174,7 @@ export function ContactForm({ initialData = {}, isLoggedIn = false }) {
         </p>
       ) : null}
       <button className="button primary" type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Submitting..." : "Submit request"}
+        {isSubmitting ? labels.contact.submitting : labels.contact.submit}
       </button>
     </form>
   );

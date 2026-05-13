@@ -2,15 +2,16 @@
 
 import { useState } from "react";
 
-export function AuthForm({ mode }) {
+export function AuthForm({ mode, labels, localePath, initialError = "" }) {
   const isRegister = mode === "register";
+  const googleUrl = `/api/auth/google/?next=${encodeURIComponent(localePath("/account/"))}`;
   const [form, setForm] = useState({
     email: "",
     password: "",
     displayName: "",
     organization: ""
   });
-  const [status, setStatus] = useState({ type: "idle", message: "" });
+  const [status, setStatus] = useState(initialError ? { type: "error", message: initialError } : { type: "idle", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   function updateField(event) {
@@ -32,18 +33,18 @@ export function AuthForm({ mode }) {
       const result = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(result.error || "Authentication failed.");
+        throw new Error(result.error || labels.auth.failure);
       }
 
       if (result.requiresConfirmation) {
         setStatus({
           type: "success",
-          message: "Please check your email to confirm your account before signing in."
+          message: labels.auth.confirmation
         });
         return;
       }
 
-      window.location.assign("/account/");
+      window.location.assign(localePath("/account/"));
     } catch (error) {
       setStatus({ type: "error", message: error.message });
     } finally {
@@ -53,33 +54,39 @@ export function AuthForm({ mode }) {
 
   return (
     <form className="form-shell auth-card" onSubmit={handleSubmit}>
+      <a className="button secondary oauth-button" href={googleUrl}>
+        {labels.auth.continueWithGoogle || "Continue with Google"}
+      </a>
+      <div className="auth-divider" aria-hidden="true">
+        <span>{labels.auth.orEmail || "or"}</span>
+      </div>
       {isRegister ? (
         <>
           <div className="field">
-            <label htmlFor="displayName">Name</label>
+            <label htmlFor="displayName">{labels.common.name}</label>
             <input id="displayName" name="displayName" value={form.displayName} onChange={updateField} autoComplete="name" />
           </div>
           <div className="field">
-            <label htmlFor="organization">Organization</label>
+            <label htmlFor="organization">{labels.common.organization}</label>
             <input id="organization" name="organization" value={form.organization} onChange={updateField} autoComplete="organization" />
           </div>
         </>
       ) : null}
       <div className="field">
-        <label htmlFor="email">Work email</label>
+        <label htmlFor="email">{labels.common.workEmail}</label>
         <input id="email" name="email" type="email" value={form.email} onChange={updateField} autoComplete="email" required />
       </div>
       <div className="field">
-        <label htmlFor="password">Password</label>
+        <label htmlFor="password">{labels.common.password}</label>
         <input id="password" name="password" type="password" value={form.password} onChange={updateField} autoComplete={isRegister ? "new-password" : "current-password"} required />
       </div>
       {status.message ? <p className={`form-message ${status.type}`} role="status">{status.message}</p> : null}
       <button className="button primary" type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Please wait..." : isRegister ? "Create account" : "Sign in"}
+        {isSubmitting ? labels.common.pleaseWait : isRegister ? labels.auth.createAccount : labels.auth.signIn}
       </button>
       <p className="muted-line">
-        {isRegister ? "Already have an account? " : "Need an account? "}
-        <a href={isRegister ? "/login/" : "/register/"}>{isRegister ? "Sign in" : "Register"}</a>
+        {isRegister ? labels.auth.alreadyHaveAccount : labels.auth.needAccount}
+        <a href={localePath(isRegister ? "/login/" : "/register/")}>{isRegister ? labels.auth.signIn : labels.auth.register}</a>
       </p>
     </form>
   );

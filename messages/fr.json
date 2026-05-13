@@ -1,0 +1,120 @@
+{
+  "layout": {
+    "brand": "Aifar",
+    "menu": "Open navigation",
+    "language": "Language",
+    "nav": {
+      "product": "Product",
+      "downloads": "Downloads",
+      "whatsNew": "What's New",
+      "docs": "Docs",
+      "support": "Support",
+      "contact": "Contact",
+      "admin": "Admin",
+      "account": "Account",
+      "signIn": "Sign in"
+    },
+    "footer": {
+      "full": "© 2026 Aifar. All rights reserved.",
+      "short": "© 2026 Aifar.",
+      "security": "Security",
+      "docs": "Documentation",
+      "contact": "Contact"
+    },
+    "auth": {
+      "signOut": "Sign out",
+      "signingOut": "Signing out..."
+    }
+  },
+  "forms": {
+    "common": {
+      "email": "Email",
+      "name": "Name",
+      "organization": "Organization",
+      "workEmail": "Work email",
+      "password": "Password",
+      "pleaseWait": "Please wait..."
+    },
+    "auth": {
+      "createAccount": "Create account",
+      "signIn": "Sign in",
+      "register": "Register",
+      "alreadyHaveAccount": "Already have an account? ",
+      "needAccount": "Need an account? ",
+      "confirmation": "Please check your email to confirm your account before signing in.",
+      "failure": "Authentication failed.",
+      "continueWithGoogle": "Continue with Google",
+      "orEmail": "or use email"
+    },
+    "contact": {
+      "subject": "Subject",
+      "requestType": "Request type",
+      "message": "Message",
+      "submit": "Submit request",
+      "submitting": "Submitting...",
+      "validation": "Please fill in your name, work email, request type, and message.",
+      "invalidEmail": "Please enter a valid work email.",
+      "submitFailed": "Submit failed",
+      "success": "Your request has been submitted. The Aifar team will follow up soon.",
+      "error": "We could not submit your request right now. Please try again later.",
+      "requestTypes": {
+        "product_inquiry": "Product inquiry",
+        "technical_support": "Technical support",
+        "partnership": "Partnership",
+        "other": "Other"
+      }
+    },
+    "profile": {
+      "jobTitle": "Job title",
+      "countryRegion": "Country / Region",
+      "phone": "Phone",
+      "save": "Save profile",
+      "saving": "Saving...",
+      "success": "Profile updated.",
+      "failure": "Profile update failed."
+    },
+    "admin": {
+      "statusActions": "Ticket status actions",
+      "markInProgress": "Mark in progress",
+      "closeTicket": "Close ticket",
+      "reply": "Reply",
+      "sendReply": "Send reply",
+      "sending": "Sending...",
+      "statusUpdated": "Ticket status updated.",
+      "statusFailure": "Unable to update status.",
+      "replyRequired": "Reply message is required.",
+      "replyFailure": "Unable to send reply."
+    }
+  },
+  "pages": {
+    "home": {
+      "seo": {
+        "title": "Aifar | Lightweight Standard Collaboration for Government and Enterprise Teams",
+        "description": "Aifar brings chat, meetings, email, contacts, documents, workflows, and forms into one lightweight collaboration workspace for government and enterprise teams."
+      },
+      "eyebrow": "Government and enterprise collaboration",
+      "title": "Aifar",
+      "lead": "Lightweight standard collaboration for teams that need clear communication, structured work, and reliable access across desktop and mobile clients.",
+      "primaryCta": "Download Aifar",
+      "secondaryCta": "Contact Sales",
+      "heroAlt": "Aifar collaboration workspace preview showing desktop and mobile app screens",
+      "schemaDescription": "Lightweight standard collaboration software for government and enterprise teams.",
+      "trustLabel": "Aifar platform highlights",
+      "trust": [["7", "Core collaboration modules"], ["5", "Client families supported"], ["24/7", "Support-ready site structure"], ["SEO", "Micro-lightweight, ready out of the box"]],
+      "modulesTitle": "One workspace for standard collaboration",
+      "modulesLead": "Aifar covers the daily collaboration layer without forcing teams into a heavy, fragmented toolset.",
+      "modules": [["C", "Chat", "Organized team messaging for departments, projects, and cross-agency collaboration."], ["M", "Meeting", "Simple meeting access for distributed teams across desktop, phone, and tablet."], ["E", "Email", "Integrated mail workflows that keep formal communication connected to work context."], ["D", "Documents", "Centralized document access for policies, procedures, guides, and shared materials."]],
+      "managedTitle": "Built for managed teams",
+      "managedLead": "The website is planned as the public entry point for product introduction, downloads, updates, documentation, and technical support.",
+      "features": [["Cross-client access", "PC, iOS, Android phone, Android pad, and Mac Preview are represented from the first release of the site."], ["Operational content", "What's New, documentation, support, and download pages are separated so each area can be maintained independently."], ["Future Aifar integration", "Contact forms, support requests, release notes, and documents can later connect to Aifar Forms, Workflow, Docs, Chat, Meeting, Email, and Contact."]],
+      "updatesTitle": "Latest updates",
+      "viewAll": "View all",
+      "updates": [["Website foundation", "Initial public website structure for product introduction, downloads, documentation, support, and contact.", "Planning"], ["Mac client preview", "Download area includes a preview channel for the Mac client.", "Preview"], ["Docs hub prepared", "Documentation entry points are ready for user guides, admin guides, deployment notes, and support policies.", "Docs"]],
+      "ctaEyebrow": "Ready for launch operations",
+      "ctaTitle": "Start with a clear website. Grow into a connected Aifar service portal.",
+      "ctaLead": "The first version stays lightweight and deployable. Future versions can connect forms, workflows, documents, contact records, and support conversations directly to Aifar.",
+      "ctaPrimary": "Get Aifar",
+      "ctaSecondary": "Technical Support"
+    }
+  }
+}

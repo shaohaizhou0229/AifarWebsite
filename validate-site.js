@@ -3,22 +3,22 @@ const path = require("path");
 
 const root = __dirname;
 const pages = [
-  "app/page.jsx",
-  "app/product/page.jsx",
-  "app/downloads/page.jsx",
-  "app/whats-new/page.jsx",
-  "app/docs/page.jsx",
-  "app/support/page.jsx",
-  "app/contact/page.jsx",
-  "app/security/page.jsx",
-  "app/login/page.jsx",
-  "app/register/page.jsx",
-  "app/account/page.jsx",
-  "app/account/profile/page.jsx",
-  "app/account/tickets/page.jsx",
-  "app/account/tickets/[id]/page.jsx",
-  "app/admin/tickets/page.jsx",
-  "app/admin/tickets/[id]/page.jsx"
+  "app/[locale]/page.jsx",
+  "app/[locale]/product/page.jsx",
+  "app/[locale]/downloads/page.jsx",
+  "app/[locale]/whats-new/page.jsx",
+  "app/[locale]/docs/page.jsx",
+  "app/[locale]/support/page.jsx",
+  "app/[locale]/contact/page.jsx",
+  "app/[locale]/security/page.jsx",
+  "app/[locale]/login/page.jsx",
+  "app/[locale]/register/page.jsx",
+  "app/[locale]/account/page.jsx",
+  "app/[locale]/account/profile/page.jsx",
+  "app/[locale]/account/tickets/page.jsx",
+  "app/[locale]/account/tickets/[id]/page.jsx",
+  "app/[locale]/admin/tickets/page.jsx",
+  "app/[locale]/admin/tickets/[id]/page.jsx"
 ];
 
 let failures = 0;
@@ -39,7 +39,7 @@ for (const page of pages) {
   }
 
   const source = fs.readFileSync(file, "utf8");
-  for (const token of ["metadata", "description", "canonical"]) {
+  for (const token of ["generateMetadata", "description", "buildMetadata"]) {
     if (!source.includes(token)) {
       console.error(`${page}: missing ${token}`);
       failures += 1;
@@ -53,10 +53,14 @@ for (const page of pages) {
 }
 
 for (const file of [
-  "app/layout.jsx",
+  "app/[locale]/layout.jsx",
   "app/globals.css",
+  "app/robots.js",
+  "app/sitemap.js",
   "components/SiteHeader.jsx",
   "components/SiteFooter.jsx",
+  "components/LanguageSwitcher.jsx",
+  "components/MobileMenu.jsx",
   "components/PageHero.jsx",
   "components/Card.jsx",
   "components/Rows.jsx",
@@ -64,18 +68,24 @@ for (const file of [
   "components/ProfileForm.jsx",
   "components/SignOutButton.jsx",
   "components/AdminTicketActions.jsx",
-  "public/robots.txt",
-  "public/sitemap.xml",
   "public/assets/styles/main.css",
-  "public/assets/scripts/main.js",
   "public/assets/images/aifar-hero.png",
+  "i18n/routing.js",
+  "i18n/request.js",
+  "i18n/messages.js",
+  "i18n/seo.js",
+  "messages/en.json",
+  "messages/zh-CN.json",
+  "messages/fr.json",
+  "messages/ar.json",
+  "middleware.js",
   "next.config.js"
 ]) {
   requireFile(file);
 }
 
 const pkg = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
-for (const dependency of ["@supabase/supabase-js", "next", "pg", "react", "react-dom"]) {
+for (const dependency of ["@supabase/ssr", "@supabase/supabase-js", "next", "next-intl", "pg", "react", "react-dom"]) {
   if (!pkg.dependencies || !pkg.dependencies[dependency]) {
     console.error(`package.json: missing ${dependency}`);
     failures += 1;
