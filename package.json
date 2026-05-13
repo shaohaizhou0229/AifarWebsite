@@ -10,8 +10,13 @@
     "validate": "node validate-site.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.105.4",
     "next": "^15.3.2",
+    "pg": "^8.20.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@netlify/plugin-nextjs": "^5.15.11"
   }
 }

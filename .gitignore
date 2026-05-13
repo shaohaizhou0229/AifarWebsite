@@ -42,6 +42,7 @@ coverage/
 # TypeScript and framework cache
 *.tsbuildinfo
 .vercel/
+.netlify/
 
 # OS and editor files
 .DS_Store

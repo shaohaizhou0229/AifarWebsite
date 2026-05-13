@@ -96,8 +96,21 @@ a {
   padding: 10px 12px;
 }
 
+.nav-action {
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 650;
+  padding: 10px 12px;
+}
+
 .nav-links a:hover,
-.nav-links a[aria-current="page"] {
+.nav-links a[aria-current="page"],
+.nav-action:hover {
   background: var(--soft-blue);
   color: var(--ink);
 }
@@ -231,6 +244,11 @@ h3 {
   color: white;
 }
 
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
 .button.secondary {
   border-color: var(--line);
   background: var(--surface);
@@ -289,7 +307,7 @@ h3 {
 
 .section-head {
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
   margin-bottom: 28px;
@@ -320,6 +338,20 @@ h3 {
   border-radius: 8px;
   background: var(--surface);
   padding: 22px;
+}
+
+.auth-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 24px;
+}
+
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
 }
 
 .alt .card {
@@ -463,6 +495,68 @@ h3 {
 .field textarea {
   min-height: 128px;
   resize: vertical;
+}
+
+.form-message {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-weight: 700;
+}
+
+.form-message.success {
+  border-color: rgba(47, 125, 82, 0.32);
+  background: rgba(47, 125, 82, 0.08);
+  color: var(--green);
+}
+
+.form-message.error {
+  border-color: rgba(184, 107, 25, 0.34);
+  background: rgba(184, 107, 25, 0.08);
+  color: var(--amber);
+}
+
+.muted-line {
+  margin: 0;
+  color: var(--muted);
+}
+
+.muted-line a,
+.auth-card a {
+  color: var(--blue);
+  font-weight: 800;
+}
+
+.detail-layout {
+  display: grid;
+  gap: 18px;
+}
+
+.detail-card {
+  min-height: auto;
+}
+
+.reply-list {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-actions {
+  display: grid;
+  gap: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 22px;
+}
+
+.status-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
 }
 
 [dir="rtl"] body {

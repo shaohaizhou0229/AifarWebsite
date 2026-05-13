@@ -1,4 +1,7 @@
 import { PageHero } from "@/components/PageHero";
+import { ContactForm } from "@/components/ContactForm";
+import { getCurrentUser } from "@/lib/auth";
+import { getProfile } from "@/lib/profiles";
 
 export const metadata = {
   title: "Contact | Aifar",
@@ -6,7 +9,15 @@ export const metadata = {
   alternates: { canonical: "/contact/" }
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const user = await getCurrentUser();
+  const profile = user?.id ? await getProfile(user.id) : null;
+  const initialData = user ? {
+    name: profile?.display_name || "",
+    workEmail: user.email || "",
+    organization: profile?.organization || ""
+  } : {};
+
   return (
     <main>
       <PageHero
@@ -16,36 +27,7 @@ export default function ContactPage() {
       />
       <section className="section alt">
         <div className="section-inner">
-          <form className="form-shell">
-            <div className="field">
-              <label htmlFor="name">Name</label>
-              <input id="name" name="name" autoComplete="name" />
-            </div>
-            <div className="field">
-              <label htmlFor="email">Work email</label>
-              <input id="email" name="email" type="email" autoComplete="email" />
-            </div>
-            <div className="field">
-              <label htmlFor="organization">Organization</label>
-              <input id="organization" name="organization" autoComplete="organization" />
-            </div>
-            <div className="field">
-              <label htmlFor="request-type">Request type</label>
-              <select id="request-type" name="request-type">
-                <option>Product inquiry</option>
-                <option>Technical support</option>
-                <option>Partnership</option>
-                <option>Other</option>
-              </select>
-            </div>
-            <div className="field">
-              <label htmlFor="message">Message</label>
-              <textarea id="message" name="message" />
-            </div>
-            <button className="button primary" type="button">
-              Submit request
-            </button>
-          </form>
+          <ContactForm initialData={initialData} isLoggedIn={Boolean(user)} />
         </div>
       </section>
     </main>

@@ -10,7 +10,15 @@ const pages = [
   "app/docs/page.jsx",
   "app/support/page.jsx",
   "app/contact/page.jsx",
-  "app/security/page.jsx"
+  "app/security/page.jsx",
+  "app/login/page.jsx",
+  "app/register/page.jsx",
+  "app/account/page.jsx",
+  "app/account/profile/page.jsx",
+  "app/account/tickets/page.jsx",
+  "app/account/tickets/[id]/page.jsx",
+  "app/admin/tickets/page.jsx",
+  "app/admin/tickets/[id]/page.jsx"
 ];
 
 let failures = 0;
@@ -52,6 +60,10 @@ for (const file of [
   "components/PageHero.jsx",
   "components/Card.jsx",
   "components/Rows.jsx",
+  "components/AuthForms.jsx",
+  "components/ProfileForm.jsx",
+  "components/SignOutButton.jsx",
+  "components/AdminTicketActions.jsx",
   "public/robots.txt",
   "public/sitemap.xml",
   "public/assets/styles/main.css",
@@ -63,7 +75,7 @@ for (const file of [
 }
 
 const pkg = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
-for (const dependency of ["next", "react", "react-dom"]) {
+for (const dependency of ["@supabase/supabase-js", "next", "pg", "react", "react-dom"]) {
   if (!pkg.dependencies || !pkg.dependencies[dependency]) {
     console.error(`package.json: missing ${dependency}`);
     failures += 1;

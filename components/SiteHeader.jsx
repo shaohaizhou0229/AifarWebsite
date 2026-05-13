@@ -1,3 +1,7 @@
+import { getCurrentUser } from "@/lib/auth";
+import { getProfile } from "@/lib/profiles";
+import { SignOutButton } from "@/components/SignOutButton";
+
 const navLinks = [
   { href: "/product/", label: "Product" },
   { href: "/downloads/", label: "Downloads" },
@@ -7,7 +11,10 @@ const navLinks = [
   { href: "/contact/", label: "Contact" }
 ];
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const user = await getCurrentUser();
+  const profile = user?.id ? await getProfile(user.id) : null;
+
   return (
     <header className="site-header">
       <div className="nav-wrap">
@@ -24,6 +31,15 @@ export function SiteHeader() {
               {link.label}
             </a>
           ))}
+          {profile?.role === "admin" ? <a href="/admin/tickets/">Admin</a> : null}
+          {user ? (
+            <>
+              <a href="/account/">Account</a>
+              <SignOutButton />
+            </>
+          ) : (
+            <a href="/login/">Sign in</a>
+          )}
         </nav>
       </div>
     </header>
