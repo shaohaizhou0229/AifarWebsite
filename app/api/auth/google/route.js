@@ -27,6 +27,10 @@ function getRequestOrigin(request) {
   const host = forwardedHost || request.headers.get("host");
   const proto = forwardedProto || fallbackUrl.protocol.replace(":", "") || "https";
 
+  if (host?.endsWith("--aifar-website.netlify.app")) {
+    return "https://aifar-website.netlify.app";
+  }
+
   return host ? `${proto}://${host}` : fallbackUrl.origin;
 }
 
