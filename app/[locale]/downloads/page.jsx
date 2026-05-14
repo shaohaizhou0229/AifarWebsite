@@ -44,6 +44,7 @@ export default async function DownloadsPage({ params }) {
                   href={`/api/downloads/${platform.key}/`}
                   disabled={!isAvailable}
                   meta={versionMeta}
+                  checksum={release.checksumSha256}
                 />
               );
             })}

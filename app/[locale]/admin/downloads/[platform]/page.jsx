@@ -58,8 +58,11 @@ export default async function AdminDownloadDetailPage({ params }) {
             <h3>{page.current}</h3>
             <p>{release.version || page.noVersion}</p>
             <p className="muted-line">{page.status}: {release.isPublished ? page.published : page.draft}</p>
+            <p className="muted-line">Upload status: {release.uploadStatus}</p>
             <p className="muted-line">{page.file}: {release.storagePath || release.externalUrl || page.noFile}</p>
+            {release.originalFilename ? <p className="muted-line">Original file: {release.originalFilename}</p> : null}
             {release.fileSize ? <p className="muted-line">{page.fileSize}: {formatFileSize(release.fileSize)}</p> : null}
+            {release.checksumSha256 ? <code className="checksum-line">SHA-256: {release.checksumSha256}</code> : null}
             {release.publishedAt ? <p className="muted-line">{page.publishedAt}: {formatDate(release.publishedAt, locale)}</p> : null}
           </article>
           <AdminDownloadForm platform={platform} labels={messages.forms.downloads} />

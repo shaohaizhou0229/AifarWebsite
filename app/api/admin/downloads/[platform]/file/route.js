@@ -3,20 +3,15 @@ import { AdminRequiredError, createUserSupabaseClient, getCurrentAccessToken, re
 import { getProfile } from "@/lib/profiles";
 import {
   DOWNLOAD_BUCKET,
+  MAX_RELEASE_FILE_SIZE,
   buildFileUpload,
+  isAllowedReleaseFilename,
   sanitizePlatform,
   updateClientReleaseFile
 } from "@/lib/downloads";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-const MAX_FILE_SIZE = 300 * 1024 * 1024;
-const ALLOWED_EXTENSIONS = new Set(["exe", "msi", "dmg", "pkg", "apk", "zip"]);
-
-function getExtension(filename = "") {
-  return filename.includes(".") ? filename.split(".").pop().toLowerCase() : "";
-}
 
 export async function POST(request, { params }) {
   const { platform } = await params;
@@ -35,12 +30,11 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: "A release file is required." }, { status: 400 });
     }
 
-    if (file.size > MAX_FILE_SIZE) {
+    if (file.size > MAX_RELEASE_FILE_SIZE) {
       return NextResponse.json({ error: "File size must be 300 MB or less." }, { status: 400 });
     }
 
-    const extension = getExtension(file.name);
-    if (!ALLOWED_EXTENSIONS.has(extension)) {
+    if (!isAllowedReleaseFilename(file.name)) {
       return NextResponse.json({ error: "Unsupported file type." }, { status: 400 });
     }
 

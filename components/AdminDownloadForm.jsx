@@ -1,6 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import * as tus from "tus-js-client";
+
+async function calculateSha256(file) {
+  const buffer = await file.arrayBuffer();
+  const digest = await crypto.subtle.digest("SHA-256", buffer);
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
 
 export function AdminDownloadForm({ platform, labels }) {
   const release = platform.release;
@@ -16,6 +25,9 @@ export function AdminDownloadForm({ platform, labels }) {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadPaused, setUploadPaused] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const uploadRef = useRef(null);
 
   function updateField(event) {
     const { name, value, type, checked } = event.target;
@@ -54,35 +66,113 @@ export function AdminDownloadForm({ platform, labels }) {
 
   async function uploadFile(event) {
     event.preventDefault();
+    if (uploadPaused && uploadRef.current) {
+      setUploading(true);
+      setUploadPaused(false);
+      setMessage("");
+      setError("");
+      uploadRef.current.start();
+      return;
+    }
+
     if (!file) {
       setError(labels.fileRequired);
       return;
     }
 
     setUploading(true);
+    setUploadPaused(false);
+    setUploadProgress(0);
     setMessage("");
     setError("");
 
     try {
-      const body = new FormData();
-      body.append("file", file);
-      const response = await fetch(`/api/admin/downloads/${platform.key}/file/`, {
+      const checksumSha256 = await calculateSha256(file);
+      const response = await fetch(`/api/admin/downloads/${platform.key}/upload-session/`, {
         method: "POST",
-        body
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          filename: file.name,
+          fileSize: file.size,
+          contentType: file.type || "application/octet-stream"
+        })
       });
-      const data = await response.json().catch(() => ({}));
+      const session = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.error || labels.uploadFailed);
+        throw new Error(session.error || labels.uploadFailed);
       }
 
+      await new Promise((resolve, reject) => {
+        const upload = new tus.Upload(file, {
+          endpoint: session.endpoint,
+          chunkSize: session.chunkSize,
+          retryDelays: [0, 1000, 3000, 5000],
+          uploadDataDuringCreation: true,
+          removeFingerprintOnSuccess: true,
+          headers: session.headers || {},
+          metadata: {
+            bucketName: session.bucket,
+            objectName: session.storagePath,
+            contentType: file.type || "application/octet-stream",
+            cacheControl: "3600"
+          },
+          onError(uploadError) {
+            reject(uploadError);
+          },
+          onProgress(bytesUploaded, bytesTotal) {
+            setUploadProgress(bytesTotal ? Math.round((bytesUploaded / bytesTotal) * 100) : 0);
+          },
+          async onSuccess() {
+            try {
+              const completeResponse = await fetch(`/api/admin/downloads/${platform.key}/upload-complete/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  storagePath: session.storagePath,
+                  fileSize: file.size,
+                  checksumSha256,
+                  originalFilename: file.name,
+                  contentType: file.type || "application/octet-stream"
+                })
+              });
+              const completeData = await completeResponse.json().catch(() => ({}));
+
+              if (!completeResponse.ok) {
+                throw new Error(completeData.error || labels.uploadFailed);
+              }
+
+              resolve();
+            } catch (completeError) {
+              reject(completeError);
+            }
+          }
+        });
+
+        uploadRef.current = upload;
+        upload.findPreviousUploads().then((previousUploads) => {
+          if (previousUploads.length) {
+            upload.resumeFromPreviousUpload(previousUploads[0]);
+          }
+          upload.start();
+        }).catch(reject);
+      });
+
+      setUploadProgress(100);
       setMessage(labels.uploaded);
       window.location.reload();
     } catch (uploadError) {
       setError(uploadError.message || labels.uploadFailed);
     } finally {
       setUploading(false);
+      setUploadPaused(false);
     }
+  }
+
+  function pauseUpload() {
+    uploadRef.current?.abort();
+    setUploading(false);
+    setUploadPaused(true);
   }
 
   return (
@@ -116,12 +206,31 @@ export function AdminDownloadForm({ platform, labels }) {
       <form className="admin-actions" onSubmit={uploadFile}>
         <div className="field">
           <label htmlFor="releaseFile">{labels.file}</label>
-          <input id="releaseFile" type="file" onChange={(event) => setFile(event.target.files?.[0] || null)} />
+          <input
+            id="releaseFile"
+            type="file"
+            accept=".exe,.msi,.dmg,.pkg,.apk,.zip"
+            onChange={(event) => setFile(event.target.files?.[0] || null)}
+          />
         </div>
         <p className="muted-line">{labels.fileHint}</p>
-        <button className="button secondary" type="submit" disabled={uploading}>
-          {uploading ? labels.uploading : labels.upload}
-        </button>
+        {release.uploadStatus ? <p className="muted-line">Upload status: {release.uploadStatus}</p> : null}
+        {uploading || uploadPaused || uploadProgress > 0 ? (
+          <div className="upload-progress">
+            <progress value={uploadProgress} max="100" />
+            <span>{uploadProgress}%</span>
+          </div>
+        ) : null}
+        <div className="card-actions">
+          <button className="button secondary" type="submit" disabled={uploading}>
+            {uploading ? labels.uploading : uploadPaused ? "Resume upload" : labels.upload}
+          </button>
+          {uploading ? (
+            <button className="button secondary" type="button" onClick={pauseUpload}>
+              Pause
+            </button>
+          ) : null}
+        </div>
       </form>
 
       {message ? <p className="form-message success">{message}</p> : null}

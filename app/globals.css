@@ -582,6 +582,27 @@ h3 {
   font-weight: 800;
 }
 
+.checksum-line {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+.upload-progress {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.upload-progress progress {
+  width: 100%;
+  height: 12px;
+}
+
 .detail-layout {
   display: grid;
   gap: 18px;
