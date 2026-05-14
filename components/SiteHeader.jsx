@@ -33,7 +33,7 @@ export async function SiteHeader({ locale, messages }) {
               {nav[key]}
             </a>
           ))}
-          {profile?.role === "admin" ? <a href={localizedPath(locale, "/admin/tickets/")}>{nav.admin}</a> : null}
+          {profile?.role === "admin" ? <a href={localizedPath(locale, "/admin/downloads/")}>{nav.admin}</a> : null}
           {user ? (
             <>
               <a href={localizedPath(locale, "/account/")}>{nav.account}</a>

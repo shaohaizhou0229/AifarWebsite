@@ -84,6 +84,24 @@
       "statusFailure": "Unable to update status.",
       "replyRequired": "Reply message is required.",
       "replyFailure": "Unable to send reply."
+    },
+    "downloads": {
+      "version": "Version",
+      "buildNumber": "Build number",
+      "externalUrl": "External URL",
+      "releaseNotes": "Release notes",
+      "published": "Published",
+      "save": "Save release",
+      "saving": "Saving...",
+      "saved": "Release saved.",
+      "saveFailed": "Unable to save release.",
+      "file": "Release file",
+      "fileHint": "Supported files: exe, msi, dmg, pkg, apk, zip. Uploading a new file unpublishes the platform until you publish it again.",
+      "fileRequired": "Please choose a file.",
+      "upload": "Upload file",
+      "uploading": "Uploading...",
+      "uploaded": "File uploaded. Review the version and publish when ready.",
+      "uploadFailed": "Unable to upload file."
     }
   },
   "pages": {
@@ -160,6 +178,8 @@
       "eyebrow": "Downloads",
       "title": "Get Aifar on the devices your teams already use.",
       "lead": "Download links are placeholders for the first website skeleton and can be connected to release storage or Aifar-managed version records later.",
+      "versionLabel": "Version",
+      "comingSoon": "Coming soon",
       "items": [
         ["PC Client", "Windows desktop client for daily collaboration.", "Download", "primary"],
         ["iOS Client", "Mobile access for iPhone and iPad users.", "App Store", "secondary"],
@@ -336,6 +356,40 @@
       "notProvided": "Not provided",
       "replies": "Replies",
       "noReplies": "No replies yet."
+    },
+    "adminDownloads": {
+      "seo": {
+        "title": "Admin Downloads | Aifar",
+        "description": "Manage Aifar client download releases."
+      },
+      "eyebrow": "Admin",
+      "deniedTitle": "Administrator access required.",
+      "deniedLead": "Your account does not have permission to manage client downloads.",
+      "title": "Client downloads.",
+      "lead": "Maintain the current public release for each Aifar client platform.",
+      "tickets": "Ticket admin",
+      "published": "Published",
+      "draft": "Draft",
+      "noVersion": "No version configured"
+    },
+    "adminDownloadDetail": {
+      "seo": {
+        "title": "Admin Download Detail | Aifar",
+        "description": "Update an Aifar client release and upload files."
+      },
+      "eyebrow": "Admin download",
+      "deniedTitle": "Administrator access required.",
+      "deniedLead": "Your account does not have permission to manage this download.",
+      "lead": "Upload a release file, fill in version details, then publish when it is ready.",
+      "current": "Current release",
+      "status": "Status",
+      "published": "Published",
+      "draft": "Draft",
+      "file": "File",
+      "fileSize": "File size",
+      "publishedAt": "Published",
+      "noVersion": "No version configured",
+      "noFile": "No file or external URL configured"
     }
   }
 }
