@@ -54,10 +54,14 @@ create policy "Published client releases are public"
 on public.client_releases
 for select
 to anon, authenticated
-using (
-  is_published
-  or private.is_admin()
-);
+using (is_published);
+
+drop policy if exists "Admins can view all client releases" on public.client_releases;
+create policy "Admins can view all client releases"
+on public.client_releases
+for select
+to authenticated
+using (private.is_admin());
 
 drop policy if exists "Admins can update client releases" on public.client_releases;
 create policy "Admins can update client releases"
