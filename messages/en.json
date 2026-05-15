@@ -108,7 +108,10 @@
         "uploadStatusUploading": "Uploading file...",
         "uploadStatusPaused": "Upload paused",
         "uploadStatusFinalizing": "Finalizing release file...",
-        "uploadStatusComplete": "Upload complete"
+        "uploadStatusComplete": "Upload complete",
+        "uploadStatusInterrupted": "Previous upload did not finish",
+        "uploadStatusFailed": "Upload failed",
+        "uploadInterruptedHint": "Choose the same file and start upload again to continue."
       }
   },
   "pages": {

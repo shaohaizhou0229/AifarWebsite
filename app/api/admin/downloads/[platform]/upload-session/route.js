@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import {
   AdminRequiredError,
   getCurrentAccessToken,
+  getSupabaseAnonKey,
   getSupabaseStorageUrl,
   requireAdmin
 } from "@/lib/auth";
@@ -64,6 +65,7 @@ export async function POST(request, { params }) {
       storagePath,
       endpoint: `${getSupabaseStorageUrl()}/storage/v1/upload/resumable`,
       headers: {
+        apikey: getSupabaseAnonKey(),
         authorization: `Bearer ${accessToken}`
       },
       chunkSize: RELEASE_UPLOAD_CHUNK_SIZE,

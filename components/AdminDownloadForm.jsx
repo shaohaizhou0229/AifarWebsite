@@ -26,7 +26,7 @@ export function AdminDownloadForm({ platform, labels }) {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadPaused, setUploadPaused] = useState(false);
-  const [uploadPhase, setUploadPhase] = useState("idle");
+  const [uploadPhase, setUploadPhase] = useState(release.uploadStatus === "uploading" ? "interrupted" : "idle");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedBytes, setUploadedBytes] = useState(0);
   const [totalBytes, setTotalBytes] = useState(file?.size || 0);
@@ -38,7 +38,9 @@ export function AdminDownloadForm({ platform, labels }) {
     uploading: labels.uploadStatusUploading || "Uploading file...",
     paused: labels.uploadStatusPaused || "Upload paused",
     finalizing: labels.uploadStatusFinalizing || "Finalizing release file...",
-    complete: labels.uploadStatusComplete || "Upload complete"
+    complete: labels.uploadStatusComplete || "Upload complete",
+    interrupted: labels.uploadStatusInterrupted || "Previous upload did not finish",
+    failed: labels.uploadStatusFailed || "Upload failed"
   };
 
   const showUploadPanel = uploadPhase !== "idle" || release.uploadStatus === "uploading";
@@ -106,7 +108,6 @@ export function AdminDownloadForm({ platform, labels }) {
     setError("");
 
     try {
-      const checksumSha256 = await calculateSha256(file);
       const response = await fetch(`/api/admin/downloads/${platform.key}/upload-session/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -148,6 +149,7 @@ export function AdminDownloadForm({ platform, labels }) {
           async onSuccess() {
             try {
               setUploadPhase("finalizing");
+              const checksumSha256 = await calculateSha256(file);
               const completeResponse = await fetch(`/api/admin/downloads/${platform.key}/upload-complete/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -187,7 +189,7 @@ export function AdminDownloadForm({ platform, labels }) {
       window.location.reload();
     } catch (uploadError) {
       if (!uploadPaused) {
-        setUploadPhase("idle");
+        setUploadPhase("failed");
       }
       setError(uploadError.message || labels.uploadFailed);
     } finally {
@@ -221,12 +223,12 @@ export function AdminDownloadForm({ platform, labels }) {
             role="progressbar"
             aria-valuemin="0"
             aria-valuemax="100"
-            aria-valuenow={uploadPhase === "preparing" || uploadPhase === "finalizing" ? undefined : uploadProgress}
+            aria-valuenow={uploadPhase === "preparing" || uploadPhase === "finalizing" || uploadPhase === "interrupted" ? undefined : uploadProgress}
           >
             <span style={{ width: `${Math.max(uploadProgress, animatedProgress ? 6 : 0)}%` }} />
           </div>
           <p className="muted-line">
-            {file?.name || release.originalFilename || release.storagePath || ""}
+            {uploadPhase === "interrupted" ? (labels.uploadInterruptedHint || "Choose the same file and start upload again to continue.") : file?.name || release.originalFilename || release.storagePath || ""}
             {totalBytes ? ` · ${uploadedBytes ? `${Math.round(uploadedBytes / 1024 / 1024)} MB / ` : ""}${Math.round(totalBytes / 1024 / 1024)} MB` : ""}
           </p>
         </section>
