@@ -40,7 +40,7 @@ export async function PATCH(request, { params }) {
       const current = await getAdminDownloadPlatform(platformKey);
       const release = current?.release;
 
-      if (!release?.storagePath || release.uploadStatus !== "uploaded" || !release.checksumSha256) {
+      if (!release?.storagePath || !release.checksumSha256) {
         return NextResponse.json({ error: "A completed release file is required before publishing." }, { status: 400 });
       }
 

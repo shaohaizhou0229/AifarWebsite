@@ -13,7 +13,6 @@ import {
   RELEASE_UPLOAD_CHUNK_SIZE,
   createStoragePath,
   isAllowedReleaseFilename,
-  markClientReleaseUploading,
   sanitizePlatform
 } from "@/lib/downloads";
 
@@ -29,7 +28,7 @@ export async function POST(request, { params }) {
   }
 
   try {
-    const [{ user }, accessToken] = await Promise.all([requireAdmin(getProfile), getCurrentAccessToken()]);
+    const [, accessToken] = await Promise.all([requireAdmin(getProfile), getCurrentAccessToken()]);
     const input = await request.json().catch(() => ({}));
     const filename = String(input.filename || "");
     const fileSize = Number(input.fileSize || 0);
@@ -53,13 +52,6 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: "A valid admin session is required." }, { status: 401 });
     }
 
-    const release = await markClientReleaseUploading(platformKey, user, {
-      storagePath,
-      fileSize,
-      originalFilename: filename,
-      contentType
-    });
-
     return NextResponse.json({
       bucket: DOWNLOAD_BUCKET,
       storagePath,
@@ -68,8 +60,7 @@ export async function POST(request, { params }) {
         apikey: getSupabaseAnonKey(),
         authorization: `Bearer ${accessToken}`
       },
-      chunkSize: RELEASE_UPLOAD_CHUNK_SIZE,
-      release
+      chunkSize: RELEASE_UPLOAD_CHUNK_SIZE
     });
   } catch (error) {
     if (error instanceof AdminRequiredError) {

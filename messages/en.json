@@ -121,7 +121,19 @@
         "deletingFile": "Deleting...",
         "fileDeleted": "Release file deleted.",
         "deleteFileFailed": "Unable to delete release file.",
-        "deleteFileConfirm": "Delete the current release file? This will unpublish this platform."
+        "deleteFileConfirm": "Delete the current release file? This will unpublish this platform.",
+        "currentWebFile": "Current web file",
+        "currentWebFileHint": "This is the file visitors will download after the platform is published.",
+        "noCurrentFile": "No file uploaded",
+        "noCurrentFileHint": "Upload a package file before publishing this platform.",
+        "replacementFile": "Replacement file",
+        "chooseReplacement": "Choose a package to upload",
+        "replacementHint": "Choosing a file does not change the current web file. It only replaces the web file after upload completes.",
+        "chooseFile": "Choose file",
+        "changeFile": "Change file",
+        "clearSelectedFile": "Clear selection",
+        "selectedFile": "Selected file",
+        "uploadReplacement": "Upload replacement"
       }
   },
   "pages": {

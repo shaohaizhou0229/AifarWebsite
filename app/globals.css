@@ -721,6 +721,61 @@ h3 {
   padding-bottom: 18px;
 }
 
+.release-file-panel {
+  gap: 20px;
+}
+
+.upload-workflow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfd;
+  padding: 18px;
+}
+
+.upload-workflow .eyebrow,
+.file-management .eyebrow {
+  margin-bottom: 6px;
+}
+
+.upload-picker {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.file-input {
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.selected-file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border: 1px solid rgba(22, 124, 128, 0.22);
+  border-radius: 8px;
+  background: var(--soft-teal);
+  padding: 14px 16px;
+}
+
+.selected-file span {
+  color: var(--teal);
+  font-weight: 800;
+}
+
 .status-actions {
   display: flex;
   flex-wrap: wrap;
