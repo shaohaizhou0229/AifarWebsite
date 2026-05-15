@@ -114,7 +114,13 @@
         "uploadInterruptedHint": "Choose the same file and start upload again to continue.",
         "cancelUpload": "Cancel upload",
         "cancellingUpload": "Cancelling...",
-        "uploadCancelled": "Upload cancelled."
+        "uploadCancelled": "Upload cancelled.",
+        "currentFile": "Current file",
+        "deleteFile": "Delete file",
+        "deletingFile": "Deleting...",
+        "fileDeleted": "Release file deleted.",
+        "deleteFileFailed": "Unable to delete release file.",
+        "deleteFileConfirm": "Delete the current release file? This will unpublish this platform."
       }
   },
   "pages": {

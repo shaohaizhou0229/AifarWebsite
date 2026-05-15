@@ -32,6 +32,7 @@ export function AdminDownloadForm({ platform, labels }) {
   const [uploadedBytes, setUploadedBytes] = useState(0);
   const [totalBytes, setTotalBytes] = useState(file?.size || 0);
   const [cancelling, setCancelling] = useState(false);
+  const [deletingFile, setDeletingFile] = useState(false);
   const uploadRef = useRef(null);
 
   const phaseText = {
@@ -251,6 +252,33 @@ export function AdminDownloadForm({ platform, labels }) {
     }
   }
 
+  async function deleteReleaseFile() {
+    const confirmed = window.confirm(labels.deleteFileConfirm || "Delete the current release file? This will unpublish this platform.");
+    if (!confirmed) return;
+
+    setDeletingFile(true);
+    setMessage("");
+    setError("");
+
+    try {
+      const response = await fetch(`/api/admin/downloads/${platform.key}/file/`, {
+        method: "DELETE"
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.error || labels.deleteFileFailed || labels.uploadFailed);
+      }
+
+      setMessage(labels.fileDeleted || "Release file deleted.");
+      window.location.reload();
+    } catch (deleteError) {
+      setError(deleteError.message || labels.deleteFileFailed || labels.uploadFailed);
+    } finally {
+      setDeletingFile(false);
+    }
+  }
+
   return (
     <div className="detail-layout">
       {showUploadPanel ? (
@@ -310,6 +338,17 @@ export function AdminDownloadForm({ platform, labels }) {
       </form>
 
       <form className="admin-actions" onSubmit={uploadFile}>
+        {release.storagePath ? (
+          <div className="file-management">
+            <div>
+              <h3>{labels.currentFile || "Current file"}</h3>
+              <p className="muted-line">{release.originalFilename || release.storagePath}</p>
+            </div>
+            <button className="button secondary danger" type="button" onClick={deleteReleaseFile} disabled={deletingFile || uploading}>
+              {deletingFile ? (labels.deletingFile || "Deleting...") : (labels.deleteFile || "Delete file")}
+            </button>
+          </div>
+        ) : null}
         <div className="field">
           <label htmlFor="releaseFile">{labels.file}</label>
           <input

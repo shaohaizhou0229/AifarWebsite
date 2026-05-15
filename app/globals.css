@@ -277,6 +277,11 @@ h3 {
   color: var(--ink);
 }
 
+.button.danger {
+  border-color: rgba(184, 107, 25, 0.38);
+  color: var(--amber);
+}
+
 .hero-media {
   border: 1px solid rgba(219, 226, 234, 0.9);
   border-radius: 8px;
@@ -705,6 +710,15 @@ h3 {
   border-radius: 8px;
   background: var(--surface);
   padding: 22px;
+}
+
+.file-management {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 18px;
 }
 
 .status-actions {

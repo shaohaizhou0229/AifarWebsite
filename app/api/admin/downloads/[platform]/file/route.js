@@ -5,6 +5,8 @@ import {
   DOWNLOAD_BUCKET,
   MAX_RELEASE_FILE_SIZE,
   buildFileUpload,
+  clearClientReleaseFile,
+  getAdminDownloadPlatform,
   isAllowedReleaseFilename,
   sanitizePlatform,
   updateClientReleaseFile
@@ -59,5 +61,38 @@ export async function POST(request, { params }) {
     }
 
     return NextResponse.json({ error: error.message || "Could not upload release file." }, { status: 400 });
+  }
+}
+
+export async function DELETE(_request, { params }) {
+  const { platform } = await params;
+  const platformKey = sanitizePlatform(platform);
+
+  if (!platformKey) {
+    return NextResponse.json({ error: "Unknown platform." }, { status: 404 });
+  }
+
+  try {
+    const [{ user }, accessToken] = await Promise.all([requireAdmin(getProfile), getCurrentAccessToken()]);
+    const current = await getAdminDownloadPlatform(platformKey);
+    const storagePath = current?.release?.storagePath;
+
+    if (storagePath) {
+      const supabase = createUserSupabaseClient(accessToken);
+      const { error } = await supabase.storage.from(DOWNLOAD_BUCKET).remove([storagePath]);
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 400 });
+      }
+    }
+
+    const release = await clearClientReleaseFile(platformKey, user);
+    return NextResponse.json({ release });
+  } catch (error) {
+    if (error instanceof AdminRequiredError) {
+      return NextResponse.json({ error: error.message }, { status: 403 });
+    }
+
+    return NextResponse.json({ error: error.message || "Could not delete release file." }, { status: 400 });
   }
 }
