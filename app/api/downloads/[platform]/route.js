@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createPublicSupabaseClient } from "@/lib/auth";
-import { DOWNLOAD_BUCKET, getPublishedRelease, sanitizePlatform } from "@/lib/downloads";
+import { DOWNLOAD_BUCKET, clientReleaseFileExists, getPublishedRelease, sanitizePlatform } from "@/lib/downloads";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,6 +25,11 @@ export async function GET(_request, { params }) {
 
   if (!result.release.storagePath) {
     return NextResponse.json({ error: "No download file is available." }, { status: 404 });
+  }
+
+  const fileExists = await clientReleaseFileExists(result.release.storagePath);
+  if (!fileExists) {
+    return NextResponse.json({ error: "The published download file is missing. Please contact support." }, { status: 404 });
   }
 
   const supabase = createPublicSupabaseClient();
