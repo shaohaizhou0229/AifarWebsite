@@ -359,6 +359,128 @@
       "user": "User",
       "noReplies": "No replies yet."
     },
+    "adminHome": {
+      "seo": {
+        "title": "Admin | Aifar",
+        "description": "Manage Aifar website content, downloads, documents, support feedback, and contact requests."
+      },
+      "eyebrow": "Admin",
+      "deniedTitle": "Administrator access required.",
+      "deniedLead": "Your account does not have permission to manage Aifar website operations.",
+      "title": "Aifar management center.",
+      "lead": "Choose the area you want to operate. Existing capabilities are available now; planned areas are reserved for the next build.",
+      "active": "Ready",
+      "planned": "Planned",
+      "nav": {
+        "label": "Admin sections",
+        "home": "Management",
+        "product": "Product",
+        "downloads": "Downloads",
+        "docs": "Docs",
+        "support": "Support",
+        "contact": "Contact us"
+      },
+      "modules": [
+        {
+          "key": "product",
+          "href": "/admin/product/",
+          "title": "Product content",
+          "description": "Maintain product pages, feature copy, media, and public website content.",
+          "status": "planned"
+        },
+        {
+          "key": "downloads",
+          "href": "/admin/downloads/",
+          "title": "Client downloads",
+          "description": "Maintain client versions, release files, release notes, and publish status.",
+          "status": "active"
+        },
+        {
+          "key": "docs",
+          "href": "/admin/docs/",
+          "title": "Online docs",
+          "description": "Prepare an online document workspace similar to cloud docs for guides and help content.",
+          "status": "planned"
+        },
+        {
+          "key": "support",
+          "href": "/admin/support/",
+          "title": "Support feedback",
+          "description": "Manage support form feedback, issue categories, and support handling status.",
+          "status": "planned"
+        },
+        {
+          "key": "contact",
+          "href": "/admin/contact/",
+          "title": "Contact forms",
+          "description": "Review contact form requests, reply to visitors, and close handled requests.",
+          "status": "active"
+        }
+      ]
+    },
+    "adminProduct": {
+      "seo": {
+        "title": "Admin Product | Aifar",
+        "description": "Manage Aifar product content."
+      },
+      "eyebrow": "Admin product",
+      "deniedTitle": "Administrator access required.",
+      "deniedLead": "Your account does not have permission to manage product content.",
+      "breadcrumb": "Product",
+      "title": "Product content management.",
+      "lead": "This area is reserved for product page copy, media, capability descriptions, and website content publishing.",
+      "status": "Planned",
+      "emptyTitle": "Product content tools are not connected yet.",
+      "emptyLead": "The navigation and permission boundary are ready. We can add content models, preview, and publishing workflow in the next step."
+    },
+    "adminDocs": {
+      "seo": {
+        "title": "Admin Docs | Aifar",
+        "description": "Manage Aifar online documents."
+      },
+      "eyebrow": "Admin docs",
+      "deniedTitle": "Administrator access required.",
+      "deniedLead": "Your account does not have permission to manage online documents.",
+      "breadcrumb": "Docs",
+      "title": "Online document management.",
+      "lead": "This area is reserved for an online document workspace similar to cloud docs.",
+      "status": "Planned",
+      "emptyTitle": "Online document editing is not connected yet.",
+      "emptyLead": "The management entry is ready. Next we can design document folders, editor permissions, drafts, and publishing behavior."
+    },
+    "adminSupport": {
+      "seo": {
+        "title": "Admin Support | Aifar",
+        "description": "Manage Aifar support feedback."
+      },
+      "eyebrow": "Admin support",
+      "deniedTitle": "Administrator access required.",
+      "deniedLead": "Your account does not have permission to manage support feedback.",
+      "breadcrumb": "Support",
+      "title": "Support feedback management.",
+      "lead": "This area is reserved for support form feedback and support handling workflows.",
+      "status": "Planned",
+      "emptyTitle": "Support feedback tools are not connected yet.",
+      "emptyLead": "The management entry is ready. Next we can connect support forms, categories, priorities, owners, and response records."
+    },
+    "adminContact": {
+      "seo": {
+        "title": "Admin Contact Forms | Aifar",
+        "description": "Query and manage Aifar contact form requests."
+      },
+      "eyebrow": "Admin contact",
+      "deniedTitle": "Administrator access required.",
+      "deniedLead": "Your account does not have permission to query contact form requests.",
+      "breadcrumb": "Contact us",
+      "title": "Contact form queries.",
+      "lead": "Review website contact requests, reply in the site, and close handled requests.",
+      "all": "All",
+      "new": "New",
+      "inProgress": "In progress",
+      "closed": "Closed",
+      "emptyTitle": "No contact requests found.",
+      "emptyLead": "New website contact submissions will appear here."
+    },
     "adminTickets": {
       "seo": {
         "title": "Admin Tickets | Aifar",
@@ -367,6 +489,7 @@
       "eyebrow": "Admin",
       "deniedTitle": "Administrator access required.",
       "deniedLead": "Your account does not have permission to manage Aifar website tickets.",
+      "breadcrumb": "Ticket list",
       "title": "Contact request tickets.",
       "lead": "Review, reply to, and close website contact requests.",
       "all": "All",
@@ -382,6 +505,7 @@
       "eyebrow": "Admin ticket",
       "deniedTitle": "Administrator access required.",
       "deniedLead": "Your account does not have permission to manage this ticket.",
+      "breadcrumb": "Ticket detail",
       "submitted": "Submitted",
       "requestTitle": "Request",
       "organization": "Organization",
@@ -397,6 +521,7 @@
       "eyebrow": "Admin",
       "deniedTitle": "Administrator access required.",
       "deniedLead": "Your account does not have permission to manage client downloads.",
+      "breadcrumb": "Downloads",
       "title": "Client downloads.",
       "lead": "Maintain the current public release for each Aifar client platform.",
       "tickets": "Ticket admin",

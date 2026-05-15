@@ -1,6 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { AdminDownloadForm } from "@/components/AdminDownloadForm";
+import { AdminNav } from "@/components/AdminNav";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PageHero } from "@/components/PageHero";
 import { AdminRequiredError, requireAdmin } from "@/lib/auth";
 import { formatFileSize, getAdminDownloadPlatform } from "@/lib/downloads";
@@ -30,6 +32,7 @@ export default async function AdminDownloadDetailPage({ params }) {
     getPageMessages(locale, "adminDownloadDetail"),
     getLocaleMessages(locale)
   ]);
+  const adminHome = await getPageMessages(locale, "adminHome");
 
   try {
     await requireAdmin(getProfile);
@@ -54,6 +57,15 @@ export default async function AdminDownloadDetailPage({ params }) {
       <PageHero eyebrow={page.eyebrow} title={platform.label} lead={page.lead} />
       <section className="section alt">
         <div className="section-inner detail-layout">
+          <Breadcrumbs
+            locale={locale}
+            items={[
+              { label: adminHome.nav.home, href: "/admin/" },
+              { label: adminHome.nav.downloads, href: "/admin/downloads/" },
+              { label: platform.label }
+            ]}
+          />
+          <AdminNav locale={locale} labels={adminHome.nav} current="downloads" />
           <article className="card detail-card">
             <h3>{page.current}</h3>
             <p>{release.version || page.noVersion}</p>

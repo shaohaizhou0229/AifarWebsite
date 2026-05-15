@@ -1,6 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
+import { AdminNav } from "@/components/AdminNav";
 import { AdminTicketActions } from "@/components/AdminTicketActions";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PageHero } from "@/components/PageHero";
 import { AdminRequiredError, requireAdmin } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
@@ -27,6 +29,7 @@ export default async function AdminTicketDetailPage({ params }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
   const [page, messages] = await Promise.all([getPageMessages(locale, "adminTicketDetail"), getLocaleMessages(locale)]);
+  const adminHome = await getPageMessages(locale, "adminHome");
 
   try {
     await requireAdmin(getProfile);
@@ -55,6 +58,15 @@ export default async function AdminTicketDetailPage({ params }) {
       />
       <section className="section alt">
         <div className="section-inner detail-layout">
+          <Breadcrumbs
+            locale={locale}
+            items={[
+              { label: adminHome.nav.home, href: "/admin/" },
+              { label: adminHome.nav.contact, href: "/admin/contact/" },
+              { label: page.breadcrumb }
+            ]}
+          />
+          <AdminNav locale={locale} labels={adminHome.nav} current="contact" />
           <article className="card detail-card">
             <h3>{page.requestTitle}</h3>
             <p>{ticket.message}</p>

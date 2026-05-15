@@ -784,6 +784,103 @@ h3 {
   margin-bottom: 18px;
 }
 
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.breadcrumb-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.breadcrumb-item:not(:last-child)::after {
+  color: var(--muted);
+  content: "/";
+}
+
+.breadcrumbs a {
+  color: var(--teal);
+}
+
+.admin-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.admin-nav a {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
+  padding: 10px 14px;
+}
+
+.admin-nav a.active {
+  border-color: rgba(22, 124, 128, 0.35);
+  background: var(--soft-teal);
+  color: var(--teal);
+}
+
+.admin-module-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-module-card {
+  display: flex;
+  min-height: 190px;
+  justify-content: space-between;
+  gap: 22px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+.admin-module-card h2,
+.admin-empty-state h2 {
+  margin: 14px 0 8px;
+}
+
+.admin-module-card p,
+.admin-empty-state p {
+  color: var(--muted);
+  margin: 0;
+}
+
+.admin-module-card strong {
+  align-self: flex-start;
+  color: var(--ink);
+  font-size: 26px;
+}
+
+.admin-module-card.planned {
+  opacity: 0.82;
+}
+
+.admin-empty-state {
+  max-width: 760px;
+}
+
+.detail-layout > .breadcrumbs,
+.detail-layout > .admin-nav {
+  grid-column: 1 / -1;
+}
+
 [dir="rtl"] body {
   text-align: right;
 }
@@ -853,6 +950,7 @@ h3 {
   .hero-grid,
   .grid.three,
   .grid.four,
+  .admin-module-grid,
   .trust-row {
     grid-template-columns: 1fr;
   }

@@ -10,16 +10,13 @@ import { getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
 
-const pathname = "/admin/tickets/";
+const pathname = "/admin/contact/";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;
-  const [page, adminHome] = await Promise.all([
-    getPageMessages(locale, "adminTickets"),
-    getPageMessages(locale, "adminHome")
-  ]);
+  const page = await getPageMessages(locale, "adminContact");
   return buildMetadata({ locale, pathname, title: page.seo.title, description: page.seo.description });
 }
 
@@ -27,10 +24,13 @@ function formatDate(value, locale) {
   return value ? new Date(value).toLocaleDateString(locale, { year: "numeric", month: "short", day: "numeric" }) : "";
 }
 
-export default async function AdminTicketsPage({ params, searchParams }) {
+export default async function AdminContactPage({ params, searchParams }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const page = await getPageMessages(locale, "adminTickets");
+  const [page, adminHome] = await Promise.all([
+    getPageMessages(locale, "adminContact"),
+    getPageMessages(locale, "adminHome")
+  ]);
 
   try {
     await requireAdmin(getProfile);
@@ -58,19 +58,18 @@ export default async function AdminTicketsPage({ params, searchParams }) {
             locale={locale}
             items={[
               { label: adminHome.nav.home, href: "/admin/" },
-              { label: adminHome.nav.contact, href: "/admin/contact/" },
               { label: page.breadcrumb }
             ]}
           />
           <AdminNav locale={locale} labels={adminHome.nav} current="contact" />
           <div className="status-actions">
-            <a className="button secondary" href={localizedPath(locale, "/admin/tickets/")}>{page.all}</a>
-            <a className="button secondary" href={`${localizedPath(locale, "/admin/tickets/")}?status=new`}>{page.new}</a>
-            <a className="button secondary" href={`${localizedPath(locale, "/admin/tickets/")}?status=in_progress`}>{page.inProgress}</a>
-            <a className="button secondary" href={`${localizedPath(locale, "/admin/tickets/")}?status=closed`}>{page.closed}</a>
+            <a className="button secondary" href={localizedPath(locale, "/admin/contact/")}>{page.all}</a>
+            <a className="button secondary" href={`${localizedPath(locale, "/admin/contact/")}?status=new`}>{page.new}</a>
+            <a className="button secondary" href={`${localizedPath(locale, "/admin/contact/")}?status=in_progress`}>{page.inProgress}</a>
+            <a className="button secondary" href={`${localizedPath(locale, "/admin/contact/")}?status=closed`}>{page.closed}</a>
           </div>
           <div className="release-list">
-            {tickets.map((ticket) => (
+            {tickets.length ? tickets.map((ticket) => (
               <a className="release" key={ticket.id} href={localizedPath(locale, `/admin/tickets/${ticket.id}/`)}>
                 <div>
                   <h3>{ticket.subject || ticket.requestType.replace("_", " ")}</h3>
@@ -78,10 +77,16 @@ export default async function AdminTicketsPage({ params, searchParams }) {
                 </div>
                 <span className="pill">{ticket.status.replace("_", " ")}</span>
               </a>
-            ))}
+            )) : (
+              <article className="card admin-empty-state">
+                <h2>{page.emptyTitle}</h2>
+                <p>{page.emptyLead}</p>
+              </article>
+            )}
           </div>
         </div>
       </section>
     </main>
   );
 }
+
