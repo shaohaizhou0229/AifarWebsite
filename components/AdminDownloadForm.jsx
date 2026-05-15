@@ -26,8 +26,23 @@ export function AdminDownloadForm({ platform, labels }) {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadPaused, setUploadPaused] = useState(false);
+  const [uploadPhase, setUploadPhase] = useState("idle");
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadedBytes, setUploadedBytes] = useState(0);
+  const [totalBytes, setTotalBytes] = useState(file?.size || 0);
   const uploadRef = useRef(null);
+
+  const phaseText = {
+    idle: labels.uploadStatusIdle || "Ready to upload",
+    preparing: labels.uploadStatusPreparing || "Preparing file and checksum...",
+    uploading: labels.uploadStatusUploading || "Uploading file...",
+    paused: labels.uploadStatusPaused || "Upload paused",
+    finalizing: labels.uploadStatusFinalizing || "Finalizing release file...",
+    complete: labels.uploadStatusComplete || "Upload complete"
+  };
+
+  const showUploadPanel = uploadPhase !== "idle" || release.uploadStatus === "uploading";
+  const animatedProgress = uploadPhase === "preparing" || uploadPhase === "uploading" || uploadPhase === "finalizing";
 
   function updateField(event) {
     const { name, value, type, checked } = event.target;
@@ -69,6 +84,7 @@ export function AdminDownloadForm({ platform, labels }) {
     if (uploadPaused && uploadRef.current) {
       setUploading(true);
       setUploadPaused(false);
+      setUploadPhase("uploading");
       setMessage("");
       setError("");
       uploadRef.current.start();
@@ -82,7 +98,10 @@ export function AdminDownloadForm({ platform, labels }) {
 
     setUploading(true);
     setUploadPaused(false);
+    setUploadPhase("preparing");
     setUploadProgress(0);
+    setUploadedBytes(0);
+    setTotalBytes(file.size);
     setMessage("");
     setError("");
 
@@ -121,10 +140,14 @@ export function AdminDownloadForm({ platform, labels }) {
             reject(uploadError);
           },
           onProgress(bytesUploaded, bytesTotal) {
+            setUploadPhase("uploading");
+            setUploadedBytes(bytesUploaded);
+            setTotalBytes(bytesTotal);
             setUploadProgress(bytesTotal ? Math.round((bytesUploaded / bytesTotal) * 100) : 0);
           },
           async onSuccess() {
             try {
+              setUploadPhase("finalizing");
               const completeResponse = await fetch(`/api/admin/downloads/${platform.key}/upload-complete/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -159,13 +182,19 @@ export function AdminDownloadForm({ platform, labels }) {
       });
 
       setUploadProgress(100);
+      setUploadPhase("complete");
       setMessage(labels.uploaded);
       window.location.reload();
     } catch (uploadError) {
+      if (!uploadPaused) {
+        setUploadPhase("idle");
+      }
       setError(uploadError.message || labels.uploadFailed);
     } finally {
       setUploading(false);
-      setUploadPaused(false);
+      if (!uploadPaused) {
+        setUploadPaused(false);
+      }
     }
   }
 
@@ -173,10 +202,36 @@ export function AdminDownloadForm({ platform, labels }) {
     uploadRef.current?.abort();
     setUploading(false);
     setUploadPaused(true);
+    setUploadPhase("paused");
   }
 
   return (
     <div className="detail-layout">
+      {showUploadPanel ? (
+        <section className={`upload-live-panel ${animatedProgress ? "is-active" : ""}`} aria-live="polite">
+          <div className="upload-live-head">
+            <div>
+              <p className="eyebrow">{labels.uploadProgressTitle || "Upload progress"}</p>
+              <h3>{phaseText[uploadPhase] || phaseText.idle}</h3>
+            </div>
+            <strong>{uploadPhase === "preparing" || uploadPhase === "finalizing" ? "..." : `${uploadProgress}%`}</strong>
+          </div>
+          <div
+            className={`upload-meter ${uploadPhase === "preparing" || uploadPhase === "finalizing" ? "is-indeterminate" : ""}`}
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow={uploadPhase === "preparing" || uploadPhase === "finalizing" ? undefined : uploadProgress}
+          >
+            <span style={{ width: `${Math.max(uploadProgress, animatedProgress ? 6 : 0)}%` }} />
+          </div>
+          <p className="muted-line">
+            {file?.name || release.originalFilename || release.storagePath || ""}
+            {totalBytes ? ` · ${uploadedBytes ? `${Math.round(uploadedBytes / 1024 / 1024)} MB / ` : ""}${Math.round(totalBytes / 1024 / 1024)} MB` : ""}
+          </p>
+        </section>
+      ) : null}
+
       <form className="admin-actions" onSubmit={saveRelease}>
         <div className="field">
           <label htmlFor="version">{labels.version}</label>
@@ -210,7 +265,14 @@ export function AdminDownloadForm({ platform, labels }) {
             id="releaseFile"
             type="file"
             accept=".exe,.msi,.dmg,.pkg,.apk,.zip"
-            onChange={(event) => setFile(event.target.files?.[0] || null)}
+            onChange={(event) => {
+              const nextFile = event.target.files?.[0] || null;
+              setFile(nextFile);
+              setTotalBytes(nextFile?.size || 0);
+              setUploadProgress(0);
+              setUploadedBytes(0);
+              setUploadPhase("idle");
+            }}
           />
         </div>
         <p className="muted-line">{labels.fileHint}</p>

@@ -98,11 +98,18 @@
       "file": "Release file",
       "fileHint": "Supported files: exe, msi, dmg, pkg, apk, zip. Uploading a new file unpublishes the platform until you publish it again.",
       "fileRequired": "Please choose a file.",
-      "upload": "Upload file",
-      "uploading": "Uploading...",
-      "uploaded": "File uploaded. Review the version and publish when ready.",
-      "uploadFailed": "Unable to upload file."
-    }
+        "upload": "Upload file",
+        "uploading": "Uploading...",
+        "uploaded": "File uploaded. Review the version and publish when ready.",
+        "uploadFailed": "Unable to upload file.",
+        "uploadProgressTitle": "Upload progress",
+        "uploadStatusIdle": "Ready to upload",
+        "uploadStatusPreparing": "Preparing file and checksum...",
+        "uploadStatusUploading": "Uploading file...",
+        "uploadStatusPaused": "Upload paused",
+        "uploadStatusFinalizing": "Finalizing release file...",
+        "uploadStatusComplete": "Upload complete"
+      }
   },
   "pages": {
     "home": {

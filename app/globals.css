@@ -603,6 +603,87 @@ h3 {
   height: 12px;
 }
 
+.upload-live-panel {
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(40, 95, 159, 0.26);
+  border-radius: 8px;
+  background: linear-gradient(180deg, #f7fbff, var(--surface));
+  box-shadow: 0 12px 32px rgba(40, 95, 159, 0.1);
+  padding: 18px 22px;
+}
+
+.upload-live-panel.is-active {
+  border-color: rgba(22, 124, 128, 0.42);
+}
+
+.upload-live-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.upload-live-head .eyebrow {
+  margin-bottom: 4px;
+}
+
+.upload-live-head strong {
+  color: var(--teal);
+  font-size: 1.5rem;
+}
+
+.upload-meter {
+  position: relative;
+  height: 12px;
+  border-radius: 999px;
+  background: #dbe7f2;
+  overflow: hidden;
+}
+
+.upload-meter span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  min-width: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0)),
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.28) 0 10px, rgba(255, 255, 255, 0) 10px 20px),
+    linear-gradient(90deg, var(--teal), var(--blue));
+  transition: width 220ms ease;
+}
+
+.upload-live-panel.is-active .upload-meter span {
+  animation: upload-stripes 1s linear infinite;
+  background-size: auto, 28px 28px, auto;
+}
+
+.upload-meter.is-indeterminate span {
+  width: 38% !important;
+  animation: upload-indeterminate 1.3s ease-in-out infinite;
+}
+
+@keyframes upload-stripes {
+  from {
+    background-position: 0 0, 0 0, 0 0;
+  }
+  to {
+    background-position: 0 0, 28px 0, 0 0;
+  }
+}
+
+@keyframes upload-indeterminate {
+  0% {
+    left: -40%;
+  }
+  50% {
+    left: 32%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
 .detail-layout {
   display: grid;
   gap: 18px;
