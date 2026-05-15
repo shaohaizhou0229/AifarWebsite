@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import {
   AdminRequiredError,
-  createUserSupabaseClient,
   getCurrentAccessToken,
-  getSupabaseUrl,
+  getSupabaseStorageUrl,
   requireAdmin
 } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
@@ -19,21 +18,6 @@ import {
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-function getSignedUploadToken(data) {
-  if (data?.token) return data.token;
-
-  if (data?.signedUrl) {
-    try {
-      const url = new URL(data.signedUrl);
-      return url.searchParams.get("token") || url.searchParams.get("signature") || "";
-    } catch {
-      return "";
-    }
-  }
-
-  return "";
-}
 
 export async function POST(request, { params }) {
   const { platform } = await params;
@@ -63,16 +47,9 @@ export async function POST(request, { params }) {
     }
 
     const storagePath = createStoragePath(platformKey, filename);
-    const supabase = createUserSupabaseClient(accessToken);
-    const { data, error } = await supabase.storage.from(DOWNLOAD_BUCKET).createSignedUploadUrl(storagePath);
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
-    }
-
-    const token = getSignedUploadToken(data);
-    if (!token) {
-      return NextResponse.json({ error: "Supabase did not return an upload signature." }, { status: 400 });
+    if (!accessToken) {
+      return NextResponse.json({ error: "A valid admin session is required." }, { status: 401 });
     }
 
     const release = await markClientReleaseUploading(platformKey, user, {
@@ -85,9 +62,9 @@ export async function POST(request, { params }) {
     return NextResponse.json({
       bucket: DOWNLOAD_BUCKET,
       storagePath,
-      endpoint: `${getSupabaseUrl()}/storage/v1/upload/resumable`,
+      endpoint: `${getSupabaseStorageUrl()}/storage/v1/upload/resumable`,
       headers: {
-        "x-signature": token
+        authorization: `Bearer ${accessToken}`
       },
       chunkSize: RELEASE_UPLOAD_CHUNK_SIZE,
       release
