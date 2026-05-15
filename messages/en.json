@@ -111,7 +111,10 @@
         "uploadStatusComplete": "Upload complete",
         "uploadStatusInterrupted": "Previous upload did not finish",
         "uploadStatusFailed": "Upload failed",
-        "uploadInterruptedHint": "Choose the same file and start upload again to continue."
+        "uploadInterruptedHint": "Choose the same file and start upload again to continue.",
+        "cancelUpload": "Cancel upload",
+        "cancellingUpload": "Cancelling...",
+        "uploadCancelled": "Upload cancelled."
       }
   },
   "pages": {

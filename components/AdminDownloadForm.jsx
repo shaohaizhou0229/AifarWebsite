@@ -26,10 +26,12 @@ export function AdminDownloadForm({ platform, labels }) {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadPaused, setUploadPaused] = useState(false);
+  const [serverUploadStatus, setServerUploadStatus] = useState(release.uploadStatus || "idle");
   const [uploadPhase, setUploadPhase] = useState(release.uploadStatus === "uploading" ? "interrupted" : "idle");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedBytes, setUploadedBytes] = useState(0);
   const [totalBytes, setTotalBytes] = useState(file?.size || 0);
+  const [cancelling, setCancelling] = useState(false);
   const uploadRef = useRef(null);
 
   const phaseText = {
@@ -43,8 +45,24 @@ export function AdminDownloadForm({ platform, labels }) {
     failed: labels.uploadStatusFailed || "Upload failed"
   };
 
-  const showUploadPanel = uploadPhase !== "idle" || release.uploadStatus === "uploading";
+  const showUploadPanel = uploadPhase !== "idle" || serverUploadStatus === "uploading";
   const animatedProgress = uploadPhase === "preparing" || uploadPhase === "uploading" || uploadPhase === "finalizing";
+
+  async function setRemoteUploadStatus(uploadStatus) {
+    const response = await fetch(`/api/admin/downloads/${platform.key}/upload-status/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ uploadStatus })
+    });
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data.error || labels.uploadFailed);
+    }
+
+    setServerUploadStatus(data.release?.uploadStatus || uploadStatus);
+    return data.release;
+  }
 
   function updateField(event) {
     const { name, value, type, checked } = event.target;
@@ -123,6 +141,7 @@ export function AdminDownloadForm({ platform, labels }) {
         throw new Error(session.error || labels.uploadFailed);
       }
 
+      setServerUploadStatus("uploading");
       await new Promise((resolve, reject) => {
         const upload = new tus.Upload(file, {
           endpoint: session.endpoint,
@@ -190,6 +209,7 @@ export function AdminDownloadForm({ platform, labels }) {
     } catch (uploadError) {
       if (!uploadPaused) {
         setUploadPhase("failed");
+        setRemoteUploadStatus("failed").catch(() => {});
       }
       setError(uploadError.message || labels.uploadFailed);
     } finally {
@@ -205,6 +225,30 @@ export function AdminDownloadForm({ platform, labels }) {
     setUploading(false);
     setUploadPaused(true);
     setUploadPhase("paused");
+  }
+
+  async function cancelUpload() {
+    setCancelling(true);
+    setMessage("");
+    setError("");
+
+    try {
+      if (uploadRef.current) {
+        await uploadRef.current.abort(true).catch(() => uploadRef.current.abort());
+      }
+      await setRemoteUploadStatus("idle");
+      uploadRef.current = null;
+      setUploading(false);
+      setUploadPaused(false);
+      setUploadProgress(0);
+      setUploadedBytes(0);
+      setUploadPhase("idle");
+      setMessage(labels.uploadCancelled || "Upload cancelled.");
+    } catch (cancelError) {
+      setError(cancelError.message || labels.uploadFailed);
+    } finally {
+      setCancelling(false);
+    }
   }
 
   return (
@@ -231,6 +275,11 @@ export function AdminDownloadForm({ platform, labels }) {
             {uploadPhase === "interrupted" ? (labels.uploadInterruptedHint || "Choose the same file and start upload again to continue.") : file?.name || release.originalFilename || release.storagePath || ""}
             {totalBytes ? ` · ${uploadedBytes ? `${Math.round(uploadedBytes / 1024 / 1024)} MB / ` : ""}${Math.round(totalBytes / 1024 / 1024)} MB` : ""}
           </p>
+          <div className="card-actions">
+            <button className="button secondary" type="button" onClick={cancelUpload} disabled={cancelling}>
+              {cancelling ? (labels.cancellingUpload || "Cancelling...") : (labels.cancelUpload || "Cancel upload")}
+            </button>
+          </div>
         </section>
       ) : null}
 
@@ -274,11 +323,12 @@ export function AdminDownloadForm({ platform, labels }) {
               setUploadProgress(0);
               setUploadedBytes(0);
               setUploadPhase("idle");
+              setServerUploadStatus("idle");
             }}
           />
         </div>
         <p className="muted-line">{labels.fileHint}</p>
-        {release.uploadStatus ? <p className="muted-line">Upload status: {release.uploadStatus}</p> : null}
+        {serverUploadStatus ? <p className="muted-line">Upload status: {serverUploadStatus}</p> : null}
         {uploading || uploadPaused || uploadProgress > 0 ? (
           <div className="upload-progress">
             <progress value={uploadProgress} max="100" />
@@ -292,6 +342,11 @@ export function AdminDownloadForm({ platform, labels }) {
           {uploading ? (
             <button className="button secondary" type="button" onClick={pauseUpload}>
               Pause
+            </button>
+          ) : null}
+          {uploading || uploadPaused ? (
+            <button className="button secondary" type="button" onClick={cancelUpload} disabled={cancelling}>
+              {cancelling ? (labels.cancellingUpload || "Cancelling...") : (labels.cancelUpload || "Cancel upload")}
             </button>
           ) : null}
         </div>
