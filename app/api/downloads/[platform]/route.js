@@ -35,7 +35,9 @@ export async function GET(_request, { params }) {
   const supabase = createPublicSupabaseClient();
   const { data, error } = await supabase.storage
     .from(DOWNLOAD_BUCKET)
-    .createSignedUrl(result.release.storagePath, 60 * 10);
+    .createSignedUrl(result.release.storagePath, 60 * 10, {
+      download: result.release.originalFilename || true
+    });
 
   if (error || !data?.signedUrl) {
     return NextResponse.json({ error: error?.message || "Could not create download link." }, { status: 500 });
