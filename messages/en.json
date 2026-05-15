@@ -102,6 +102,7 @@
         "uploading": "Uploading...",
         "uploaded": "File uploaded. Review the version and publish when ready.",
         "uploadFailed": "Unable to upload file.",
+        "uploadTooLarge": "The file exceeds the current Supabase Storage upload limit. In Supabase Storage Settings, set the Global file size limit to at least 300 MB, or upload a smaller file.",
         "uploadProgressTitle": "Upload progress",
         "uploadStatusIdle": "Ready to upload",
         "uploadStatusPreparing": "Preparing file and checksum...",

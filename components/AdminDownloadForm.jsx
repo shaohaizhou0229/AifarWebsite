@@ -11,6 +11,14 @@ async function calculateSha256(file) {
     .join("");
 }
 
+function getUploadErrorMessage(error, labels) {
+  const message = error?.message || "";
+  if (message.includes("Maximum size exceeded") || message.includes("413")) {
+    return labels.uploadTooLarge || "The file exceeds the current Supabase Storage upload limit. Increase the Storage global file size limit or upload a smaller file.";
+  }
+  return message || labels.uploadFailed;
+}
+
 export function AdminDownloadForm({ platform, labels }) {
   const release = platform.release;
   const [form, setForm] = useState({
@@ -212,7 +220,7 @@ export function AdminDownloadForm({ platform, labels }) {
         setUploadPhase("failed");
         setRemoteUploadStatus("failed").catch(() => {});
       }
-      setError(uploadError.message || labels.uploadFailed);
+      setError(getUploadErrorMessage(uploadError, labels));
     } finally {
       setUploading(false);
       if (!uploadPaused) {
@@ -368,12 +376,6 @@ export function AdminDownloadForm({ platform, labels }) {
         </div>
         <p className="muted-line">{labels.fileHint}</p>
         {serverUploadStatus ? <p className="muted-line">Upload status: {serverUploadStatus}</p> : null}
-        {uploading || uploadPaused || uploadProgress > 0 ? (
-          <div className="upload-progress">
-            <progress value={uploadProgress} max="100" />
-            <span>{uploadProgress}%</span>
-          </div>
-        ) : null}
         <div className="card-actions">
           <button className="button secondary" type="submit" disabled={uploading}>
             {uploading ? labels.uploading : uploadPaused ? "Resume upload" : labels.upload}
