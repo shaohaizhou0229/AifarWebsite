@@ -42,6 +42,32 @@ function renderInline(text) {
   return parts;
 }
 
+function normalizeHeadingText(value = "") {
+  return String(value)
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/~~([^~]+)~~/g, "$1")
+    .replace(/\*([^*]+)\*/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .trim();
+}
+
+function slugifyHeading(value = "") {
+  return normalizeHeadingText(value)
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^\p{Letter}\p{Number}]+/gu, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-");
+}
+
+function createHeadingId(content, headingCounts, fallbackIndex) {
+  const base = slugifyHeading(content) || `section-${fallbackIndex + 1}`;
+  const count = headingCounts.get(base) || 0;
+  headingCounts.set(base, count + 1);
+  return count ? `${base}-${count + 1}` : base;
+}
+
 function flushParagraph(blocks, paragraph) {
   const content = paragraph.join(" ").trim();
   if (content) {
@@ -57,6 +83,7 @@ function parseMarkdown(markdown) {
   let list = null;
   let code = null;
   let table = null;
+  const headingCounts = new Map();
 
   function flushList() {
     if (list?.items.length) blocks.push(list);
@@ -120,7 +147,12 @@ function parseMarkdown(markdown) {
       flushParagraph(blocks, paragraph);
       flushList();
       flushTable();
-      blocks.push({ type: "heading", level: heading[1].length, content: heading[2].trim() });
+      blocks.push({
+        type: "heading",
+        level: heading[1].length,
+        content: heading[2].trim(),
+        id: createHeadingId(heading[2].trim(), headingCounts, blocks.length)
+      });
       continue;
     }
 
@@ -183,6 +215,16 @@ function parseMarkdown(markdown) {
   return blocks;
 }
 
+export function getMarkdownTableOfContents(content) {
+  return parseMarkdown(content)
+    .filter((block) => block.type === "heading" && (block.level === 2 || block.level === 3))
+    .map((block) => ({
+      id: block.id,
+      level: block.level,
+      title: normalizeHeadingText(block.content)
+    }));
+}
+
 export function MarkdownContent({ content }) {
   const blocks = parseMarkdown(content);
 
@@ -191,7 +233,7 @@ export function MarkdownContent({ content }) {
       {blocks.map((block, index) => {
         if (block.type === "heading") {
           const HeadingTag = `h${Math.min(Math.max(block.level, 2), 4)}`;
-          return <HeadingTag key={index}>{renderInline(block.content)}</HeadingTag>;
+          return <HeadingTag id={block.id} key={index}>{renderInline(block.content)}</HeadingTag>;
         }
         if (block.type === "paragraph") {
           return <p key={index}>{renderInline(block.content)}</p>;

@@ -934,7 +934,9 @@
       "updatedAt": "Updated",
       "download": "Download Markdown",
       "signInToDownload": "Sign in to download",
-      "downloadDisabled": "Download unavailable"
+      "downloadDisabled": "Download unavailable",
+      "contents": "Contents",
+      "onThisPage": "On this page"
     },
     "adminDocEdit": {
       "seo": {

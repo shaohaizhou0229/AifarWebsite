@@ -934,7 +934,9 @@
       "updatedAt": "更新时间",
       "download": "下载 Markdown",
       "signInToDownload": "登录后下载",
-      "downloadDisabled": "暂不允许下载"
+      "downloadDisabled": "暂不允许下载",
+      "contents": "目录",
+      "onThisPage": "本文目录"
     },
     "adminDocEdit": {
       "seo": {

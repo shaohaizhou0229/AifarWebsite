@@ -1,7 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { MarkdownContent } from "@/components/MarkdownContent";
+import { DocumentTableOfContents } from "@/components/DocumentTableOfContents";
+import { MarkdownContent, getMarkdownTableOfContents } from "@/components/MarkdownContent";
 import { PageHero } from "@/components/PageHero";
 import { getCurrentUser } from "@/lib/auth";
 import { getPublicDocumentBySlug, normalizeDocumentSlug } from "@/lib/documents";
@@ -52,6 +53,7 @@ export default async function DocDetailPage({ params }) {
   }
 
   const canDownload = Boolean(user && document.allowAuthenticatedDownload && document.storagePath);
+  const tocItems = getMarkdownTableOfContents(document.markdownContent);
 
   return (
     <main>
@@ -80,7 +82,13 @@ export default async function DocDetailPage({ params }) {
               )}
             </div>
           </article>
-          <MarkdownContent content={document.markdownContent} />
+          <div className="doc-reading-layout">
+            <div className="doc-reading-main">
+              <DocumentTableOfContents items={tocItems} labels={page} variant="mobile" />
+              <MarkdownContent content={document.markdownContent} />
+            </div>
+            <DocumentTableOfContents items={tocItems} labels={page} variant="desktop" />
+          </div>
         </div>
       </section>
     </main>

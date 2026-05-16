@@ -1567,6 +1567,84 @@ h3 {
   gap: 18px;
 }
 
+.doc-reading-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+  align-items: start;
+  gap: 22px;
+}
+
+.doc-reading-main {
+  min-width: 0;
+}
+
+.doc-toc {
+  border: 1px solid rgba(183, 200, 213, 0.78);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 251, 253, 0.86));
+  box-shadow: 0 10px 28px rgba(20, 38, 55, 0.07);
+}
+
+.doc-toc.desktop {
+  position: sticky;
+  top: 96px;
+  max-height: calc(100vh - 116px);
+  overflow: auto;
+  padding: 18px;
+}
+
+.doc-toc.mobile {
+  display: none;
+  margin-bottom: 14px;
+}
+
+.doc-toc h2 {
+  margin: 0 0 12px;
+  font-family: "IBM Plex Sans", "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.doc-toc .eyebrow {
+  margin-bottom: 5px;
+}
+
+.doc-toc-list {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.doc-toc-list a {
+  display: block;
+  border-left: 3px solid transparent;
+  border-radius: 0 8px 8px 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 750;
+  line-height: 1.35;
+  padding: 7px 9px;
+}
+
+.doc-toc-list a:hover {
+  background: rgba(232, 241, 251, 0.72);
+  color: var(--ink);
+}
+
+.doc-toc-list a[aria-current="true"] {
+  border-left-color: var(--teal);
+  background: var(--soft-teal);
+  color: var(--teal);
+}
+
+.doc-toc-list .is-nested a {
+  font-size: 0.86rem;
+  padding-left: 22px;
+}
+
 .version-list {
   display: grid;
   gap: 10px;
@@ -1602,6 +1680,7 @@ h3 {
 .markdown-body h4 {
   margin-top: 10px;
   font-family: "IBM Plex Sans", "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+  scroll-margin-top: 96px;
 }
 
 .markdown-body h2 {
@@ -1735,6 +1814,21 @@ h3 {
   text-align: right;
 }
 
+[dir="rtl"] .doc-toc-list a {
+  border-right: 3px solid transparent;
+  border-left: 0;
+  border-radius: 8px 0 0 8px;
+}
+
+[dir="rtl"] .doc-toc-list a[aria-current="true"] {
+  border-right-color: var(--teal);
+}
+
+[dir="rtl"] .doc-toc-list .is-nested a {
+  padding-right: 22px;
+  padding-left: 9px;
+}
+
 [dir="rtl"] h1 {
   direction: ltr;
   text-align: right;
@@ -1779,6 +1873,31 @@ h3 {
 
   .ticket-side-panel {
     grid-column: auto;
+  }
+
+  .doc-reading-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .doc-toc.desktop {
+    display: none;
+  }
+
+  .doc-toc.mobile {
+    display: block;
+    padding: 0;
+  }
+
+  .doc-toc.mobile summary {
+    cursor: pointer;
+    color: var(--ink);
+    font-weight: 850;
+    padding: 14px 16px;
+  }
+
+  .doc-toc.mobile .doc-toc-list {
+    border-top: 1px solid var(--line);
+    padding: 10px 12px 12px;
   }
 
   .nav-primary,
