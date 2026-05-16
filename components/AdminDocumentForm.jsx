@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { MarkdownEditor } from "@/components/MarkdownEditor";
 
 function slugify(value) {
   return String(value || "")
@@ -25,10 +26,54 @@ export function AdminDocumentForm({ document, categories, labels, locale }) {
   }), [categories, document]);
 
   const [form, setForm] = useState(initial);
+  const [draftNotice, setDraftNotice] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [archiving, setArchiving] = useState(false);
+  const lastSavedRef = useRef(initial);
+  const hasUnsavedChangesRef = useRef(false);
+  const skipUnloadWarningRef = useRef(false);
+  const draftKey = useMemo(() => `aifar:admin-doc-draft:${locale}:${document?.id || "new"}`, [document?.id, locale]);
+  const hasUnsavedChanges = useMemo(() => JSON.stringify(form) !== JSON.stringify(lastSavedRef.current), [form]);
+
+  useEffect(() => {
+    hasUnsavedChangesRef.current = hasUnsavedChanges;
+  }, [hasUnsavedChanges]);
+
+  useEffect(() => {
+    try {
+      const rawDraft = window.localStorage.getItem(draftKey);
+      if (!rawDraft) return;
+      const draft = JSON.parse(rawDraft);
+      if (draft?.form?.markdownContent && JSON.stringify(draft.form) !== JSON.stringify(initial)) {
+        setDraftNotice(labels.draftFound);
+      }
+    } catch {
+      window.localStorage.removeItem(draftKey);
+    }
+  }, [draftKey, initial, labels.draftFound]);
+
+  useEffect(() => {
+    if (!hasUnsavedChanges) return;
+    const timer = window.setTimeout(() => {
+      window.localStorage.setItem(draftKey, JSON.stringify({ form, savedAt: new Date().toISOString() }));
+      setDraftNotice(labels.draftSaved);
+    }, 1800);
+
+    return () => window.clearTimeout(timer);
+  }, [draftKey, form, hasUnsavedChanges, labels.draftSaved]);
+
+  useEffect(() => {
+    function warnBeforeUnload(event) {
+      if (skipUnloadWarningRef.current || !hasUnsavedChangesRef.current) return;
+      event.preventDefault();
+      event.returnValue = labels.unsavedWarning;
+    }
+
+    window.addEventListener("beforeunload", warnBeforeUnload);
+    return () => window.removeEventListener("beforeunload", warnBeforeUnload);
+  }, [labels.unsavedWarning]);
 
   function updateField(event) {
     const { name, value, type, checked } = event.target;
@@ -45,6 +90,32 @@ export function AdminDocumentForm({ document, categories, labels, locale }) {
       title,
       slug: current.slug ? current.slug : slugify(title)
     }));
+  }
+
+  function updateMarkdownContent(markdownContent) {
+    setForm((current) => ({
+      ...current,
+      markdownContent
+    }));
+  }
+
+  function restoreDraft() {
+    try {
+      const rawDraft = window.localStorage.getItem(draftKey);
+      if (!rawDraft) return;
+      const draft = JSON.parse(rawDraft);
+      if (draft?.form) {
+        setForm(draft.form);
+        setDraftNotice(labels.draftRestored);
+      }
+    } catch {
+      setError(labels.draftRestoreFailed);
+    }
+  }
+
+  function discardDraft() {
+    window.localStorage.removeItem(draftKey);
+    setDraftNotice("");
   }
 
   async function readMarkdownFile(event) {
@@ -85,6 +156,9 @@ export function AdminDocumentForm({ document, categories, labels, locale }) {
       }
 
       setMessage(labels.saved);
+      window.localStorage.removeItem(draftKey);
+      lastSavedRef.current = form;
+      skipUnloadWarningRef.current = true;
       const nextId = data.document?.id || document?.id;
       if (nextId) {
         window.location.href = `/${locale}/admin/docs/${nextId}/`;
@@ -114,6 +188,7 @@ export function AdminDocumentForm({ document, categories, labels, locale }) {
         throw new Error(data.error || labels.archiveFailed);
       }
 
+      skipUnloadWarningRef.current = true;
       window.location.href = `/${locale}/admin/docs/`;
     } catch (archiveError) {
       setError(archiveError.message || labels.archiveFailed);
@@ -165,7 +240,16 @@ export function AdminDocumentForm({ document, categories, labels, locale }) {
       </div>
       <div className="field">
         <label htmlFor="markdownContent">{labels.markdownContent}</label>
-        <textarea id="markdownContent" name="markdownContent" className="markdown-textarea" value={form.markdownContent} onChange={updateField} required />
+        {draftNotice ? (
+          <div className="draft-status">
+            <span>{draftNotice}</span>
+            <div>
+              <button className="button secondary compact" type="button" onClick={restoreDraft}>{labels.restoreDraft}</button>
+              <button className="button secondary compact" type="button" onClick={discardDraft}>{labels.discardDraft}</button>
+            </div>
+          </div>
+        ) : null}
+        <MarkdownEditor id="markdownContent" labels={labels} value={form.markdownContent} onChange={updateMarkdownContent} />
       </div>
       <label className="checkbox-line">
         <input name="isPublished" type="checkbox" checked={form.isPublished} onChange={updateField} />

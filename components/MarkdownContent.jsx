@@ -4,7 +4,7 @@ function isSafeHref(href = "") {
 
 function renderInline(text) {
   const parts = [];
-  const pattern = /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g;
+  const pattern = /(`[^`]+`|\*\*[^*]+\*\*|~~[^~]+~~|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g;
   let lastIndex = 0;
   let match;
 
@@ -18,6 +18,10 @@ function renderInline(text) {
       parts.push(<code key={parts.length}>{token.slice(1, -1)}</code>);
     } else if (token.startsWith("**")) {
       parts.push(<strong key={parts.length}>{token.slice(2, -2)}</strong>);
+    } else if (token.startsWith("~~")) {
+      parts.push(<s key={parts.length}>{token.slice(2, -2)}</s>);
+    } else if (token.startsWith("*")) {
+      parts.push(<em key={parts.length}>{token.slice(1, -1)}</em>);
     } else {
       const link = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(token);
       const href = link?.[2] || "#";
@@ -52,16 +56,36 @@ function parseMarkdown(markdown) {
   const paragraph = [];
   let list = null;
   let code = null;
+  let table = null;
 
   function flushList() {
     if (list?.items.length) blocks.push(list);
     list = null;
   }
 
-  for (const line of lines) {
+  function flushTable() {
+    if (table?.rows.length) blocks.push(table);
+    table = null;
+  }
+
+  function isTableSeparator(value = "") {
+    return /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(value);
+  }
+
+  function parseTableRow(value) {
+    return value
+      .trim()
+      .replace(/^\||\|$/g, "")
+      .split("|")
+      .map((cell) => cell.trim());
+  }
+
+  for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
+    const line = lines[lineIndex];
     if (line.trim().startsWith("```")) {
       flushParagraph(blocks, paragraph);
       flushList();
+      flushTable();
       if (code) {
         blocks.push({ type: "code", content: code.join("\n") });
         code = null;
@@ -79,13 +103,23 @@ function parseMarkdown(markdown) {
     if (!line.trim()) {
       flushParagraph(blocks, paragraph);
       flushList();
+      flushTable();
       continue;
+    }
+
+    if (table) {
+      if (line.includes("|")) {
+        table.rows.push(parseTableRow(line));
+        continue;
+      }
+      flushTable();
     }
 
     const heading = /^(#{1,6})\s+(.+)$/.exec(line);
     if (heading) {
       flushParagraph(blocks, paragraph);
       flushList();
+      flushTable();
       blocks.push({ type: "heading", level: heading[1].length, content: heading[2].trim() });
       continue;
     }
@@ -93,20 +127,40 @@ function parseMarkdown(markdown) {
     if (/^---+$/.test(line.trim())) {
       flushParagraph(blocks, paragraph);
       flushList();
+      flushTable();
       blocks.push({ type: "hr" });
       continue;
     }
 
+    if (line.includes("|") && isTableSeparator(lines[lineIndex + 1])) {
+      flushParagraph(blocks, paragraph);
+      flushList();
+      table = { type: "table", headers: parseTableRow(line), rows: [] };
+      lineIndex += 1;
+      continue;
+    }
+
+    if (isTableSeparator(line)) {
+      continue;
+    }
+
+    const task = /^[-*]\s+\[( |x|X)\]\s+(.+)$/.exec(line);
     const unordered = /^[-*]\s+(.+)$/.exec(line);
     const ordered = /^\d+\.\s+(.+)$/.exec(line);
-    if (unordered || ordered) {
+    if (task || unordered || ordered) {
       flushParagraph(blocks, paragraph);
+      flushTable();
       const type = ordered ? "orderedList" : "unorderedList";
       if (!list || list.type !== type) {
         flushList();
         list = { type, items: [] };
       }
-      list.items.push((unordered?.[1] || ordered?.[1] || "").trim());
+      list.items.push(task ? {
+        content: task[2].trim(),
+        checked: task[1].toLowerCase() === "x"
+      } : {
+        content: (unordered?.[1] || ordered?.[1] || "").trim()
+      });
       continue;
     }
 
@@ -114,6 +168,7 @@ function parseMarkdown(markdown) {
     if (quote) {
       flushParagraph(blocks, paragraph);
       flushList();
+      flushTable();
       blocks.push({ type: "quote", content: quote[1].trim() });
       continue;
     }
@@ -123,6 +178,7 @@ function parseMarkdown(markdown) {
 
   flushParagraph(blocks, paragraph);
   flushList();
+  flushTable();
   if (code) blocks.push({ type: "code", content: code.join("\n") });
   return blocks;
 }
@@ -141,16 +197,37 @@ export function MarkdownContent({ content }) {
           return <p key={index}>{renderInline(block.content)}</p>;
         }
         if (block.type === "unorderedList") {
-          return <ul key={index}>{block.items.map((item, itemIndex) => <li key={itemIndex}>{renderInline(item)}</li>)}</ul>;
+          return <ul key={index}>{block.items.map((item, itemIndex) => (
+            <li className={typeof item.checked === "boolean" ? "task-list-item" : ""} key={itemIndex}>
+              {typeof item.checked === "boolean" ? <input checked={item.checked} readOnly type="checkbox" /> : null}
+              <span>{renderInline(item.content)}</span>
+            </li>
+          ))}</ul>;
         }
         if (block.type === "orderedList") {
-          return <ol key={index}>{block.items.map((item, itemIndex) => <li key={itemIndex}>{renderInline(item)}</li>)}</ol>;
+          return <ol key={index}>{block.items.map((item, itemIndex) => <li key={itemIndex}>{renderInline(item.content)}</li>)}</ol>;
         }
         if (block.type === "quote") {
           return <blockquote key={index}>{renderInline(block.content)}</blockquote>;
         }
         if (block.type === "code") {
           return <pre key={index}><code>{block.content}</code></pre>;
+        }
+        if (block.type === "table") {
+          return (
+            <div className="markdown-table-wrap" key={index}>
+              <table>
+                <thead>
+                  <tr>{block.headers.map((header, cellIndex) => <th key={cellIndex}>{renderInline(header)}</th>)}</tr>
+                </thead>
+                <tbody>
+                  {block.rows.map((row, rowIndex) => (
+                    <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex}>{renderInline(cell)}</td>)}</tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
         }
         return <hr key={index} />;
       })}

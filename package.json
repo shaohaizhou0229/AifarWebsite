@@ -10,6 +10,8 @@
     "validate": "node validate-site.js"
   },
   "dependencies": {
+    "@milkdown/crepe": "^7.21.1",
+    "@milkdown/utils": "^7.21.1",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.4",
     "next": "^15.3.2",

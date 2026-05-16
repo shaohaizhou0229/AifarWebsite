@@ -1410,6 +1410,155 @@ h3 {
   line-height: 1.6;
 }
 
+.button.compact {
+  min-height: 36px;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  padding: 7px 10px;
+}
+
+.markdown-editor-shell {
+  display: grid;
+  gap: 0;
+  border: 1px solid rgba(183, 200, 213, 0.86);
+  border-radius: 10px;
+  background: #fbfcfd;
+  overflow: hidden;
+}
+
+.markdown-editor-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(248, 251, 253, 0.92));
+  padding: 16px;
+}
+
+.markdown-editor-topbar .eyebrow {
+  margin-bottom: 4px;
+}
+
+.markdown-editor-topbar h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.segmented-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid rgba(183, 200, 213, 0.9);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.86);
+  padding: 4px;
+}
+
+.segmented-control button {
+  min-width: 82px;
+  height: 34px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  padding: 0 12px;
+}
+
+.segmented-control button:hover,
+.segmented-control button[aria-selected="true"] {
+  background: var(--ink);
+  color: white;
+}
+
+.milkdown-editor-frame {
+  position: relative;
+  min-height: 440px;
+  background: white;
+}
+
+.editor-loading {
+  position: absolute;
+  z-index: 1;
+  top: 16px;
+  left: 16px;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 800;
+  padding: 7px 11px;
+}
+
+.milkdown-editor {
+  min-height: 440px;
+}
+
+.milkdown-editor .milkdown {
+  min-height: 440px;
+  background: white;
+}
+
+.milkdown-editor .ProseMirror {
+  min-height: 440px;
+  padding: 28px 32px;
+  color: var(--ink);
+  font-family: "IBM Plex Sans", "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+  outline: 0;
+}
+
+.milkdown-editor .ProseMirror:focus {
+  box-shadow: inset 0 0 0 3px rgba(18, 124, 130, 0.1);
+}
+
+.markdown-editor-shell > .markdown-textarea {
+  min-height: 440px;
+  border: 0;
+  border-radius: 0;
+  background: white;
+}
+
+.markdown-preview-panel {
+  min-height: 440px;
+  background: white;
+  padding: 18px;
+}
+
+.markdown-preview-panel .markdown-body {
+  max-width: none;
+  min-height: 400px;
+  border: 0;
+  box-shadow: none;
+  padding: 16px;
+}
+
+.draft-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid rgba(31, 95, 159, 0.18);
+  border-radius: 10px;
+  background: rgba(232, 241, 251, 0.76);
+  color: var(--blue);
+  font-weight: 800;
+  padding: 12px 14px;
+}
+
+.draft-status div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .document-meta {
   display: flex;
   min-height: auto;
@@ -1466,6 +1615,41 @@ h3 {
 .markdown-body p,
 .markdown-body li {
   color: var(--muted);
+}
+
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.markdown-body th,
+.markdown-body td {
+  border: 1px solid var(--line);
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.markdown-body th {
+  background: var(--soft-blue);
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.markdown-table-wrap {
+  overflow-x: auto;
+}
+
+.markdown-body .task-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  list-style: none;
+}
+
+.markdown-body .task-list-item input {
+  margin-top: 5px;
 }
 
 .markdown-body a {
@@ -1660,9 +1844,20 @@ h3 {
   }
 
   .section-head,
+  .markdown-editor-topbar,
+  .draft-status,
   .footer-inner {
     align-items: start;
     flex-direction: column;
+  }
+
+  .segmented-control {
+    width: 100%;
+  }
+
+  .segmented-control button {
+    flex: 1;
+    min-width: 0;
   }
 
   .language-switcher {
