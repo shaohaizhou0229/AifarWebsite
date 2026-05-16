@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { createPublicSupabaseClient } from "@/lib/auth";
+import { createPublicSupabaseClient, getCurrentUser } from "@/lib/auth";
 import { DOWNLOAD_BUCKET, clientReleaseFileExists, getPublishedRelease, sanitizePlatform } from "@/lib/downloads";
+import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,6 +21,15 @@ export async function GET(_request, { params }) {
   }
 
   if (result.release.externalUrl) {
+    const user = await getCurrentUser();
+    await recordUserFootprint({
+      userId: user?.id,
+      actorUserId: user?.id,
+      eventType: USER_FOOTPRINT_EVENTS.downloadStarted,
+      summary: `User started a ${platformKey} client download.`,
+      relatedType: "client_release",
+      metadata: { platform: platformKey, version: result.release.version }
+    });
     return NextResponse.redirect(result.release.externalUrl);
   }
 
@@ -42,6 +52,16 @@ export async function GET(_request, { params }) {
   if (error || !data?.signedUrl) {
     return NextResponse.json({ error: error?.message || "Could not create download link." }, { status: 500 });
   }
+
+  const user = await getCurrentUser();
+  await recordUserFootprint({
+    userId: user?.id,
+    actorUserId: user?.id,
+    eventType: USER_FOOTPRINT_EVENTS.downloadStarted,
+    summary: `User started a ${platformKey} client download.`,
+    relatedType: "client_release",
+    metadata: { platform: platformKey, version: result.release.version }
+  });
 
   return NextResponse.redirect(data.signedUrl);
 }

@@ -33,7 +33,7 @@ export async function GET(_request, { params }) {
 
 export async function PATCH(request, { params }) {
   try {
-    await requireAdmin(getProfile);
+    const { user } = await requireAdmin(getProfile);
     const { id } = await params;
     const payload = await request.json().catch(() => ({}));
     const input = {};
@@ -63,7 +63,7 @@ export async function PATCH(request, { params }) {
       input.assigneeUserId = typeof payload.assigneeUserId === "string" ? payload.assigneeUserId : "";
     }
 
-    const ticket = await updateTicketFields(id, input);
+    const ticket = await updateTicketFields(id, input, user);
     if (!ticket) {
       return NextResponse.json({ error: "Ticket not found." }, { status: 404 });
     }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPostgresPool } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
+import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
 
 export const runtime = "nodejs";
 
@@ -74,13 +75,24 @@ export async function POST(request) {
   try {
     const pool = getPostgresPool();
 
-    await pool.query(
+    const result = await pool.query(
       `insert into public.contact_requests
         (user_id, name, work_email, organization, subject, request_type, message)
        values
-        ($1, $2, $3, $4, $5, $6, $7)`,
+        ($1, $2, $3, $4, $5, $6, $7)
+       returning id`,
       [user?.id || null, name, workEmail, organization, subject, requestType, message]
     );
+
+    await recordUserFootprint({
+      userId: user?.id,
+      actorUserId: user?.id,
+      eventType: USER_FOOTPRINT_EVENTS.contactSubmitted,
+      summary: "User submitted a contact request.",
+      relatedType: "contact_request",
+      relatedId: result.rows[0]?.id,
+      metadata: { requestType }
+    });
 
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (error) {

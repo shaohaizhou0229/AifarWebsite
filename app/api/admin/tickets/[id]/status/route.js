@@ -17,7 +17,7 @@ function permissionError(error) {
 
 export async function PATCH(request, { params }) {
   try {
-    await requireAdmin(getProfile);
+    const { user } = await requireAdmin(getProfile);
     const { id } = await params;
     const payload = await request.json().catch(() => ({}));
     const status = typeof payload.status === "string" ? payload.status : "";
@@ -26,7 +26,7 @@ export async function PATCH(request, { params }) {
       return NextResponse.json({ error: "Invalid ticket status." }, { status: 400 });
     }
 
-    const ticket = await updateTicketFields(id, { status });
+    const ticket = await updateTicketFields(id, { status }, user);
     if (!ticket) {
       return NextResponse.json({ error: "Ticket not found." }, { status: 404 });
     }

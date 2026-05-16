@@ -680,7 +680,8 @@
         "downloads": "Présentation Aifar",
         "docs": "Présentation Aifar",
         "support": "Présentation Aifar",
-        "contact": "Présentation Aifar"
+        "contact": "Présentation Aifar",
+        "users": "Utilisateurs"
       },
       "modules": [
         {
@@ -709,6 +710,13 @@
           "href": "/admin/support/",
           "title": "Tickets support",
           "description": "Gerer statut, priorite, categorie, responsable, reponses et notes internes.",
+          "status": "active"
+        },
+        {
+          "key": "users",
+          "href": "/admin/users/",
+          "title": "Utilisateurs",
+          "description": "Consulter les profils, roles, tickets et traces principales.",
           "status": "active"
         },
         {
@@ -929,6 +937,77 @@
       "category": "Category",
       "history": "Version history",
       "noVersion": "No version"
+    },
+    "adminUsers": {
+      "seo": {
+        "title": "Gestion des utilisateurs | Aifar",
+        "description": "Gerer les utilisateurs, roles, tickets et traces d activite Aifar."
+      },
+      "eyebrow": "Utilisateurs admin",
+      "deniedTitle": "Acces administrateur requis.",
+      "deniedLead": "Votre compte ne peut pas gerer les utilisateurs.",
+      "title": "Gestion des utilisateurs.",
+      "lead": "Recherchez des utilisateurs, consultez les profils et ouvrez les traces d activite.",
+      "breadcrumb": "Utilisateurs",
+      "searchLabel": "Rechercher des utilisateurs",
+      "searchPlaceholder": "Rechercher email, nom ou organisation",
+      "searchAction": "Rechercher",
+      "emptyTitle": "Aucun utilisateur trouve.",
+      "emptyLead": "Essayez un autre terme ou attendez de nouvelles inscriptions.",
+      "notProvided": "Non renseigne",
+      "tickets": "Tickets",
+      "createdAt": "Cree",
+      "lastFootprint": "Derniere activite",
+      "roles": {
+        "user": "Utilisateur",
+        "admin": "Admin"
+      }
+    },
+    "adminUserDetail": {
+      "seo": {
+        "title": "Detail utilisateur | Aifar",
+        "description": "Consulter et mettre a jour le profil, le role, les tickets et les traces d un utilisateur Aifar."
+      },
+      "eyebrow": "Utilisateur admin",
+      "deniedTitle": "Acces administrateur requis.",
+      "deniedLead": "Votre compte ne peut pas gerer cet utilisateur.",
+      "breadcrumb": "Detail utilisateur",
+      "role": "Role",
+      "createdAt": "Cree",
+      "profileTitle": "Profil et role",
+      "ticketsTitle": "Tickets associes",
+      "footprintsTitle": "Traces utilisateur",
+      "noTickets": "Aucun ticket associe.",
+      "noFootprints": "Aucune trace utilisateur enregistree.",
+      "actor": "Acteur",
+      "footprints": {
+        "auth.registered": "Inscription",
+        "auth.logged_in": "Connexion",
+        "auth.oauth_logged_in": "Connexion Google",
+        "profile.updated": "Profil mis a jour",
+        "admin.user_updated": "Mise a jour admin",
+        "contact.submitted": "Demande de contact",
+        "ticket.replied": "Reponse ticket",
+        "ticket.status_updated": "Statut ticket",
+        "download.started": "Telechargement"
+      },
+      "form": {
+        "email": "Email",
+        "name": "Nom",
+        "organization": "Organisation",
+        "jobTitle": "Fonction",
+        "countryRegion": "Pays / Region",
+        "phone": "Telephone",
+        "role": "Role",
+        "roles": {
+          "user": "Utilisateur",
+          "admin": "Admin"
+        },
+        "save": "Enregistrer",
+        "saving": "Enregistrement...",
+        "saved": "Utilisateur mis a jour.",
+        "saveFailed": "Impossible de mettre a jour l utilisateur."
+      }
     }
   }
 }

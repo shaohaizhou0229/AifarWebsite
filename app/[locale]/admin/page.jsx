@@ -5,7 +5,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PageHero } from "@/components/PageHero";
 import { AdminRequiredError, requireAdmin } from "@/lib/auth";
 import { listAdminDownloadPlatforms } from "@/lib/downloads";
-import { getProfile } from "@/lib/profiles";
+import { getProfile, listAdminUsers } from "@/lib/profiles";
 import { listAdminTickets } from "@/lib/tickets";
 import { getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
@@ -39,15 +39,17 @@ export default async function AdminHomePage({ params }) {
     redirect(localizedPath(locale, "/login/"));
   }
 
-  const [platforms, tickets] = await Promise.all([
+  const [platforms, tickets, users] = await Promise.all([
     listAdminDownloadPlatforms(),
-    listAdminTickets()
+    listAdminTickets(),
+    listAdminUsers()
   ]);
   const publishedCount = platforms.filter((platform) => platform.release.isPublished).length;
   const openTickets = tickets.filter((ticket) => ticket.status !== "closed").length;
 
   const stats = {
     downloads: `${publishedCount}/${platforms.length}`,
+    users: String(users.length),
     contact: String(openTickets),
     product: page.planned,
     docs: page.planned,

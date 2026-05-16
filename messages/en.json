@@ -680,7 +680,8 @@
         "downloads": "Downloads",
         "docs": "Docs",
         "support": "Support",
-        "contact": "Contact us"
+        "contact": "Contact us",
+        "users": "Users"
       },
       "modules": [
         {
@@ -709,6 +710,13 @@
           "href": "/admin/support/",
           "title": "Support tickets",
           "description": "Manage ticket status, priority, category, owner, replies, and internal notes.",
+          "status": "active"
+        },
+        {
+          "key": "users",
+          "href": "/admin/users/",
+          "title": "Users",
+          "description": "Review user profiles, roles, contact history, and core activity footprints.",
           "status": "active"
         },
         {
@@ -929,6 +937,77 @@
       "category": "Category",
       "history": "Version history",
       "noVersion": "No version"
+    },
+    "adminUsers": {
+      "seo": {
+        "title": "User management | Aifar",
+        "description": "Manage Aifar website users, roles, tickets, and activity footprints."
+      },
+      "eyebrow": "Admin users",
+      "deniedTitle": "Administrator access required.",
+      "deniedLead": "Your account does not have permission to manage users.",
+      "title": "User management.",
+      "lead": "Search users, review profiles, and open user activity records.",
+      "breadcrumb": "Users",
+      "searchLabel": "Search users",
+      "searchPlaceholder": "Search email, name, or organization",
+      "searchAction": "Search",
+      "emptyTitle": "No users found.",
+      "emptyLead": "Try another search term or wait for users to register.",
+      "notProvided": "Not provided",
+      "tickets": "Tickets",
+      "createdAt": "Created",
+      "lastFootprint": "Last activity",
+      "roles": {
+        "user": "User",
+        "admin": "Admin"
+      }
+    },
+    "adminUserDetail": {
+      "seo": {
+        "title": "User detail | Aifar",
+        "description": "Review and update an Aifar user profile, role, tickets, and activity footprints."
+      },
+      "eyebrow": "Admin user",
+      "deniedTitle": "Administrator access required.",
+      "deniedLead": "Your account does not have permission to manage this user.",
+      "breadcrumb": "User detail",
+      "role": "Role",
+      "createdAt": "Created",
+      "profileTitle": "Profile and role",
+      "ticketsTitle": "Related tickets",
+      "footprintsTitle": "User footprints",
+      "noTickets": "No related tickets yet.",
+      "noFootprints": "No user footprints recorded yet.",
+      "actor": "Actor",
+      "footprints": {
+        "auth.registered": "Registered",
+        "auth.logged_in": "Signed in",
+        "auth.oauth_logged_in": "Google sign in",
+        "profile.updated": "Profile updated",
+        "admin.user_updated": "Admin update",
+        "contact.submitted": "Contact request",
+        "ticket.replied": "Ticket reply",
+        "ticket.status_updated": "Ticket status",
+        "download.started": "Download"
+      },
+      "form": {
+        "email": "Email",
+        "name": "Name",
+        "organization": "Organization",
+        "jobTitle": "Job title",
+        "countryRegion": "Country / Region",
+        "phone": "Phone",
+        "role": "Role",
+        "roles": {
+          "user": "User",
+          "admin": "Admin"
+        },
+        "save": "Save user",
+        "saving": "Saving...",
+        "saved": "User updated.",
+        "saveFailed": "Unable to update user."
+      }
     }
   }
 }

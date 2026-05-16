@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ensureProfile } from "@/lib/profiles";
 import { exchangeOAuthCode, setAuthCookies } from "@/lib/auth";
+import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
 
 export const runtime = "nodejs";
 
@@ -33,6 +34,12 @@ export async function GET(request) {
     if (user?.id) {
       await ensureProfile(user, {
         displayName: user.user_metadata?.full_name || user.user_metadata?.name || null
+      });
+      await recordUserFootprint({
+        userId: user.id,
+        actorUserId: user.id,
+        eventType: USER_FOOTPRINT_EVENTS.oauthLoggedIn,
+        summary: "User signed in with Google OAuth."
       });
     }
 
