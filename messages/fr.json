@@ -998,15 +998,27 @@
       "noFootprints": "Aucune trace utilisateur enregistree.",
       "actor": "Acteur",
       "footprints": {
-        "auth.registered": "Inscription",
-        "auth.logged_in": "Connexion",
-        "auth.oauth_logged_in": "Connexion Google",
-        "profile.updated": "Profil mis a jour",
-        "admin.user_updated": "Mise a jour admin",
-        "contact.submitted": "Demande de contact",
-        "ticket.replied": "Reponse ticket",
-        "ticket.status_updated": "Statut ticket",
-        "download.started": "Telechargement"
+        "auth": {
+          "registered": "Inscription",
+          "logged_in": "Connexion",
+          "oauth_logged_in": "Connexion Google"
+        },
+        "profile": {
+          "updated": "Profil mis a jour"
+        },
+        "admin": {
+          "user_updated": "Mise a jour admin"
+        },
+        "contact": {
+          "submitted": "Demande de contact"
+        },
+        "ticket": {
+          "replied": "Reponse ticket",
+          "status_updated": "Statut ticket"
+        },
+        "download": {
+          "started": "Telechargement"
+        }
       },
       "form": {
         "email": "Email",

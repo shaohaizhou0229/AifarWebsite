@@ -28,7 +28,8 @@ function formatDate(value, locale) {
 }
 
 function footprintLabel(labels, eventType) {
-  return labels.footprints[eventType] || eventType;
+  const [group, key] = String(eventType || "").split(".");
+  return labels.footprints?.[group]?.[key] || eventType;
 }
 
 export default async function AdminUserDetailPage({ params }) {

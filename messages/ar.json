@@ -998,15 +998,27 @@
       "noFootprints": "No user footprints recorded yet.",
       "actor": "Actor",
       "footprints": {
-        "auth.registered": "Registered",
-        "auth.logged_in": "Signed in",
-        "auth.oauth_logged_in": "Google sign in",
-        "profile.updated": "Profile updated",
-        "admin.user_updated": "Admin update",
-        "contact.submitted": "Contact request",
-        "ticket.replied": "Ticket reply",
-        "ticket.status_updated": "Ticket status",
-        "download.started": "Download"
+        "auth": {
+          "registered": "Registered",
+          "logged_in": "Signed in",
+          "oauth_logged_in": "Google sign in"
+        },
+        "profile": {
+          "updated": "Profile updated"
+        },
+        "admin": {
+          "user_updated": "Admin update"
+        },
+        "contact": {
+          "submitted": "Contact request"
+        },
+        "ticket": {
+          "replied": "Ticket reply",
+          "status_updated": "Ticket status"
+        },
+        "download": {
+          "started": "Download"
+        }
       },
       "form": {
         "email": "Email",

@@ -998,15 +998,27 @@
       "noFootprints": "暂无用户足迹记录。",
       "actor": "操作人",
       "footprints": {
-        "auth.registered": "注册",
-        "auth.logged_in": "登录",
-        "auth.oauth_logged_in": "Google 登录",
-        "profile.updated": "资料更新",
-        "admin.user_updated": "管理员更新",
-        "contact.submitted": "提交联系请求",
-        "ticket.replied": "工单回复",
-        "ticket.status_updated": "工单状态更新",
-        "download.started": "下载"
+        "auth": {
+          "registered": "注册",
+          "logged_in": "登录",
+          "oauth_logged_in": "Google 登录"
+        },
+        "profile": {
+          "updated": "资料更新"
+        },
+        "admin": {
+          "user_updated": "管理员更新"
+        },
+        "contact": {
+          "submitted": "提交联系请求"
+        },
+        "ticket": {
+          "replied": "工单回复",
+          "status_updated": "工单状态更新"
+        },
+        "download": {
+          "started": "下载"
+        }
       },
       "form": {
         "email": "邮箱",
