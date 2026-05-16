@@ -1017,6 +1017,33 @@ h3 {
   margin-bottom: 18px;
 }
 
+.admin-search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.admin-search input {
+  min-width: 0;
+  border: 1px solid rgba(183, 200, 213, 0.9);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--ink);
+  font: inherit;
+  padding: 12px;
+}
+
+.admin-user-meta {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: right;
+}
+
 .breadcrumbs {
   display: flex;
   flex-wrap: wrap;
@@ -1311,8 +1338,14 @@ h3 {
   .download-row,
   .doc-link,
   .release,
-  .feature {
+  .feature,
+  .admin-search {
     grid-template-columns: 1fr;
+  }
+
+  .admin-user-meta {
+    justify-items: start;
+    text-align: left;
   }
 
   .actions .button {

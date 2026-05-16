@@ -16,7 +16,8 @@ export const publicPathnames = [
   "/account/",
   "/account/profile/",
   "/account/tickets/",
-  "/admin/tickets/"
+  "/admin/tickets/",
+  "/admin/users/"
 ];
 
 export function buildLanguageAlternates(pathname) {

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { AuthRequiredError, requireUser } from "@/lib/auth";
 import { ensureProfile, updateProfile } from "@/lib/profiles";
+import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
 
 export const runtime = "nodejs";
 
@@ -35,6 +36,12 @@ export async function PATCH(request) {
       jobTitle: clean(payload.jobTitle),
       countryRegion: clean(payload.countryRegion),
       phone: clean(payload.phone)
+    });
+    await recordUserFootprint({
+      userId: user.id,
+      actorUserId: user.id,
+      eventType: USER_FOOTPRINT_EVENTS.profileUpdated,
+      summary: "User updated their profile."
     });
 
     return NextResponse.json({ profile });

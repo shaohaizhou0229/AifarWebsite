@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ensureProfile } from "@/lib/profiles";
 import { setAuthCookies, signInWithPassword } from "@/lib/auth";
+import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
 
 export const runtime = "nodejs";
 
@@ -20,6 +21,12 @@ export async function POST(request) {
   try {
     const session = await signInWithPassword(email, password);
     const profile = await ensureProfile(session.user);
+    await recordUserFootprint({
+      userId: session.user.id,
+      actorUserId: session.user.id,
+      eventType: USER_FOOTPRINT_EVENTS.loggedIn,
+      summary: "User signed in with email and password."
+    });
     const response = NextResponse.json({ ok: true, user: session.user, profile });
     setAuthCookies(response, session);
     return response;

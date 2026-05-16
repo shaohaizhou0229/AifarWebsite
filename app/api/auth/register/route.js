@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ensureProfile } from "@/lib/profiles";
 import { setAuthCookies, signUpWithPassword } from "@/lib/auth";
+import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
 
 export const runtime = "nodejs";
 
@@ -33,6 +34,12 @@ export async function POST(request) {
     let profile = null;
     if (user?.id) {
       profile = await ensureProfile(user, { displayName, organization });
+      await recordUserFootprint({
+        userId: user.id,
+        actorUserId: user.id,
+        eventType: USER_FOOTPRINT_EVENTS.registered,
+        summary: "User registered an Aifar account."
+      });
     }
 
     const response = NextResponse.json({

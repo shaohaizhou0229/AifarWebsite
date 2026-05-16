@@ -25,7 +25,9 @@ const pages = [
   "app/[locale]/admin/product/page.jsx",
   "app/[locale]/admin/support/page.jsx",
   "app/[locale]/admin/tickets/page.jsx",
-  "app/[locale]/admin/tickets/[id]/page.jsx"
+  "app/[locale]/admin/tickets/[id]/page.jsx",
+  "app/[locale]/admin/users/page.jsx",
+  "app/[locale]/admin/users/[id]/page.jsx"
 ];
 
 const locales = ["en", "zh-CN", "fr", "ar"];
@@ -133,6 +135,7 @@ for (const file of [
   "components/SignOutButton.jsx",
   "components/AdminTicketActions.jsx",
   "components/AdminDownloadForm.jsx",
+  "components/AdminUserForm.jsx",
   "public/assets/images/aifar-hero.png",
   "i18n/routing.js",
   "i18n/request.js",

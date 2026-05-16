@@ -4,6 +4,7 @@ const ADMIN_ITEMS = [
   ["home", "/admin/"],
   ["product", "/admin/product/"],
   ["downloads", "/admin/downloads/"],
+  ["users", "/admin/users/"],
   ["docs", "/admin/docs/"],
   ["support", "/admin/support/"],
   ["contact", "/admin/contact/"]
@@ -13,6 +14,7 @@ const FALLBACK_LABELS = {
   home: "Admin home",
   product: "Product",
   downloads: "Downloads",
+  users: "Users",
   docs: "Docs",
   support: "Support",
   contact: "Contact"
