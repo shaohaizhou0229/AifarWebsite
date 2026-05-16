@@ -6,9 +6,10 @@ import { PageHero } from "@/components/PageHero";
 import { AdminRequiredError, requireAdmin } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import { listAdminTickets, TICKET_STATUSES } from "@/lib/tickets";
-import { getPageMessages } from "@/i18n/messages";
+import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
+import { getRequestTypeLabel, getTicketStatusLabel } from "@/i18n/labels";
 
 const pathname = "/admin/contact/";
 
@@ -27,9 +28,10 @@ function formatDate(value, locale) {
 export default async function AdminContactPage({ params, searchParams }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const [page, adminHome] = await Promise.all([
+  const [page, adminHome, messages] = await Promise.all([
     getPageMessages(locale, "adminContact"),
-    getPageMessages(locale, "adminHome")
+    getPageMessages(locale, "adminHome"),
+    getLocaleMessages(locale)
   ]);
 
   try {
@@ -72,10 +74,10 @@ export default async function AdminContactPage({ params, searchParams }) {
             {tickets.length ? tickets.map((ticket) => (
               <a className="release" key={ticket.id} href={localizedPath(locale, `/admin/tickets/${ticket.id}/`)}>
                 <div>
-                  <h3>{ticket.subject || ticket.requestType.replace("_", " ")}</h3>
+                  <h3>{ticket.subject || getRequestTypeLabel(messages.forms, ticket.requestType)}</h3>
                   <p>{formatDate(ticket.createdAt, locale)} - {ticket.name} - {ticket.workEmail}</p>
                 </div>
-                <span className="pill">{ticket.status.replace("_", " ")}</span>
+                <span className="pill">{getTicketStatusLabel(messages.forms.admin, ticket.status)}</span>
               </a>
             )) : (
               <article className="card admin-empty-state">
@@ -89,4 +91,3 @@ export default async function AdminContactPage({ params, searchParams }) {
     </main>
   );
 }
-

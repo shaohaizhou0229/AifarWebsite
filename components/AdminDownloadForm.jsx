@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import * as tus from "tus-js-client";
+import { formatMessage, getUploadStatusLabel } from "@/i18n/labels";
 
 async function calculateSha256(file) {
   const buffer = await file.arrayBuffer();
@@ -324,7 +325,10 @@ export function AdminDownloadForm({ platform, labels }) {
           </div>
           <p className="muted-line">
             {uploadPhase === "interrupted" ? (labels.uploadInterruptedHint || "Choose the same file and start upload again to continue.") : file?.name || release.originalFilename || release.storagePath || ""}
-            {totalBytes ? ` · ${uploadedBytes ? `${Math.round(uploadedBytes / 1024 / 1024)} MB / ` : ""}${Math.round(totalBytes / 1024 / 1024)} MB` : ""}
+            {totalBytes ? ` ${formatMessage(labels.uploadSizeProgress, {
+              uploaded: uploadedBytes ? `${Math.round(uploadedBytes / 1024 / 1024)} MB / ` : "",
+              total: Math.round(totalBytes / 1024 / 1024)
+            })}` : ""}
           </p>
           <div className="card-actions">
             <button className="button secondary" type="button" onClick={cancelUpload} disabled={cancelling}>
@@ -432,14 +436,14 @@ export function AdminDownloadForm({ platform, labels }) {
         ) : null}
 
         <p className="muted-line">{labels.fileHint}</p>
-        {serverUploadStatus ? <p className="muted-line">Upload status: {serverUploadStatus}</p> : null}
+        {serverUploadStatus ? <p className="muted-line">{labels.uploadStatus}: {getUploadStatusLabel(labels, serverUploadStatus)}</p> : null}
         <div className="card-actions">
           <button className="button primary" type="submit" disabled={uploading || (!file && !uploadPaused)}>
-            {uploading ? labels.uploading : uploadPaused ? "Resume upload" : (labels.uploadReplacement || labels.upload)}
+            {uploading ? labels.uploading : uploadPaused ? labels.resumeUpload : (labels.uploadReplacement || labels.upload)}
           </button>
           {uploading ? (
             <button className="button secondary" type="button" onClick={pauseUpload}>
-              Pause
+              {labels.pauseUpload}
             </button>
           ) : null}
           {uploading || uploadPaused ? (

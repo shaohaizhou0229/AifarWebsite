@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { getTicketStatusLabel } from "@/i18n/labels";
 
 export function AdminTicketActions({ ticket, labels }) {
   const [status, setStatus] = useState(ticket.status);
@@ -56,7 +57,7 @@ export function AdminTicketActions({ ticket, labels }) {
   return (
     <div className="admin-actions">
       <div className="status-actions" aria-label={labels.statusActions}>
-        <span className="pill">{status.replace("_", " ")}</span>
+        <span className="pill">{getTicketStatusLabel(labels, status)}</span>
         <button className="button secondary" type="button" onClick={() => updateStatus("in_progress")} disabled={status === "in_progress"}>
           {labels.markInProgress}
         </button>

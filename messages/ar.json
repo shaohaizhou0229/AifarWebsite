@@ -1,120 +1,727 @@
 {
   "layout": {
     "brand": "Aifar",
-    "menu": "Open navigation",
-    "language": "Language",
+    "menu": "فتح التنقل",
+    "language": "اللغة",
     "nav": {
-      "product": "Product",
-      "downloads": "Downloads",
-      "whatsNew": "What's New",
-      "docs": "Docs",
-      "support": "Support",
-      "contact": "Contact",
-      "admin": "Admin",
-      "account": "Account",
-      "signIn": "Sign in"
+      "product": "المنتج",
+      "downloads": "التنزيلات",
+      "whatsNew": "الجديد",
+      "docs": "الوثائق",
+      "support": "الدعم",
+      "contact": "اتصل بنا",
+      "admin": "الإدارة",
+      "account": "الحساب",
+      "signIn": "تسجيل الدخول"
     },
     "footer": {
-      "full": "© 2026 Aifar. All rights reserved.",
+      "full": "© 2026 Aifar. جميع الحقوق محفوظة.",
       "short": "© 2026 Aifar.",
-      "security": "Security",
-      "docs": "Documentation",
-      "contact": "Contact"
+      "security": "الأمان",
+      "docs": "الوثائق",
+      "contact": "التواصل"
     },
     "auth": {
-      "signOut": "Sign out",
-      "signingOut": "Signing out..."
+      "signOut": "تسجيل الخروج",
+      "signingOut": "جار تسجيل الخروج..."
     }
   },
   "forms": {
     "common": {
-      "email": "Email",
-      "name": "Name",
-      "organization": "Organization",
-      "workEmail": "Work email",
-      "password": "Password",
-      "pleaseWait": "Please wait..."
+      "email": "البريد الإلكتروني",
+      "name": "الاسم",
+      "organization": "المؤسسة",
+      "workEmail": "بريد العمل",
+      "password": "كلمة المرور",
+      "pleaseWait": "يرجى الانتظار..."
     },
     "auth": {
-      "createAccount": "Create account",
-      "signIn": "Sign in",
-      "register": "Register",
-      "alreadyHaveAccount": "Already have an account? ",
-      "needAccount": "Need an account? ",
-      "confirmation": "Please check your email to confirm your account before signing in.",
-      "failure": "Authentication failed.",
-      "continueWithGoogle": "Continue with Google",
-      "orEmail": "or use email"
+      "createAccount": "إنشاء حساب",
+      "signIn": "تسجيل الدخول",
+      "register": "تسجيل",
+      "alreadyHaveAccount": "لديك حساب بالفعل؟ ",
+      "needAccount": "تحتاج إلى حساب؟ ",
+      "confirmation": "يرجى تأكيد حسابك عبر البريد قبل تسجيل الدخول.",
+      "failure": "فشلت المصادقة.",
+      "continueWithGoogle": "المتابعة باستخدام Google",
+      "orEmail": "أو استخدم البريد",
+      "errors": {
+        "google_failed": "فشل تسجيل الدخول عبر Google. يرجى المحاولة مرة أخرى.",
+        "google_missing_code": "استدعاء Google لا يحتوي على رمز التفويض."
+      }
     },
     "contact": {
-      "subject": "Subject",
-      "requestType": "Request type",
-      "message": "Message",
-      "submit": "Submit request",
-      "submitting": "Submitting...",
-      "validation": "Please fill in your name, work email, request type, and message.",
-      "invalidEmail": "Please enter a valid work email.",
-      "submitFailed": "Submit failed",
-      "success": "Your request has been submitted. The Aifar team will follow up soon.",
-      "error": "We could not submit your request right now. Please try again later.",
+      "subject": "الموضوع",
+      "requestType": "نوع الطلب",
+      "message": "الرسالة",
+      "submit": "إرسال الطلب",
+      "submitting": "جار الإرسال...",
+      "validation": "يرجى إدخال الاسم وبريد العمل ونوع الطلب والرسالة.",
+      "invalidEmail": "يرجى إدخال بريد عمل صالح.",
+      "submitFailed": "فشل الإرسال",
+      "success": "تم إرسال طلبك. سيتابع فريق Aifar قريباً.",
+      "error": "تعذر إرسال الطلب الآن. يرجى المحاولة لاحقاً.",
       "requestTypes": {
-        "product_inquiry": "Product inquiry",
-        "technical_support": "Technical support",
-        "partnership": "Partnership",
-        "other": "Other"
+        "product_inquiry": "استفسار عن المنتج",
+        "technical_support": "دعم فني",
+        "partnership": "شراكة",
+        "other": "أخرى"
       }
     },
     "profile": {
-      "jobTitle": "Job title",
-      "countryRegion": "Country / Region",
-      "phone": "Phone",
-      "save": "Save profile",
-      "saving": "Saving...",
-      "success": "Profile updated.",
-      "failure": "Profile update failed."
+      "jobTitle": "المسمى الوظيفي",
+      "countryRegion": "الدولة / المنطقة",
+      "phone": "الهاتف",
+      "save": "حفظ الملف",
+      "saving": "جار الحفظ...",
+      "success": "تم تحديث الملف.",
+      "failure": "فشل تحديث الملف."
     },
     "admin": {
-      "statusActions": "Ticket status actions",
-      "markInProgress": "Mark in progress",
-      "closeTicket": "Close ticket",
-      "reply": "Reply",
-      "sendReply": "Send reply",
-      "sending": "Sending...",
-      "statusUpdated": "Ticket status updated.",
-      "statusFailure": "Unable to update status.",
-      "replyRequired": "Reply message is required.",
-      "replyFailure": "Unable to send reply."
+      "statusActions": "إجراءات حالة التذكرة",
+      "markInProgress": "تعيين قيد المعالجة",
+      "closeTicket": "إغلاق التذكرة",
+      "reply": "رد",
+      "sendReply": "إرسال الرد",
+      "sending": "جار الإرسال...",
+      "statusUpdated": "تم تحديث حالة التذكرة.",
+      "statusFailure": "تعذر تحديث الحالة.",
+      "replyRequired": "رسالة الرد مطلوبة.",
+      "replyFailure": "تعذر إرسال الرد.",
+      "ticketStatuses": {
+        "new": "جديدة",
+        "in_progress": "قيد المعالجة",
+        "closed": "مغلقة"
+      }
+    },
+    "downloads": {
+      "version": "الإصدار",
+      "buildNumber": "رقم البناء",
+      "externalUrl": "رابط خارجي",
+      "releaseNotes": "ملاحظات الإصدار",
+      "published": "منشور",
+      "save": "حفظ الإصدار",
+      "saving": "جار الحفظ...",
+      "saved": "تم حفظ الإصدار.",
+      "saveFailed": "تعذر حفظ الإصدار.",
+      "file": "ملف الإصدار",
+      "fileHint": "الملفات المدعومة: exe و msi و dmg و pkg و apk و zip. رفع ملف جديد يلغي نشر المنصة حتى تعيد نشرها.",
+      "fileRequired": "يرجى اختيار ملف.",
+      "upload": "رفع الملف",
+      "uploading": "جار الرفع...",
+      "uploaded": "تم رفع الملف. راجع الإصدار ثم انشره.",
+      "uploadFailed": "تعذر رفع الملف.",
+      "uploadTooLarge": "يتجاوز الملف حد Supabase Storage الحالي. اضبط الحد العام إلى 300 MB على الأقل أو ارفع ملفاً أصغر.",
+      "uploadProgressTitle": "تقدم الرفع",
+      "uploadStatusIdle": "جاهز للرفع",
+      "uploadStatusPreparing": "جار تجهيز الملف والتحقق...",
+      "uploadStatusUploading": "جار رفع الملف...",
+      "uploadStatusPaused": "تم إيقاف الرفع مؤقتاً",
+      "uploadStatusFinalizing": "جار إنهاء ملف الإصدار...",
+      "uploadStatusComplete": "اكتمل الرفع",
+      "uploadStatusInterrupted": "الرفع السابق لم يكتمل",
+      "uploadStatusFailed": "فشل الرفع",
+      "uploadInterruptedHint": "اختر الملف نفسه وابدأ الرفع مرة أخرى للمتابعة.",
+      "cancelUpload": "إلغاء الرفع",
+      "cancellingUpload": "جار الإلغاء...",
+      "uploadCancelled": "تم إلغاء الرفع.",
+      "currentFile": "الملف الحالي",
+      "deleteFile": "حذف الملف",
+      "deletingFile": "جار الحذف...",
+      "fileDeleted": "تم حذف ملف الإصدار.",
+      "deleteFileFailed": "تعذر حذف ملف الإصدار.",
+      "deleteFileConfirm": "هل تريد حذف ملف الإصدار الحالي؟ سيتم إلغاء نشر هذه المنصة.",
+      "currentWebFile": "ملف الموقع الحالي",
+      "currentWebFileHint": "هذا هو الملف الذي سيحمله الزوار بعد نشر المنصة.",
+      "noCurrentFile": "لم يتم رفع ملف",
+      "noCurrentFileHint": "ارفع حزمة قبل نشر هذه المنصة.",
+      "replacementFile": "ملف بديل",
+      "chooseReplacement": "اختر حزمة للرفع",
+      "replacementHint": "اختيار ملف لا يغير ملف الموقع الحالي. يتم الاستبدال بعد اكتمال الرفع.",
+      "chooseFile": "اختيار ملف",
+      "changeFile": "تغيير الملف",
+      "clearSelectedFile": "مسح الاختيار",
+      "selectedFile": "الملف المختار",
+      "uploadReplacement": "رفع البديل",
+      "uploadStatus": "حالة الرفع",
+      "uploadStatuses": {
+        "idle": "جاهز",
+        "uploading": "يرفع",
+        "uploaded": "مرفوع",
+        "failed": "فشل",
+        "complete": "مكتمل"
+      },
+      "resumeUpload": "متابعة الرفع",
+      "pauseUpload": "إيقاف مؤقت",
+      "uploadSizeProgress": "· {uploaded}{total} MB"
     }
   },
   "pages": {
     "home": {
       "seo": {
-        "title": "Aifar | Lightweight Standard Collaboration for Government and Enterprise Teams",
-        "description": "Aifar brings chat, meetings, email, contacts, documents, workflows, and forms into one lightweight collaboration workspace for government and enterprise teams."
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
       },
-      "eyebrow": "Government and enterprise collaboration",
+      "eyebrow": "معلومات Aifar",
       "title": "Aifar",
-      "lead": "Lightweight standard collaboration for teams that need clear communication, structured work, and reliable access across desktop and mobile clients.",
-      "primaryCta": "Download Aifar",
-      "secondaryCta": "Contact Sales",
-      "heroAlt": "Aifar collaboration workspace preview showing desktop and mobile app screens",
-      "schemaDescription": "Lightweight standard collaboration software for government and enterprise teams.",
-      "trustLabel": "Aifar platform highlights",
-      "trust": [["7", "Core collaboration modules"], ["5", "Client families supported"], ["24/7", "Support-ready site structure"], ["SEO", "Micro-lightweight, ready out of the box"]],
-      "modulesTitle": "One workspace for standard collaboration",
-      "modulesLead": "Aifar covers the daily collaboration layer without forcing teams into a heavy, fragmented toolset.",
-      "modules": [["C", "Chat", "Organized team messaging for departments, projects, and cross-agency collaboration."], ["M", "Meeting", "Simple meeting access for distributed teams across desktop, phone, and tablet."], ["E", "Email", "Integrated mail workflows that keep formal communication connected to work context."], ["D", "Documents", "Centralized document access for policies, procedures, guides, and shared materials."]],
-      "managedTitle": "Built for managed teams",
-      "managedLead": "The website is planned as the public entry point for product introduction, downloads, updates, documentation, and technical support.",
-      "features": [["Cross-client access", "PC, iOS, Android phone, Android pad, and Mac Preview are represented from the first release of the site."], ["Operational content", "What's New, documentation, support, and download pages are separated so each area can be maintained independently."], ["Future Aifar integration", "Contact forms, support requests, release notes, and documents can later connect to Aifar Forms, Workflow, Docs, Chat, Meeting, Email, and Contact."]],
-      "updatesTitle": "Latest updates",
-      "viewAll": "View all",
-      "updates": [["Website foundation", "Initial public website structure for product introduction, downloads, documentation, support, and contact.", "Planning"], ["Mac client preview", "Download area includes a preview channel for the Mac client.", "Preview"], ["Docs hub prepared", "Documentation entry points are ready for user guides, admin guides, deployment notes, and support policies.", "Docs"]],
-      "ctaEyebrow": "Ready for launch operations",
-      "ctaTitle": "Start with a clear website. Grow into a connected Aifar service portal.",
-      "ctaLead": "The first version stays lightweight and deployable. Future versions can connect forms, workflows, documents, contact records, and support conversations directly to Aifar.",
-      "ctaPrimary": "Get Aifar",
-      "ctaSecondary": "Technical Support"
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
+      "primaryCta": "معلومات Aifar",
+      "secondaryCta": "معلومات Aifar",
+      "heroAlt": "معلومات Aifar",
+      "schemaDescription": "معلومات Aifar",
+      "trustLabel": "معلومات Aifar",
+      "trust": [
+        [
+          "7",
+          "معلومات Aifar"
+        ],
+        [
+          "5",
+          "معلومات Aifar"
+        ],
+        [
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ],
+        [
+          "SEO",
+          "معلومات Aifar"
+        ]
+      ],
+      "modulesTitle": "معلومات Aifar",
+      "modulesLead": "معلومات Aifar",
+      "modules": [
+        [
+          "C",
+          "Chat",
+          "معلومات Aifar"
+        ],
+        [
+          "M",
+          "Meeting",
+          "معلومات Aifar"
+        ],
+        [
+          "E",
+          "Email",
+          "معلومات Aifar"
+        ],
+        [
+          "D",
+          "Documents",
+          "معلومات Aifar"
+        ]
+      ],
+      "managedTitle": "معلومات Aifar",
+      "managedLead": "معلومات Aifar",
+      "features": [
+        [
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ],
+        [
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ],
+        [
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ]
+      ],
+      "updatesTitle": "معلومات Aifar",
+      "viewAll": "معلومات Aifar",
+      "updates": [
+        [
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ],
+        [
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ],
+        [
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ]
+      ],
+      "ctaEyebrow": "معلومات Aifar",
+      "ctaTitle": "معلومات Aifar",
+      "ctaLead": "معلومات Aifar",
+      "ctaPrimary": "معلومات Aifar",
+      "ctaSecondary": "معلومات Aifar"
+    },
+    "product": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "title": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
+      "features": [
+        [
+          "C",
+          "Chat",
+          "معلومات Aifar"
+        ],
+        [
+          "M",
+          "Meeting",
+          "معلومات Aifar"
+        ],
+        [
+          "E",
+          "Email",
+          "معلومات Aifar"
+        ],
+        [
+          "P",
+          "Contact",
+          "معلومات Aifar"
+        ],
+        [
+          "D",
+          "Documents",
+          "معلومات Aifar"
+        ],
+        [
+          "W",
+          "Workflow",
+          "معلومات Aifar"
+        ],
+        [
+          "F",
+          "Forms",
+          "معلومات Aifar"
+        ]
+      ]
+    },
+    "downloads": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "title": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
+      "versionLabel": "معلومات Aifar",
+      "comingSoon": "معلومات Aifar",
+      "items": [
+        [
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ],
+        [
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "App Store",
+          "معلومات Aifar"
+        ],
+        [
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ],
+        [
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ],
+        [
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ]
+      ]
+    },
+    "docs": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "title": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
+      "items": [
+        [
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ],
+        [
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ],
+        [
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ],
+        [
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ]
+      ]
+    },
+    "support": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "title": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
+      "items": [
+        [
+          "A",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ],
+        [
+          "I",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ],
+        [
+          "T",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ]
+      ]
+    },
+    "contact": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "Contact",
+      "title": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته."
+    },
+    "security": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "title": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
+      "items": [
+        [
+          "G",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ],
+        [
+          "P",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ],
+        [
+          "D",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ]
+      ]
+    },
+    "whatsNew": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "title": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
+      "items": [
+        [
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ],
+        [
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ],
+        [
+          "معلومات Aifar",
+          "معلومات Aifar",
+          "معلومات Aifar"
+        ]
+      ]
+    },
+    "login": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "title": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته."
+    },
+    "register": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "title": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته."
+    },
+    "account": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "welcome": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
+      "cards": {
+        "profileTitle": "معلومات Aifar",
+        "profileText": "معلومات Aifar",
+        "profileAction": "معلومات Aifar",
+        "ticketsTitle": "معلومات Aifar",
+        "ticketsText": "{count} طلبات تواصل مرتبطة بحسابك.",
+        "ticketsAction": "معلومات Aifar",
+        "contactTitle": "معلومات Aifar",
+        "contactText": "معلومات Aifar",
+        "contactAction": "معلومات Aifar"
+      }
+    },
+    "profile": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "title": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته."
+    },
+    "tickets": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "title": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
+      "emptyTitle": "معلومات Aifar",
+      "emptyText": "معلومات Aifar",
+      "emptyAction": "معلومات Aifar"
+    },
+    "ticketDetail": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "status": "معلومات Aifar",
+      "submitted": "معلومات Aifar",
+      "requestTitle": "معلومات Aifar",
+      "replies": "معلومات Aifar",
+      "aifarTeam": "معلومات Aifar",
+      "user": "معلومات Aifar",
+      "noReplies": "معلومات Aifar"
+    },
+    "adminHome": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "deniedTitle": "معلومات Aifar",
+      "deniedLead": "معلومات Aifar",
+      "title": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
+      "active": "معلومات Aifar",
+      "planned": "معلومات Aifar",
+      "nav": {
+        "label": "معلومات Aifar",
+        "home": "معلومات Aifar",
+        "product": "معلومات Aifar",
+        "downloads": "معلومات Aifar",
+        "docs": "معلومات Aifar",
+        "support": "معلومات Aifar",
+        "contact": "معلومات Aifar"
+      },
+      "modules": [
+        {
+          "key": "معلومات Aifar",
+          "href": "معلومات Aifar",
+          "title": "معلومات Aifar",
+          "description": "معلومات Aifar",
+          "status": "معلومات Aifar"
+        },
+        {
+          "key": "معلومات Aifar",
+          "href": "معلومات Aifar",
+          "title": "معلومات Aifar",
+          "description": "معلومات Aifar",
+          "status": "معلومات Aifar"
+        },
+        {
+          "key": "معلومات Aifar",
+          "href": "معلومات Aifar",
+          "title": "معلومات Aifar",
+          "description": "معلومات Aifar",
+          "status": "معلومات Aifar"
+        },
+        {
+          "key": "معلومات Aifar",
+          "href": "معلومات Aifar",
+          "title": "معلومات Aifar",
+          "description": "معلومات Aifar",
+          "status": "معلومات Aifar"
+        },
+        {
+          "key": "معلومات Aifar",
+          "href": "معلومات Aifar",
+          "title": "معلومات Aifar",
+          "description": "معلومات Aifar",
+          "status": "معلومات Aifar"
+        }
+      ]
+    },
+    "adminProduct": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "deniedTitle": "معلومات Aifar",
+      "deniedLead": "معلومات Aifar",
+      "breadcrumb": "معلومات Aifar",
+      "title": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
+      "status": "معلومات Aifar",
+      "emptyTitle": "معلومات Aifar",
+      "emptyLead": "معلومات Aifar"
+    },
+    "adminDocs": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "deniedTitle": "معلومات Aifar",
+      "deniedLead": "معلومات Aifar",
+      "breadcrumb": "معلومات Aifar",
+      "title": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
+      "status": "معلومات Aifar",
+      "emptyTitle": "معلومات Aifar",
+      "emptyLead": "معلومات Aifar"
+    },
+    "adminSupport": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "deniedTitle": "معلومات Aifar",
+      "deniedLead": "معلومات Aifar",
+      "breadcrumb": "معلومات Aifar",
+      "title": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
+      "status": "معلومات Aifar",
+      "emptyTitle": "معلومات Aifar",
+      "emptyLead": "معلومات Aifar"
+    },
+    "adminContact": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "deniedTitle": "معلومات Aifar",
+      "deniedLead": "معلومات Aifar",
+      "breadcrumb": "معلومات Aifar",
+      "title": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
+      "all": "معلومات Aifar",
+      "new": "معلومات Aifar",
+      "inProgress": "معلومات Aifar",
+      "closed": "معلومات Aifar",
+      "emptyTitle": "معلومات Aifar",
+      "emptyLead": "معلومات Aifar"
+    },
+    "adminTickets": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "deniedTitle": "معلومات Aifar",
+      "deniedLead": "معلومات Aifar",
+      "breadcrumb": "معلومات Aifar",
+      "title": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
+      "all": "معلومات Aifar",
+      "new": "معلومات Aifar",
+      "inProgress": "معلومات Aifar",
+      "closed": "معلومات Aifar"
+    },
+    "adminTicketDetail": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "deniedTitle": "معلومات Aifar",
+      "deniedLead": "معلومات Aifar",
+      "breadcrumb": "معلومات Aifar",
+      "submitted": "معلومات Aifar",
+      "requestTitle": "معلومات Aifar",
+      "organization": "معلومات Aifar",
+      "notProvided": "معلومات Aifar",
+      "replies": "معلومات Aifar",
+      "noReplies": "معلومات Aifar"
+    },
+    "adminDownloads": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "deniedTitle": "معلومات Aifar",
+      "deniedLead": "معلومات Aifar",
+      "breadcrumb": "معلومات Aifar",
+      "title": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
+      "tickets": "معلومات Aifar",
+      "published": "معلومات Aifar",
+      "draft": "معلومات Aifar",
+      "noVersion": "معلومات Aifar"
+    },
+    "adminDownloadDetail": {
+      "seo": {
+        "title": "معلومات Aifar | Aifar",
+        "description": "معلومات Aifar للفرق والمؤسسات."
+      },
+      "eyebrow": "معلومات Aifar",
+      "deniedTitle": "معلومات Aifar",
+      "deniedLead": "معلومات Aifar",
+      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
+      "current": "معلومات Aifar",
+      "status": "معلومات Aifar",
+      "published": "معلومات Aifar",
+      "draft": "معلومات Aifar",
+      "file": "معلومات Aifar",
+      "fileSize": "معلومات Aifar",
+      "publishedAt": "معلومات Aifar",
+      "noVersion": "معلومات Aifar",
+      "noFile": "معلومات Aifar",
+      "originalFile": "معلومات Aifar"
     }
   }
 }

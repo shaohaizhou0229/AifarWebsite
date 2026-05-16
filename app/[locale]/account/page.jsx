@@ -7,6 +7,7 @@ import { listUserTickets } from "@/lib/tickets";
 import { getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
+import { formatMessage } from "@/i18n/labels";
 
 const pathname = "/account/";
 
@@ -30,9 +31,7 @@ export default async function AccountPage({ params }) {
     listUserTickets(user)
   ]);
   const cards = page.cards;
-  const ticketsText = cards.ticketsText
-    .replace("{count}", String(tickets.length))
-    .replace("{plural}", tickets.length === 1 ? "" : "s");
+  const ticketsText = formatMessage(cards.ticketsText, { count: tickets.length });
 
   return (
     <main>

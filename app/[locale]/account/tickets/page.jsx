@@ -3,9 +3,10 @@ import { redirect } from "next/navigation";
 import { PageHero } from "@/components/PageHero";
 import { getCurrentUser } from "@/lib/auth";
 import { listUserTickets } from "@/lib/tickets";
-import { getPageMessages } from "@/i18n/messages";
+import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
+import { getRequestTypeLabel, getTicketStatusLabel } from "@/i18n/labels";
 
 const pathname = "/account/tickets/";
 
@@ -27,7 +28,11 @@ export default async function AccountTicketsPage({ params }) {
   const user = await getCurrentUser();
   if (!user) redirect(localizedPath(locale, "/login/"));
 
-  const [page, tickets] = await Promise.all([getPageMessages(locale, "tickets"), listUserTickets(user)]);
+  const [page, messages, tickets] = await Promise.all([
+    getPageMessages(locale, "tickets"),
+    getLocaleMessages(locale),
+    listUserTickets(user)
+  ]);
 
   return (
     <main>
@@ -38,10 +43,10 @@ export default async function AccountTicketsPage({ params }) {
             {tickets.length ? tickets.map((ticket) => (
               <a className="release" key={ticket.id} href={localizedPath(locale, `/account/tickets/${ticket.id}/`)}>
                 <div>
-                  <h3>{ticket.subject || ticket.requestType.replace("_", " ")}</h3>
+                  <h3>{ticket.subject || getRequestTypeLabel(messages.forms, ticket.requestType)}</h3>
                   <p>{formatDate(ticket.createdAt, locale)} - {ticket.workEmail}</p>
                 </div>
-                <span className="pill">{ticket.status.replace("_", " ")}</span>
+                <span className="pill">{getTicketStatusLabel(messages.forms.admin, ticket.status)}</span>
               </a>
             )) : (
               <article className="card">

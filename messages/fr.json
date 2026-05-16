@@ -1,120 +1,727 @@
 {
   "layout": {
     "brand": "Aifar",
-    "menu": "Open navigation",
-    "language": "Language",
+    "menu": "Ouvrir la navigation",
+    "language": "Langue",
     "nav": {
-      "product": "Product",
-      "downloads": "Downloads",
-      "whatsNew": "What's New",
+      "product": "Produit",
+      "downloads": "Téléchargements",
+      "whatsNew": "Nouveautés",
       "docs": "Docs",
       "support": "Support",
       "contact": "Contact",
       "admin": "Admin",
-      "account": "Account",
-      "signIn": "Sign in"
+      "account": "Compte",
+      "signIn": "Connexion"
     },
     "footer": {
-      "full": "© 2026 Aifar. All rights reserved.",
+      "full": "© 2026 Aifar. Tous droits réservés.",
       "short": "© 2026 Aifar.",
-      "security": "Security",
+      "security": "Sécurité",
       "docs": "Documentation",
       "contact": "Contact"
     },
     "auth": {
-      "signOut": "Sign out",
-      "signingOut": "Signing out..."
+      "signOut": "Se déconnecter",
+      "signingOut": "Déconnexion..."
     }
   },
   "forms": {
     "common": {
-      "email": "Email",
-      "name": "Name",
-      "organization": "Organization",
-      "workEmail": "Work email",
-      "password": "Password",
-      "pleaseWait": "Please wait..."
+      "email": "E-mail",
+      "name": "Nom",
+      "organization": "Organisation",
+      "workEmail": "E-mail professionnel",
+      "password": "Mot de passe",
+      "pleaseWait": "Veuillez patienter..."
     },
     "auth": {
-      "createAccount": "Create account",
-      "signIn": "Sign in",
-      "register": "Register",
-      "alreadyHaveAccount": "Already have an account? ",
-      "needAccount": "Need an account? ",
-      "confirmation": "Please check your email to confirm your account before signing in.",
-      "failure": "Authentication failed.",
-      "continueWithGoogle": "Continue with Google",
-      "orEmail": "or use email"
+      "createAccount": "Créer un compte",
+      "signIn": "Se connecter",
+      "register": "S’inscrire",
+      "alreadyHaveAccount": "Vous avez déjà un compte ? ",
+      "needAccount": "Besoin d’un compte ? ",
+      "confirmation": "Veuillez confirmer votre compte par e-mail avant de vous connecter.",
+      "failure": "Échec de l’authentification.",
+      "continueWithGoogle": "Continuer avec Google",
+      "orEmail": "ou utiliser l’e-mail",
+      "errors": {
+        "google_failed": "La connexion Google a échoué. Veuillez réessayer.",
+        "google_missing_code": "Le rappel Google ne contient pas de code d’autorisation."
+      }
     },
     "contact": {
-      "subject": "Subject",
-      "requestType": "Request type",
+      "subject": "Sujet",
+      "requestType": "Type de demande",
       "message": "Message",
-      "submit": "Submit request",
-      "submitting": "Submitting...",
-      "validation": "Please fill in your name, work email, request type, and message.",
-      "invalidEmail": "Please enter a valid work email.",
-      "submitFailed": "Submit failed",
-      "success": "Your request has been submitted. The Aifar team will follow up soon.",
-      "error": "We could not submit your request right now. Please try again later.",
+      "submit": "Envoyer la demande",
+      "submitting": "Envoi...",
+      "validation": "Veuillez renseigner votre nom, e-mail professionnel, type de demande et message.",
+      "invalidEmail": "Veuillez saisir un e-mail professionnel valide.",
+      "submitFailed": "Échec de l’envoi",
+      "success": "Votre demande a été envoyée. L’équipe Aifar vous répondra bientôt.",
+      "error": "Impossible d’envoyer votre demande pour le moment. Veuillez réessayer plus tard.",
       "requestTypes": {
-        "product_inquiry": "Product inquiry",
-        "technical_support": "Technical support",
-        "partnership": "Partnership",
-        "other": "Other"
+        "product_inquiry": "Demande produit",
+        "technical_support": "Support technique",
+        "partnership": "Partenariat",
+        "other": "Autre"
       }
     },
     "profile": {
-      "jobTitle": "Job title",
-      "countryRegion": "Country / Region",
-      "phone": "Phone",
-      "save": "Save profile",
-      "saving": "Saving...",
-      "success": "Profile updated.",
-      "failure": "Profile update failed."
+      "jobTitle": "Fonction",
+      "countryRegion": "Pays / Région",
+      "phone": "Téléphone",
+      "save": "Enregistrer le profil",
+      "saving": "Enregistrement...",
+      "success": "Profil mis à jour.",
+      "failure": "Échec de la mise à jour du profil."
     },
     "admin": {
-      "statusActions": "Ticket status actions",
-      "markInProgress": "Mark in progress",
-      "closeTicket": "Close ticket",
-      "reply": "Reply",
-      "sendReply": "Send reply",
-      "sending": "Sending...",
-      "statusUpdated": "Ticket status updated.",
-      "statusFailure": "Unable to update status.",
-      "replyRequired": "Reply message is required.",
-      "replyFailure": "Unable to send reply."
+      "statusActions": "Actions de statut du ticket",
+      "markInProgress": "Marquer en cours",
+      "closeTicket": "Fermer le ticket",
+      "reply": "Réponse",
+      "sendReply": "Envoyer la réponse",
+      "sending": "Envoi...",
+      "statusUpdated": "Statut du ticket mis à jour.",
+      "statusFailure": "Impossible de mettre à jour le statut.",
+      "replyRequired": "Le message de réponse est obligatoire.",
+      "replyFailure": "Impossible d’envoyer la réponse.",
+      "ticketStatuses": {
+        "new": "Nouveau",
+        "in_progress": "En cours",
+        "closed": "Fermé"
+      }
+    },
+    "downloads": {
+      "version": "Version",
+      "buildNumber": "Numéro de build",
+      "externalUrl": "URL externe",
+      "releaseNotes": "Notes de version",
+      "published": "Publié",
+      "save": "Enregistrer la version",
+      "saving": "Enregistrement...",
+      "saved": "Version enregistrée.",
+      "saveFailed": "Impossible d’enregistrer la version.",
+      "file": "Fichier de version",
+      "fileHint": "Fichiers pris en charge : exe, msi, dmg, pkg, apk, zip. L’envoi d’un nouveau fichier dépublie la plateforme jusqu’à une nouvelle publication.",
+      "fileRequired": "Veuillez choisir un fichier.",
+      "upload": "Envoyer le fichier",
+      "uploading": "Envoi...",
+      "uploaded": "Fichier envoyé. Vérifiez la version puis publiez.",
+      "uploadFailed": "Impossible d’envoyer le fichier.",
+      "uploadTooLarge": "Le fichier dépasse la limite Supabase Storage actuelle. Réglez la limite globale à au moins 300 MB ou envoyez un fichier plus petit.",
+      "uploadProgressTitle": "Progression de l’envoi",
+      "uploadStatusIdle": "Prêt à envoyer",
+      "uploadStatusPreparing": "Préparation du fichier et du checksum...",
+      "uploadStatusUploading": "Envoi du fichier...",
+      "uploadStatusPaused": "Envoi en pause",
+      "uploadStatusFinalizing": "Finalisation du fichier...",
+      "uploadStatusComplete": "Envoi terminé",
+      "uploadStatusInterrupted": "L’envoi précédent n’est pas terminé",
+      "uploadStatusFailed": "Échec de l’envoi",
+      "uploadInterruptedHint": "Choisissez le même fichier et relancez l’envoi pour continuer.",
+      "cancelUpload": "Annuler l’envoi",
+      "cancellingUpload": "Annulation...",
+      "uploadCancelled": "Envoi annulé.",
+      "currentFile": "Fichier actuel",
+      "deleteFile": "Supprimer le fichier",
+      "deletingFile": "Suppression...",
+      "fileDeleted": "Fichier de version supprimé.",
+      "deleteFileFailed": "Impossible de supprimer le fichier.",
+      "deleteFileConfirm": "Supprimer le fichier actuel ? Cette plateforme sera dépubliée.",
+      "currentWebFile": "Fichier web actuel",
+      "currentWebFileHint": "C’est le fichier que les visiteurs téléchargeront après publication.",
+      "noCurrentFile": "Aucun fichier envoyé",
+      "noCurrentFileHint": "Envoyez un package avant de publier cette plateforme.",
+      "replacementFile": "Fichier de remplacement",
+      "chooseReplacement": "Choisir un package à envoyer",
+      "replacementHint": "Choisir un fichier ne change pas le fichier web actuel. Il sera remplacé après l’envoi.",
+      "chooseFile": "Choisir un fichier",
+      "changeFile": "Changer de fichier",
+      "clearSelectedFile": "Effacer la sélection",
+      "selectedFile": "Fichier sélectionné",
+      "uploadReplacement": "Envoyer le remplacement",
+      "uploadStatus": "Statut d’envoi",
+      "uploadStatuses": {
+        "idle": "Prêt",
+        "uploading": "Envoi",
+        "uploaded": "Envoyé",
+        "failed": "Échec",
+        "complete": "Terminé"
+      },
+      "resumeUpload": "Reprendre l’envoi",
+      "pauseUpload": "Pause",
+      "uploadSizeProgress": "· {uploaded}{total} MB"
     }
   },
   "pages": {
     "home": {
       "seo": {
-        "title": "Aifar | Lightweight Standard Collaboration for Government and Enterprise Teams",
-        "description": "Aifar brings chat, meetings, email, contacts, documents, workflows, and forms into one lightweight collaboration workspace for government and enterprise teams."
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
       },
-      "eyebrow": "Government and enterprise collaboration",
+      "eyebrow": "Présentation Aifar",
       "title": "Aifar",
-      "lead": "Lightweight standard collaboration for teams that need clear communication, structured work, and reliable access across desktop and mobile clients.",
-      "primaryCta": "Download Aifar",
-      "secondaryCta": "Contact Sales",
-      "heroAlt": "Aifar collaboration workspace preview showing desktop and mobile app screens",
-      "schemaDescription": "Lightweight standard collaboration software for government and enterprise teams.",
-      "trustLabel": "Aifar platform highlights",
-      "trust": [["7", "Core collaboration modules"], ["5", "Client families supported"], ["24/7", "Support-ready site structure"], ["SEO", "Micro-lightweight, ready out of the box"]],
-      "modulesTitle": "One workspace for standard collaboration",
-      "modulesLead": "Aifar covers the daily collaboration layer without forcing teams into a heavy, fragmented toolset.",
-      "modules": [["C", "Chat", "Organized team messaging for departments, projects, and cross-agency collaboration."], ["M", "Meeting", "Simple meeting access for distributed teams across desktop, phone, and tablet."], ["E", "Email", "Integrated mail workflows that keep formal communication connected to work context."], ["D", "Documents", "Centralized document access for policies, procedures, guides, and shared materials."]],
-      "managedTitle": "Built for managed teams",
-      "managedLead": "The website is planned as the public entry point for product introduction, downloads, updates, documentation, and technical support.",
-      "features": [["Cross-client access", "PC, iOS, Android phone, Android pad, and Mac Preview are represented from the first release of the site."], ["Operational content", "What's New, documentation, support, and download pages are separated so each area can be maintained independently."], ["Future Aifar integration", "Contact forms, support requests, release notes, and documents can later connect to Aifar Forms, Workflow, Docs, Chat, Meeting, Email, and Contact."]],
-      "updatesTitle": "Latest updates",
-      "viewAll": "View all",
-      "updates": [["Website foundation", "Initial public website structure for product introduction, downloads, documentation, support, and contact.", "Planning"], ["Mac client preview", "Download area includes a preview channel for the Mac client.", "Preview"], ["Docs hub prepared", "Documentation entry points are ready for user guides, admin guides, deployment notes, and support policies.", "Docs"]],
-      "ctaEyebrow": "Ready for launch operations",
-      "ctaTitle": "Start with a clear website. Grow into a connected Aifar service portal.",
-      "ctaLead": "The first version stays lightweight and deployable. Future versions can connect forms, workflows, documents, contact records, and support conversations directly to Aifar.",
-      "ctaPrimary": "Get Aifar",
-      "ctaSecondary": "Technical Support"
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "primaryCta": "Présentation Aifar",
+      "secondaryCta": "Présentation Aifar",
+      "heroAlt": "Présentation Aifar",
+      "schemaDescription": "Présentation Aifar",
+      "trustLabel": "Présentation Aifar",
+      "trust": [
+        [
+          "7",
+          "Présentation Aifar"
+        ],
+        [
+          "5",
+          "Présentation Aifar"
+        ],
+        [
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ],
+        [
+          "SEO",
+          "Présentation Aifar"
+        ]
+      ],
+      "modulesTitle": "Présentation Aifar",
+      "modulesLead": "Présentation Aifar",
+      "modules": [
+        [
+          "C",
+          "Chat",
+          "Présentation Aifar"
+        ],
+        [
+          "M",
+          "Meeting",
+          "Présentation Aifar"
+        ],
+        [
+          "E",
+          "Email",
+          "Présentation Aifar"
+        ],
+        [
+          "D",
+          "Documents",
+          "Présentation Aifar"
+        ]
+      ],
+      "managedTitle": "Présentation Aifar",
+      "managedLead": "Présentation Aifar",
+      "features": [
+        [
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ],
+        [
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ],
+        [
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ]
+      ],
+      "updatesTitle": "Présentation Aifar",
+      "viewAll": "Présentation Aifar",
+      "updates": [
+        [
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ],
+        [
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ],
+        [
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ]
+      ],
+      "ctaEyebrow": "Présentation Aifar",
+      "ctaTitle": "Présentation Aifar",
+      "ctaLead": "Présentation Aifar",
+      "ctaPrimary": "Présentation Aifar",
+      "ctaSecondary": "Présentation Aifar"
+    },
+    "product": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "title": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "features": [
+        [
+          "C",
+          "Chat",
+          "Présentation Aifar"
+        ],
+        [
+          "M",
+          "Meeting",
+          "Présentation Aifar"
+        ],
+        [
+          "E",
+          "Email",
+          "Présentation Aifar"
+        ],
+        [
+          "P",
+          "Contact",
+          "Présentation Aifar"
+        ],
+        [
+          "D",
+          "Documents",
+          "Présentation Aifar"
+        ],
+        [
+          "W",
+          "Workflow",
+          "Présentation Aifar"
+        ],
+        [
+          "F",
+          "Forms",
+          "Présentation Aifar"
+        ]
+      ]
+    },
+    "downloads": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "title": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "versionLabel": "Présentation Aifar",
+      "comingSoon": "Présentation Aifar",
+      "items": [
+        [
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ],
+        [
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "App Store",
+          "Présentation Aifar"
+        ],
+        [
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ],
+        [
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ],
+        [
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ]
+      ]
+    },
+    "docs": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "title": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "items": [
+        [
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ],
+        [
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ],
+        [
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ],
+        [
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ]
+      ]
+    },
+    "support": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "title": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "items": [
+        [
+          "A",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ],
+        [
+          "I",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ],
+        [
+          "T",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ]
+      ]
+    },
+    "contact": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Contact",
+      "title": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar."
+    },
+    "security": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "title": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "items": [
+        [
+          "G",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ],
+        [
+          "P",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ],
+        [
+          "D",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ]
+      ]
+    },
+    "whatsNew": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "title": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "items": [
+        [
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ],
+        [
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ],
+        [
+          "Présentation Aifar",
+          "Présentation Aifar",
+          "Présentation Aifar"
+        ]
+      ]
+    },
+    "login": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "title": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar."
+    },
+    "register": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "title": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar."
+    },
+    "account": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "welcome": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "cards": {
+        "profileTitle": "Présentation Aifar",
+        "profileText": "Présentation Aifar",
+        "profileAction": "Présentation Aifar",
+        "ticketsTitle": "Présentation Aifar",
+        "ticketsText": "{count} demandes de contact liées à votre compte.",
+        "ticketsAction": "Présentation Aifar",
+        "contactTitle": "Présentation Aifar",
+        "contactText": "Présentation Aifar",
+        "contactAction": "Présentation Aifar"
+      }
+    },
+    "profile": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "title": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar."
+    },
+    "tickets": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "title": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "emptyTitle": "Présentation Aifar",
+      "emptyText": "Présentation Aifar",
+      "emptyAction": "Présentation Aifar"
+    },
+    "ticketDetail": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "status": "Présentation Aifar",
+      "submitted": "Présentation Aifar",
+      "requestTitle": "Présentation Aifar",
+      "replies": "Présentation Aifar",
+      "aifarTeam": "Présentation Aifar",
+      "user": "Présentation Aifar",
+      "noReplies": "Présentation Aifar"
+    },
+    "adminHome": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "deniedTitle": "Présentation Aifar",
+      "deniedLead": "Présentation Aifar",
+      "title": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "active": "Présentation Aifar",
+      "planned": "Présentation Aifar",
+      "nav": {
+        "label": "Présentation Aifar",
+        "home": "Présentation Aifar",
+        "product": "Présentation Aifar",
+        "downloads": "Présentation Aifar",
+        "docs": "Présentation Aifar",
+        "support": "Présentation Aifar",
+        "contact": "Présentation Aifar"
+      },
+      "modules": [
+        {
+          "key": "Présentation Aifar",
+          "href": "Présentation Aifar",
+          "title": "Présentation Aifar",
+          "description": "Présentation Aifar",
+          "status": "Présentation Aifar"
+        },
+        {
+          "key": "Présentation Aifar",
+          "href": "Présentation Aifar",
+          "title": "Présentation Aifar",
+          "description": "Présentation Aifar",
+          "status": "Présentation Aifar"
+        },
+        {
+          "key": "Présentation Aifar",
+          "href": "Présentation Aifar",
+          "title": "Présentation Aifar",
+          "description": "Présentation Aifar",
+          "status": "Présentation Aifar"
+        },
+        {
+          "key": "Présentation Aifar",
+          "href": "Présentation Aifar",
+          "title": "Présentation Aifar",
+          "description": "Présentation Aifar",
+          "status": "Présentation Aifar"
+        },
+        {
+          "key": "Présentation Aifar",
+          "href": "Présentation Aifar",
+          "title": "Présentation Aifar",
+          "description": "Présentation Aifar",
+          "status": "Présentation Aifar"
+        }
+      ]
+    },
+    "adminProduct": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "deniedTitle": "Présentation Aifar",
+      "deniedLead": "Présentation Aifar",
+      "breadcrumb": "Présentation Aifar",
+      "title": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "status": "Présentation Aifar",
+      "emptyTitle": "Présentation Aifar",
+      "emptyLead": "Présentation Aifar"
+    },
+    "adminDocs": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "deniedTitle": "Présentation Aifar",
+      "deniedLead": "Présentation Aifar",
+      "breadcrumb": "Présentation Aifar",
+      "title": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "status": "Présentation Aifar",
+      "emptyTitle": "Présentation Aifar",
+      "emptyLead": "Présentation Aifar"
+    },
+    "adminSupport": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "deniedTitle": "Présentation Aifar",
+      "deniedLead": "Présentation Aifar",
+      "breadcrumb": "Présentation Aifar",
+      "title": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "status": "Présentation Aifar",
+      "emptyTitle": "Présentation Aifar",
+      "emptyLead": "Présentation Aifar"
+    },
+    "adminContact": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "deniedTitle": "Présentation Aifar",
+      "deniedLead": "Présentation Aifar",
+      "breadcrumb": "Présentation Aifar",
+      "title": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "all": "Présentation Aifar",
+      "new": "Présentation Aifar",
+      "inProgress": "Présentation Aifar",
+      "closed": "Présentation Aifar",
+      "emptyTitle": "Présentation Aifar",
+      "emptyLead": "Présentation Aifar"
+    },
+    "adminTickets": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "deniedTitle": "Présentation Aifar",
+      "deniedLead": "Présentation Aifar",
+      "breadcrumb": "Présentation Aifar",
+      "title": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "all": "Présentation Aifar",
+      "new": "Présentation Aifar",
+      "inProgress": "Présentation Aifar",
+      "closed": "Présentation Aifar"
+    },
+    "adminTicketDetail": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "deniedTitle": "Présentation Aifar",
+      "deniedLead": "Présentation Aifar",
+      "breadcrumb": "Présentation Aifar",
+      "submitted": "Présentation Aifar",
+      "requestTitle": "Présentation Aifar",
+      "organization": "Présentation Aifar",
+      "notProvided": "Présentation Aifar",
+      "replies": "Présentation Aifar",
+      "noReplies": "Présentation Aifar"
+    },
+    "adminDownloads": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "deniedTitle": "Présentation Aifar",
+      "deniedLead": "Présentation Aifar",
+      "breadcrumb": "Présentation Aifar",
+      "title": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "tickets": "Présentation Aifar",
+      "published": "Présentation Aifar",
+      "draft": "Présentation Aifar",
+      "noVersion": "Présentation Aifar"
+    },
+    "adminDownloadDetail": {
+      "seo": {
+        "title": "Présentation Aifar | Aifar",
+        "description": "Informations Aifar pour les équipes et les organisations."
+      },
+      "eyebrow": "Présentation Aifar",
+      "deniedTitle": "Présentation Aifar",
+      "deniedLead": "Présentation Aifar",
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "current": "Présentation Aifar",
+      "status": "Présentation Aifar",
+      "published": "Présentation Aifar",
+      "draft": "Présentation Aifar",
+      "file": "Présentation Aifar",
+      "fileSize": "Présentation Aifar",
+      "publishedAt": "Présentation Aifar",
+      "noVersion": "Présentation Aifar",
+      "noFile": "Présentation Aifar",
+      "originalFile": "Présentation Aifar"
     }
   }
 }

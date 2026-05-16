@@ -9,20 +9,20 @@
       "whatsNew": "最新动态",
       "docs": "文档",
       "support": "支持",
-      "contact": "联系我们",
-      "admin": "管理",
+      "contact": "联系",
+      "admin": "管理后台",
       "account": "账户",
       "signIn": "登录"
     },
     "footer": {
-      "full": "© 2026 Aifar. 保留所有权利。",
-      "short": "© 2026 Aifar.",
+      "full": "© 2026 Aifar。保留所有权利。",
+      "short": "© 2026 Aifar。",
       "security": "安全",
       "docs": "文档",
       "contact": "联系"
     },
     "auth": {
-      "signOut": "退出",
+      "signOut": "退出登录",
       "signingOut": "正在退出..."
     }
   },
@@ -41,10 +41,14 @@
       "register": "注册",
       "alreadyHaveAccount": "已有账户？",
       "needAccount": "需要账户？",
-      "confirmation": "请查看邮箱并确认账户后再登录。",
+      "confirmation": "请先查收邮件并确认账户，然后再登录。",
       "failure": "认证失败。",
       "continueWithGoogle": "使用 Google 继续",
-      "orEmail": "或使用邮箱"
+      "orEmail": "或使用邮箱",
+      "errors": {
+        "google_failed": "Google 登录失败，请重试。",
+        "google_missing_code": "Google 登录回调缺少授权码。"
+      }
     },
     "contact": {
       "subject": "主题",
@@ -56,7 +60,7 @@
       "invalidEmail": "请输入有效的工作邮箱。",
       "submitFailed": "提交失败",
       "success": "你的请求已提交，Aifar 团队会尽快跟进。",
-      "error": "当前无法提交请求，请稍后再试。",
+      "error": "当前无法提交请求，请稍后重试。",
       "requestTypes": {
         "product_inquiry": "产品咨询",
         "technical_support": "技术支持",
@@ -70,8 +74,8 @@
       "phone": "电话",
       "save": "保存资料",
       "saving": "正在保存...",
-      "success": "个人资料已更新。",
-      "failure": "个人资料更新失败。"
+      "success": "资料已更新。",
+      "failure": "资料更新失败。"
     },
     "admin": {
       "statusActions": "工单状态操作",
@@ -83,53 +87,168 @@
       "statusUpdated": "工单状态已更新。",
       "statusFailure": "无法更新状态。",
       "replyRequired": "请填写回复内容。",
-      "replyFailure": "无法发送回复。"
+      "replyFailure": "无法发送回复。",
+      "ticketStatuses": {
+        "new": "新建",
+        "in_progress": "处理中",
+        "closed": "已关闭"
+      }
+    },
+    "downloads": {
+      "version": "版本",
+      "buildNumber": "构建号",
+      "externalUrl": "外部链接",
+      "releaseNotes": "发布说明",
+      "published": "已发布",
+      "save": "保存版本",
+      "saving": "正在保存...",
+      "saved": "版本已保存。",
+      "saveFailed": "无法保存版本。",
+      "file": "发布文件",
+      "fileHint": "支持 exe、msi、dmg、pkg、apk、zip。上传新文件后，该平台会保持未发布状态，直到你再次发布。",
+      "fileRequired": "请选择文件。",
+      "upload": "上传文件",
+      "uploading": "正在上传...",
+      "uploaded": "文件已上传。请检查版本信息并在准备好后发布。",
+      "uploadFailed": "无法上传文件。",
+      "uploadTooLarge": "文件超过当前 Supabase Storage 上传限制。请在 Supabase Storage Settings 中将 Global file size limit 设置为至少 300 MB，或上传更小的文件。",
+      "uploadProgressTitle": "上传进度",
+      "uploadStatusIdle": "准备上传",
+      "uploadStatusPreparing": "正在准备文件和校验值...",
+      "uploadStatusUploading": "正在上传文件...",
+      "uploadStatusPaused": "上传已暂停",
+      "uploadStatusFinalizing": "正在完成发布文件...",
+      "uploadStatusComplete": "上传完成",
+      "uploadStatusInterrupted": "上一次上传未完成",
+      "uploadStatusFailed": "上传失败",
+      "uploadInterruptedHint": "请选择同一个文件并重新开始上传以继续。",
+      "cancelUpload": "取消上传",
+      "cancellingUpload": "正在取消...",
+      "uploadCancelled": "上传已取消。",
+      "currentFile": "当前文件",
+      "deleteFile": "删除文件",
+      "deletingFile": "正在删除...",
+      "fileDeleted": "发布文件已删除。",
+      "deleteFileFailed": "无法删除发布文件。",
+      "deleteFileConfirm": "确认删除当前发布文件？该平台会被取消发布。",
+      "currentWebFile": "当前网站文件",
+      "currentWebFileHint": "这是访客在平台发布后会下载的文件。",
+      "noCurrentFile": "尚未上传文件",
+      "noCurrentFileHint": "发布该平台前，请先上传安装包文件。",
+      "replacementFile": "替换文件",
+      "chooseReplacement": "选择要上传的安装包",
+      "replacementHint": "选择文件不会立即改变当前网站文件。只有上传完成后才会替换。",
+      "chooseFile": "选择文件",
+      "changeFile": "更换文件",
+      "clearSelectedFile": "清除选择",
+      "selectedFile": "已选文件",
+      "uploadReplacement": "上传替换文件",
+      "uploadStatus": "上传状态",
+      "uploadStatuses": {
+        "idle": "准备就绪",
+        "uploading": "上传中",
+        "uploaded": "已上传",
+        "failed": "失败",
+        "complete": "完成"
+      },
+      "resumeUpload": "继续上传",
+      "pauseUpload": "暂停",
+      "uploadSizeProgress": "· {uploaded}{total} MB"
     }
   },
   "pages": {
     "home": {
       "seo": {
-        "title": "Aifar | 面向政府与企业团队的轻量级标准协作工具",
-        "description": "Aifar 将聊天、会议、邮件、联系人、文档、流程和表单整合到一个轻量级协作工作空间，服务政府与企业团队。"
+        "title": "Aifar | 面向政府和企业团队的轻量级标准协同平台",
+        "description": "Aifar 将聊天、会议、邮件、联系人、文档、流程和表单整合到一个轻量协同工作空间。"
       },
-      "eyebrow": "政府与企业协作",
+      "eyebrow": "政府与企业协同",
       "title": "Aifar",
-      "lead": "面向需要清晰沟通、结构化工作和多端可靠访问的团队，提供轻量级标准协作能力。",
+      "lead": "面向需要清晰沟通、结构化工作和多端可靠访问的团队，提供轻量级标准协同能力。",
       "primaryCta": "下载 Aifar",
       "secondaryCta": "联系销售",
-      "heroAlt": "Aifar 协作工作台预览，展示桌面端与移动端界面",
-      "schemaDescription": "面向政府与企业团队的轻量级标准协作软件。",
+      "heroAlt": "Aifar 协同工作台预览",
+      "schemaDescription": "面向政府和企业团队的轻量级标准协同软件。",
       "trustLabel": "Aifar 平台亮点",
       "trust": [
-        ["7", "核心协作模块"],
-        ["5", "支持的客户端类型"],
-        ["24/7", "面向支持流程的网站结构"],
-        ["SEO", "轻量可上线，开箱可用"]
+        [
+          "7",
+          "核心协同模块"
+        ],
+        [
+          "5",
+          "支持的客户端类型"
+        ],
+        [
+          "24/7",
+          "面向支持流程的网站结构"
+        ],
+        [
+          "SEO",
+          "轻量可上线"
+        ]
       ],
-      "modulesTitle": "一个标准协作工作空间",
-      "modulesLead": "Aifar 覆盖团队日常协作层，避免工具过重、过散和难维护。",
+      "modulesTitle": "一个标准协同工作空间",
+      "modulesLead": "Aifar 覆盖团队日常协同层，避免工具过重、过散和难维护。",
       "modules": [
-        ["C", "Chat", "面向部门、项目和跨组织协作的团队消息。"],
-        ["M", "Meeting", "支持桌面、手机和平板的简洁会议访问。"],
-        ["E", "Email", "让正式沟通与工作上下文保持连接的邮件流程。"],
-        ["D", "Documents", "集中访问政策、流程、指南和共享资料。"]
+        [
+          "C",
+          "Chat",
+          "团队消息。"
+        ],
+        [
+          "M",
+          "Meeting",
+          "会议访问。"
+        ],
+        [
+          "E",
+          "Email",
+          "邮件流程。"
+        ],
+        [
+          "D",
+          "Documents",
+          "文档访问。"
+        ]
       ],
-      "managedTitle": "为可管理团队设计",
-      "managedLead": "官网作为产品介绍、下载、更新、文档和技术支持的统一入口。",
+      "managedTitle": "为可管理团队而设计",
+      "managedLead": "官网将作为产品介绍、下载、更新、文档和技术支持的统一入口。",
       "features": [
-        ["多端访问", "首版网站即呈现 PC、iOS、Android 手机、Android Pad 和 Mac Preview。"],
-        ["运营内容分区", "最新动态、文档、支持和下载页面分开维护，便于长期运营。"],
-        ["未来接入 Aifar 能力", "联系表单、支持请求、发布说明和文档后续可接入 Aifar Forms、Workflow、Docs、Chat、Meeting、Email 和 Contact。"]
+        [
+          "多端访问",
+          "覆盖 PC、iOS、Android Phone、Android Pad 和 Mac Preview。"
+        ],
+        [
+          "运营内容分区",
+          "最新动态、文档、支持和下载页面分开维护。"
+        ],
+        [
+          "未来接入 Aifar 能力",
+          "后续可接入 Aifar Forms、Workflow、Docs、Chat、Meeting、Email 和 Contact。"
+        ]
       ],
       "updatesTitle": "最新更新",
       "viewAll": "查看全部",
       "updates": [
-        ["网站基础结构", "已准备产品介绍、下载、文档、支持和联系入口。", "规划中"],
-        ["Mac 客户端预览", "下载区域已包含 Mac 预览版通道。", "预览版"],
-        ["文档中心准备", "已预留用户指南、管理员指南、部署说明和支持政策入口。", "文档"]
+        [
+          "网站基础结构",
+          "已准备产品介绍、下载、文档、支持和联系入口。",
+          "规划"
+        ],
+        [
+          "Mac 客户端预览",
+          "下载区域包含 Mac 预览版通道。",
+          "预览"
+        ],
+        [
+          "文档中心准备",
+          "已预留用户指南、管理员指南、部署说明和支持政策入口。",
+          "文档"
+        ]
       ],
       "ctaEyebrow": "面向上线运营",
-      "ctaTitle": "先建立清晰官网，再逐步成长为 Aifar 服务门户。",
+      "ctaTitle": "先建立清晰官网，再逐步成长为连接 Aifar 的服务门户。",
       "ctaLead": "首版保持轻量、可部署。后续可把表单、流程、文档、联系人记录和支持沟通直接接入 Aifar。",
       "ctaPrimary": "获取 Aifar",
       "ctaSecondary": "技术支持"
@@ -137,129 +256,236 @@
     "product": {
       "seo": {
         "title": "产品 | Aifar",
-        "description": "了解 Aifar 的 Chat、Meeting、Email、Contact、文档、流程和表单能力。"
+        "description": "了解 Aifar 的聊天、会议、邮件、联系人、文档、流程和表单能力。"
       },
       "eyebrow": "产品",
-      "title": "标准协作，不增加不必要的复杂度。",
+      "title": "标准协同，不增加不必要的复杂度。",
       "lead": "Aifar 将沟通、结构化工作和业务记录整合到一个轻量工作空间。",
       "features": [
-        ["C", "Chat", "团队频道、直接沟通和持续保留的工作上下文。"],
-        ["M", "Meeting", "支持跨地域团队在桌面端和移动端进行会议访问。"],
-        ["E", "Email", "让正式沟通与联系人、文档和工作记录连接。"],
-        ["P", "Contact", "组织化管理人员与机构信息，服务企业沟通。"],
-        ["D", "Documents", "集中管理指南、政策、项目材料和共享资源。"],
-        ["W", "Workflow", "面向可管理团队的结构化审批和运营流程。"],
-        ["F", "Forms", "用于联系请求、支持和内部流程的数据收集。"]
+        [
+          "C",
+          "Chat",
+          "团队频道和工作上下文。"
+        ],
+        [
+          "M",
+          "Meeting",
+          "会议访问。"
+        ],
+        [
+          "E",
+          "Email",
+          "正式沟通。"
+        ],
+        [
+          "P",
+          "Contact",
+          "联系人和组织信息。"
+        ],
+        [
+          "D",
+          "Documents",
+          "文档和共享资源。"
+        ],
+        [
+          "W",
+          "Workflow",
+          "审批和运营流程。"
+        ],
+        [
+          "F",
+          "Forms",
+          "数据收集。"
+        ]
       ]
     },
     "downloads": {
       "seo": {
         "title": "下载 | Aifar",
-        "description": "下载 Aifar PC、iOS、Android 手机、Android Pad 和 Mac Preview 客户端。"
+        "description": "下载 Aifar PC、iOS、Android Phone、Android Pad 和 Mac Preview 客户端。"
       },
       "eyebrow": "下载",
       "title": "在团队已经使用的设备上获取 Aifar。",
-      "lead": "首版网站中的下载链接仍是占位，后续可接入发布存储或 Aifar 管理的版本记录。",
+      "lead": "下载链接可以接入发布存储或 Aifar 管理的版本记录。",
+      "versionLabel": "版本",
+      "comingSoon": "即将提供",
       "items": [
-        ["PC 客户端", "适合日常协作的 Windows 桌面客户端。", "下载", "primary"],
-        ["iOS 客户端", "面向 iPhone 和 iPad 用户的移动访问。", "App Store", "secondary"],
-        ["Android 手机", "为手机屏幕优化的 Android 客户端。", "下载 APK", "secondary"],
-        ["Android Pad", "适合平板的 Android 协作体验。", "下载 APK", "secondary"],
-        ["Mac 客户端", "当前通道：预览版。", "预览版", "secondary"]
+        [
+          "PC 客户端",
+          "Windows 桌面客户端。",
+          "下载",
+          "primary"
+        ],
+        [
+          "iOS 客户端",
+          "iPhone 和 iPad 移动访问。",
+          "App Store",
+          "secondary"
+        ],
+        [
+          "Android Phone",
+          "手机端 Android 客户端。",
+          "下载 APK",
+          "secondary"
+        ],
+        [
+          "Android Pad",
+          "平板 Android 体验。",
+          "下载 APK",
+          "secondary"
+        ],
+        [
+          "Mac 客户端",
+          "当前通道：预览版。",
+          "预览",
+          "secondary"
+        ]
       ]
     },
     "docs": {
       "seo": {
         "title": "文档 | Aifar",
-        "description": "Aifar 文档中心，包含用户指南、管理员指南、部署说明、安全和支持政策。"
+        "description": "Aifar 文档中心。"
       },
       "eyebrow": "文档",
       "title": "面向用户、管理员和支持团队的指南。",
-      "lead": "文档中心已为产品资料准备好入口，后续可接入 Aifar Docs 或其他内容系统。",
+      "lead": "文档中心已为产品资料准备好入口。",
       "items": [
-        ["快速开始", "核心概念、账号访问和首次使用清单。", "用户指南"],
-        ["客户端安装", "安装和更新 PC、iOS、Android 与 Mac Preview 客户端。", "安装"],
-        ["管理员指南", "团队结构、访问管理、联系人和运营治理。", "管理"],
-        ["安全概览", "安全姿态、隐私处理和企业部署说明。", "安全"]
+        [
+          "快速开始",
+          "核心概念和首次使用清单。",
+          "用户指南"
+        ],
+        [
+          "客户端安装",
+          "安装和更新客户端。",
+          "安装"
+        ],
+        [
+          "管理员指南",
+          "团队结构和访问管理。",
+          "管理"
+        ],
+        [
+          "安全概览",
+          "安全和企业部署说明。",
+          "安全"
+        ]
       ]
     },
     "support": {
       "seo": {
         "title": "支持 | Aifar",
-        "description": "获取 Aifar 产品、客户端、文档、部署和账号访问相关技术支持。"
+        "description": "获取 Aifar 技术支持。"
       },
       "eyebrow": "支持",
       "title": "面向 Aifar 团队的技术支持。",
-      "lead": "此页面已为账号、客户端、部署和产品支持流程预留入口。",
+      "lead": "此页面为账号、客户端、部署和产品支持流程预留入口。",
       "items": [
-        ["A", "账号访问", "协助处理登录、组织访问和账号准备。"],
-        ["I", "安装", "为桌面和移动端用户提供客户端设置指南。"],
-        ["T", "技术问题", "结构化支持请求后续可通过 Aifar Forms 和 Workflow 流转。"]
+        [
+          "A",
+          "账号访问",
+          "登录和组织访问支持。"
+        ],
+        [
+          "I",
+          "安装",
+          "客户端设置指南。"
+        ],
+        [
+          "T",
+          "技术问题",
+          "结构化支持请求。"
+        ]
       ]
     },
     "contact": {
       "seo": {
         "title": "联系 | Aifar",
-        "description": "联系 Aifar，咨询政企协同产品、技术支持和合作事宜。"
+        "description": "联系 Aifar 团队。"
       },
       "eyebrow": "联系",
       "title": "与 Aifar 团队沟通。",
-      "lead": "首版网站使用此占位表单，后续可直接提交到 Aifar Forms、Workflow、Contact 和 Email。"
+      "lead": "提交产品咨询、技术支持或合作请求。"
     },
     "security": {
       "seo": {
         "title": "安全 | Aifar",
-        "description": "Aifar 面向政府与企业协作环境的安全和合规概览。"
+        "description": "Aifar 安全和合规概览。"
       },
       "eyebrow": "安全",
-      "title": "为可管理协作环境而设计。",
-      "lead": "随着产品文档完善，此页面将承载 Aifar 的安全、隐私、治理和部署信息。",
+      "title": "为可管理协同环境而设计。",
+      "lead": "承载 Aifar 的安全、隐私、治理和部署信息。",
       "items": [
-        ["G", "治理", "为企业运营提供清晰权责、结构化沟通和可维护内容。"],
-        ["P", "隐私", "预留隐私政策、数据处理、留存和客户专属条款空间。"],
-        ["D", "部署", "可承载部署说明、客户端更新策略和特定环境文档。"]
+        [
+          "G",
+          "治理",
+          "清晰权责和结构化沟通。"
+        ],
+        [
+          "P",
+          "隐私",
+          "隐私和数据处理说明。"
+        ],
+        [
+          "D",
+          "部署",
+          "部署和更新策略。"
+        ]
       ]
     },
     "whatsNew": {
       "seo": {
         "title": "最新动态 | Aifar",
-        "description": "阅读 Aifar 发布说明、产品更新、客户端变化和文档公告。"
+        "description": "阅读 Aifar 发布说明和产品更新。"
       },
       "eyebrow": "最新动态",
       "title": "产品更新与发布说明。",
       "lead": "在此发布版本亮点、客户端更新、修复和运营公告。",
       "items": [
-        ["2026 年 5 月网站基础结构", "已为 Aifar 上线内容准备首版公开网站结构。", "网站"],
-        ["Mac Preview 通道", "下载页面包含专门的 Mac 预览版入口，便于早期客户端发布。", "客户端"],
-        ["文档中心", "文档入口已准备承载产品、管理员、部署和安全资料。", "文档"]
+        [
+          "网站基础结构",
+          "首版公开网站结构。",
+          "网站"
+        ],
+        [
+          "Mac Preview 通道",
+          "Mac 预览版入口。",
+          "客户端"
+        ],
+        [
+          "文档中心",
+          "文档入口已准备。",
+          "文档"
+        ]
       ]
     },
     "login": {
       "seo": {
         "title": "登录 | Aifar",
-        "description": "登录 Aifar 账户，管理个人资料和支持工单。"
+        "description": "登录 Aifar 账户。"
       },
       "eyebrow": "账户",
       "title": "登录 Aifar。",
-      "lead": "访问个人资料，并查看与你工作邮箱关联的联系请求。"
+      "lead": "访问个人资料并查看联系请求。"
     },
     "register": {
       "seo": {
         "title": "注册 | Aifar",
-        "description": "创建 Aifar 账户，管理个人资料和联系请求。"
+        "description": "创建 Aifar 账户。"
       },
       "eyebrow": "账户",
       "title": "创建你的 Aifar 账户。",
-      "lead": "使用工作邮箱关联未来和历史联系请求。"
+      "lead": "使用工作邮箱关联联系请求。"
     },
     "account": {
       "seo": {
         "title": "账户 | Aifar",
-        "description": "管理你的 Aifar 个人资料和支持工单。"
+        "description": "管理你的 Aifar 资料和工单。"
       },
       "eyebrow": "账户",
       "welcome": "欢迎",
-      "lead": "管理个人资料，并查看与你工作邮箱关联的联系请求。",
+      "lead": "管理个人资料并查看联系请求。",
       "cards": {
         "profileTitle": "个人资料",
         "profileText": "保持组织和联系方式最新。",
@@ -268,7 +494,7 @@
         "ticketsText": "你的账户关联了 {count} 条联系请求。",
         "ticketsAction": "查看工单",
         "contactTitle": "联系 Aifar",
-        "contactText": "使用你的账户信息提交新请求。",
+        "contactText": "提交新请求。",
         "contactAction": "新建请求"
       }
     },
@@ -279,24 +505,24 @@
       },
       "eyebrow": "个人资料",
       "title": "管理你的个人资料。",
-      "lead": "这些信息帮助 Aifar 支持和销售团队理解你的组织背景。"
+      "lead": "这些信息帮助 Aifar 团队理解你的组织背景。"
     },
     "tickets": {
       "seo": {
         "title": "我的工单 | Aifar",
-        "description": "查看与你 Aifar 账户关联的联系请求。"
+        "description": "查看联系请求。"
       },
       "eyebrow": "工单",
       "title": "你的联系请求。",
-      "lead": "请求会通过账户 ID 和工作邮箱关联，也包括匹配的历史提交。",
+      "lead": "请求会通过账户和工作邮箱关联。",
       "emptyTitle": "暂无工单",
-      "emptyText": "提交联系请求后，它会显示在这里。",
+      "emptyText": "提交联系请求后会显示在这里。",
       "emptyAction": "联系 Aifar"
     },
     "ticketDetail": {
       "seo": {
         "title": "工单详情 | Aifar",
-        "description": "查看联系请求和 Aifar 团队回复。"
+        "description": "查看联系请求和回复。"
       },
       "eyebrow": "工单",
       "status": "状态",
@@ -307,16 +533,139 @@
       "user": "用户",
       "noReplies": "暂无回复。"
     },
+    "adminHome": {
+      "seo": {
+        "title": "管理后台 | Aifar",
+        "description": "管理 Aifar 网站运营。"
+      },
+      "eyebrow": "管理后台",
+      "deniedTitle": "需要管理员权限。",
+      "deniedLead": "你的账户无权管理 Aifar 网站运营。",
+      "title": "Aifar 管理中心。",
+      "lead": "选择要操作的区域。",
+      "active": "可用",
+      "planned": "规划中",
+      "nav": {
+        "label": "管理区域",
+        "home": "管理中心",
+        "product": "产品",
+        "downloads": "下载",
+        "docs": "文档",
+        "support": "支持",
+        "contact": "联系我们"
+      },
+      "modules": [
+        {
+          "key": "product",
+          "href": "/admin/product/",
+          "title": "产品内容",
+          "description": "维护产品页面和公开内容。",
+          "status": "planned"
+        },
+        {
+          "key": "downloads",
+          "href": "/admin/downloads/",
+          "title": "客户端下载",
+          "description": "维护客户端版本和发布文件。",
+          "status": "active"
+        },
+        {
+          "key": "docs",
+          "href": "/admin/docs/",
+          "title": "在线文档",
+          "description": "准备在线文档工作区。",
+          "status": "planned"
+        },
+        {
+          "key": "support",
+          "href": "/admin/support/",
+          "title": "支持反馈",
+          "description": "管理支持反馈。",
+          "status": "planned"
+        },
+        {
+          "key": "contact",
+          "href": "/admin/contact/",
+          "title": "联系表单",
+          "description": "查看并回复联系请求。",
+          "status": "active"
+        }
+      ]
+    },
+    "adminProduct": {
+      "seo": {
+        "title": "管理产品 | Aifar",
+        "description": "管理 Aifar 产品内容。"
+      },
+      "eyebrow": "管理产品",
+      "deniedTitle": "需要管理员权限。",
+      "deniedLead": "你的账户无权管理产品内容。",
+      "breadcrumb": "产品",
+      "title": "产品内容管理。",
+      "lead": "此区域为产品内容发布预留。",
+      "status": "规划中",
+      "emptyTitle": "产品内容工具尚未接入。",
+      "emptyLead": "导航和权限边界已准备好。"
+    },
+    "adminDocs": {
+      "seo": {
+        "title": "管理文档 | Aifar",
+        "description": "管理 Aifar 在线文档。"
+      },
+      "eyebrow": "管理文档",
+      "deniedTitle": "需要管理员权限。",
+      "deniedLead": "你的账户无权管理在线文档。",
+      "breadcrumb": "文档",
+      "title": "在线文档管理。",
+      "lead": "此区域为在线文档工作区预留。",
+      "status": "规划中",
+      "emptyTitle": "在线文档编辑尚未接入。",
+      "emptyLead": "管理入口已准备好。"
+    },
+    "adminSupport": {
+      "seo": {
+        "title": "管理支持 | Aifar",
+        "description": "管理 Aifar 支持反馈。"
+      },
+      "eyebrow": "管理支持",
+      "deniedTitle": "需要管理员权限。",
+      "deniedLead": "你的账户无权管理支持反馈。",
+      "breadcrumb": "支持",
+      "title": "支持反馈管理。",
+      "lead": "此区域为支持处理流程预留。",
+      "status": "规划中",
+      "emptyTitle": "支持反馈工具尚未接入。",
+      "emptyLead": "管理入口已准备好。"
+    },
+    "adminContact": {
+      "seo": {
+        "title": "管理联系表单 | Aifar",
+        "description": "查询和管理联系请求。"
+      },
+      "eyebrow": "管理联系",
+      "deniedTitle": "需要管理员权限。",
+      "deniedLead": "你的账户无权查询联系请求。",
+      "breadcrumb": "联系我们",
+      "title": "联系表单查询。",
+      "lead": "查看网站联系请求并关闭已处理请求。",
+      "all": "全部",
+      "new": "新建",
+      "inProgress": "处理中",
+      "closed": "已关闭",
+      "emptyTitle": "未找到联系请求。",
+      "emptyLead": "新的网站联系提交会显示在这里。"
+    },
     "adminTickets": {
       "seo": {
         "title": "管理工单 | Aifar",
-        "description": "管理 Aifar 官网联系请求工单。"
+        "description": "管理联系请求工单。"
       },
-      "eyebrow": "管理",
+      "eyebrow": "管理后台",
       "deniedTitle": "需要管理员权限。",
-      "deniedLead": "你的账户无权管理 Aifar 官网工单。",
+      "deniedLead": "你的账户无权管理工单。",
+      "breadcrumb": "工单列表",
       "title": "联系请求工单。",
-      "lead": "查看、回复并关闭官网联系请求。",
+      "lead": "查看、回复并关闭网站联系请求。",
       "all": "全部",
       "new": "新建",
       "inProgress": "处理中",
@@ -325,17 +674,54 @@
     "adminTicketDetail": {
       "seo": {
         "title": "管理工单详情 | Aifar",
-        "description": "查看、回复并更新 Aifar 联系请求工单。"
+        "description": "查看、回复并更新工单。"
       },
       "eyebrow": "管理工单",
       "deniedTitle": "需要管理员权限。",
       "deniedLead": "你的账户无权管理此工单。",
+      "breadcrumb": "工单详情",
       "submitted": "提交于",
       "requestTitle": "请求",
       "organization": "组织",
       "notProvided": "未提供",
       "replies": "回复",
       "noReplies": "暂无回复。"
+    },
+    "adminDownloads": {
+      "seo": {
+        "title": "管理下载 | Aifar",
+        "description": "管理客户端下载版本。"
+      },
+      "eyebrow": "管理后台",
+      "deniedTitle": "需要管理员权限。",
+      "deniedLead": "你的账户无权管理客户端下载。",
+      "breadcrumb": "下载",
+      "title": "客户端下载。",
+      "lead": "维护每个平台当前公开发布版本。",
+      "tickets": "工单管理",
+      "published": "已发布",
+      "draft": "草稿",
+      "noVersion": "未配置版本"
+    },
+    "adminDownloadDetail": {
+      "seo": {
+        "title": "管理下载详情 | Aifar",
+        "description": "更新客户端版本并上传文件。"
+      },
+      "eyebrow": "管理下载",
+      "deniedTitle": "需要管理员权限。",
+      "deniedLead": "你的账户无权管理此下载。",
+      "lead": "上传发布文件，填写版本信息，并在准备好后发布。",
+      "current": "当前版本",
+      "status": "状态",
+      "published": "已发布",
+      "draft": "草稿",
+      "file": "文件",
+      "fileSize": "文件大小",
+      "publishedAt": "发布时间",
+      "noVersion": "未配置版本",
+      "noFile": "未配置文件或外部链接",
+      "originalFile": "原始文件"
     }
   }
 }

@@ -25,6 +25,8 @@ export default async function LoginPage({ params, searchParams }) {
   if (user) redirect(localizedPath(locale, "/account/"));
 
   const [page, messages] = await Promise.all([getPageMessages(locale, "login"), getLocaleMessages(locale)]);
+  const errorCode = typeof query?.error === "string" ? query.error : "";
+  const initialError = messages.forms.auth.errors?.[errorCode] || "";
 
   return (
     <main>
@@ -37,7 +39,7 @@ export default async function LoginPage({ params, searchParams }) {
             accountPath={localizedPath(locale, "/account/")}
             loginPath={localizedPath(locale, "/login/")}
             registerPath={localizedPath(locale, "/register/")}
-            initialError={typeof query?.error === "string" ? query.error : ""}
+            initialError={initialError}
           />
         </div>
       </section>

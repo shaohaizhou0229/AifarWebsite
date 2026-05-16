@@ -44,7 +44,11 @@
       "confirmation": "Please check your email to confirm your account before signing in.",
       "failure": "Authentication failed.",
       "continueWithGoogle": "Continue with Google",
-      "orEmail": "or use email"
+      "orEmail": "or use email",
+      "errors": {
+        "google_failed": "Google sign in failed. Please try again.",
+        "google_missing_code": "Google sign in callback is missing a code."
+      }
     },
     "contact": {
       "subject": "Subject",
@@ -83,7 +87,12 @@
       "statusUpdated": "Ticket status updated.",
       "statusFailure": "Unable to update status.",
       "replyRequired": "Reply message is required.",
-      "replyFailure": "Unable to send reply."
+      "replyFailure": "Unable to send reply.",
+      "ticketStatuses": {
+        "new": "New",
+        "in_progress": "In progress",
+        "closed": "Closed"
+      }
     },
     "downloads": {
       "version": "Version",
@@ -98,43 +107,54 @@
       "file": "Release file",
       "fileHint": "Supported files: exe, msi, dmg, pkg, apk, zip. Uploading a new file unpublishes the platform until you publish it again.",
       "fileRequired": "Please choose a file.",
-        "upload": "Upload file",
-        "uploading": "Uploading...",
-        "uploaded": "File uploaded. Review the version and publish when ready.",
-        "uploadFailed": "Unable to upload file.",
-        "uploadTooLarge": "The file exceeds the current Supabase Storage upload limit. In Supabase Storage Settings, set the Global file size limit to at least 300 MB, or upload a smaller file.",
-        "uploadProgressTitle": "Upload progress",
-        "uploadStatusIdle": "Ready to upload",
-        "uploadStatusPreparing": "Preparing file and checksum...",
-        "uploadStatusUploading": "Uploading file...",
-        "uploadStatusPaused": "Upload paused",
-        "uploadStatusFinalizing": "Finalizing release file...",
-        "uploadStatusComplete": "Upload complete",
-        "uploadStatusInterrupted": "Previous upload did not finish",
-        "uploadStatusFailed": "Upload failed",
-        "uploadInterruptedHint": "Choose the same file and start upload again to continue.",
-        "cancelUpload": "Cancel upload",
-        "cancellingUpload": "Cancelling...",
-        "uploadCancelled": "Upload cancelled.",
-        "currentFile": "Current file",
-        "deleteFile": "Delete file",
-        "deletingFile": "Deleting...",
-        "fileDeleted": "Release file deleted.",
-        "deleteFileFailed": "Unable to delete release file.",
-        "deleteFileConfirm": "Delete the current release file? This will unpublish this platform.",
-        "currentWebFile": "Current web file",
-        "currentWebFileHint": "This is the file visitors will download after the platform is published.",
-        "noCurrentFile": "No file uploaded",
-        "noCurrentFileHint": "Upload a package file before publishing this platform.",
-        "replacementFile": "Replacement file",
-        "chooseReplacement": "Choose a package to upload",
-        "replacementHint": "Choosing a file does not change the current web file. It only replaces the web file after upload completes.",
-        "chooseFile": "Choose file",
-        "changeFile": "Change file",
-        "clearSelectedFile": "Clear selection",
-        "selectedFile": "Selected file",
-        "uploadReplacement": "Upload replacement"
-      }
+      "upload": "Upload file",
+      "uploading": "Uploading...",
+      "uploaded": "File uploaded. Review the version and publish when ready.",
+      "uploadFailed": "Unable to upload file.",
+      "uploadTooLarge": "The file exceeds the current Supabase Storage upload limit. In Supabase Storage Settings, set the Global file size limit to at least 300 MB, or upload a smaller file.",
+      "uploadProgressTitle": "Upload progress",
+      "uploadStatusIdle": "Ready to upload",
+      "uploadStatusPreparing": "Preparing file and checksum...",
+      "uploadStatusUploading": "Uploading file...",
+      "uploadStatusPaused": "Upload paused",
+      "uploadStatusFinalizing": "Finalizing release file...",
+      "uploadStatusComplete": "Upload complete",
+      "uploadStatusInterrupted": "Previous upload did not finish",
+      "uploadStatusFailed": "Upload failed",
+      "uploadInterruptedHint": "Choose the same file and start upload again to continue.",
+      "cancelUpload": "Cancel upload",
+      "cancellingUpload": "Cancelling...",
+      "uploadCancelled": "Upload cancelled.",
+      "currentFile": "Current file",
+      "deleteFile": "Delete file",
+      "deletingFile": "Deleting...",
+      "fileDeleted": "Release file deleted.",
+      "deleteFileFailed": "Unable to delete release file.",
+      "deleteFileConfirm": "Delete the current release file? This will unpublish this platform.",
+      "currentWebFile": "Current web file",
+      "currentWebFileHint": "This is the file visitors will download after the platform is published.",
+      "noCurrentFile": "No file uploaded",
+      "noCurrentFileHint": "Upload a package file before publishing this platform.",
+      "replacementFile": "Replacement file",
+      "chooseReplacement": "Choose a package to upload",
+      "replacementHint": "Choosing a file does not change the current web file. It only replaces the web file after upload completes.",
+      "chooseFile": "Choose file",
+      "changeFile": "Change file",
+      "clearSelectedFile": "Clear selection",
+      "selectedFile": "Selected file",
+      "uploadReplacement": "Upload replacement",
+      "uploadStatus": "Upload status",
+      "uploadStatuses": {
+        "idle": "Ready",
+        "uploading": "Uploading",
+        "uploaded": "Uploaded",
+        "failed": "Failed",
+        "complete": "Complete"
+      },
+      "resumeUpload": "Resume upload",
+      "pauseUpload": "Pause",
+      "uploadSizeProgress": "· {uploaded}{total} MB"
+    }
   },
   "pages": {
     "home": {
@@ -151,32 +171,81 @@
       "schemaDescription": "Lightweight standard collaboration software for government and enterprise teams.",
       "trustLabel": "Aifar platform highlights",
       "trust": [
-        ["7", "Core collaboration modules"],
-        ["5", "Client families supported"],
-        ["24/7", "Support-ready site structure"],
-        ["SEO", "Micro-lightweight, ready out of the box"]
+        [
+          "7",
+          "Core collaboration modules"
+        ],
+        [
+          "5",
+          "Client families supported"
+        ],
+        [
+          "24/7",
+          "Support-ready site structure"
+        ],
+        [
+          "SEO",
+          "Micro-lightweight, ready out of the box"
+        ]
       ],
       "modulesTitle": "One workspace for standard collaboration",
       "modulesLead": "Aifar covers the daily collaboration layer without forcing teams into a heavy, fragmented toolset.",
       "modules": [
-        ["C", "Chat", "Organized team messaging for departments, projects, and cross-agency collaboration."],
-        ["M", "Meeting", "Simple meeting access for distributed teams across desktop, phone, and tablet."],
-        ["E", "Email", "Integrated mail workflows that keep formal communication connected to work context."],
-        ["D", "Documents", "Centralized document access for policies, procedures, guides, and shared materials."]
+        [
+          "C",
+          "Chat",
+          "Organized team messaging for departments, projects, and cross-agency collaboration."
+        ],
+        [
+          "M",
+          "Meeting",
+          "Simple meeting access for distributed teams across desktop, phone, and tablet."
+        ],
+        [
+          "E",
+          "Email",
+          "Integrated mail workflows that keep formal communication connected to work context."
+        ],
+        [
+          "D",
+          "Documents",
+          "Centralized document access for policies, procedures, guides, and shared materials."
+        ]
       ],
       "managedTitle": "Built for managed teams",
       "managedLead": "The website is planned as the public entry point for product introduction, downloads, updates, documentation, and technical support.",
       "features": [
-        ["Cross-client access", "PC, iOS, Android phone, Android pad, and Mac Preview are represented from the first release of the site."],
-        ["Operational content", "What's New, documentation, support, and download pages are separated so each area can be maintained independently."],
-        ["Future Aifar integration", "Contact forms, support requests, release notes, and documents can later connect to Aifar Forms, Workflow, Docs, Chat, Meeting, Email, and Contact."]
+        [
+          "Cross-client access",
+          "PC, iOS, Android phone, Android pad, and Mac Preview are represented from the first release of the site."
+        ],
+        [
+          "Operational content",
+          "What's New, documentation, support, and download pages are separated so each area can be maintained independently."
+        ],
+        [
+          "Future Aifar integration",
+          "Contact forms, support requests, release notes, and documents can later connect to Aifar Forms, Workflow, Docs, Chat, Meeting, Email, and Contact."
+        ]
       ],
       "updatesTitle": "Latest updates",
       "viewAll": "View all",
       "updates": [
-        ["Website foundation", "Initial public website structure for product introduction, downloads, documentation, support, and contact.", "Planning"],
-        ["Mac client preview", "Download area includes a preview channel for the Mac client.", "Preview"],
-        ["Docs hub prepared", "Documentation entry points are ready for user guides, admin guides, deployment notes, and support policies.", "Docs"]
+        [
+          "Website foundation",
+          "Initial public website structure for product introduction, downloads, documentation, support, and contact.",
+          "Planning"
+        ],
+        [
+          "Mac client preview",
+          "Download area includes a preview channel for the Mac client.",
+          "Preview"
+        ],
+        [
+          "Docs hub prepared",
+          "Documentation entry points are ready for user guides, admin guides, deployment notes, and support policies.",
+          "Docs"
+        ]
       ],
       "ctaEyebrow": "Ready for launch operations",
       "ctaTitle": "Start with a clear website. Grow into a connected Aifar service portal.",
@@ -193,13 +262,41 @@
       "title": "Standard collaboration without unnecessary complexity.",
       "lead": "Aifar combines communication, structured work, and business records into one lightweight workspace.",
       "features": [
-        ["C", "Chat", "Team channels, direct communication, and persistent work context."],
-        ["M", "Meeting", "Meeting access for cross-location teams on desktop and mobile clients."],
-        ["E", "Email", "Formal communication connected to contacts, documents, and work records."],
-        ["P", "Contact", "Organized people and organization records for enterprise communication."],
-        ["D", "Documents", "Guides, policies, project materials, and shared resources in one place."],
-        ["W", "Workflow", "Structured approvals and operational flows for managed teams."],
-        ["F", "Forms", "Simple data collection for contact requests, support, and internal processes."]
+        [
+          "C",
+          "Chat",
+          "Team channels, direct communication, and persistent work context."
+        ],
+        [
+          "M",
+          "Meeting",
+          "Meeting access for cross-location teams on desktop and mobile clients."
+        ],
+        [
+          "E",
+          "Email",
+          "Formal communication connected to contacts, documents, and work records."
+        ],
+        [
+          "P",
+          "Contact",
+          "Organized people and organization records for enterprise communication."
+        ],
+        [
+          "D",
+          "Documents",
+          "Guides, policies, project materials, and shared resources in one place."
+        ],
+        [
+          "W",
+          "Workflow",
+          "Structured approvals and operational flows for managed teams."
+        ],
+        [
+          "F",
+          "Forms",
+          "Simple data collection for contact requests, support, and internal processes."
+        ]
       ]
     },
     "downloads": {
@@ -213,11 +310,36 @@
       "versionLabel": "Version",
       "comingSoon": "Coming soon",
       "items": [
-        ["PC Client", "Windows desktop client for daily collaboration.", "Download", "primary"],
-        ["iOS Client", "Mobile access for iPhone and iPad users.", "App Store", "secondary"],
-        ["Android Phone", "Android client optimized for phone screens.", "Download APK", "secondary"],
-        ["Android Pad", "Tablet-ready Android collaboration experience.", "Download APK", "secondary"],
-        ["Mac Client", "Current channel: preview version.", "Preview", "secondary"]
+        [
+          "PC Client",
+          "Windows desktop client for daily collaboration.",
+          "Download",
+          "primary"
+        ],
+        [
+          "iOS Client",
+          "Mobile access for iPhone and iPad users.",
+          "App Store",
+          "secondary"
+        ],
+        [
+          "Android Phone",
+          "Android client optimized for phone screens.",
+          "Download APK",
+          "secondary"
+        ],
+        [
+          "Android Pad",
+          "Tablet-ready Android collaboration experience.",
+          "Download APK",
+          "secondary"
+        ],
+        [
+          "Mac Client",
+          "Current channel: preview version.",
+          "Preview",
+          "secondary"
+        ]
       ]
     },
     "docs": {
@@ -229,10 +351,26 @@
       "title": "Guides for users, administrators, and support teams.",
       "lead": "The docs hub is ready for product materials and can later be backed by Aifar Docs or another content system.",
       "items": [
-        ["Getting Started", "Core concepts, account access, and first-use checklist.", "User guide"],
-        ["Client Installation", "Install and update Aifar across PC, iOS, Android, and Mac Preview.", "Setup"],
-        ["Administrator Guide", "Team structure, access management, contacts, and operational governance.", "Admin"],
-        ["Security Overview", "Security posture, privacy handling, and enterprise deployment notes.", "Security"]
+        [
+          "Getting Started",
+          "Core concepts, account access, and first-use checklist.",
+          "User guide"
+        ],
+        [
+          "Client Installation",
+          "Install and update Aifar across PC, iOS, Android, and Mac Preview.",
+          "Setup"
+        ],
+        [
+          "Administrator Guide",
+          "Team structure, access management, contacts, and operational governance.",
+          "Admin"
+        ],
+        [
+          "Security Overview",
+          "Security posture, privacy handling, and enterprise deployment notes.",
+          "Security"
+        ]
       ]
     },
     "support": {
@@ -244,9 +382,21 @@
       "title": "Technical support for Aifar teams.",
       "lead": "This page is prepared for account, client, deployment, and product support workflows.",
       "items": [
-        ["A", "Account Access", "Help with login, organization access, and account readiness."],
-        ["I", "Installation", "Client setup guidance for desktop and mobile users."],
-        ["T", "Technical Issue", "Structured support requests can later route through Aifar Forms and Workflow."]
+        [
+          "A",
+          "Account Access",
+          "Help with login, organization access, and account readiness."
+        ],
+        [
+          "I",
+          "Installation",
+          "Client setup guidance for desktop and mobile users."
+        ],
+        [
+          "T",
+          "Technical Issue",
+          "Structured support requests can later route through Aifar Forms and Workflow."
+        ]
       ]
     },
     "contact": {
@@ -267,9 +417,21 @@
       "title": "Designed for managed collaboration environments.",
       "lead": "This page gives Aifar a dedicated place for security, privacy, governance, and deployment messaging as the product documentation matures.",
       "items": [
-        ["G", "Governance", "Clear ownership, structured communication, and maintainable content for enterprise operations."],
-        ["P", "Privacy", "Prepared space for privacy policies, data handling, retention, and customer-specific terms."],
-        ["D", "Deployment", "Ready for deployment notes, client update policy, and environment-specific documentation."]
+        [
+          "G",
+          "Governance",
+          "Clear ownership, structured communication, and maintainable content for enterprise operations."
+        ],
+        [
+          "P",
+          "Privacy",
+          "Prepared space for privacy policies, data handling, retention, and customer-specific terms."
+        ],
+        [
+          "D",
+          "Deployment",
+          "Ready for deployment notes, client update policy, and environment-specific documentation."
+        ]
       ]
     },
     "whatsNew": {
@@ -281,9 +443,21 @@
       "title": "Product updates and release notes.",
       "lead": "Use this area to publish release highlights, client updates, fixes, and operational announcements.",
       "items": [
-        ["May 2026 Website foundation", "Initial public website structure prepared for Aifar launch content.", "Website"],
-        ["Mac Preview channel", "The downloads page includes a dedicated Mac Preview entry for early client availability.", "Client"],
-        ["Documentation hub", "Docs entry points are ready for product, administrator, deployment, and security materials.", "Docs"]
+        [
+          "May 2026 Website foundation",
+          "Initial public website structure prepared for Aifar launch content.",
+          "Website"
+        ],
+        [
+          "Mac Preview channel",
+          "The downloads page includes a dedicated Mac Preview entry for early client availability.",
+          "Client"
+        ],
+        [
+          "Documentation hub",
+          "Docs entry points are ready for product, administrator, deployment, and security materials.",
+          "Docs"
+        ]
       ]
     },
     "login": {
@@ -317,7 +491,7 @@
         "profileText": "Keep your organization and contact details up to date.",
         "profileAction": "Edit profile",
         "ticketsTitle": "Tickets",
-        "ticketsText": "{count} contact request{plural} linked to your account.",
+        "ticketsText": "{count} contact requests linked to your account.",
         "ticketsAction": "View tickets",
         "contactTitle": "Contact Aifar",
         "contactText": "Submit a new request using your account information.",
@@ -546,7 +720,8 @@
       "fileSize": "File size",
       "publishedAt": "Published",
       "noVersion": "No version configured",
-      "noFile": "No file or external URL configured"
+      "noFile": "No file or external URL configured",
+      "originalFile": "Original file"
     }
   }
 }

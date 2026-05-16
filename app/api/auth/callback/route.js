@@ -22,7 +22,7 @@ export async function GET(request) {
 
   if (!code) {
     const responseUrl = new URL(loginPathFromNext(nextPath), request.url);
-    responseUrl.searchParams.set("error", "Google sign in callback is missing a code.");
+    responseUrl.searchParams.set("error", "google_missing_code");
     return NextResponse.redirect(responseUrl);
   }
 
@@ -46,7 +46,7 @@ export async function GET(request) {
     return response;
   } catch (error) {
     const responseUrl = new URL(loginPathFromNext(nextPath), request.url);
-    responseUrl.searchParams.set("error", error.message || "Google sign in failed.");
+    responseUrl.searchParams.set("error", "google_failed");
     return NextResponse.redirect(responseUrl);
   }
 }

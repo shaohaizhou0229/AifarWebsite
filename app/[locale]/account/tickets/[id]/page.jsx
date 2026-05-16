@@ -3,9 +3,10 @@ import { notFound, redirect } from "next/navigation";
 import { PageHero } from "@/components/PageHero";
 import { getCurrentUser } from "@/lib/auth";
 import { getUserTicket } from "@/lib/tickets";
-import { getPageMessages } from "@/i18n/messages";
+import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
+import { getRequestTypeLabel, getTicketStatusLabel } from "@/i18n/labels";
 
 const pathname = "/account/tickets/";
 
@@ -27,7 +28,11 @@ export default async function AccountTicketDetailPage({ params }) {
   const user = await getCurrentUser();
   if (!user) redirect(localizedPath(locale, "/login/"));
 
-  const [page, result] = await Promise.all([getPageMessages(locale, "ticketDetail"), getUserTicket(user, id)]);
+  const [page, messages, result] = await Promise.all([
+    getPageMessages(locale, "ticketDetail"),
+    getLocaleMessages(locale),
+    getUserTicket(user, id)
+  ]);
   if (!result) notFound();
 
   const { ticket, replies } = result;
@@ -36,8 +41,8 @@ export default async function AccountTicketDetailPage({ params }) {
     <main>
       <PageHero
         eyebrow={page.eyebrow}
-        title={ticket.subject || ticket.requestType.replace("_", " ")}
-        lead={`${page.status}: ${ticket.status.replace("_", " ")} - ${page.submitted} ${formatDate(ticket.createdAt, locale)}`}
+        title={ticket.subject || getRequestTypeLabel(messages.forms, ticket.requestType)}
+        lead={`${page.status}: ${getTicketStatusLabel(messages.forms.admin, ticket.status)} - ${page.submitted} ${formatDate(ticket.createdAt, locale)}`}
       />
       <section className="section alt">
         <div className="section-inner detail-layout">

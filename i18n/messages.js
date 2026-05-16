@@ -9,33 +9,14 @@ const loaders = {
 
 export async function getLocaleMessages(locale) {
   const safeLocale = isLocale(locale) ? locale : defaultLocale;
-  const defaultMessages = (await loaders[defaultLocale]()).default;
-  if (safeLocale === defaultLocale) return defaultMessages;
-
-  const localeMessages = (await loaders[safeLocale]()).default;
-  return mergeMessages(defaultMessages, localeMessages);
+  return (await loaders[safeLocale]()).default;
 }
 
 export async function getPageMessages(locale, pageKey) {
   const messages = await getLocaleMessages(locale);
-  return messages.pages[pageKey];
-}
-
-function mergeMessages(base, override) {
-  if (Array.isArray(base) || Array.isArray(override)) {
-    return override ?? base;
+  const page = messages.pages[pageKey];
+  if (!page) {
+    throw new Error(`Missing page messages for "${pageKey}" in locale "${locale}".`);
   }
-
-  if (!isPlainObject(base) || !isPlainObject(override)) {
-    return override ?? base;
-  }
-
-  return Object.keys(base).reduce((current, key) => {
-    current[key] = mergeMessages(base[key], override[key]);
-    return current;
-  }, { ...override });
-}
-
-function isPlainObject(value) {
-  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+  return page;
 }

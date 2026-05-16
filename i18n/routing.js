@@ -2,7 +2,6 @@ import { defineRouting } from "next-intl/routing";
 
 export const locales = ["en", "zh-CN", "fr", "ar"];
 export const defaultLocale = "en";
-export const activeLocales = ["en", "zh-CN"];
 
 export const localeLabels = {
   en: "English",

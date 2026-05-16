@@ -10,6 +10,7 @@ import { getAdminTicket } from "@/lib/tickets";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
+import { getRequestTypeLabel } from "@/i18n/labels";
 
 const pathname = "/admin/tickets/";
 
@@ -53,7 +54,7 @@ export default async function AdminTicketDetailPage({ params }) {
     <main>
       <PageHero
         eyebrow={page.eyebrow}
-        title={ticket.subject || ticket.requestType.replace("_", " ")}
+        title={ticket.subject || getRequestTypeLabel(messages.forms, ticket.requestType)}
         lead={`${ticket.name} - ${ticket.workEmail} - ${page.submitted} ${formatDate(ticket.createdAt, locale)}`}
       />
       <section className="section alt">
