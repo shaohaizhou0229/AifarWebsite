@@ -681,7 +681,7 @@
         "docs": "文档",
         "support": "支持",
         "contact": "联系我们",
-        "users": "??"
+        "users": "用户"
       },
       "modules": [
         {
@@ -715,8 +715,8 @@
         {
           "key": "users",
           "href": "/admin/users/",
-          "title": "????",
-          "description": "??????????????????????",
+          "title": "用户管理",
+          "description": "查看用户资料、角色、联系记录和关键行为足迹。",
           "status": "active"
         },
         {
@@ -940,73 +940,73 @@
     },
     "adminUsers": {
       "seo": {
-        "title": "???? | Aifar",
-        "description": "?? Aifar ????????????????"
+        "title": "用户管理 | Aifar",
+        "description": "管理 Aifar 网站用户、角色、工单和行为足迹。"
       },
-      "eyebrow": "????",
-      "deniedTitle": "????????",
-      "deniedLead": "?????????????",
-      "title": "?????",
-      "lead": "????????????????????",
-      "breadcrumb": "??",
-      "searchLabel": "????",
-      "searchPlaceholder": "??????????",
-      "searchAction": "??",
-      "emptyTitle": "??????",
-      "emptyLead": "?????????????????",
-      "notProvided": "???",
-      "tickets": "??",
-      "createdAt": "????",
-      "lastFootprint": "????",
+      "eyebrow": "用户管理",
+      "deniedTitle": "需要管理员权限。",
+      "deniedLead": "你的账户无权管理用户。",
+      "title": "用户管理。",
+      "lead": "搜索用户、查看资料，并打开用户行为记录。",
+      "breadcrumb": "用户",
+      "searchLabel": "搜索用户",
+      "searchPlaceholder": "搜索邮箱、姓名或组织",
+      "searchAction": "搜索",
+      "emptyTitle": "未找到用户。",
+      "emptyLead": "请尝试其他搜索词，或等待用户注册。",
+      "notProvided": "未提供",
+      "tickets": "工单",
+      "createdAt": "创建时间",
+      "lastFootprint": "最近活动",
       "roles": {
-        "user": "??",
-        "admin": "???"
+        "user": "用户",
+        "admin": "管理员"
       }
     },
     "adminUserDetail": {
       "seo": {
-        "title": "???? | Aifar",
-        "description": "????? Aifar ????????????????"
+        "title": "用户详情 | Aifar",
+        "description": "查看并更新 Aifar 用户资料、角色、工单和行为足迹。"
       },
-      "eyebrow": "????",
-      "deniedTitle": "????????",
-      "deniedLead": "???????????????",
-      "breadcrumb": "????",
-      "role": "??",
-      "createdAt": "????",
-      "profileTitle": "?????",
-      "ticketsTitle": "????",
-      "footprintsTitle": "????",
-      "noTickets": "???????",
-      "noFootprints": "???????",
-      "actor": "???",
+      "eyebrow": "用户详情",
+      "deniedTitle": "需要管理员权限。",
+      "deniedLead": "你的账户无权管理此用户。",
+      "breadcrumb": "用户详情",
+      "role": "角色",
+      "createdAt": "创建时间",
+      "profileTitle": "资料与角色",
+      "ticketsTitle": "关联工单",
+      "footprintsTitle": "用户足迹",
+      "noTickets": "暂无关联工单。",
+      "noFootprints": "暂无用户足迹记录。",
+      "actor": "操作人",
       "footprints": {
-        "auth.registered": "??",
-        "auth.logged_in": "??",
-        "auth.oauth_logged_in": "Google ??",
-        "profile.updated": "????",
-        "admin.user_updated": "????",
-        "contact.submitted": "????",
-        "ticket.replied": "????",
-        "ticket.status_updated": "????",
-        "download.started": "??"
+        "auth.registered": "注册",
+        "auth.logged_in": "登录",
+        "auth.oauth_logged_in": "Google 登录",
+        "profile.updated": "资料更新",
+        "admin.user_updated": "管理员更新",
+        "contact.submitted": "提交联系请求",
+        "ticket.replied": "工单回复",
+        "ticket.status_updated": "工单状态更新",
+        "download.started": "下载"
       },
       "form": {
-        "email": "??",
-        "name": "??",
-        "organization": "??",
-        "jobTitle": "??",
-        "countryRegion": "??/??",
-        "phone": "??",
-        "role": "??",
+        "email": "邮箱",
+        "name": "姓名",
+        "organization": "组织",
+        "jobTitle": "职位",
+        "countryRegion": "国家/地区",
+        "phone": "电话",
+        "role": "角色",
         "roles": {
-          "user": "??",
-          "admin": "???"
+          "user": "用户",
+          "admin": "管理员"
         },
-        "save": "????",
-        "saving": "???...",
-        "saved": "??????",
-        "saveFailed": "???????"
+        "save": "保存用户",
+        "saving": "保存中...",
+        "saved": "用户已更新。",
+        "saveFailed": "无法更新用户。"
       }
     }
   }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, createUserSupabaseClient, getCurrentAccessToken, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, AuthRequiredError, createUserSupabaseClient, getCurrentAccessToken, requireAdmin } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import {
   SITE_CONTENT_BUCKET,
@@ -12,6 +12,16 @@ import {
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+function permissionError(error) {
+  if (error instanceof AuthRequiredError) {
+    return NextResponse.json({ error: error.message }, { status: 401 });
+  }
+  if (error instanceof AdminRequiredError) {
+    return NextResponse.json({ error: error.message }, { status: 403 });
+  }
+  return null;
+}
 
 export async function POST(request) {
   try {
@@ -49,10 +59,6 @@ export async function POST(request) {
       fileSize: upload.fileSize
     });
   } catch (error) {
-    if (error instanceof AdminRequiredError) {
-      return NextResponse.json({ error: error.message }, { status: 403 });
-    }
-
-    return NextResponse.json({ error: error.message || "Could not upload image." }, { status: 400 });
+    return permissionError(error) || NextResponse.json({ error: error.message || "Could not upload image." }, { status: 400 });
   }
 }

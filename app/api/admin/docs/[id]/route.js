@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, getCurrentAccessToken, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, AuthRequiredError, getCurrentAccessToken, requireAdmin } from "@/lib/auth";
 import {
   MAX_MARKDOWN_FILE_SIZE,
   getAdminDocument,
@@ -12,6 +12,16 @@ import { getProfile } from "@/lib/profiles";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+function permissionError(error) {
+  if (error instanceof AuthRequiredError) {
+    return NextResponse.json({ error: error.message }, { status: 401 });
+  }
+  if (error instanceof AdminRequiredError) {
+    return NextResponse.json({ error: error.message }, { status: 403 });
+  }
+  return null;
+}
 
 function normalizeInput(body, id) {
   return {
@@ -62,11 +72,7 @@ export async function PATCH(request, { params }) {
     const result = await saveDocumentVersion(user, input, uploadInfo);
     return NextResponse.json(result);
   } catch (error) {
-    if (error instanceof AdminRequiredError) {
-      return NextResponse.json({ error: error.message }, { status: 403 });
-    }
-
-    return NextResponse.json({ error: error.message || "Could not update document." }, { status: 400 });
+    return permissionError(error) || NextResponse.json({ error: error.message || "Could not update document." }, { status: 400 });
   }
 }
 
@@ -81,10 +87,6 @@ export async function DELETE(_request, { params }) {
     }
     return NextResponse.json({ document });
   } catch (error) {
-    if (error instanceof AdminRequiredError) {
-      return NextResponse.json({ error: error.message }, { status: 403 });
-    }
-
-    return NextResponse.json({ error: error.message || "Could not archive document." }, { status: 400 });
+    return permissionError(error) || NextResponse.json({ error: error.message || "Could not archive document." }, { status: 400 });
   }
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, getCurrentAccessToken, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, AuthRequiredError, getCurrentAccessToken, requireAdmin } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import {
   MAX_MARKDOWN_FILE_SIZE,
@@ -11,6 +11,16 @@ import {
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+function permissionError(error) {
+  if (error instanceof AuthRequiredError) {
+    return NextResponse.json({ error: error.message }, { status: 401 });
+  }
+  if (error instanceof AdminRequiredError) {
+    return NextResponse.json({ error: error.message }, { status: 403 });
+  }
+  return null;
+}
 
 function normalizeInput(body) {
   return {
@@ -32,11 +42,7 @@ export async function GET() {
     const documents = await listAdminDocuments();
     return NextResponse.json({ documents });
   } catch (error) {
-    if (error instanceof AdminRequiredError) {
-      return NextResponse.json({ error: error.message }, { status: 403 });
-    }
-
-    return NextResponse.json({ error: error.message || "Could not list documents." }, { status: 400 });
+    return permissionError(error) || NextResponse.json({ error: error.message || "Could not list documents." }, { status: 400 });
   }
 }
 
@@ -68,10 +74,6 @@ export async function POST(request) {
     const result = await saveDocumentVersion(user, input, uploadInfo);
     return NextResponse.json(result);
   } catch (error) {
-    if (error instanceof AdminRequiredError) {
-      return NextResponse.json({ error: error.message }, { status: 403 });
-    }
-
-    return NextResponse.json({ error: error.message || "Could not save document." }, { status: 400 });
+    return permissionError(error) || NextResponse.json({ error: error.message || "Could not save document." }, { status: 400 });
   }
 }
