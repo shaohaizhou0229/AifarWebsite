@@ -1,28 +1,36 @@
 import { setRequestLocale } from "next-intl/server";
+import { connection } from "next/server";
 import { Card } from "@/components/Card";
 import { Release } from "@/components/Rows";
+import { getPublishedSitePageContent } from "@/lib/site-content";
 import { getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
 
 const pathname = "/";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }) {
+  await connection();
   const { locale } = await params;
-  const page = await getPageMessages(locale, "home");
+  const fallback = await getPageMessages(locale, "home");
+  const page = await getPublishedSitePageContent("home", locale, fallback);
   return buildMetadata({
     locale,
     pathname,
     title: page.seo.title,
     description: page.seo.description,
-    image: "/assets/images/aifar-hero.png"
+    image: page.heroImageUrl || "/assets/images/aifar-hero.png"
   });
 }
 
 export default async function HomePage({ params }) {
+  await connection();
   const { locale } = await params;
   setRequestLocale(locale);
-  const page = await getPageMessages(locale, "home");
+  const fallback = await getPageMessages(locale, "home");
+  const page = await getPublishedSitePageContent("home", locale, fallback);
   const schema = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -36,7 +44,7 @@ export default async function HomePage({ params }) {
   return (
     <main>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
-      <section className="hero home-hero">
+      <section className="hero home-hero" style={{ "--home-hero-image": `url("${page.heroImageUrl}")` }}>
         <div className="section-inner hero-grid home-hero-grid">
           <div className="hero-copy">
             <p className="eyebrow">{page.eyebrow}</p>
@@ -48,7 +56,7 @@ export default async function HomePage({ params }) {
             </div>
           </div>
           <div className="hero-media product-stage">
-            <img src="/assets/images/aifar-hero.png" alt={page.heroAlt} />
+            <img src={page.heroImageUrl} alt={page.heroAlt} />
           </div>
         </div>
         <div className="section-inner trust-row" aria-label={page.trustLabel}>

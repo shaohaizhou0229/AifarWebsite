@@ -267,7 +267,7 @@ a {
   background:
     linear-gradient(90deg, rgba(247, 250, 252, 0.98) 0%, rgba(247, 250, 252, 0.9) 44%, rgba(247, 250, 252, 0.3) 74%),
     linear-gradient(180deg, rgba(16, 24, 32, 0.02), rgba(18, 124, 130, 0.08)),
-    url("/assets/images/aifar-hero.png") right 6% center / min(56vw, 840px) auto no-repeat;
+    var(--home-hero-image, url("/assets/images/aifar-hero.png")) right 6% center / min(56vw, 840px) auto no-repeat;
 }
 
 .home-hero::before {
@@ -445,6 +445,15 @@ h3 {
   aspect-ratio: 16 / 10;
   background: rgba(232, 241, 251, 0.62);
   object-fit: contain;
+}
+
+.product-visual-section {
+  padding-bottom: 0;
+}
+
+.product-page-media {
+  max-width: 960px;
+  margin: 0 auto;
 }
 
 .trust-row {
@@ -945,6 +954,59 @@ h3 {
   padding: 22px;
 }
 
+.site-content-form {
+  gap: 22px;
+}
+
+.cms-toolbar,
+.form-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.cms-toolbar,
+.form-grid.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.form-grid.three {
+  grid-template-columns: 110px minmax(0, 0.8fr) minmax(0, 1.2fr);
+}
+
+.form-grid input {
+  width: 100%;
+  border: 1px solid rgba(183, 200, 213, 0.9);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--ink);
+  font: inherit;
+  padding: 12px;
+}
+
+.cms-status-panel,
+.cms-editor-section {
+  display: grid;
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfd;
+  padding: 18px;
+}
+
+.cms-status-panel {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.cms-image-preview {
+  width: min(100%, 520px);
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(232, 241, 251, 0.62);
+  object-fit: contain;
+}
+
 .file-management {
   display: flex;
   align-items: center;
@@ -1234,7 +1296,7 @@ h3 {
     min-height: auto;
     background:
       linear-gradient(180deg, rgba(247, 250, 252, 0.96), rgba(247, 250, 252, 0.78)),
-      url("/assets/images/aifar-hero.png") center bottom / min(96vw, 720px) auto no-repeat;
+      var(--home-hero-image, url("/assets/images/aifar-hero.png")) center bottom / min(96vw, 720px) auto no-repeat;
     padding-bottom: 280px;
   }
 
@@ -1289,14 +1351,19 @@ h3 {
     padding-bottom: 220px;
   }
 
-  .hero-copy,
-  .lead,
-  .section-head,
-  .cta-band,
-  .trust-row {
-    max-width: 100%;
-    min-width: 0;
-  }
+    .hero-copy,
+    .lead,
+    .section-head,
+    .cta-band,
+    .trust-row,
+    .cms-toolbar,
+    .form-grid.two,
+    .form-grid.three,
+    .cms-status-panel {
+      max-width: 100%;
+      min-width: 0;
+      grid-template-columns: 1fr;
+    }
 
   .lead,
   .section-head p,
