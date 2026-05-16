@@ -36,9 +36,9 @@ export default async function HomePage({ params }) {
   return (
     <main>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
-      <section className="hero">
-        <div className="section-inner hero-grid">
-          <div>
+      <section className="hero home-hero">
+        <div className="section-inner hero-grid home-hero-grid">
+          <div className="hero-copy">
             <p className="eyebrow">{page.eyebrow}</p>
             <h1>{page.title}</h1>
             <p className="lead">{page.lead}</p>
@@ -47,7 +47,7 @@ export default async function HomePage({ params }) {
               <a className="button secondary" href={localizedPath(locale, "/contact/")}>{page.secondaryCta}</a>
             </div>
           </div>
-          <div className="hero-media">
+          <div className="hero-media product-stage">
             <img src="/assets/images/aifar-hero.png" alt={page.heroAlt} />
           </div>
         </div>
