@@ -31,6 +31,7 @@ export default async function AdminTicketsPage({ params, searchParams }) {
     getPageMessages(locale, "adminTickets"),
     getPageMessages(locale, "adminHome")
   ]);
+  const adminNav = adminHome.nav;
 
   try {
     await requireAdmin(getProfile);
@@ -57,12 +58,12 @@ export default async function AdminTicketsPage({ params, searchParams }) {
           <Breadcrumbs
             locale={locale}
             items={[
-              { label: adminHome.nav.home, href: "/admin/" },
-              { label: adminHome.nav.contact, href: "/admin/contact/" },
+              { label: adminNav.home, href: "/admin/" },
+              { label: adminNav.contact, href: "/admin/contact/" },
               { label: page.breadcrumb }
             ]}
           />
-          <AdminNav locale={locale} labels={adminHome.nav} current="contact" />
+          <AdminNav locale={locale} labels={adminNav} current="contact" />
           <div className="status-actions">
             <a className="button secondary" href={localizedPath(locale, "/admin/tickets/")}>{page.all}</a>
             <a className="button secondary" href={`${localizedPath(locale, "/admin/tickets/")}?status=new`}>{page.new}</a>

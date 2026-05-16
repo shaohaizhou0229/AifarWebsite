@@ -31,6 +31,7 @@ export default async function AdminDownloadsPage({ params }) {
     getPageMessages(locale, "adminDownloads"),
     getPageMessages(locale, "adminHome")
   ]);
+  const adminNav = adminHome.nav;
 
   try {
     await requireAdmin(getProfile);
@@ -55,11 +56,11 @@ export default async function AdminDownloadsPage({ params }) {
           <Breadcrumbs
             locale={locale}
             items={[
-              { label: adminHome.nav.home, href: "/admin/" },
+              { label: adminNav.home, href: "/admin/" },
               { label: page.breadcrumb }
             ]}
           />
-          <AdminNav locale={locale} labels={adminHome.nav} current="downloads" />
+          <AdminNav locale={locale} labels={adminNav} current="downloads" />
           <div className="release-list">
             {platforms.map((platform) => (
               <a className="release" key={platform.key} href={localizedPath(locale, `/admin/downloads/${platform.key}/`)}>
