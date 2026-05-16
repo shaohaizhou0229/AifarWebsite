@@ -10,6 +10,9 @@ create table if not exists public.document_categories (
 );
 
 alter table public.document_categories
+  drop constraint if exists document_categories_key_check;
+
+alter table public.document_categories
   add constraint document_categories_key_check
   check (key in ('operation_guides', 'technical_whitepapers', 'deployment_manuals', 'feature_lists'));
 
@@ -50,6 +53,9 @@ create table if not exists public.documents (
 );
 
 alter table public.documents
+  drop constraint if exists documents_slug_check;
+
+alter table public.documents
   add constraint documents_slug_check
   check (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$');
 
@@ -86,6 +92,9 @@ create table if not exists public.document_chunks (
   created_at timestamptz not null default now(),
   unique (version_id, chunk_index)
 );
+
+alter table public.document_chunks
+  drop constraint if exists document_chunks_index_status_check;
 
 alter table public.document_chunks
   add constraint document_chunks_index_status_check
