@@ -78,20 +78,53 @@
       "failure": "فشل تحديث الملف."
     },
     "admin": {
-      "statusActions": "إجراءات حالة التذكرة",
-      "markInProgress": "تعيين قيد المعالجة",
-      "closeTicket": "إغلاق التذكرة",
-      "reply": "رد",
-      "sendReply": "إرسال الرد",
-      "sending": "جار الإرسال...",
-      "statusUpdated": "تم تحديث حالة التذكرة.",
-      "statusFailure": "تعذر تحديث الحالة.",
-      "replyRequired": "رسالة الرد مطلوبة.",
-      "replyFailure": "تعذر إرسال الرد.",
+      "statusActions": "Ticket status actions",
+      "markInProgress": "Mark in progress",
+      "closeTicket": "Close ticket",
+      "status": "Status",
+      "priority": "Priority",
+      "category": "Category",
+      "assignee": "Assignee",
+      "unassigned": "Unassigned",
+      "saveChanges": "Save changes",
+      "saving": "Saving...",
+      "ticketUpdated": "Ticket updated.",
+      "updateFailure": "Unable to update ticket.",
+      "reply": "Customer reply",
+      "sendReply": "Send reply",
+      "sending": "Sending...",
+      "statusUpdated": "Ticket status updated.",
+      "statusFailure": "Unable to update status.",
+      "replyRequired": "Reply message is required.",
+      "replyFailure": "Unable to send reply.",
+      "internalNote": "Internal note",
+      "addNote": "Add internal note",
+      "internalNotes": "Internal notes",
+      "noInternalNotes": "No internal notes yet.",
+      "noteRequired": "Internal note is required.",
+      "noteFailure": "Unable to add internal note.",
+      "adminUser": "Administrator",
       "ticketStatuses": {
-        "new": "جديدة",
-        "in_progress": "قيد المعالجة",
-        "closed": "مغلقة"
+        "new": "New",
+        "in_progress": "In progress",
+        "waiting_customer": "Waiting for customer",
+        "resolved": "Resolved",
+        "closed": "Closed"
+      },
+      "ticketPriorities": {
+        "low": "Low",
+        "normal": "Normal",
+        "high": "High",
+        "urgent": "Urgent"
+      },
+      "ticketCategories": {
+        "account_access": "Account access",
+        "client_download": "Client download",
+        "installation": "Installation",
+        "product_usage": "Product usage",
+        "bug_report": "Issue report",
+        "partnership": "Partnership",
+        "other": "Other"
       }
     },
     "downloads": {
@@ -556,39 +589,39 @@
       },
       "modules": [
         {
-          "key": "معلومات Aifar",
-          "href": "معلومات Aifar",
-          "title": "معلومات Aifar",
-          "description": "معلومات Aifar",
-          "status": "معلومات Aifar"
+          "key": "product",
+          "href": "/admin/product/",
+          "title": "Product content",
+          "description": "Maintain product pages, copy, media, and public content.",
+          "status": "planned"
         },
         {
-          "key": "معلومات Aifar",
-          "href": "معلومات Aifar",
-          "title": "معلومات Aifar",
-          "description": "معلومات Aifar",
-          "status": "معلومات Aifar"
+          "key": "downloads",
+          "href": "/admin/downloads/",
+          "title": "Client downloads",
+          "description": "Maintain client versions, files, notes, and publish status.",
+          "status": "active"
         },
         {
-          "key": "معلومات Aifar",
-          "href": "معلومات Aifar",
-          "title": "معلومات Aifar",
-          "description": "معلومات Aifar",
-          "status": "معلومات Aifar"
+          "key": "docs",
+          "href": "/admin/docs/",
+          "title": "Online docs",
+          "description": "Prepare an online documentation workspace for guides.",
+          "status": "planned"
         },
         {
-          "key": "معلومات Aifar",
-          "href": "معلومات Aifar",
-          "title": "معلومات Aifar",
-          "description": "معلومات Aifar",
-          "status": "معلومات Aifar"
+          "key": "support",
+          "href": "/admin/support/",
+          "title": "Support tickets",
+          "description": "Manage status, priority, category, owner, replies, and internal notes.",
+          "status": "active"
         },
         {
-          "key": "معلومات Aifar",
-          "href": "معلومات Aifar",
-          "title": "معلومات Aifar",
-          "description": "معلومات Aifar",
-          "status": "معلومات Aifar"
+          "key": "contact",
+          "href": "/admin/contact/",
+          "title": "Contact forms",
+          "description": "Review contact requests and reply to visitors.",
+          "status": "active"
         }
       ]
     },
@@ -624,18 +657,38 @@
     },
     "adminSupport": {
       "seo": {
-        "title": "معلومات Aifar | Aifar",
-        "description": "معلومات Aifar للفرق والمؤسسات."
+        "title": "Support Tickets | Aifar",
+        "description": "Manage Aifar support tickets, owners, priorities, and replies."
       },
-      "eyebrow": "معلومات Aifar",
-      "deniedTitle": "معلومات Aifar",
-      "deniedLead": "معلومات Aifar",
-      "breadcrumb": "معلومات Aifar",
-      "title": "معلومات Aifar",
-      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
-      "status": "معلومات Aifar",
-      "emptyTitle": "معلومات Aifar",
-      "emptyLead": "معلومات Aifar"
+      "eyebrow": "Support tickets",
+      "deniedTitle": "Administrator access required.",
+      "deniedLead": "Your account does not have permission to manage support tickets.",
+      "breadcrumb": "Support tickets",
+      "title": "Support ticket workspace.",
+      "lead": "Review, assign, prioritize, reply to, and close customer requests from one operating view.",
+      "stats": {
+        "pending": "Pending",
+        "inProgress": "In progress",
+        "today": "New today",
+        "closed": "Closed"
+      },
+      "filters": {
+        "status": "Status",
+        "priority": "Priority",
+        "category": "Category",
+        "assignee": "Assignee",
+        "keyword": "Keyword",
+        "keywordPlaceholder": "Search subject, customer, email, organization, or message",
+        "allStatuses": "All statuses",
+        "allPriorities": "All priorities",
+        "allCategories": "All categories",
+        "allAssignees": "All assignees",
+        "apply": "Apply filters",
+        "reset": "Reset"
+      },
+      "notProvided": "Not provided",
+      "emptyTitle": "No tickets found.",
+      "emptyLead": "New contact and support requests will appear here."
     },
     "adminContact": {
       "seo": {
@@ -657,35 +710,41 @@
     },
     "adminTickets": {
       "seo": {
-        "title": "معلومات Aifar | Aifar",
-        "description": "معلومات Aifar للفرق والمؤسسات."
+        "title": "Admin Tickets | Aifar",
+        "description": "Manage Aifar contact request tickets."
       },
-      "eyebrow": "معلومات Aifar",
-      "deniedTitle": "معلومات Aifar",
-      "deniedLead": "معلومات Aifar",
-      "breadcrumb": "معلومات Aifar",
-      "title": "معلومات Aifar",
-      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
-      "all": "معلومات Aifar",
-      "new": "معلومات Aifar",
-      "inProgress": "معلومات Aifar",
-      "closed": "معلومات Aifar"
+      "eyebrow": "Admin",
+      "deniedTitle": "Administrator access required.",
+      "deniedLead": "Your account does not have permission to manage Aifar website tickets.",
+      "breadcrumb": "Ticket list",
+      "title": "Contact request tickets.",
+      "lead": "This legacy list remains available; the main operating workspace is now Support.",
+      "all": "All",
+      "new": "New",
+      "inProgress": "In progress",
+      "waitingCustomer": "Waiting for customer",
+      "resolved": "Resolved",
+      "closed": "Closed"
     },
     "adminTicketDetail": {
       "seo": {
-        "title": "معلومات Aifar | Aifar",
-        "description": "معلومات Aifar للفرق والمؤسسات."
+        "title": "Admin Ticket Detail | Aifar",
+        "description": "Review, reply to, and update an Aifar support ticket."
       },
-      "eyebrow": "معلومات Aifar",
-      "deniedTitle": "معلومات Aifar",
-      "deniedLead": "معلومات Aifar",
-      "breadcrumb": "معلومات Aifar",
-      "submitted": "معلومات Aifar",
-      "requestTitle": "معلومات Aifar",
-      "organization": "معلومات Aifar",
-      "notProvided": "معلومات Aifar",
-      "replies": "معلومات Aifar",
-      "noReplies": "معلومات Aifar"
+      "eyebrow": "Support ticket",
+      "deniedTitle": "Administrator access required.",
+      "deniedLead": "Your account does not have permission to manage this ticket.",
+      "breadcrumb": "Ticket detail",
+      "submitted": "Submitted",
+      "requestTitle": "Customer request",
+      "organization": "Organization",
+      "notProvided": "Not provided",
+      "replies": "Customer-visible replies",
+      "noReplies": "No replies yet.",
+      "processing": "Processing panel",
+      "customer": "Customer",
+      "createdAt": "Created",
+      "lastRepliedAt": "Last reply"
     },
     "adminDownloads": {
       "seo": {

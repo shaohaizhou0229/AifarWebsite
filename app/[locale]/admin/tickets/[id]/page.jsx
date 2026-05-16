@@ -6,11 +6,12 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PageHero } from "@/components/PageHero";
 import { AdminRequiredError, requireAdmin } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
+import { listAdminProfiles } from "@/lib/profiles";
 import { getAdminTicket } from "@/lib/tickets";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
-import { getRequestTypeLabel } from "@/i18n/labels";
+import { getRequestTypeLabel, getTicketCategoryLabel, getTicketPriorityLabel, getTicketStatusLabel } from "@/i18n/labels";
 
 const pathname = "/admin/tickets/";
 
@@ -45,10 +46,14 @@ export default async function AdminTicketDetailPage({ params }) {
     redirect(localizedPath(locale, "/login/"));
   }
 
-  const result = await getAdminTicket(id);
+  const [result, profiles] = await Promise.all([
+    getAdminTicket(id),
+    listAdminProfiles()
+  ]);
   if (!result) notFound();
 
-  const { ticket, replies } = result;
+  const { ticket, replies, internalNotes } = result;
+  const adminLabels = messages.forms.admin;
 
   return (
     <main>
@@ -63,26 +68,63 @@ export default async function AdminTicketDetailPage({ params }) {
             locale={locale}
             items={[
               { label: adminHome.nav.home, href: "/admin/" },
-              { label: adminHome.nav.contact, href: "/admin/contact/" },
+              { label: adminHome.nav.support, href: "/admin/support/" },
               { label: page.breadcrumb }
             ]}
           />
-          <AdminNav locale={locale} labels={adminHome.nav} current="contact" />
-          <article className="card detail-card">
-            <h3>{page.requestTitle}</h3>
-            <p>{ticket.message}</p>
-            <p className="muted-line">{page.organization}: {ticket.organization || page.notProvided}</p>
-          </article>
-          <AdminTicketActions ticket={ticket} labels={messages.forms.admin} />
-          <div className="reply-list">
-            <h2>{page.replies}</h2>
-            {replies.length ? replies.map((reply) => (
-              <article className="card" key={reply.id}>
-                <h3>{reply.authorName || reply.authorEmail || reply.authorRole}</h3>
-                <p>{reply.message}</p>
-                <p className="muted-line">{formatDate(reply.createdAt, locale)}</p>
+          <AdminNav locale={locale} labels={adminHome.nav} current="support" />
+          <div className="ticket-detail-grid">
+            <div className="ticket-conversation">
+              <article className="card detail-card">
+                <h3>{page.requestTitle}</h3>
+                <p>{ticket.message}</p>
+                <p className="muted-line">{page.organization}: {ticket.organization || page.notProvided}</p>
               </article>
-            )) : <p className="muted-line">{page.noReplies}</p>}
+              <div className="reply-list">
+                <h2>{page.replies}</h2>
+                {replies.length ? replies.map((reply) => (
+                  <article className="card" key={reply.id}>
+                    <h3>{reply.authorName || reply.authorEmail || reply.authorRole}</h3>
+                    <p>{reply.message}</p>
+                    <p className="muted-line">{formatDate(reply.createdAt, locale)}</p>
+                  </article>
+                )) : <p className="muted-line">{page.noReplies}</p>}
+              </div>
+            </div>
+            <AdminTicketActions ticket={ticket} labels={adminLabels} profiles={profiles} internalNotes={internalNotes} />
+            <aside className="ticket-side-panel">
+              <h2>{page.processing}</h2>
+              <dl>
+                <div>
+                  <dt>{adminLabels.status}</dt>
+                  <dd>{getTicketStatusLabel(adminLabels, ticket.status)}</dd>
+                </div>
+                <div>
+                  <dt>{adminLabels.priority}</dt>
+                  <dd>{getTicketPriorityLabel(adminLabels, ticket.priority)}</dd>
+                </div>
+                <div>
+                  <dt>{adminLabels.category}</dt>
+                  <dd>{getTicketCategoryLabel(adminLabels, ticket.category || "other")}</dd>
+                </div>
+                <div>
+                  <dt>{adminLabels.assignee}</dt>
+                  <dd>{ticket.assigneeName || ticket.assigneeEmail || adminLabels.unassigned}</dd>
+                </div>
+                <div>
+                  <dt>{page.customer}</dt>
+                  <dd>{ticket.name} / {ticket.workEmail}</dd>
+                </div>
+                <div>
+                  <dt>{page.createdAt}</dt>
+                  <dd>{formatDate(ticket.createdAt, locale)}</dd>
+                </div>
+                <div>
+                  <dt>{page.lastRepliedAt}</dt>
+                  <dd>{formatDate(ticket.lastRepliedAt, locale) || page.notProvided}</dd>
+                </div>
+              </dl>
+            </aside>
           </div>
         </div>
       </section>

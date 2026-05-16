@@ -81,6 +81,15 @@
       "statusActions": "Ticket status actions",
       "markInProgress": "Mark in progress",
       "closeTicket": "Close ticket",
+      "status": "Status",
+      "priority": "Priority",
+      "category": "Category",
+      "assignee": "Assignee",
+      "unassigned": "Unassigned",
+      "saveChanges": "Save changes",
+      "saving": "Saving...",
+      "ticketUpdated": "Ticket updated.",
+      "updateFailure": "Unable to update ticket.",
       "reply": "Reply",
       "sendReply": "Send reply",
       "sending": "Sending...",
@@ -88,10 +97,34 @@
       "statusFailure": "Unable to update status.",
       "replyRequired": "Reply message is required.",
       "replyFailure": "Unable to send reply.",
+      "internalNote": "Internal note",
+      "addNote": "Add internal note",
+      "internalNotes": "Internal notes",
+      "noInternalNotes": "No internal notes yet.",
+      "noteRequired": "Internal note is required.",
+      "noteFailure": "Unable to add internal note.",
+      "adminUser": "Administrator",
       "ticketStatuses": {
         "new": "New",
         "in_progress": "In progress",
+        "waiting_customer": "Waiting for customer",
+        "resolved": "Resolved",
         "closed": "Closed"
+      },
+      "ticketPriorities": {
+        "low": "Low",
+        "normal": "Normal",
+        "high": "High",
+        "urgent": "Urgent"
+      },
+      "ticketCategories": {
+        "account_access": "Account access",
+        "client_download": "Client download",
+        "installation": "Installation",
+        "product_usage": "Product usage",
+        "bug_report": "Issue report",
+        "partnership": "Partnership",
+        "other": "Other"
       }
     },
     "downloads": {
@@ -579,9 +612,9 @@
         {
           "key": "support",
           "href": "/admin/support/",
-          "title": "Support feedback",
-          "description": "Manage support form feedback, issue categories, and support handling status.",
-          "status": "planned"
+          "title": "Support tickets",
+          "description": "Manage ticket status, priority, category, owner, replies, and internal notes.",
+          "status": "active"
         },
         {
           "key": "contact",
@@ -624,18 +657,38 @@
     },
     "adminSupport": {
       "seo": {
-        "title": "Admin Support | Aifar",
-        "description": "Manage Aifar support feedback."
+        "title": "Support Tickets | Aifar",
+        "description": "Manage Aifar support tickets, owners, priorities, and replies."
       },
-      "eyebrow": "Admin support",
+      "eyebrow": "Support tickets",
       "deniedTitle": "Administrator access required.",
-      "deniedLead": "Your account does not have permission to manage support feedback.",
-      "breadcrumb": "Support",
-      "title": "Support feedback management.",
-      "lead": "This area is reserved for support form feedback and support handling workflows.",
-      "status": "Planned",
-      "emptyTitle": "Support feedback tools are not connected yet.",
-      "emptyLead": "The management entry is ready. Next we can connect support forms, categories, priorities, owners, and response records."
+      "deniedLead": "Your account does not have permission to manage support tickets.",
+      "breadcrumb": "Support tickets",
+      "title": "Support ticket workspace.",
+      "lead": "Review, assign, prioritize, reply to, and close customer requests from one operating view.",
+      "stats": {
+        "pending": "Pending",
+        "inProgress": "In progress",
+        "today": "New today",
+        "closed": "Closed"
+      },
+      "filters": {
+        "status": "Status",
+        "priority": "Priority",
+        "category": "Category",
+        "assignee": "Assignee",
+        "keyword": "Keyword",
+        "keywordPlaceholder": "Search subject, customer, email, organization, or message",
+        "allStatuses": "All statuses",
+        "allPriorities": "All priorities",
+        "allCategories": "All categories",
+        "allAssignees": "All assignees",
+        "apply": "Apply filters",
+        "reset": "Reset"
+      },
+      "notProvided": "Not provided",
+      "emptyTitle": "No tickets found.",
+      "emptyLead": "New contact and support requests will appear here."
     },
     "adminContact": {
       "seo": {
@@ -665,27 +718,33 @@
       "deniedLead": "Your account does not have permission to manage Aifar website tickets.",
       "breadcrumb": "Ticket list",
       "title": "Contact request tickets.",
-      "lead": "Review, reply to, and close website contact requests.",
+      "lead": "This legacy list remains available; the main operating workspace is now Support.",
       "all": "All",
       "new": "New",
       "inProgress": "In progress",
+      "waitingCustomer": "Waiting for customer",
+      "resolved": "Resolved",
       "closed": "Closed"
     },
     "adminTicketDetail": {
       "seo": {
         "title": "Admin Ticket Detail | Aifar",
-        "description": "Review, reply to, and update an Aifar contact request ticket."
+        "description": "Review, reply to, and update an Aifar support ticket."
       },
-      "eyebrow": "Admin ticket",
+      "eyebrow": "Support ticket",
       "deniedTitle": "Administrator access required.",
       "deniedLead": "Your account does not have permission to manage this ticket.",
       "breadcrumb": "Ticket detail",
       "submitted": "Submitted",
-      "requestTitle": "Request",
+      "requestTitle": "Customer request",
       "organization": "Organization",
       "notProvided": "Not provided",
-      "replies": "Replies",
-      "noReplies": "No replies yet."
+      "replies": "Customer-visible replies",
+      "noReplies": "No replies yet.",
+      "processing": "Processing panel",
+      "customer": "Customer",
+      "createdAt": "Created",
+      "lastRepliedAt": "Last reply"
     },
     "adminDownloads": {
       "seo": {

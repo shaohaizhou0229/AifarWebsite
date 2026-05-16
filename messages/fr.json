@@ -81,17 +81,50 @@
       "statusActions": "Actions de statut du ticket",
       "markInProgress": "Marquer en cours",
       "closeTicket": "Fermer le ticket",
-      "reply": "Réponse",
-      "sendReply": "Envoyer la réponse",
+      "status": "Statut",
+      "priority": "Priorite",
+      "category": "Categorie",
+      "assignee": "Responsable",
+      "unassigned": "Non attribue",
+      "saveChanges": "Enregistrer",
+      "saving": "Enregistrement...",
+      "ticketUpdated": "Ticket mis a jour.",
+      "updateFailure": "Impossible de mettre a jour le ticket.",
+      "reply": "Reponse client",
+      "sendReply": "Envoyer la reponse",
       "sending": "Envoi...",
-      "statusUpdated": "Statut du ticket mis à jour.",
-      "statusFailure": "Impossible de mettre à jour le statut.",
-      "replyRequired": "Le message de réponse est obligatoire.",
-      "replyFailure": "Impossible d’envoyer la réponse.",
+      "statusUpdated": "Statut du ticket mis a jour.",
+      "statusFailure": "Impossible de mettre a jour le statut.",
+      "replyRequired": "Le message de reponse est obligatoire.",
+      "replyFailure": "Impossible d envoyer la reponse.",
+      "internalNote": "Note interne",
+      "addNote": "Ajouter une note interne",
+      "internalNotes": "Notes internes",
+      "noInternalNotes": "Aucune note interne.",
+      "noteRequired": "La note interne est obligatoire.",
+      "noteFailure": "Impossible d ajouter la note interne.",
+      "adminUser": "Administrateur",
       "ticketStatuses": {
         "new": "Nouveau",
         "in_progress": "En cours",
-        "closed": "Fermé"
+        "waiting_customer": "En attente client",
+        "resolved": "Resolu",
+        "closed": "Ferme"
+      },
+      "ticketPriorities": {
+        "low": "Basse",
+        "normal": "Normale",
+        "high": "Haute",
+        "urgent": "Urgente"
+      },
+      "ticketCategories": {
+        "account_access": "Acces compte",
+        "client_download": "Telechargement client",
+        "installation": "Installation",
+        "product_usage": "Utilisation produit",
+        "bug_report": "Incident",
+        "partnership": "Partenariat",
+        "other": "Autre"
       }
     },
     "downloads": {
@@ -556,39 +589,39 @@
       },
       "modules": [
         {
-          "key": "Présentation Aifar",
-          "href": "Présentation Aifar",
-          "title": "Présentation Aifar",
-          "description": "Présentation Aifar",
-          "status": "Présentation Aifar"
+          "key": "product",
+          "href": "/admin/product/",
+          "title": "Contenu produit",
+          "description": "Maintenir les pages produit, les textes et les contenus publics.",
+          "status": "planned"
         },
         {
-          "key": "Présentation Aifar",
-          "href": "Présentation Aifar",
-          "title": "Présentation Aifar",
-          "description": "Présentation Aifar",
-          "status": "Présentation Aifar"
+          "key": "downloads",
+          "href": "/admin/downloads/",
+          "title": "Telechargements client",
+          "description": "Maintenir les versions client, fichiers et notes de version.",
+          "status": "active"
         },
         {
-          "key": "Présentation Aifar",
-          "href": "Présentation Aifar",
-          "title": "Présentation Aifar",
-          "description": "Présentation Aifar",
-          "status": "Présentation Aifar"
+          "key": "docs",
+          "href": "/admin/docs/",
+          "title": "Docs en ligne",
+          "description": "Preparer un espace documentaire en ligne pour les guides.",
+          "status": "planned"
         },
         {
-          "key": "Présentation Aifar",
-          "href": "Présentation Aifar",
-          "title": "Présentation Aifar",
-          "description": "Présentation Aifar",
-          "status": "Présentation Aifar"
+          "key": "support",
+          "href": "/admin/support/",
+          "title": "Tickets support",
+          "description": "Gerer statut, priorite, categorie, responsable, reponses et notes internes.",
+          "status": "active"
         },
         {
-          "key": "Présentation Aifar",
-          "href": "Présentation Aifar",
-          "title": "Présentation Aifar",
-          "description": "Présentation Aifar",
-          "status": "Présentation Aifar"
+          "key": "contact",
+          "href": "/admin/contact/",
+          "title": "Formulaires contact",
+          "description": "Examiner les demandes de contact et repondre aux visiteurs.",
+          "status": "active"
         }
       ]
     },
@@ -624,18 +657,38 @@
     },
     "adminSupport": {
       "seo": {
-        "title": "Présentation Aifar | Aifar",
-        "description": "Informations Aifar pour les équipes et les organisations."
+        "title": "Tickets support | Aifar",
+        "description": "Gerer les tickets support Aifar, responsables, priorites et reponses."
       },
-      "eyebrow": "Présentation Aifar",
-      "deniedTitle": "Présentation Aifar",
-      "deniedLead": "Présentation Aifar",
-      "breadcrumb": "Présentation Aifar",
-      "title": "Présentation Aifar",
-      "lead": "Informations structurées sur les capacités et services Aifar.",
-      "status": "Présentation Aifar",
-      "emptyTitle": "Présentation Aifar",
-      "emptyLead": "Présentation Aifar"
+      "eyebrow": "Tickets support",
+      "deniedTitle": "Acces administrateur requis.",
+      "deniedLead": "Votre compte ne peut pas gerer les tickets support.",
+      "breadcrumb": "Tickets support",
+      "title": "Espace de gestion des tickets support.",
+      "lead": "Examiner, attribuer, prioriser, repondre et cloturer les demandes client depuis une vue unique.",
+      "stats": {
+        "pending": "A traiter",
+        "inProgress": "En cours",
+        "today": "Nouveaux aujourd hui",
+        "closed": "Fermes"
+      },
+      "filters": {
+        "status": "Statut",
+        "priority": "Priorite",
+        "category": "Categorie",
+        "assignee": "Responsable",
+        "keyword": "Mot-cle",
+        "keywordPlaceholder": "Rechercher sujet, client, e-mail, organisation ou message",
+        "allStatuses": "Tous les statuts",
+        "allPriorities": "Toutes les priorites",
+        "allCategories": "Toutes les categories",
+        "allAssignees": "Tous les responsables",
+        "apply": "Filtrer",
+        "reset": "Reinitialiser"
+      },
+      "notProvided": "Non renseigne",
+      "emptyTitle": "Aucun ticket trouve.",
+      "emptyLead": "Les nouvelles demandes de contact et support apparaitront ici."
     },
     "adminContact": {
       "seo": {
@@ -657,35 +710,41 @@
     },
     "adminTickets": {
       "seo": {
-        "title": "Présentation Aifar | Aifar",
-        "description": "Informations Aifar pour les équipes et les organisations."
+        "title": "Admin Tickets | Aifar",
+        "description": "Gerer les tickets de demande de contact Aifar."
       },
-      "eyebrow": "Présentation Aifar",
-      "deniedTitle": "Présentation Aifar",
-      "deniedLead": "Présentation Aifar",
-      "breadcrumb": "Présentation Aifar",
-      "title": "Présentation Aifar",
-      "lead": "Informations structurées sur les capacités et services Aifar.",
-      "all": "Présentation Aifar",
-      "new": "Présentation Aifar",
-      "inProgress": "Présentation Aifar",
-      "closed": "Présentation Aifar"
+      "eyebrow": "Admin",
+      "deniedTitle": "Acces administrateur requis.",
+      "deniedLead": "Votre compte ne peut pas gerer les tickets Aifar.",
+      "breadcrumb": "Liste des tickets",
+      "title": "Tickets de demande de contact.",
+      "lead": "Cette ancienne liste reste disponible; l espace principal est desormais Support.",
+      "all": "Tous",
+      "new": "Nouveau",
+      "inProgress": "En cours",
+      "waitingCustomer": "En attente client",
+      "resolved": "Resolu",
+      "closed": "Ferme"
     },
     "adminTicketDetail": {
       "seo": {
-        "title": "Présentation Aifar | Aifar",
-        "description": "Informations Aifar pour les équipes et les organisations."
+        "title": "Detail du ticket admin | Aifar",
+        "description": "Examiner, repondre et mettre a jour un ticket support Aifar."
       },
-      "eyebrow": "Présentation Aifar",
-      "deniedTitle": "Présentation Aifar",
-      "deniedLead": "Présentation Aifar",
-      "breadcrumb": "Présentation Aifar",
-      "submitted": "Présentation Aifar",
-      "requestTitle": "Présentation Aifar",
-      "organization": "Présentation Aifar",
-      "notProvided": "Présentation Aifar",
-      "replies": "Présentation Aifar",
-      "noReplies": "Présentation Aifar"
+      "eyebrow": "Ticket support",
+      "deniedTitle": "Acces administrateur requis.",
+      "deniedLead": "Votre compte ne peut pas gerer ce ticket.",
+      "breadcrumb": "Detail du ticket",
+      "submitted": "Envoye",
+      "requestTitle": "Demande client",
+      "organization": "Organisation",
+      "notProvided": "Non renseigne",
+      "replies": "Reponses visibles par le client",
+      "noReplies": "Aucune reponse.",
+      "processing": "Panneau de traitement",
+      "customer": "Client",
+      "createdAt": "Cree",
+      "lastRepliedAt": "Derniere reponse"
     },
     "adminDownloads": {
       "seo": {
