@@ -28,20 +28,26 @@ export async function SiteHeader({ locale, messages }) {
         </a>
         <MobileMenuButton label={messages.layout.menu} />
         <nav id="site-navigation" className="nav-links" data-nav>
-          {navLinks.map(([key, href]) => (
-            <a key={href} href={localizedPath(locale, href)}>
-              {nav[key]}
-            </a>
-          ))}
-          {profile?.role === "admin" ? <a href={localizedPath(locale, "/admin/")}>{nav.admin}</a> : null}
-          {user ? (
-            <>
-              <a href={localizedPath(locale, "/account/")}>{nav.account}</a>
-              <SignOutButton labels={messages.layout.auth} redirectTo={localizedPath(locale, "/")} />
-            </>
-          ) : (
-            <a href={localizedPath(locale, "/login/")}>{nav.signIn}</a>
-          )}
+          <span className="nav-primary">
+            {navLinks.map(([key, href]) => (
+              <a key={href} href={localizedPath(locale, href)}>
+                {nav[key]}
+              </a>
+            ))}
+          </span>
+          <span className="nav-session">
+            {profile?.role === "admin" ? (
+              <a className="nav-admin-link" href={localizedPath(locale, "/admin/")}>{nav.admin}</a>
+            ) : null}
+            {user ? (
+              <>
+                <a className="nav-account-link" href={localizedPath(locale, "/account/")}>{nav.account}</a>
+                <SignOutButton labels={messages.layout.auth} redirectTo={localizedPath(locale, "/")} />
+              </>
+            ) : (
+              <a className="nav-login-link" href={localizedPath(locale, "/login/")}>{nav.signIn}</a>
+            )}
+          </span>
           <LanguageSwitcher locale={locale} label={messages.layout.language} />
         </nav>
       </div>
