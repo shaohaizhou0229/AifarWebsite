@@ -1029,7 +1029,8 @@ h3 {
 
 .ticket-detail-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr) minmax(260px, 0.55fr);
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 0.78fr);
+  align-items: start;
   gap: 18px;
 }
 
@@ -1040,6 +1041,7 @@ h3 {
 }
 
 .ticket-side-panel {
+  grid-column: 2;
   align-self: start;
   border: 1px solid rgba(183, 200, 213, 0.78);
   border-radius: 8px;
@@ -1080,11 +1082,20 @@ h3 {
 .admin-actions {
   display: grid;
   gap: 18px;
+  min-width: 0;
   border: 1px solid rgba(183, 200, 213, 0.78);
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.82);
   box-shadow: var(--shadow-tight);
   padding: 22px;
+}
+
+.admin-actions .ticket-control-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-actions .ticket-control-grid .button {
+  width: 100%;
 }
 
 .site-content-form {
@@ -1580,6 +1591,10 @@ h3 {
 
   .ticket-meta {
     justify-content: flex-start;
+  }
+
+  .ticket-side-panel {
+    grid-column: auto;
   }
 
   .nav-primary,
