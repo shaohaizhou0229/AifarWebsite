@@ -42,12 +42,14 @@
       "alreadyHaveAccount": "لديك حساب بالفعل؟ ",
       "needAccount": "تحتاج إلى حساب؟ ",
       "confirmation": "يرجى تأكيد حسابك عبر البريد قبل تسجيل الدخول.",
-      "failure": "فشلت المصادقة.",
+      "failure": "Authentication failed. Please check your account information and try again.",
       "continueWithGoogle": "المتابعة باستخدام Google",
       "orEmail": "أو استخدم البريد",
       "errors": {
-        "google_failed": "فشل تسجيل الدخول عبر Google. يرجى المحاولة مرة أخرى.",
-        "google_missing_code": "استدعاء Google لا يحتوي على رمز التفويض."
+        "google_failed": "Google sign in failed. Please try again.",
+        "google_missing_code": "Google sign in callback is missing a code.",
+        "auth_failed": "Sign in failed. Please check your account information and try again.",
+        "auth_service_unavailable": "The account service is temporarily unavailable. Please try again later or contact the administrator."
       }
     },
     "contact": {

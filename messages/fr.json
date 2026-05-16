@@ -42,12 +42,14 @@
       "alreadyHaveAccount": "Vous avez déjà un compte ? ",
       "needAccount": "Besoin d’un compte ? ",
       "confirmation": "Veuillez confirmer votre compte par e-mail avant de vous connecter.",
-      "failure": "Échec de l’authentification.",
+      "failure": "Authentication failed. Please check your account information and try again.",
       "continueWithGoogle": "Continuer avec Google",
       "orEmail": "ou utiliser l’e-mail",
       "errors": {
-        "google_failed": "La connexion Google a échoué. Veuillez réessayer.",
-        "google_missing_code": "Le rappel Google ne contient pas de code d’autorisation."
+        "google_failed": "Google sign in failed. Please try again.",
+        "google_missing_code": "Google sign in callback is missing a code.",
+        "auth_failed": "Sign in failed. Please check your account information and try again.",
+        "auth_service_unavailable": "The account service is temporarily unavailable. Please try again later or contact the administrator."
       }
     },
     "contact": {

@@ -42,12 +42,14 @@
       "alreadyHaveAccount": "Already have an account? ",
       "needAccount": "Need an account? ",
       "confirmation": "Please check your email to confirm your account before signing in.",
-      "failure": "Authentication failed.",
+      "failure": "Authentication failed. Please check your account information and try again.",
       "continueWithGoogle": "Continue with Google",
       "orEmail": "or use email",
       "errors": {
         "google_failed": "Google sign in failed. Please try again.",
-        "google_missing_code": "Google sign in callback is missing a code."
+        "google_missing_code": "Google sign in callback is missing a code.",
+        "auth_failed": "Sign in failed. Please check your account information and try again.",
+        "auth_service_unavailable": "The account service is temporarily unavailable. Please try again later or contact the administrator."
       }
     },
     "contact": {

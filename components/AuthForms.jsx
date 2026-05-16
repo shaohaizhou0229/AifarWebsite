@@ -33,7 +33,7 @@ export function AuthForm({ mode, labels, accountPath, loginPath, registerPath, i
       const result = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(result.error || labels.auth.failure);
+        throw new Error(labels.auth.errors?.[result.errorCode] || result.error || labels.auth.failure);
       }
 
       if (result.requiresConfirmation) {

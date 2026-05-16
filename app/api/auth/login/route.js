@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ensureProfile } from "@/lib/profiles";
-import { setAuthCookies, signInWithPassword } from "@/lib/auth";
+import { AuthConfigurationError, setAuthCookies, signInWithPassword } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
@@ -24,6 +24,10 @@ export async function POST(request) {
     setAuthCookies(response, session);
     return response;
   } catch (error) {
-    return NextResponse.json({ error: error.message || "Sign in failed." }, { status: 401 });
+    console.error("Sign in failed", error);
+    if (error instanceof AuthConfigurationError) {
+      return NextResponse.json({ errorCode: "auth_service_unavailable" }, { status: 503 });
+    }
+    return NextResponse.json({ errorCode: "auth_failed" }, { status: 401 });
   }
 }

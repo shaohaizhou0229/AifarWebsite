@@ -42,12 +42,14 @@
       "alreadyHaveAccount": "已有账户？",
       "needAccount": "需要账户？",
       "confirmation": "请先查收邮件并确认账户，然后再登录。",
-      "failure": "认证失败。",
+      "failure": "认证失败，请检查账号信息后重试。",
       "continueWithGoogle": "使用 Google 继续",
       "orEmail": "或使用邮箱",
       "errors": {
         "google_failed": "Google 登录失败，请重试。",
-        "google_missing_code": "Google 登录回调缺少授权码。"
+        "google_missing_code": "Google 登录回调缺少授权码。",
+        "auth_failed": "登录失败，请检查账号信息后重试。",
+        "auth_service_unavailable": "账号服务暂时不可用，请稍后再试或联系管理员。"
       }
     },
     "contact": {
