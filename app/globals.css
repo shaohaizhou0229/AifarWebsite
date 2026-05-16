@@ -1115,6 +1115,137 @@ h3 {
   max-width: 760px;
 }
 
+.section-head.compact {
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.document-hub {
+  display: grid;
+  gap: 34px;
+}
+
+.document-category {
+  display: grid;
+  gap: 14px;
+}
+
+.document-editor {
+  align-self: start;
+}
+
+.document-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.markdown-textarea {
+  min-height: 420px;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.document-meta {
+  display: flex;
+  min-height: auto;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.version-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.version-item {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.4fr) minmax(180px, 0.6fr) minmax(0, 1fr);
+  gap: 12px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  padding-top: 10px;
+}
+
+.version-item strong {
+  color: var(--ink);
+}
+
+.markdown-body {
+  display: grid;
+  gap: 16px;
+  max-width: 880px;
+  border: 1px solid rgba(183, 200, 213, 0.78);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow-tight);
+  padding: 34px;
+}
+
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4 {
+  margin-top: 10px;
+  font-family: "IBM Plex Sans", "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+}
+
+.markdown-body h2 {
+  font-size: 1.7rem;
+}
+
+.markdown-body h3 {
+  font-size: 1.3rem;
+}
+
+.markdown-body p,
+.markdown-body li {
+  color: var(--muted);
+}
+
+.markdown-body a {
+  color: var(--blue);
+  font-weight: 800;
+}
+
+.markdown-body pre,
+.markdown-body code {
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+}
+
+.markdown-body pre {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #101820;
+  color: white;
+  padding: 16px;
+}
+
+.markdown-body p code,
+.markdown-body li code {
+  border-radius: 6px;
+  background: var(--soft-blue);
+  color: var(--ink);
+  padding: 2px 5px;
+}
+
+.markdown-body blockquote {
+  margin: 0;
+  border-left: 4px solid var(--teal);
+  background: var(--soft-teal);
+  color: var(--ink);
+  padding: 14px 18px;
+}
+
+.markdown-body hr {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
 .detail-layout > .breadcrumbs,
 .detail-layout > .admin-nav {
   grid-column: 1 / -1;
@@ -1216,6 +1347,7 @@ h3 {
   .hero-grid,
   .grid.three,
   .grid.four,
+  .document-editor-grid,
   .admin-module-grid,
   .trust-row {
     grid-template-columns: 1fr;
@@ -1311,6 +1443,8 @@ h3 {
   .download-row,
   .doc-link,
   .release,
+  .document-meta,
+  .version-item,
   .feature {
     grid-template-columns: 1fr;
   }

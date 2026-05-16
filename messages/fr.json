@@ -154,6 +154,28 @@
       "resumeUpload": "Reprendre l’envoi",
       "pauseUpload": "Pause",
       "uploadSizeProgress": "· {uploaded}{total} MB"
+    },
+    "documents": {
+      "markdownFile": "Markdown source file",
+      "chooseMarkdown": "Choose a Markdown file",
+      "fileHint": "Supported format: .md. Uploading or saving creates a new version and refreshes RAG-ready chunks.",
+      "chooseFile": "Choose file",
+      "fileTypeError": "Only .md files are supported.",
+      "title": "Title",
+      "slug": "URL slug",
+      "category": "Category",
+      "version": "Version",
+      "summary": "Summary",
+      "markdownContent": "Markdown content",
+      "published": "Published",
+      "save": "Save document",
+      "saving": "Saving...",
+      "saved": "Document saved.",
+      "saveFailed": "Unable to save document.",
+      "archive": "Archive document",
+      "archiving": "Archiving...",
+      "archiveConfirm": "Archive this document? It will be removed from public Docs but historical versions remain available in admin.",
+      "archiveFailed": "Unable to archive document."
     }
   },
   "pages": {
@@ -371,7 +393,31 @@
           "Présentation Aifar",
           "Présentation Aifar"
         ]
-      ]
+      ],
+      "breadcrumb": "Docs",
+      "noSummary": "No summary provided.",
+      "noVersion": "No version",
+      "emptyCategory": "No published documents in this category yet.",
+      "loginRequired": "Sign-in required",
+      "publicReadable": "Public",
+      "categories": {
+        "operation_guides": {
+          "label": "Operation guides",
+          "description": "How-to guides for users and administrators."
+        },
+        "technical_whitepapers": {
+          "label": "Technical whitepapers",
+          "description": "Architecture, security, and technical background materials."
+        },
+        "deployment_manuals": {
+          "label": "Deployment manuals",
+          "description": "Deployment steps, environment requirements, and operations notes."
+        },
+        "feature_lists": {
+          "label": "Feature lists",
+          "description": "Product capability lists and release scope references."
+        }
+      }
     },
     "support": {
       "seo": {
@@ -609,18 +655,38 @@
     },
     "adminDocs": {
       "seo": {
-        "title": "Présentation Aifar | Aifar",
-        "description": "Informations Aifar pour les équipes et les organisations."
+        "title": "Admin Docs | Aifar",
+        "description": "Manage Aifar online documents."
       },
-      "eyebrow": "Présentation Aifar",
-      "deniedTitle": "Présentation Aifar",
-      "deniedLead": "Présentation Aifar",
-      "breadcrumb": "Présentation Aifar",
-      "title": "Présentation Aifar",
-      "lead": "Informations structurées sur les capacités et services Aifar.",
-      "status": "Présentation Aifar",
-      "emptyTitle": "Présentation Aifar",
-      "emptyLead": "Présentation Aifar"
+      "eyebrow": "Admin docs",
+      "deniedTitle": "Administrator access required.",
+      "deniedLead": "Your account does not have permission to manage online documents.",
+      "breadcrumb": "Docs",
+      "title": "Online document management.",
+      "lead": "Upload Markdown documents, edit current content, publish versions, and keep RAG-ready chunks for future retrieval.",
+      "newDocument": "New document",
+      "published": "Published",
+      "draft": "Draft",
+      "version": "Version",
+      "noVersion": "No version",
+      "noSummary": "No summary provided.",
+      "emptyStatus": "Ready",
+      "emptyTitle": "No documents yet.",
+      "emptyLead": "Upload the first Markdown file to publish operation guides, whitepapers, deployment manuals, or feature lists.",
+      "categories": {
+        "operation_guides": {
+          "label": "Operation guides"
+        },
+        "technical_whitepapers": {
+          "label": "Technical whitepapers"
+        },
+        "deployment_manuals": {
+          "label": "Deployment manuals"
+        },
+        "feature_lists": {
+          "label": "Feature lists"
+        }
+      }
     },
     "adminSupport": {
       "seo": {
@@ -722,6 +788,38 @@
       "noVersion": "Présentation Aifar",
       "noFile": "Présentation Aifar",
       "originalFile": "Présentation Aifar"
+    },
+    "docDetail": {
+      "seo": {
+        "title": "Document | Aifar",
+        "description": "Read Aifar documentation."
+      },
+      "lead": "Read the current published version of this document.",
+      "currentVersion": "Current version",
+      "noVersion": "No version",
+      "updatedAt": "Updated",
+      "download": "Download Markdown",
+      "signInToDownload": "Sign in to download",
+      "downloadDisabled": "Download unavailable"
+    },
+    "adminDocEdit": {
+      "seo": {
+        "title": "Edit Document | Aifar",
+        "description": "Create and update Aifar online documents."
+      },
+      "eyebrow": "Admin docs",
+      "deniedTitle": "Administrator access required.",
+      "deniedLead": "Your account does not have permission to manage online documents.",
+      "newTitle": "New document",
+      "newBreadcrumb": "New document",
+      "lead": "Upload a Markdown file, review the content online, then save a version for publishing and future RAG indexing.",
+      "current": "Current document",
+      "status": "Status",
+      "published": "Published",
+      "draft": "Draft",
+      "category": "Category",
+      "history": "Version history",
+      "noVersion": "No version"
     }
   }
 }
