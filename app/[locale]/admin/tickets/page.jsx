@@ -16,10 +16,7 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;
-  const [page, adminHome] = await Promise.all([
-    getPageMessages(locale, "adminTickets"),
-    getPageMessages(locale, "adminHome")
-  ]);
+  const page = await getPageMessages(locale, "adminTickets");
   return buildMetadata({ locale, pathname, title: page.seo.title, description: page.seo.description });
 }
 
@@ -30,7 +27,10 @@ function formatDate(value, locale) {
 export default async function AdminTicketsPage({ params, searchParams }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const page = await getPageMessages(locale, "adminTickets");
+  const [page, adminHome] = await Promise.all([
+    getPageMessages(locale, "adminTickets"),
+    getPageMessages(locale, "adminHome")
+  ]);
 
   try {
     await requireAdmin(getProfile);
