@@ -42,12 +42,14 @@
       "alreadyHaveAccount": "已有账户？",
       "needAccount": "需要账户？",
       "confirmation": "请先查收邮件并确认账户，然后再登录。",
-      "failure": "认证失败。",
+      "failure": "认证失败，请检查账号信息后重试。",
       "continueWithGoogle": "使用 Google 继续",
       "orEmail": "或使用邮箱",
       "errors": {
         "google_failed": "Google 登录失败，请重试。",
-        "google_missing_code": "Google 登录回调缺少授权码。"
+        "google_missing_code": "Google 登录回调缺少授权码。",
+        "auth_failed": "登录失败，请检查账号信息后重试。",
+        "auth_service_unavailable": "账号服务暂时不可用，请稍后再试或联系管理员。"
       }
     },
     "contact": {
@@ -81,17 +83,50 @@
       "statusActions": "工单状态操作",
       "markInProgress": "标记处理中",
       "closeTicket": "关闭工单",
-      "reply": "回复",
+      "status": "状态",
+      "priority": "优先级",
+      "category": "分类",
+      "assignee": "负责人",
+      "unassigned": "未分配",
+      "saveChanges": "保存变更",
+      "saving": "正在保存...",
+      "ticketUpdated": "工单已更新。",
+      "updateFailure": "无法更新工单。",
+      "reply": "回复客户",
       "sendReply": "发送回复",
       "sending": "正在发送...",
       "statusUpdated": "工单状态已更新。",
       "statusFailure": "无法更新状态。",
       "replyRequired": "请填写回复内容。",
       "replyFailure": "无法发送回复。",
+      "internalNote": "内部备注",
+      "addNote": "添加内部备注",
+      "internalNotes": "内部备注",
+      "noInternalNotes": "暂无内部备注。",
+      "noteRequired": "请填写内部备注。",
+      "noteFailure": "无法添加内部备注。",
+      "adminUser": "管理员",
       "ticketStatuses": {
         "new": "新建",
         "in_progress": "处理中",
+        "waiting_customer": "等待客户",
+        "resolved": "已解决",
         "closed": "已关闭"
+      },
+      "ticketPriorities": {
+        "low": "低",
+        "normal": "普通",
+        "high": "高",
+        "urgent": "紧急"
+      },
+      "ticketCategories": {
+        "account_access": "账号访问",
+        "client_download": "客户端下载",
+        "installation": "安装部署",
+        "product_usage": "产品使用",
+        "bug_report": "故障反馈",
+        "partnership": "合作咨询",
+        "other": "其他"
       }
     },
     "downloads": {
@@ -672,9 +707,9 @@
         {
           "key": "support",
           "href": "/admin/support/",
-          "title": "支持反馈",
-          "description": "管理支持反馈。",
-          "status": "planned"
+          "title": "支持工单",
+          "description": "管理工单状态、优先级、分类、负责人、客户回复和内部备注。",
+          "status": "active"
         },
         {
           "key": "contact",
@@ -738,18 +773,38 @@
     },
     "adminSupport": {
       "seo": {
-        "title": "管理支持 | Aifar",
-        "description": "管理 Aifar 支持反馈。"
+        "title": "工单管理 | Aifar",
+        "description": "管理 Aifar 支持工单、负责人、优先级和回复。"
       },
-      "eyebrow": "管理支持",
+      "eyebrow": "工单管理",
       "deniedTitle": "需要管理员权限。",
-      "deniedLead": "你的账户无权管理支持反馈。",
-      "breadcrumb": "支持",
-      "title": "支持反馈管理。",
-      "lead": "此区域为支持处理流程预留。",
-      "status": "规划中",
-      "emptyTitle": "支持反馈工具尚未接入。",
-      "emptyLead": "管理入口已准备好。"
+      "deniedLead": "你的账户无权管理支持工单。",
+      "breadcrumb": "工单管理",
+      "title": "支持工单工作台。",
+      "lead": "在一个运营视图中查看、分派、定级、回复并关闭客户请求。",
+      "stats": {
+        "pending": "待处理",
+        "inProgress": "处理中",
+        "today": "今日新增",
+        "closed": "已关闭"
+      },
+      "filters": {
+        "status": "状态",
+        "priority": "优先级",
+        "category": "分类",
+        "assignee": "负责人",
+        "keyword": "关键词",
+        "keywordPlaceholder": "搜索主题、客户、邮箱、组织或留言",
+        "allStatuses": "全部状态",
+        "allPriorities": "全部优先级",
+        "allCategories": "全部分类",
+        "allAssignees": "全部负责人",
+        "apply": "筛选",
+        "reset": "重置"
+      },
+      "notProvided": "未提供",
+      "emptyTitle": "未找到工单。",
+      "emptyLead": "新的联系和支持请求会显示在这里。"
     },
     "adminContact": {
       "seo": {
@@ -772,34 +827,40 @@
     "adminTickets": {
       "seo": {
         "title": "管理工单 | Aifar",
-        "description": "管理联系请求工单。"
+        "description": "管理 Aifar 联系请求工单。"
       },
       "eyebrow": "管理后台",
       "deniedTitle": "需要管理员权限。",
       "deniedLead": "你的账户无权管理工单。",
       "breadcrumb": "工单列表",
       "title": "联系请求工单。",
-      "lead": "查看、回复并关闭网站联系请求。",
+      "lead": "此旧列表仍可使用；主要运营入口已切换到支持工单。",
       "all": "全部",
       "new": "新建",
       "inProgress": "处理中",
+      "waitingCustomer": "等待客户",
+      "resolved": "已解决",
       "closed": "已关闭"
     },
     "adminTicketDetail": {
       "seo": {
         "title": "管理工单详情 | Aifar",
-        "description": "查看、回复并更新工单。"
+        "description": "查看、回复并更新 Aifar 支持工单。"
       },
-      "eyebrow": "管理工单",
+      "eyebrow": "支持工单",
       "deniedTitle": "需要管理员权限。",
       "deniedLead": "你的账户无权管理此工单。",
       "breadcrumb": "工单详情",
       "submitted": "提交于",
-      "requestTitle": "请求",
+      "requestTitle": "客户请求",
       "organization": "组织",
       "notProvided": "未提供",
-      "replies": "回复",
-      "noReplies": "暂无回复。"
+      "replies": "客户可见回复",
+      "noReplies": "暂无回复。",
+      "processing": "处理面板",
+      "customer": "客户",
+      "createdAt": "创建时间",
+      "lastRepliedAt": "最后回复"
     },
     "adminDownloads": {
       "seo": {

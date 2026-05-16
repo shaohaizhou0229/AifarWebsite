@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdmin } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
-import { TICKET_STATUSES, updateTicketStatus } from "@/lib/tickets";
+import { TICKET_STATUSES, updateTicketFields } from "@/lib/tickets";
 
 export const runtime = "nodejs";
 
@@ -26,7 +26,7 @@ export async function PATCH(request, { params }) {
       return NextResponse.json({ error: "Invalid ticket status." }, { status: 400 });
     }
 
-    const ticket = await updateTicketStatus(id, status);
+    const ticket = await updateTicketFields(id, { status });
     if (!ticket) {
       return NextResponse.json({ error: "Ticket not found." }, { status: 404 });
     }

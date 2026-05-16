@@ -9,6 +9,14 @@ export function getTicketStatusLabel(labels, status) {
   return labels?.ticketStatuses?.[status] || status;
 }
 
+export function getTicketPriorityLabel(labels, priority) {
+  return labels?.ticketPriorities?.[priority] || priority;
+}
+
+export function getTicketCategoryLabel(labels, category) {
+  return labels?.ticketCategories?.[category] || category;
+}
+
 export function getRequestTypeLabel(labels, requestType) {
   return labels?.contact?.requestTypes?.[requestType] || requestType;
 }

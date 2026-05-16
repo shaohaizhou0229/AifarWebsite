@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdmin } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
-import { getAdminTicket, TICKET_STATUSES, updateTicketStatus } from "@/lib/tickets";
+import { getAdminTicket, TICKET_CATEGORIES, TICKET_PRIORITIES, TICKET_STATUSES, updateTicketFields } from "@/lib/tickets";
 
 export const runtime = "nodejs";
 
@@ -36,13 +36,34 @@ export async function PATCH(request, { params }) {
     await requireAdmin(getProfile);
     const { id } = await params;
     const payload = await request.json().catch(() => ({}));
-    const status = typeof payload.status === "string" ? payload.status : "";
+    const input = {};
 
-    if (!TICKET_STATUSES.has(status)) {
-      return NextResponse.json({ error: "Invalid ticket status." }, { status: 400 });
+    if (Object.prototype.hasOwnProperty.call(payload, "status")) {
+      if (!TICKET_STATUSES.has(payload.status)) {
+        return NextResponse.json({ error: "Invalid ticket status." }, { status: 400 });
+      }
+      input.status = payload.status;
     }
 
-    const ticket = await updateTicketStatus(id, status);
+    if (Object.prototype.hasOwnProperty.call(payload, "priority")) {
+      if (!TICKET_PRIORITIES.has(payload.priority)) {
+        return NextResponse.json({ error: "Invalid ticket priority." }, { status: 400 });
+      }
+      input.priority = payload.priority;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(payload, "category")) {
+      if (!TICKET_CATEGORIES.has(payload.category)) {
+        return NextResponse.json({ error: "Invalid ticket category." }, { status: 400 });
+      }
+      input.category = payload.category;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(payload, "assigneeUserId")) {
+      input.assigneeUserId = typeof payload.assigneeUserId === "string" ? payload.assigneeUserId : "";
+    }
+
+    const ticket = await updateTicketFields(id, input);
     if (!ticket) {
       return NextResponse.json({ error: "Ticket not found." }, { status: 404 });
     }
