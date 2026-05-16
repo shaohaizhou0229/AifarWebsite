@@ -27,6 +27,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
@@ -38,6 +39,7 @@ body {
   color: var(--ink);
   font-family: "IBM Plex Sans", "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
   line-height: 1.55;
+  overflow-x: clip;
 }
 
 body::before {
@@ -260,16 +262,19 @@ a {
   align-items: center;
   grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
   gap: 42px;
+  min-width: 0;
 }
 
 .home-hero-grid {
   position: relative;
   z-index: 1;
   grid-template-columns: minmax(0, 0.72fr) minmax(300px, 0.5fr);
+  width: 100%;
 }
 
 .hero-copy {
   max-width: 760px;
+  min-width: 0;
 }
 
 .eyebrow {
@@ -313,6 +318,7 @@ h3 {
 }
 
 .lead {
+  width: 100%;
   max-width: 680px;
   margin: 22px 0 0;
   color: var(--muted);
@@ -1104,6 +1110,12 @@ h3 {
   text-align: right;
 }
 
+[dir="rtl"] h1 {
+  direction: ltr;
+  text-align: right;
+  unicode-bidi: isolate;
+}
+
 @media (max-width: 900px) {
   .menu-toggle {
     display: block;
@@ -1139,6 +1151,10 @@ h3 {
   .admin-module-grid,
   .trust-row {
     grid-template-columns: 1fr;
+  }
+
+  .home-hero-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .hero {
@@ -1182,6 +1198,20 @@ h3 {
     width: min(100% - 28px, 1160px);
   }
 
+  .nav-wrap {
+    gap: 10px;
+  }
+
+  .brand {
+    min-width: 0;
+  }
+
+  .brand span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .hero-grid {
     gap: 26px;
   }
@@ -1190,8 +1220,23 @@ h3 {
     padding-bottom: 220px;
   }
 
+  .hero-copy,
+  .lead,
+  .section-head,
+  .cta-band,
+  .trust-row {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .lead,
+  .section-head p,
+  .cta-band p {
+    width: 100%;
+  }
+
   h1 {
-    font-size: clamp(2.6rem, 16vw, 4rem);
+    font-size: clamp(2.35rem, 13vw, 3.35rem);
   }
 
   .download-row,
@@ -1207,5 +1252,32 @@ h3 {
 
   .cta-band {
     padding: 26px;
+  }
+
+  [dir="rtl"] .brand {
+    direction: ltr;
+    flex-direction: row-reverse;
+  }
+
+  [dir="rtl"] .brand span:last-child {
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
+  [dir="rtl"] .hero-grid,
+  [dir="rtl"] .trust-row {
+    direction: ltr;
+  }
+
+  [dir="rtl"] .hero-copy,
+  [dir="rtl"] .trust-row div {
+    direction: rtl;
+    text-align: right;
+  }
+
+  [dir="rtl"] .lead,
+  [dir="rtl"] .section-head p,
+  [dir="rtl"] .cta-band p {
+    margin-left: 0;
   }
 }

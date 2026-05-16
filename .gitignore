@@ -30,6 +30,9 @@ pids
 # Coverage and test output
 coverage/
 .nyc_output/
+browser-check*.png
+.chrome-*/
+.edge-*/
 
 # Package manager caches
 .npm/
