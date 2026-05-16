@@ -201,6 +201,28 @@
       "published": "发布内容已更新。",
       "publishFailed": "无法发布内容。",
       "loadFailed": "无法加载内容。"
+    },
+    "documents": {
+      "markdownFile": "Markdown 源文件",
+      "chooseMarkdown": "选择 Markdown 文件",
+      "fileHint": "支持 .md。上传或保存会生成新版本，并刷新为后续 RAG 准备的分段。",
+      "chooseFile": "选择文件",
+      "fileTypeError": "仅支持 .md 文件。",
+      "title": "标题",
+      "slug": "URL 标识",
+      "category": "分类",
+      "version": "版本号",
+      "summary": "摘要",
+      "markdownContent": "Markdown 内容",
+      "published": "发布",
+      "save": "保存文档",
+      "saving": "正在保存...",
+      "saved": "文档已保存。",
+      "saveFailed": "无法保存文档。",
+      "archive": "归档文档",
+      "archiving": "正在归档...",
+      "archiveConfirm": "确认归档此文档？它将从前台 Docs 移除，但历史版本仍保留在后台。",
+      "archiveFailed": "无法归档文档。"
     }
   },
   "pages": {
@@ -418,7 +440,31 @@
           "安全和企业部署说明。",
           "安全"
         ]
-      ]
+      ],
+      "breadcrumb": "文档",
+      "noSummary": "暂无摘要。",
+      "noVersion": "暂无版本",
+      "emptyCategory": "该分类暂无已发布文档。",
+      "loginRequired": "需要登录",
+      "publicReadable": "公开可读",
+      "categories": {
+        "operation_guides": {
+          "label": "操作指南",
+          "description": "面向用户和管理员的操作说明。"
+        },
+        "technical_whitepapers": {
+          "label": "技术白皮书",
+          "description": "架构、安全和技术背景资料。"
+        },
+        "deployment_manuals": {
+          "label": "部署手册",
+          "description": "部署步骤、环境要求和运维说明。"
+        },
+        "feature_lists": {
+          "label": "功能清单",
+          "description": "产品能力清单和发布范围参考。"
+        }
+      }
     },
     "support": {
       "seo": {
@@ -621,7 +667,7 @@
           "href": "/admin/docs/",
           "title": "在线文档",
           "description": "准备在线文档工作区。",
-          "status": "planned"
+          "status": "active"
         },
         {
           "key": "support",
@@ -661,13 +707,34 @@
       },
       "eyebrow": "管理文档",
       "deniedTitle": "需要管理员权限。",
-      "deniedLead": "你的账户无权管理在线文档。",
+      "deniedLead": "你的账号无权管理在线文档。",
       "breadcrumb": "文档",
       "title": "在线文档管理。",
-      "lead": "此区域为在线文档工作区预留。",
+      "lead": "上传 Markdown 文档、在线编辑当前内容、发布版本，并为后续 RAG 检索保留分段。",
       "status": "规划中",
-      "emptyTitle": "在线文档编辑尚未接入。",
-      "emptyLead": "管理入口已准备好。"
+      "emptyTitle": "暂无文档。",
+      "emptyLead": "上传第一份 Markdown 文件，用于发布操作指南、技术白皮书、部署手册或功能清单。",
+      "newDocument": "新建文档",
+      "published": "已发布",
+      "draft": "草稿",
+      "version": "版本",
+      "noVersion": "暂无版本",
+      "noSummary": "暂无摘要。",
+      "emptyStatus": "可用",
+      "categories": {
+        "operation_guides": {
+          "label": "操作指南"
+        },
+        "technical_whitepapers": {
+          "label": "技术白皮书"
+        },
+        "deployment_manuals": {
+          "label": "部署手册"
+        },
+        "feature_lists": {
+          "label": "功能清单"
+        }
+      }
     },
     "adminSupport": {
       "seo": {
@@ -769,6 +836,38 @@
       "noVersion": "未配置版本",
       "noFile": "未配置文件或外部链接",
       "originalFile": "原始文件"
+    },
+    "docDetail": {
+      "seo": {
+        "title": "文档 | Aifar",
+        "description": "阅读 Aifar 文档。"
+      },
+      "lead": "阅读当前已发布版本。",
+      "currentVersion": "当前版本",
+      "noVersion": "暂无版本",
+      "updatedAt": "更新时间",
+      "download": "下载 Markdown",
+      "signInToDownload": "登录后下载",
+      "downloadDisabled": "暂不允许下载"
+    },
+    "adminDocEdit": {
+      "seo": {
+        "title": "编辑文档 | Aifar",
+        "description": "创建和更新 Aifar 在线文档。"
+      },
+      "eyebrow": "管理文档",
+      "deniedTitle": "需要管理员权限。",
+      "deniedLead": "你的账号无权管理在线文档。",
+      "newTitle": "新建文档",
+      "newBreadcrumb": "新建文档",
+      "lead": "上传 Markdown 文件，在线检查内容，然后保存为可发布版本，并为后续 RAG 索引做准备。",
+      "current": "当前文档",
+      "status": "状态",
+      "published": "已发布",
+      "draft": "草稿",
+      "category": "分类",
+      "history": "版本历史",
+      "noVersion": "暂无版本"
     }
   }
 }

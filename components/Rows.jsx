@@ -23,14 +23,14 @@ export function DownloadRow({
   );
 }
 
-export function DocLink({ title, description, pill }) {
+export function DocLink({ title, description, pill, href = "#", action = "" }) {
   return (
-    <a className="doc-link" href="#">
+    <a className="doc-link" href={href}>
       <div>
         <h3>{title}</h3>
         <p>{description}</p>
       </div>
-      <span className="pill">{pill}</span>
+      <span className="pill">{action || pill}</span>
     </a>
   );
 }
