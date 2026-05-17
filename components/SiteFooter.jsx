@@ -12,7 +12,7 @@ export function SiteFooter({ locale, messages }) {
     <footer className="site-footer">
       <div className="footer-inner">
         <span className="footer-brand">
-          <img className="footer-brand-mark" src="/assets/images/aifar-logo-mark.png" alt="" aria-hidden="true" />
+          <img className="footer-brand-logo" src="/assets/images/aifar-logo-full.png" alt="" aria-hidden="true" />
           <span>{full ? footer.full : footer.short}</span>
         </span>
         <div className="footer-links">
