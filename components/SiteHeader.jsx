@@ -23,8 +23,8 @@ export async function SiteHeader({ locale, messages }) {
     <header className="site-header">
       <div className="nav-wrap">
         <a className="brand" href={localizedPath(locale, "/")}>
-          <span className="brand-mark">A</span>
-          <span>{messages.layout.brand}</span>
+          <img className="brand-mark" src="/assets/images/aifar-logo-mark.png" alt="" aria-hidden="true" />
+          <span className="brand-word">{messages.layout.brand}</span>
         </a>
         <MobileMenuButton label={messages.layout.menu} />
         <nav id="site-navigation" className="nav-links" data-nav>

@@ -91,24 +91,25 @@ a {
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   font-size: 1.23rem;
   font-weight: 800;
   letter-spacing: 0;
 }
 
 .brand-mark {
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.42);
-  border-radius: 10px;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0)),
-    linear-gradient(135deg, var(--teal), var(--blue));
-  box-shadow: 0 12px 24px rgba(18, 124, 130, 0.24);
-  color: white;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 18px rgba(0, 98, 189, 0.22));
+}
+
+.brand-word {
+  background: linear-gradient(100deg, #22d1e6 0%, #1288ff 56%, #0953f3 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  font-size: 1.3rem;
   font-weight: 800;
 }
 
@@ -703,6 +704,19 @@ h3 {
   gap: 24px;
   color: var(--muted);
   font-size: 0.92rem;
+}
+
+.footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.footer-brand-mark {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  filter: drop-shadow(0 7px 14px rgba(0, 98, 189, 0.16));
 }
 
 .footer-links {
