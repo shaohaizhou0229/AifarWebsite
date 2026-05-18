@@ -1,0 +1,12 @@
+.env
+.env.local
+.env.*.local
+.deploy-netlify-*/
+.netlify/
+.next/
+node_modules/
+*.log
+deno.lock
+pages/
+tmp-logo-images/
+tmp-ui-images/
