@@ -50,7 +50,7 @@
         "google_missing_code": "Google 登录回调缺少授权码。",
         "auth_failed": "登录失败，请检查账号信息后重试。",
         "auth_service_unavailable": "账号服务暂时不可用，请稍后再试或联系管理员。",
-        "account_inactive": "??????????????????"
+        "account_inactive": "该账号未处于正常状态，请联系管理员。"
       }
     },
     "contact": {
@@ -653,16 +653,16 @@
       "title": "管理你的个人资料。",
       "lead": "这些信息帮助 Aifar 团队理解你的组织背景。",
       "deleteAccount": {
-        "title": "????",
-        "lead": "???????? Aifar ??????????????????????????????",
-        "confirmLabel": "?? DELETE ????",
+        "title": "注销账号",
+        "lead": "注销后将关闭你的 Aifar 账号访问权限。历史工单和行为记录会保留，用于支持和审计追溯。",
+        "confirmLabel": "输入 DELETE 确认注销",
         "confirmText": "DELETE",
-        "confirmRequired": "??????????????",
-        "delete": "??????",
-        "deleting": "????...",
-        "deleted": "?????????????",
-        "failed": "???????",
-        "reason": "?????????"
+        "confirmRequired": "请先输入确认文本再注销账号。",
+        "delete": "注销我的账号",
+        "deleting": "正在注销...",
+        "deleted": "账号已注销，即将退出登录。",
+        "failed": "无法注销账号。",
+        "reason": "用户自助注销账号。"
       }
     },
     "tickets": {
@@ -979,7 +979,7 @@
       "deniedTitle": "需要管理员权限。",
       "deniedLead": "你的账户无权管理用户。",
       "title": "用户管理。",
-      "lead": "???????????????????????????",
+      "lead": "搜索用户、创建邀请、分配模块权限，并查看账号活动记录。",
       "breadcrumb": "用户",
       "searchLabel": "搜索用户",
       "searchPlaceholder": "搜索邮箱、姓名或组织",
@@ -994,57 +994,57 @@
         "user": "用户",
         "admin": "管理员"
       },
-      "statusFilter": "????",
+      "statusFilter": "账号状态",
       "statuses": {
-        "all": "????",
+        "all": "全部状态",
         "active": "??",
-        "deactivated": "???",
-        "deleted": "???",
-        "pending": "?????"
+        "deactivated": "已停用",
+        "deleted": "已注销",
+        "pending": "待激活邀请"
       },
       "permissions": {
-        "users": "????",
-        "product": "????",
-        "downloads": "?????",
-        "docs": "????",
-        "support": "????",
-        "contact": "????"
+        "users": "用户管理",
+        "product": "产品内容",
+        "downloads": "客户端下载",
+        "docs": "在线文档",
+        "support": "支持工单",
+        "contact": "联系请求"
       },
       "invite": {
-        "title": "????",
-        "lead": "???????????????????????????????????",
+        "title": "邀请用户",
+        "lead": "先创建待激活账号邀请。用户用该邮箱注册后，会自动承接资料、角色和权限。",
         "form": {
-          "email": "??",
-          "name": "??",
-          "organization": "??",
-          "jobTitle": "??",
-          "countryRegion": "?? / ??",
-          "phone": "??",
-          "role": "??",
+          "email": "邮箱",
+          "name": "姓名",
+          "organization": "组织",
+          "jobTitle": "职位",
+          "countryRegion": "国家 / 地区",
+          "phone": "电话",
+          "role": "角色",
           "roles": {
-            "user": "????",
-            "admin": "???"
+            "user": "普通用户",
+            "admin": "管理员"
           },
-          "permissionsTitle": "????",
+          "permissionsTitle": "模块权限",
           "permissions": {
-            "users": "????",
-            "product": "????",
-            "downloads": "?????",
-            "docs": "????",
-            "support": "????",
-            "contact": "????"
+            "users": "用户管理",
+            "product": "产品内容",
+            "downloads": "客户端下载",
+            "docs": "在线文档",
+            "support": "支持工单",
+            "contact": "联系请求"
           },
-          "create": "????",
-          "creating": "????...",
-          "created": "??????",
-          "failed": "???????"
+          "create": "创建邀请",
+          "creating": "正在创建...",
+          "created": "邀请已创建。",
+          "failed": "无法创建邀请。"
         },
         "cancel": {
-          "cancel": "????",
-          "canceling": "????...",
-          "canceled": "??????",
-          "failed": "???????",
-          "confirm": "????????????"
+          "cancel": "取消邀请",
+          "canceling": "正在取消...",
+          "canceled": "邀请已取消。",
+          "failed": "无法取消邀请。",
+          "confirm": "确认取消这个待激活邀请？"
         }
       }
     },
@@ -1070,16 +1070,16 @@
           "registered": "注册",
           "logged_in": "登录",
           "oauth_logged_in": "Google 登录",
-          "account_deleted": "????"
+          "account_deleted": "账号注销"
         },
         "profile": {
           "updated": "资料更新"
         },
         "admin": {
           "user_updated": "管理员更新",
-          "user_deleted": "???????",
-          "user_invited": "???????",
-          "invitation_canceled": "????"
+          "user_deleted": "管理员注销用户",
+          "user_invited": "管理员邀请用户",
+          "invitation_canceled": "取消邀请"
         },
         "contact": {
           "submitted": "提交联系请求"
@@ -1108,27 +1108,27 @@
         "saving": "保存中...",
         "saved": "用户已更新。",
         "saveFailed": "无法更新用户。",
-        "accountStatus": "????",
+        "accountStatus": "账号状态",
         "statuses": {
           "active": "??",
-          "deactivated": "???",
-          "deleted": "???"
+          "deactivated": "已停用",
+          "deleted": "已注销"
         },
-        "permissionsTitle": "????",
+        "permissionsTitle": "模块权限",
         "permissions": {
-          "users": "????",
-          "product": "????",
-          "downloads": "?????",
-          "docs": "????",
-          "support": "????",
-          "contact": "????"
+          "users": "用户管理",
+          "product": "产品内容",
+          "downloads": "客户端下载",
+          "docs": "在线文档",
+          "support": "支持工单",
+          "contact": "联系请求"
         },
-        "delete": "????",
-        "deleting": "????...",
-        "deleted": "??????",
-        "deleteFailed": "???????",
-        "deleteConfirm": "????????????????????",
-        "deletedByAdmin": "????????"
+        "delete": "注销账号",
+        "deleting": "正在注销...",
+        "deleted": "账号已注销。",
+        "deleteFailed": "无法注销账号。",
+        "deleteConfirm": "确认注销该用户账号？历史记录会继续保留。",
+        "deletedByAdmin": "管理员注销账号。"
       }
     }
   }
