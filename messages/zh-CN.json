@@ -997,7 +997,7 @@
       "statusFilter": "账号状态",
       "statuses": {
         "all": "全部状态",
-        "active": "??",
+        "active": "正常",
         "deactivated": "已停用",
         "deleted": "已注销",
         "pending": "待激活邀请"
@@ -1110,7 +1110,7 @@
         "saveFailed": "无法更新用户。",
         "accountStatus": "账号状态",
         "statuses": {
-          "active": "??",
+          "active": "正常",
           "deactivated": "已停用",
           "deleted": "已注销"
         },
