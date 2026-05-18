@@ -127,8 +127,10 @@ export function AdminUserForm({ user, labels }) {
       {form.role === "admin" ? (
         <fieldset className="field checkbox-grid">
           <legend>{labels.permissionsTitle}</legend>
-          {Object.entries(labels.permissions).map(([permission, label]) => (
-            <label className="checkbox-line" key={permission}>
+          {Object.entries(labels.permissions).map(([key, label]) => {
+            const permission = `admin.${key}`;
+            return (
+            <label className="checkbox-line" key={key}>
               <input
                 type="checkbox"
                 value={permission}
@@ -137,7 +139,7 @@ export function AdminUserForm({ user, labels }) {
               />
               <span>{label}</span>
             </label>
-          ))}
+          );})}
         </fieldset>
       ) : null}
       {status.message ? <p className={`form-message ${status.type}`} role="status">{status.message}</p> : null}

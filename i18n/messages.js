@@ -1,15 +1,19 @@
 import { defaultLocale, isLocale } from "./routing";
+import enMessages from "../messages/en.json";
+import zhCNMessages from "../messages/zh-CN.json";
+import frMessages from "../messages/fr.json";
+import arMessages from "../messages/ar.json";
 
-const loaders = {
-  en: () => import("../messages/en.json"),
-  "zh-CN": () => import("../messages/zh-CN.json"),
-  fr: () => import("../messages/fr.json"),
-  ar: () => import("../messages/ar.json")
+const messagesByLocale = {
+  en: enMessages,
+  "zh-CN": zhCNMessages,
+  fr: frMessages,
+  ar: arMessages
 };
 
 export async function getLocaleMessages(locale) {
   const safeLocale = isLocale(locale) ? locale : defaultLocale;
-  return (await loaders[safeLocale]()).default;
+  return messagesByLocale[safeLocale];
 }
 
 export async function getPageMessages(locale, pageKey) {

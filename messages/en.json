@@ -1003,12 +1003,12 @@
         "pending": "Pending invitation"
       },
       "permissions": {
-        "admin.users": "Users",
-        "admin.product": "Product content",
-        "admin.downloads": "Client downloads",
-        "admin.docs": "Online docs",
-        "admin.support": "Support tickets",
-        "admin.contact": "Contact requests"
+        "users": "Users",
+        "product": "Product content",
+        "downloads": "Client downloads",
+        "docs": "Online docs",
+        "support": "Support tickets",
+        "contact": "Contact requests"
       },
       "invite": {
         "title": "Invite user",
@@ -1027,12 +1027,12 @@
           },
           "permissionsTitle": "Module permissions",
           "permissions": {
-            "admin.users": "Users",
-            "admin.product": "Product content",
-            "admin.downloads": "Client downloads",
-            "admin.docs": "Online docs",
-            "admin.support": "Support tickets",
-            "admin.contact": "Contact requests"
+            "users": "Users",
+            "product": "Product content",
+            "downloads": "Client downloads",
+            "docs": "Online docs",
+            "support": "Support tickets",
+            "contact": "Contact requests"
           },
           "create": "Create invitation",
           "creating": "Creating...",
@@ -1116,12 +1116,12 @@
         },
         "permissionsTitle": "Module permissions",
         "permissions": {
-          "admin.users": "Users",
-          "admin.product": "Product content",
-          "admin.downloads": "Client downloads",
-          "admin.docs": "Online docs",
-          "admin.support": "Support tickets",
-          "admin.contact": "Contact requests"
+          "users": "Users",
+          "product": "Product content",
+          "downloads": "Client downloads",
+          "docs": "Online docs",
+          "support": "Support tickets",
+          "contact": "Contact requests"
         },
         "delete": "Delete account",
         "deleting": "Deleting...",

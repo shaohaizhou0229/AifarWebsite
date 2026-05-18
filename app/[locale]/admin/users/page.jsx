@@ -54,7 +54,7 @@ export default async function AdminUsersPage({ params, searchParams }) {
 
   function permissionSummary(user) {
     if (user.role !== "admin") return page.notProvided;
-    const names = (user.adminPermissions || []).map((permission) => page.permissions[permission]).filter(Boolean);
+    const names = (user.adminPermissions || []).map((permission) => page.permissions[String(permission).split(".").pop()]).filter(Boolean);
     return names.length ? names.join(", ") : page.notProvided;
   }
 

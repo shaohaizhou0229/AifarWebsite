@@ -1003,12 +1003,12 @@
         "pending": "Invitation en attente"
       },
       "permissions": {
-        "admin.users": "Utilisateurs",
-        "admin.product": "Contenu produit",
-        "admin.downloads": "Telechargements client",
-        "admin.docs": "Docs en ligne",
-        "admin.support": "Tickets support",
-        "admin.contact": "Demandes de contact"
+        "users": "Utilisateurs",
+        "product": "Contenu produit",
+        "downloads": "Telechargements client",
+        "docs": "Docs en ligne",
+        "support": "Tickets support",
+        "contact": "Demandes de contact"
       },
       "invite": {
         "title": "Inviter un utilisateur",
@@ -1027,12 +1027,12 @@
           },
           "permissionsTitle": "Droits des modules",
           "permissions": {
-            "admin.users": "Utilisateurs",
-            "admin.product": "Contenu produit",
-            "admin.downloads": "Telechargements client",
-            "admin.docs": "Docs en ligne",
-            "admin.support": "Tickets support",
-            "admin.contact": "Demandes de contact"
+            "users": "Utilisateurs",
+            "product": "Contenu produit",
+            "downloads": "Telechargements client",
+            "docs": "Docs en ligne",
+            "support": "Tickets support",
+            "contact": "Demandes de contact"
           },
           "create": "Creer l invitation",
           "creating": "Creation...",
@@ -1116,12 +1116,12 @@
         },
         "permissionsTitle": "Droits des modules",
         "permissions": {
-          "admin.users": "Utilisateurs",
-          "admin.product": "Contenu produit",
-          "admin.downloads": "Telechargements client",
-          "admin.docs": "Docs en ligne",
-          "admin.support": "Tickets support",
-          "admin.contact": "Demandes de contact"
+          "users": "Utilisateurs",
+          "product": "Contenu produit",
+          "downloads": "Telechargements client",
+          "docs": "Docs en ligne",
+          "support": "Tickets support",
+          "contact": "Demandes de contact"
         },
         "delete": "Supprimer le compte",
         "deleting": "Suppression...",
