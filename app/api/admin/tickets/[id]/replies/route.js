@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { addAdminReply, normalizeText } from "@/lib/tickets";
+import { addAdminReply, getAdminTicket, normalizeText } from "@/lib/tickets";
+import { EMAIL_EVENTS, enqueueAndTrySend, getSiteUrl } from "@/lib/email";
+import { buildTicketReplyEmail } from "@/lib/email/templates";
 
 export const runtime = "nodejs";
 
@@ -14,6 +16,36 @@ function permissionError(error) {
     return NextResponse.json({ error: error.message }, { status: 403 });
   }
   return null;
+}
+
+async function queueTicketReplyEmail(ticketId, message, adminUser) {
+  try {
+    const detail = await getAdminTicket(ticketId);
+    const ticket = detail?.ticket;
+    if (!ticket?.workEmail) return false;
+
+    const email = buildTicketReplyEmail({
+      ticket,
+      replyMessage: message,
+      ticketUrl: new URL(`/zh-CN/account/tickets/${ticketId}/`, getSiteUrl()).toString()
+    });
+
+    const result = await enqueueAndTrySend({
+      eventType: EMAIL_EVENTS.ticketReplied,
+      to: ticket.workEmail,
+      subject: email.subject,
+      text: email.text,
+      html: email.html,
+      relatedType: "contact_request",
+      relatedId: ticketId,
+      metadata: { adminUserId: adminUser.id }
+    });
+
+    return Boolean(result.queued);
+  } catch (error) {
+    console.error("Failed to queue ticket reply email", error);
+    return false;
+  }
 }
 
 export async function POST(request, { params }) {
@@ -28,7 +60,8 @@ export async function POST(request, { params }) {
     }
 
     await addAdminReply(id, user, message);
-    return NextResponse.json({ ok: true }, { status: 201 });
+    const emailQueued = await queueTicketReplyEmail(id, message, user);
+    return NextResponse.json({ ok: true, emailQueued }, { status: 201 });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: "Unable to add reply." }, { status: 500 });
   }

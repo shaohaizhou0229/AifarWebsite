@@ -3,6 +3,8 @@ import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { clientReleaseFileExists, getAdminDownloadPlatform, sanitizePlatform, updateClientRelease } from "@/lib/downloads";
+import { EMAIL_EVENTS, enqueueManyAndTrySend, getAdminNotificationEmails, getSiteUrl } from "@/lib/email";
+import { buildDownloadPublishedEmail } from "@/lib/email/templates";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -23,6 +25,34 @@ function normalizeUrl(value) {
   }
 }
 
+async function queueDownloadPublishedEmails(platformKey, release) {
+  const recipients = getAdminNotificationEmails();
+  if (!recipients.length) return false;
+
+  try {
+    const email = buildDownloadPublishedEmail({
+      platform: platformKey,
+      release,
+      adminUrl: new URL(`/zh-CN/admin/downloads/${platformKey}/`, getSiteUrl()).toString()
+    });
+
+    await enqueueManyAndTrySend(recipients.map((recipient) => ({
+      eventType: EMAIL_EVENTS.downloadPublished,
+      to: recipient,
+      subject: email.subject,
+      text: email.text,
+      html: email.html,
+      relatedType: "client_release",
+      metadata: { platform: platformKey, version: release.version }
+    })));
+
+    return true;
+  } catch (error) {
+    console.error("Failed to queue download published email", error);
+    return false;
+  }
+}
+
 export async function PATCH(request, { params }) {
   const { platform } = await params;
   const platformKey = sanitizePlatform(platform);
@@ -36,10 +66,10 @@ export async function PATCH(request, { params }) {
     const body = await request.json();
     const externalUrl = normalizeUrl(body.externalUrl);
     const isPublished = Boolean(body.isPublished);
+    const before = await getAdminDownloadPlatform(platformKey);
 
     if (isPublished && !externalUrl) {
-      const current = await getAdminDownloadPlatform(platformKey);
-      const release = current?.release;
+      const release = before?.release;
 
       if (!release?.storagePath || !release.checksumSha256) {
         return NextResponse.json({ error: "A completed release file is required before publishing." }, { status: 400 });
@@ -59,7 +89,11 @@ export async function PATCH(request, { params }) {
       isPublished
     });
 
-    return NextResponse.json({ release });
+    const emailQueued = isPublished && !before?.release?.isPublished
+      ? await queueDownloadPublishedEmails(platformKey, release)
+      : false;
+
+    return NextResponse.json({ release, emailQueued });
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return NextResponse.json({ error: error.message }, { status: 403 });

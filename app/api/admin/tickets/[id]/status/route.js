@@ -3,6 +3,8 @@ import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { TICKET_STATUSES, updateTicketFields } from "@/lib/tickets";
+import { EMAIL_EVENTS, enqueueAndTrySend, getSiteUrl } from "@/lib/email";
+import { buildTicketStatusEmail } from "@/lib/email/templates";
 
 export const runtime = "nodejs";
 
@@ -14,6 +16,36 @@ function permissionError(error) {
     return NextResponse.json({ error: error.message }, { status: 403 });
   }
   return null;
+}
+
+const NOTIFIED_STATUSES = new Set(["waiting_customer", "resolved", "closed"]);
+
+async function queueTicketStatusEmail(ticket, status) {
+  if (!NOTIFIED_STATUSES.has(status) || !ticket?.workEmail) return false;
+
+  try {
+    const email = buildTicketStatusEmail({
+      ticket,
+      status,
+      ticketUrl: new URL(`/zh-CN/account/tickets/${ticket.id}/`, getSiteUrl()).toString()
+    });
+
+    const result = await enqueueAndTrySend({
+      eventType: EMAIL_EVENTS.ticketStatusUpdated,
+      to: ticket.workEmail,
+      subject: email.subject,
+      text: email.text,
+      html: email.html,
+      relatedType: "contact_request",
+      relatedId: ticket.id,
+      metadata: { status }
+    });
+
+    return Boolean(result.queued);
+  } catch (error) {
+    console.error("Failed to queue ticket status email", error);
+    return false;
+  }
 }
 
 export async function PATCH(request, { params }) {
@@ -32,7 +64,8 @@ export async function PATCH(request, { params }) {
       return NextResponse.json({ error: "Ticket not found." }, { status: 404 });
     }
 
-    return NextResponse.json({ ticket });
+    const emailQueued = await queueTicketStatusEmail(ticket, status);
+    return NextResponse.json({ ticket, emailQueued });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: "Unable to update ticket." }, { status: 500 });
   }

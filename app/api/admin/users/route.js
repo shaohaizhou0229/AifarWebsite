@@ -3,6 +3,8 @@ import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { createUserInvitation, getProfile, listAdminUsers } from "@/lib/profiles";
 import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
+import { EMAIL_EVENTS, enqueueAndTrySend, getSiteUrl } from "@/lib/email";
+import { buildInvitationEmail } from "@/lib/email/templates";
 
 export const runtime = "nodejs";
 
@@ -31,6 +33,38 @@ function clean(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function buildRegisterUrl(email, locale = "zh-CN") {
+  const safeLocale = typeof locale === "string" && locale.trim() ? locale.trim() : "zh-CN";
+  const url = new URL(`/${safeLocale}/register/`, getSiteUrl());
+  url.searchParams.set("email", email);
+  return url.toString();
+}
+
+async function queueInvitationEmail(invitation, locale) {
+  try {
+    const email = buildInvitationEmail({
+      invitation,
+      registerUrl: buildRegisterUrl(invitation.email, locale)
+    });
+
+    const result = await enqueueAndTrySend({
+      eventType: EMAIL_EVENTS.userInvitation,
+      to: invitation.email,
+      subject: email.subject,
+      text: email.text,
+      html: email.html,
+      relatedType: "user_invitation",
+      relatedId: invitation.id,
+      metadata: { role: invitation.role }
+    });
+
+    return Boolean(result.queued);
+  } catch (error) {
+    console.error("Failed to queue invitation email", error);
+    return false;
+  }
+}
+
 export async function POST(request) {
   try {
     const { user: adminUser } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.users);
@@ -45,6 +79,7 @@ export async function POST(request) {
       role: clean(payload.role),
       adminPermissions: Array.isArray(payload.adminPermissions) ? payload.adminPermissions : []
     }, adminUser.id);
+    const emailQueued = await queueInvitationEmail(invitation, clean(payload.locale));
 
     await recordUserFootprint({
       userId: adminUser.id,
@@ -55,7 +90,7 @@ export async function POST(request) {
       metadata: { email: invitation.email, role: invitation.role }
     });
 
-    return NextResponse.json({ invitation }, { status: 201 });
+    return NextResponse.json({ invitation, emailQueued }, { status: 201 });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: error.message || "Unable to invite user." }, { status: 500 });
   }

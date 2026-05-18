@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getPostgresPool } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
+import { EMAIL_EVENTS, enqueueManyAndTrySend, getAdminNotificationEmails, getSiteUrl } from "@/lib/email";
+import { buildContactRequestEmail } from "@/lib/email/templates";
 
 export const runtime = "nodejs";
 
@@ -50,6 +52,34 @@ function validatePayload(payload) {
   };
 }
 
+async function queueContactRequestEmails(ticket) {
+  const recipients = getAdminNotificationEmails();
+  if (!recipients.length) return false;
+
+  try {
+    const email = buildContactRequestEmail({
+      ticket,
+      adminUrl: new URL("/zh-CN/admin/contact/", getSiteUrl()).toString()
+    });
+
+    await enqueueManyAndTrySend(recipients.map((recipient) => ({
+      eventType: EMAIL_EVENTS.contactRequestSubmitted,
+      to: recipient,
+      subject: email.subject,
+      text: email.text,
+      html: email.html,
+      relatedType: "contact_request",
+      relatedId: ticket.id,
+      metadata: { requestType: ticket.requestType }
+    })));
+
+    return true;
+  } catch (error) {
+    console.error("Failed to queue contact request email", error);
+    return false;
+  }
+}
+
 export async function POST(request) {
   let payload;
 
@@ -84,17 +114,29 @@ export async function POST(request) {
       [user?.id || null, name, workEmail, organization, subject, requestType, message]
     );
 
+    const ticket = {
+      id: result.rows[0]?.id,
+      name,
+      workEmail,
+      organization,
+      subject,
+      requestType,
+      message
+    };
+
     await recordUserFootprint({
       userId: user?.id,
       actorUserId: user?.id,
       eventType: USER_FOOTPRINT_EVENTS.contactSubmitted,
       summary: "User submitted a contact request.",
       relatedType: "contact_request",
-      relatedId: result.rows[0]?.id,
+      relatedId: ticket.id,
       metadata: { requestType }
     });
 
-    return NextResponse.json({ ok: true }, { status: 201 });
+    const emailQueued = await queueContactRequestEmails(ticket);
+
+    return NextResponse.json({ ok: true, emailQueued }, { status: 201 });
   } catch (error) {
     console.error("Failed to create contact request", error);
 
