@@ -52,3 +52,5 @@ browser-check*.png
 Thumbs.db
 .idea/
 .vscode/
+
+.vercel
