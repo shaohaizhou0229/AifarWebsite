@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, AuthRequiredError, getCurrentAccessToken, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, AuthRequiredError, getCurrentAccessToken, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import {
   MAX_MARKDOWN_FILE_SIZE,
   isAllowedMarkdownFilename,
@@ -38,7 +39,7 @@ function normalizeInput(body) {
 
 export async function GET() {
   try {
-    await requireAdmin(getProfile);
+    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.docs);
     const documents = await listAdminDocuments();
     return NextResponse.json({ documents });
   } catch (error) {
@@ -48,7 +49,7 @@ export async function GET() {
 
 export async function POST(request) {
   try {
-    const [{ user }, accessToken] = await Promise.all([requireAdmin(getProfile), getCurrentAccessToken()]);
+    const [{ user }, accessToken] = await Promise.all([requireAdminPermission(getProfile, ADMIN_PERMISSIONS.docs), getCurrentAccessToken()]);
     const input = normalizeInput(await request.json().catch(() => ({})));
 
     if (!input.originalFilename || !isAllowedMarkdownFilename(input.originalFilename)) {

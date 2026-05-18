@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, AuthRequiredError, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getAdminTicketStats, listAdminTickets } from "@/lib/tickets";
 
 export const runtime = "nodejs";
@@ -17,7 +18,7 @@ function permissionError(error) {
 
 export async function GET(request) {
   try {
-    await requireAdmin(getProfile);
+    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.support);
     const searchParams = new URL(request.url).searchParams;
     const filters = {
       status: searchParams.get("status") || "",

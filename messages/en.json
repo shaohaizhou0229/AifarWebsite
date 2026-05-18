@@ -49,7 +49,8 @@
         "google_failed": "Google sign in failed. Please try again.",
         "google_missing_code": "Google sign in callback is missing a code.",
         "auth_failed": "Sign in failed. Please check your account information and try again.",
-        "auth_service_unavailable": "The account service is temporarily unavailable. Please try again later or contact the administrator."
+        "auth_service_unavailable": "The account service is temporarily unavailable. Please try again later or contact the administrator.",
+        "account_inactive": "This account is not active. Please contact the administrator."
       }
     },
     "contact": {
@@ -650,7 +651,19 @@
       },
       "eyebrow": "Profile",
       "title": "Manage your profile.",
-      "lead": "These details help Aifar support and sales teams understand your organization context."
+      "lead": "These details help Aifar support and sales teams understand your organization context.",
+      "deleteAccount": {
+        "title": "Delete account",
+        "lead": "This will close your Aifar account access. Historical tickets and activity records remain for support and audit continuity.",
+        "confirmLabel": "Type DELETE to confirm",
+        "confirmText": "DELETE",
+        "confirmRequired": "Please type the confirmation text before deleting your account.",
+        "delete": "Delete my account",
+        "deleting": "Deleting...",
+        "deleted": "Account deleted. You will be signed out.",
+        "failed": "Unable to delete account.",
+        "reason": "Self-service account deletion."
+      }
     },
     "tickets": {
       "seo": {
@@ -966,7 +979,7 @@
       "deniedTitle": "Administrator access required.",
       "deniedLead": "Your account does not have permission to manage users.",
       "title": "User management.",
-      "lead": "Search users, review profiles, and open user activity records.",
+      "lead": "Search users, create invitations, assign module permissions, and review account activity.",
       "breadcrumb": "Users",
       "searchLabel": "Search users",
       "searchPlaceholder": "Search email, name, or organization",
@@ -980,6 +993,59 @@
       "roles": {
         "user": "User",
         "admin": "Admin"
+      },
+      "statusFilter": "Account status",
+      "statuses": {
+        "all": "All statuses",
+        "active": "Active",
+        "deactivated": "Deactivated",
+        "deleted": "Deleted",
+        "pending": "Pending invitation"
+      },
+      "permissions": {
+        "admin.users": "Users",
+        "admin.product": "Product content",
+        "admin.downloads": "Client downloads",
+        "admin.docs": "Online docs",
+        "admin.support": "Support tickets",
+        "admin.contact": "Contact requests"
+      },
+      "invite": {
+        "title": "Invite user",
+        "lead": "Create a pending account invitation. When the user registers with this email, the profile, role, and permissions will be applied.",
+        "form": {
+          "email": "Email",
+          "name": "Name",
+          "organization": "Organization",
+          "jobTitle": "Job title",
+          "countryRegion": "Country / Region",
+          "phone": "Phone",
+          "role": "Role",
+          "roles": {
+            "user": "User",
+            "admin": "Admin"
+          },
+          "permissionsTitle": "Module permissions",
+          "permissions": {
+            "admin.users": "Users",
+            "admin.product": "Product content",
+            "admin.downloads": "Client downloads",
+            "admin.docs": "Online docs",
+            "admin.support": "Support tickets",
+            "admin.contact": "Contact requests"
+          },
+          "create": "Create invitation",
+          "creating": "Creating...",
+          "created": "Invitation created.",
+          "failed": "Unable to create invitation."
+        },
+        "cancel": {
+          "cancel": "Cancel invitation",
+          "canceling": "Canceling...",
+          "canceled": "Invitation canceled.",
+          "failed": "Unable to cancel invitation.",
+          "confirm": "Cancel this pending invitation?"
+        }
       }
     },
     "adminUserDetail": {
@@ -1003,13 +1069,17 @@
         "auth": {
           "registered": "Registered",
           "logged_in": "Signed in",
-          "oauth_logged_in": "Google sign in"
+          "oauth_logged_in": "Google sign in",
+          "account_deleted": "Account deleted"
         },
         "profile": {
           "updated": "Profile updated"
         },
         "admin": {
-          "user_updated": "Admin update"
+          "user_updated": "Admin update",
+          "user_deleted": "User deleted",
+          "user_invited": "User invited",
+          "invitation_canceled": "Invitation canceled"
         },
         "contact": {
           "submitted": "Contact request"
@@ -1037,7 +1107,28 @@
         "save": "Save user",
         "saving": "Saving...",
         "saved": "User updated.",
-        "saveFailed": "Unable to update user."
+        "saveFailed": "Unable to update user.",
+        "accountStatus": "Account status",
+        "statuses": {
+          "active": "Active",
+          "deactivated": "Deactivated",
+          "deleted": "Deleted"
+        },
+        "permissionsTitle": "Module permissions",
+        "permissions": {
+          "admin.users": "Users",
+          "admin.product": "Product content",
+          "admin.downloads": "Client downloads",
+          "admin.docs": "Online docs",
+          "admin.support": "Support tickets",
+          "admin.contact": "Contact requests"
+        },
+        "delete": "Delete account",
+        "deleting": "Deleting...",
+        "deleted": "Account deleted.",
+        "deleteFailed": "Unable to delete account.",
+        "deleteConfirm": "Delete this user account? Historical records will be retained.",
+        "deletedByAdmin": "Deleted by administrator."
       }
     }
   }

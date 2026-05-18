@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, AuthRequiredError, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import {
   getAdminSitePageContent,
   sanitizeSiteLocale,
@@ -36,7 +37,7 @@ export async function GET(request) {
   }
 
   try {
-    await requireAdmin(getProfile);
+    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.product);
     const fallback = await getFallbackContent(pageKey, locale);
     const result = await getAdminSitePageContent(pageKey, locale, fallback);
     return NextResponse.json(result);
@@ -47,7 +48,7 @@ export async function GET(request) {
 
 export async function PATCH(request) {
   try {
-    const { user } = await requireAdmin(getProfile);
+    const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.product);
     const body = await request.json();
     const pageKey = sanitizeSitePageKey(body.pageKey);
     const locale = sanitizeSiteLocale(body.locale);

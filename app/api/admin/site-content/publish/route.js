@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, AuthRequiredError, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getAdminSitePageContent, publishSitePageDraft, sanitizeSiteLocale, sanitizeSitePageKey } from "@/lib/site-content";
 import { getPageMessages } from "@/i18n/messages";
 
@@ -19,7 +20,7 @@ function permissionError(error) {
 
 export async function POST(request) {
   try {
-    const { user } = await requireAdmin(getProfile);
+    const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.product);
     const body = await request.json();
     const pageKey = sanitizeSitePageKey(body.pageKey);
     const locale = sanitizeSiteLocale(body.locale);

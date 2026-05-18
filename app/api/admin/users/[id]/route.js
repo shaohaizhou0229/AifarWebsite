@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, AuthRequiredError, requireAdmin } from "@/lib/auth";
-import { getAdminUser, getProfile, updateAdminUserProfile } from "@/lib/profiles";
+import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
+import { getAdminUser, getProfile, softDeleteAdminUser, updateAdminUserProfile } from "@/lib/profiles";
 import { listAdminTicketsForUser } from "@/lib/tickets";
 import { listUserFootprints, recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
 
@@ -22,7 +23,7 @@ function permissionError(error) {
 
 export async function GET(_request, { params }) {
   try {
-    await requireAdmin(getProfile);
+    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.users);
     const { id } = await params;
     const user = await getAdminUser(id);
 
@@ -43,7 +44,7 @@ export async function GET(_request, { params }) {
 
 export async function PATCH(request, { params }) {
   try {
-    const { user: adminUser } = await requireAdmin(getProfile);
+    const { user: adminUser } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.users);
     const { id } = await params;
     const payload = await request.json().catch(() => ({}));
     const user = await updateAdminUserProfile(id, {
@@ -52,7 +53,9 @@ export async function PATCH(request, { params }) {
       jobTitle: clean(payload.jobTitle),
       countryRegion: clean(payload.countryRegion),
       phone: clean(payload.phone),
-      role: clean(payload.role)
+      role: clean(payload.role),
+      accountStatus: clean(payload.accountStatus),
+      adminPermissions: Array.isArray(payload.adminPermissions) ? payload.adminPermissions : []
     });
 
     if (!user) {
@@ -66,11 +69,38 @@ export async function PATCH(request, { params }) {
       summary: "Administrator updated user profile or role.",
       relatedType: "profile",
       relatedId: id,
-      metadata: { role: user.role }
+      metadata: { role: user.role, accountStatus: user.accountStatus, adminPermissions: user.adminPermissions }
     });
 
     return NextResponse.json({ user });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: error.message || "Unable to update user." }, { status: 500 });
+  }
+}
+
+export async function DELETE(request, { params }) {
+  try {
+    const { user: adminUser } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.users);
+    const { id } = await params;
+    const payload = await request.json().catch(() => ({}));
+    const user = await softDeleteAdminUser(id, adminUser.id, clean(payload.reason) || "Deleted by administrator.");
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found." }, { status: 404 });
+    }
+
+    await recordUserFootprint({
+      userId: id,
+      actorUserId: adminUser.id,
+      eventType: USER_FOOTPRINT_EVENTS.adminUserDeleted,
+      summary: "Administrator deleted user account.",
+      relatedType: "profile",
+      relatedId: id,
+      metadata: { reason: clean(payload.reason) || null }
+    });
+
+    return NextResponse.json({ user });
+  } catch (error) {
+    return permissionError(error) || NextResponse.json({ error: error.message || "Unable to delete user." }, { status: 500 });
   }
 }

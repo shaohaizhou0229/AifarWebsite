@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, AuthRequiredError, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getAdminTicket, TICKET_CATEGORIES, TICKET_PRIORITIES, TICKET_STATUSES, updateTicketFields } from "@/lib/tickets";
 
 export const runtime = "nodejs";
@@ -17,7 +18,7 @@ function permissionError(error) {
 
 export async function GET(_request, { params }) {
   try {
-    await requireAdmin(getProfile);
+    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.support);
     const { id } = await params;
     const result = await getAdminTicket(id);
 
@@ -33,7 +34,7 @@ export async function GET(_request, { params }) {
 
 export async function PATCH(request, { params }) {
   try {
-    const { user } = await requireAdmin(getProfile);
+    const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.support);
     const { id } = await params;
     const payload = await request.json().catch(() => ({}));
     const input = {};

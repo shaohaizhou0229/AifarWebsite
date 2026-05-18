@@ -3,9 +3,10 @@ import { redirect } from "next/navigation";
 import { AdminNav } from "@/components/AdminNav";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PageHero } from "@/components/PageHero";
-import { AdminRequiredError, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { listAdminDownloadPlatforms } from "@/lib/downloads";
 import { getProfile } from "@/lib/profiles";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -34,7 +35,7 @@ export default async function AdminDownloadsPage({ params }) {
   const adminNav = adminHome.nav;
 
   try {
-    await requireAdmin(getProfile);
+    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.downloads);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return (

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ensureProfile } from "@/lib/profiles";
+import { ensureProfile, isProfileActive } from "@/lib/profiles";
 import { exchangeOAuthCode, setAuthCookies } from "@/lib/auth";
 import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
 
@@ -32,9 +32,14 @@ export async function GET(request) {
     const user = result.session.user;
 
     if (user?.id) {
-      await ensureProfile(user, {
+      const profile = await ensureProfile(user, {
         displayName: user.user_metadata?.full_name || user.user_metadata?.name || null
       });
+      if (!isProfileActive(profile)) {
+        const responseUrl = new URL(loginPathFromNext(nextPath), request.url);
+        responseUrl.searchParams.set("error", "account_inactive");
+        return NextResponse.redirect(responseUrl);
+      }
       await recordUserFootprint({
         userId: user.id,
         actorUserId: user.id,

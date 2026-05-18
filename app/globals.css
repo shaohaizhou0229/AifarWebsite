@@ -801,6 +801,29 @@ h3 {
   height: 18px;
 }
 
+.checkbox-grid {
+  border: 1px solid rgba(183, 200, 213, 0.78);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.checkbox-grid legend {
+  padding: 0 6px;
+  font-weight: 850;
+}
+
+.inline-actions {
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+}
+
+.danger-zone {
+  margin-top: 34px;
+  border-top: 1px solid rgba(184, 107, 25, 0.26);
+  padding-top: 24px;
+}
+
 .form-message {
   margin: 0;
   border: 1px solid var(--line);

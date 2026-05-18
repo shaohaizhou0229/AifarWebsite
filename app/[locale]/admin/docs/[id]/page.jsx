@@ -4,9 +4,10 @@ import { AdminDocumentForm } from "@/components/AdminDocumentForm";
 import { AdminNav } from "@/components/AdminNav";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PageHero } from "@/components/PageHero";
-import { AdminRequiredError, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getAdminDocument, listDocumentCategories, listDocumentVersions } from "@/lib/documents";
 import { getProfile } from "@/lib/profiles";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -43,7 +44,7 @@ export default async function EditAdminDocumentPage({ params }) {
   ]);
 
   try {
-    await requireAdmin(getProfile);
+    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.docs);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return (

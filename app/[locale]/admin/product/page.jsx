@@ -5,8 +5,9 @@ import { AdminNav } from "@/components/AdminNav";
 import { AdminSiteContentForm } from "@/components/AdminSiteContentForm";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PageHero } from "@/components/PageHero";
-import { AdminRequiredError, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getAdminSitePageContent } from "@/lib/site-content";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localeLabels, locales, localizedPath } from "@/i18n/routing";
@@ -35,7 +36,7 @@ export default async function AdminProductPage({ params, searchParams }) {
   ]);
 
   try {
-    await requireAdmin(getProfile);
+    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.product);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return (

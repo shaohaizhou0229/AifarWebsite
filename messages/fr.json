@@ -49,7 +49,8 @@
         "google_failed": "Google sign in failed. Please try again.",
         "google_missing_code": "Google sign in callback is missing a code.",
         "auth_failed": "Sign in failed. Please check your account information and try again.",
-        "auth_service_unavailable": "The account service is temporarily unavailable. Please try again later or contact the administrator."
+        "auth_service_unavailable": "The account service is temporarily unavailable. Please try again later or contact the administrator.",
+        "account_inactive": "Ce compte n est pas actif. Contactez l administrateur."
       }
     },
     "contact": {
@@ -650,7 +651,19 @@
       },
       "eyebrow": "Présentation Aifar",
       "title": "Présentation Aifar",
-      "lead": "Informations structurées sur les capacités et services Aifar."
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "deleteAccount": {
+        "title": "Supprimer le compte",
+        "lead": "Cela ferme l acces a votre compte Aifar. Les tickets et activites historiques sont conserves pour le support et l audit.",
+        "confirmLabel": "Saisissez DELETE pour confirmer",
+        "confirmText": "DELETE",
+        "confirmRequired": "Saisissez le texte de confirmation avant de supprimer le compte.",
+        "delete": "Supprimer mon compte",
+        "deleting": "Suppression...",
+        "deleted": "Compte supprime. Vous allez etre deconnecte.",
+        "failed": "Impossible de supprimer le compte.",
+        "reason": "Suppression de compte en libre-service."
+      }
     },
     "tickets": {
       "seo": {
@@ -966,7 +979,7 @@
       "deniedTitle": "Acces administrateur requis.",
       "deniedLead": "Votre compte ne peut pas gerer les utilisateurs.",
       "title": "Gestion des utilisateurs.",
-      "lead": "Recherchez des utilisateurs, consultez les profils et ouvrez les traces d activite.",
+      "lead": "Rechercher des utilisateurs, creer des invitations, attribuer les droits par module et consulter l activite.",
       "breadcrumb": "Utilisateurs",
       "searchLabel": "Rechercher des utilisateurs",
       "searchPlaceholder": "Rechercher email, nom ou organisation",
@@ -980,6 +993,59 @@
       "roles": {
         "user": "Utilisateur",
         "admin": "Admin"
+      },
+      "statusFilter": "Statut du compte",
+      "statuses": {
+        "all": "Tous les statuts",
+        "active": "Actif",
+        "deactivated": "Desactive",
+        "deleted": "Supprime",
+        "pending": "Invitation en attente"
+      },
+      "permissions": {
+        "admin.users": "Utilisateurs",
+        "admin.product": "Contenu produit",
+        "admin.downloads": "Telechargements client",
+        "admin.docs": "Docs en ligne",
+        "admin.support": "Tickets support",
+        "admin.contact": "Demandes de contact"
+      },
+      "invite": {
+        "title": "Inviter un utilisateur",
+        "lead": "Cree une invitation en attente. Quand l utilisateur s inscrit avec cet email, le profil, le role et les droits sont appliques.",
+        "form": {
+          "email": "Email",
+          "name": "Nom",
+          "organization": "Organisation",
+          "jobTitle": "Poste",
+          "countryRegion": "Pays / Region",
+          "phone": "Telephone",
+          "role": "Role",
+          "roles": {
+            "user": "Utilisateur",
+            "admin": "Admin"
+          },
+          "permissionsTitle": "Droits des modules",
+          "permissions": {
+            "admin.users": "Utilisateurs",
+            "admin.product": "Contenu produit",
+            "admin.downloads": "Telechargements client",
+            "admin.docs": "Docs en ligne",
+            "admin.support": "Tickets support",
+            "admin.contact": "Demandes de contact"
+          },
+          "create": "Creer l invitation",
+          "creating": "Creation...",
+          "created": "Invitation creee.",
+          "failed": "Impossible de creer l invitation."
+        },
+        "cancel": {
+          "cancel": "Annuler l invitation",
+          "canceling": "Annulation...",
+          "canceled": "Invitation annulee.",
+          "failed": "Impossible d annuler l invitation.",
+          "confirm": "Annuler cette invitation en attente ?"
+        }
       }
     },
     "adminUserDetail": {
@@ -1003,13 +1069,17 @@
         "auth": {
           "registered": "Inscription",
           "logged_in": "Connexion",
-          "oauth_logged_in": "Connexion Google"
+          "oauth_logged_in": "Connexion Google",
+          "account_deleted": "Compte supprime"
         },
         "profile": {
           "updated": "Profil mis a jour"
         },
         "admin": {
-          "user_updated": "Mise a jour admin"
+          "user_updated": "Mise a jour admin",
+          "user_deleted": "Utilisateur supprime",
+          "user_invited": "Utilisateur invite",
+          "invitation_canceled": "Invitation annulee"
         },
         "contact": {
           "submitted": "Demande de contact"
@@ -1037,7 +1107,28 @@
         "save": "Enregistrer",
         "saving": "Enregistrement...",
         "saved": "Utilisateur mis a jour.",
-        "saveFailed": "Impossible de mettre a jour l utilisateur."
+        "saveFailed": "Impossible de mettre a jour l utilisateur.",
+        "accountStatus": "Statut du compte",
+        "statuses": {
+          "active": "Actif",
+          "deactivated": "Desactive",
+          "deleted": "Supprime"
+        },
+        "permissionsTitle": "Droits des modules",
+        "permissions": {
+          "admin.users": "Utilisateurs",
+          "admin.product": "Contenu produit",
+          "admin.downloads": "Telechargements client",
+          "admin.docs": "Docs en ligne",
+          "admin.support": "Tickets support",
+          "admin.contact": "Demandes de contact"
+        },
+        "delete": "Supprimer le compte",
+        "deleting": "Suppression...",
+        "deleted": "Compte supprime.",
+        "deleteFailed": "Impossible de supprimer le compte.",
+        "deleteConfirm": "Supprimer ce compte utilisateur ? Les historiques seront conserves.",
+        "deletedByAdmin": "Supprime par un administrateur."
       }
     }
   }

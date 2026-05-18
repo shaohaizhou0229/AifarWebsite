@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ensureProfile } from "@/lib/profiles";
+import { ensureProfile, isProfileActive } from "@/lib/profiles";
 import { AuthConfigurationError, setAuthCookies, signUpWithPassword } from "@/lib/auth";
 import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
 
@@ -34,6 +34,9 @@ export async function POST(request) {
     let profile = null;
     if (user?.id) {
       profile = await ensureProfile(user, { displayName, organization });
+      if (!isProfileActive(profile)) {
+        return NextResponse.json({ errorCode: "account_inactive" }, { status: 403 });
+      }
       await recordUserFootprint({
         userId: user.id,
         actorUserId: user.id,

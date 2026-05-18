@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, AuthRequiredError, createUserSupabaseClient, getCurrentAccessToken, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, AuthRequiredError, createUserSupabaseClient, getCurrentAccessToken, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import {
   SITE_CONTENT_BUCKET,
   buildSiteImageUpload,
@@ -25,7 +26,7 @@ function permissionError(error) {
 
 export async function POST(request) {
   try {
-    const [, accessToken] = await Promise.all([requireAdmin(getProfile), getCurrentAccessToken()]);
+    const [, accessToken] = await Promise.all([requireAdminPermission(getProfile, ADMIN_PERMISSIONS.product), getCurrentAccessToken()]);
     const formData = await request.formData();
     const pageKey = sanitizeSitePageKey(String(formData.get("pageKey") || ""));
     const locale = sanitizeSiteLocale(String(formData.get("locale") || ""));

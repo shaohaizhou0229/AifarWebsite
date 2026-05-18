@@ -1,9 +1,10 @@
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
+import { AccountDeletionForm } from "@/components/AccountDeletionForm";
 import { PageHero } from "@/components/PageHero";
 import { ProfileForm } from "@/components/ProfileForm";
 import { getCurrentUser } from "@/lib/auth";
-import { ensureProfile } from "@/lib/profiles";
+import { ensureProfile, isProfileActive } from "@/lib/profiles";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -30,12 +31,15 @@ export default async function AccountProfilePage({ params }) {
     ensureProfile(user)
   ]);
 
+  if (!isProfileActive(profile)) redirect(localizedPath(locale, "/login/"));
+
   return (
     <main>
       <PageHero eyebrow={page.eyebrow} title={page.title} lead={page.lead} />
       <section className="section alt">
         <div className="section-inner">
           <ProfileForm profile={profile} labels={messages.forms} />
+          <AccountDeletionForm labels={page.deleteAccount} redirectPath={localizedPath(locale, "/login/")} />
         </div>
       </section>
     </main>

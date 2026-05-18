@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { AuthRequiredError, requireUser } from "@/lib/auth";
-import { ensureProfile, updateProfile } from "@/lib/profiles";
+import { AuthRequiredError, clearAuthCookies, requireUser } from "@/lib/auth";
+import { ensureProfile, isProfileActive, selfDeleteProfile, updateProfile } from "@/lib/profiles";
 import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
 
 export const runtime = "nodejs";
@@ -20,6 +20,9 @@ export async function GET() {
   try {
     const user = await requireUser();
     const profile = await ensureProfile(user);
+    if (!isProfileActive(profile)) {
+      return NextResponse.json({ error: "This account is not active." }, { status: 403 });
+    }
     return NextResponse.json({ profile });
   } catch (error) {
     return authError(error) || NextResponse.json({ error: "Unable to load profile." }, { status: 500 });
@@ -29,6 +32,10 @@ export async function GET() {
 export async function PATCH(request) {
   try {
     const user = await requireUser();
+    const current = await ensureProfile(user);
+    if (!isProfileActive(current)) {
+      return NextResponse.json({ error: "This account is not active." }, { status: 403 });
+    }
     const payload = await request.json().catch(() => ({}));
     const profile = await updateProfile(user, {
       displayName: clean(payload.displayName),
@@ -47,5 +54,27 @@ export async function PATCH(request) {
     return NextResponse.json({ profile });
   } catch (error) {
     return authError(error) || NextResponse.json({ error: "Unable to update profile." }, { status: 500 });
+  }
+}
+
+export async function DELETE(request) {
+  try {
+    const user = await requireUser();
+    const payload = await request.json().catch(() => ({}));
+    const profile = await selfDeleteProfile(user, clean(payload.reason) || "Self-service account deletion.");
+    await recordUserFootprint({
+      userId: user.id,
+      actorUserId: user.id,
+      eventType: USER_FOOTPRINT_EVENTS.accountDeleted,
+      summary: "User deleted their own account.",
+      relatedType: "profile",
+      relatedId: user.id
+    });
+
+    const response = NextResponse.json({ ok: true, profile });
+    clearAuthCookies(response);
+    return response;
+  } catch (error) {
+    return authError(error) || NextResponse.json({ error: error.message || "Unable to delete account." }, { status: 500 });
   }
 }

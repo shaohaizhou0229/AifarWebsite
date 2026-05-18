@@ -2,7 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { PageHero } from "@/components/PageHero";
 import { getCurrentUser } from "@/lib/auth";
-import { ensureProfile } from "@/lib/profiles";
+import { ensureProfile, isProfileActive } from "@/lib/profiles";
 import { listUserTickets } from "@/lib/tickets";
 import { getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
@@ -32,6 +32,7 @@ export default async function AccountPage({ params }) {
   ]);
   const cards = page.cards;
   const ticketsText = formatMessage(cards.ticketsText, { count: tickets.length });
+  if (!isProfileActive(profile)) redirect(localizedPath(locale, "/login/"));
 
   return (
     <main>

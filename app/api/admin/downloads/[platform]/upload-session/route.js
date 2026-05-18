@@ -4,9 +4,10 @@ import {
   getCurrentAccessToken,
   getSupabaseAnonKey,
   getSupabaseStorageUrl,
-  requireAdmin
+  requireAdminPermission
 } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import {
   DOWNLOAD_BUCKET,
   MAX_RELEASE_FILE_SIZE,
@@ -28,7 +29,7 @@ export async function POST(request, { params }) {
   }
 
   try {
-    const [, accessToken] = await Promise.all([requireAdmin(getProfile), getCurrentAccessToken()]);
+    const [, accessToken] = await Promise.all([requireAdminPermission(getProfile, ADMIN_PERMISSIONS.downloads), getCurrentAccessToken()]);
     const input = await request.json().catch(() => ({}));
     const filename = String(input.filename || "");
     const fileSize = Number(input.fileSize || 0);

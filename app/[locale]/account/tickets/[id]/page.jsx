@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { PageHero } from "@/components/PageHero";
 import { getCurrentUser } from "@/lib/auth";
+import { ensureProfile, isProfileActive } from "@/lib/profiles";
 import { getUserTicket } from "@/lib/tickets";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
@@ -28,11 +29,13 @@ export default async function AccountTicketDetailPage({ params }) {
   const user = await getCurrentUser();
   if (!user) redirect(localizedPath(locale, "/login/"));
 
-  const [page, messages, result] = await Promise.all([
+  const [page, messages, profile, result] = await Promise.all([
     getPageMessages(locale, "ticketDetail"),
     getLocaleMessages(locale),
+    ensureProfile(user),
     getUserTicket(user, id)
   ]);
+  if (!isProfileActive(profile)) redirect(localizedPath(locale, "/login/"));
   if (!result) notFound();
 
   const { ticket, replies } = result;

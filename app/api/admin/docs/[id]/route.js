@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, AuthRequiredError, getCurrentAccessToken, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, AuthRequiredError, getCurrentAccessToken, requireAdminPermission } from "@/lib/auth";
 import {
   MAX_MARKDOWN_FILE_SIZE,
   getAdminDocument,
@@ -9,6 +9,7 @@ import {
   uploadMarkdownToStorage
 } from "@/lib/documents";
 import { getProfile } from "@/lib/profiles";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -41,7 +42,7 @@ export async function PATCH(request, { params }) {
   const { id } = await params;
 
   try {
-    const [{ user }, accessToken] = await Promise.all([requireAdmin(getProfile), getCurrentAccessToken()]);
+    const [{ user }, accessToken] = await Promise.all([requireAdminPermission(getProfile, ADMIN_PERMISSIONS.docs), getCurrentAccessToken()]);
     const input = normalizeInput(await request.json().catch(() => ({})), id);
 
     if (!input.originalFilename || !isAllowedMarkdownFilename(input.originalFilename)) {
@@ -80,7 +81,7 @@ export async function DELETE(_request, { params }) {
   const { id } = await params;
 
   try {
-    const { user } = await requireAdmin(getProfile);
+    const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.docs);
     const document = await softDeleteDocument(id, user);
     if (!document) {
       return NextResponse.json({ error: "Document not found." }, { status: 404 });

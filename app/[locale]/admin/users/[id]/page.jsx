@@ -4,7 +4,8 @@ import { AdminNav } from "@/components/AdminNav";
 import { AdminUserForm } from "@/components/AdminUserForm";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PageHero } from "@/components/PageHero";
-import { AdminRequiredError, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getAdminUser, getProfile } from "@/lib/profiles";
 import { listAdminTicketsForUser } from "@/lib/tickets";
 import { listUserFootprints } from "@/lib/user-footprints";
@@ -42,7 +43,7 @@ export default async function AdminUserDetailPage({ params }) {
   ]);
 
   try {
-    await requireAdmin(getProfile);
+    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.users);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return (
@@ -64,7 +65,7 @@ export default async function AdminUserDetailPage({ params }) {
 
   return (
     <main>
-      <PageHero eyebrow={page.eyebrow} title={user.displayName || user.email} lead={`${page.role}: ${page.form.roles[user.role] || user.role} - ${page.createdAt} ${formatDate(user.createdAt, locale)}`} />
+      <PageHero eyebrow={page.eyebrow} title={user.displayName || user.email} lead={`${page.role}: ${page.form.roles[user.role] || user.role} - ${page.form.accountStatus}: ${page.form.statuses[user.accountStatus] || user.accountStatus} - ${page.createdAt} ${formatDate(user.createdAt, locale)}`} />
       <section className="section alt">
         <div className="section-inner detail-layout">
           <Breadcrumbs

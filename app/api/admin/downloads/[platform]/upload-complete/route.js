@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import {
   MAX_RELEASE_FILE_SIZE,
   isAllowedReleaseFilename,
@@ -24,7 +25,7 @@ export async function POST(request, { params }) {
   }
 
   try {
-    const { user } = await requireAdmin(getProfile);
+    const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.downloads);
     const input = await request.json().catch(() => ({}));
     const storagePath = String(input.storagePath || "");
     const fileSize = Number(input.fileSize || 0);

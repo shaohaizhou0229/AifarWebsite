@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/lib/auth";
-import { getProfile } from "@/lib/profiles";
+import { getProfile, isProfileActive } from "@/lib/profiles";
 import { localizedPath } from "@/i18n/routing";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { MobileMenuButton } from "@/components/MobileMenu";
@@ -35,10 +35,10 @@ export async function SiteHeader({ locale, messages }) {
             ))}
           </span>
           <span className="nav-session">
-            {profile?.role === "admin" ? (
+            {profile?.role === "admin" && isProfileActive(profile) ? (
               <a className="nav-admin-link" href={localizedPath(locale, "/admin/")}>{nav.admin}</a>
             ) : null}
-            {user ? (
+            {user && isProfileActive(profile) ? (
               <>
                 <a className="nav-account-link" href={localizedPath(locale, "/account/")}>{nav.account}</a>
                 <SignOutButton labels={messages.layout.auth} redirectTo={localizedPath(locale, "/")} />

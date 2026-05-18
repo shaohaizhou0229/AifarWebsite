@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, createUserSupabaseClient, getCurrentAccessToken, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, createUserSupabaseClient, getCurrentAccessToken, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import {
   DOWNLOAD_BUCKET,
   MAX_RELEASE_FILE_SIZE,
@@ -24,7 +25,7 @@ export async function POST(request, { params }) {
   }
 
   try {
-    const [{ user }, accessToken] = await Promise.all([requireAdmin(getProfile), getCurrentAccessToken()]);
+    const [{ user }, accessToken] = await Promise.all([requireAdminPermission(getProfile, ADMIN_PERMISSIONS.downloads), getCurrentAccessToken()]);
     const formData = await request.formData();
     const file = formData.get("file");
 
@@ -73,7 +74,7 @@ export async function DELETE(_request, { params }) {
   }
 
   try {
-    const [{ user }, accessToken] = await Promise.all([requireAdmin(getProfile), getCurrentAccessToken()]);
+    const [{ user }, accessToken] = await Promise.all([requireAdminPermission(getProfile, ADMIN_PERMISSIONS.downloads), getCurrentAccessToken()]);
     const current = await getAdminDownloadPlatform(platformKey);
     const storagePath = current?.release?.storagePath;
 

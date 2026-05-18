@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { sanitizePlatform, updateClientReleaseUploadStatus } from "@/lib/downloads";
 
 export const runtime = "nodejs";
@@ -17,7 +18,7 @@ export async function POST(request, { params }) {
   }
 
   try {
-    const { user } = await requireAdmin(getProfile);
+    const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.downloads);
     const body = await request.json().catch(() => ({}));
     const uploadStatus = String(body.uploadStatus || "");
 

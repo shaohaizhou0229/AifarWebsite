@@ -4,8 +4,9 @@ import { AdminNav } from "@/components/AdminNav";
 import { AdminTicketActions } from "@/components/AdminTicketActions";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PageHero } from "@/components/PageHero";
-import { AdminRequiredError, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { listAdminProfiles } from "@/lib/profiles";
 import { getAdminTicket } from "@/lib/tickets";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
@@ -34,7 +35,7 @@ export default async function AdminTicketDetailPage({ params }) {
   const adminHome = await getPageMessages(locale, "adminHome");
 
   try {
-    await requireAdmin(getProfile);
+    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.support);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return (

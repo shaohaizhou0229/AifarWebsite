@@ -2,13 +2,13 @@ import { redirect } from "next/navigation";
 import { AdminNav } from "@/components/AdminNav";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PageHero } from "@/components/PageHero";
-import { AdminRequiredError, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import { localizedPath } from "@/i18n/routing";
 
-export async function AdminPlaceholderPage({ locale, page, nav, sectionKey }) {
+export async function AdminPlaceholderPage({ locale, page, nav, sectionKey, permission }) {
   try {
-    await requireAdmin(getProfile);
+    await requireAdminPermission(getProfile, permission);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return (
@@ -43,4 +43,3 @@ export async function AdminPlaceholderPage({ locale, page, nav, sectionKey }) {
     </main>
   );
 }
-
