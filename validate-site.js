@@ -23,6 +23,8 @@ const pages = [
   "app/[locale]/admin/contact/page.jsx",
   "app/[locale]/admin/collaboration/page.jsx",
   "app/[locale]/admin/collaboration/spaces/[id]/page.jsx",
+  "app/[locale]/admin/collaboration/tasks/[id]/page.jsx",
+  "app/[locale]/admin/collaboration/subtasks/[id]/page.jsx",
   "app/[locale]/admin/docs/page.jsx",
   "app/[locale]/admin/docs/new/page.jsx",
   "app/[locale]/admin/docs/[id]/page.jsx",

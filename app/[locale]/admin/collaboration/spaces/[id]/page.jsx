@@ -3,10 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { AdminNav } from "@/components/AdminNav";
 import {
   CollaborationMemberForm,
-  CollaborationSubtaskForm,
-  CollaborationTaskForm,
-  CloseRecurringTaskButton,
-  SubtaskStatusForm
+  CollaborationTaskForm
 } from "@/components/AdminCollaborationForms";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PageHero } from "@/components/PageHero";
@@ -117,7 +114,7 @@ export default async function AdminCollaborationSpacePage({ params }) {
           </article>
           <article className="card detail-card">
             <h2>{page.createTaskTitle}</h2>
-            <CollaborationTaskForm spaceId={space.id} labels={page.taskForm} />
+            <CollaborationTaskForm spaceId={space.id} labels={page.taskForm} locale={locale} />
           </article>
           <div className="release-list">
             {space.tasks.length ? space.tasks.map((task) => (
@@ -140,10 +137,13 @@ export default async function AdminCollaborationSpacePage({ params }) {
                     {task.repeatLimit ? ` - ${page.repeatLimit}: ${task.generatedCount}/${task.repeatLimit}` : ` - ${page.untilClosed}`}
                   </p>
                 ) : null}
-                <CloseRecurringTaskButton task={task} labels={page.recurringActions} />
                 <div className="subtask-list">
                   {task.subtasks.map((subtask) => (
-                    <div className="subtask-row" key={subtask.id}>
+                    <a
+                      className="subtask-row"
+                      key={subtask.id}
+                      href={localizedPath(locale, `/admin/collaboration/subtasks/${subtask.id}/`)}
+                    >
                       <div>
                         <span className="pill">{page.statuses[subtask.status] || subtask.status}</span>
                         <h3>{subtask.title}</h3>
@@ -154,12 +154,13 @@ export default async function AdminCollaborationSpacePage({ params }) {
                           {page.dueAt}: {formatDate(subtask.dueAt, locale) || page.notProvided}
                         </p>
                       </div>
-                      <SubtaskStatusForm subtask={subtask} labels={page.subtaskStatusForm} locale={locale} />
-                    </div>
+                    </a>
                   ))}
                   {!task.subtasks.length ? <p className="muted-line">{page.noSubtasks}</p> : null}
                 </div>
-                <CollaborationSubtaskForm taskId={task.id} members={space.members} labels={page.subtaskForm} locale={locale} />
+                <a className="button secondary compact" href={localizedPath(locale, `/admin/collaboration/tasks/${task.id}/`)}>
+                  {page.openTask}
+                </a>
               </article>
             )) : (
               <article className="card admin-empty-state">

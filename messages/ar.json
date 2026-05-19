@@ -1337,6 +1337,102 @@
         "saving": "Closing...",
         "closed": "Recurring task closed.",
         "failed": "Unable to close recurring task."
+      },
+      "openTask": "Open task details"
+    },
+    "adminCollaborationTask": {
+      "seo": {
+        "title": "Collaboration task | Aifar",
+        "description": "View a collaboration task, its progress, and assigned subtasks."
+      },
+      "eyebrow": "Collaboration task",
+      "deniedTitle": "Administrator permission required.",
+      "deniedLead": "Your account cannot access this collaboration task.",
+      "overviewTitle": "Task overview",
+      "subtasksTitle": "Subtasks",
+      "createSubtaskTitle": "Create subtask",
+      "noDescription": "No description provided.",
+      "createdBy": "Created by",
+      "dueAt": "Due at",
+      "progress": "Progress",
+      "assignee": "Assignee",
+      "notProvided": "Not provided",
+      "repeat": "Repeat",
+      "repeatLimit": "Repeat count",
+      "untilClosed": "Until manually closed",
+      "noSubtasks": "No subtasks yet.",
+      "taskTypes": {
+        "one_time": "One-time",
+        "recurring": "Recurring"
+      },
+      "frequencies": {
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly"
+      },
+      "statuses": {
+        "not_started": "Not started",
+        "in_progress": "In progress",
+        "blocked": "Blocked",
+        "completed": "Completed"
+      },
+      "subtaskForm": {
+        "title": "Subtask title",
+        "description": "Description",
+        "assignee": "Assignee",
+        "dueAt": "Due date",
+        "create": "Add subtask",
+        "saving": "Adding...",
+        "failed": "Unable to add subtask."
+      },
+      "recurringActions": {
+        "closeRecurring": "Close recurring task",
+        "saving": "Closing...",
+        "closed": "Recurring task closed.",
+        "failed": "Unable to close recurring task."
+      }
+    },
+    "adminCollaborationSubtask": {
+      "seo": {
+        "title": "Collaboration subtask | Aifar",
+        "description": "View a collaboration subtask, update status, and review progress history."
+      },
+      "eyebrow": "Collaboration subtask",
+      "deniedTitle": "Administrator permission required.",
+      "deniedLead": "Your account cannot access this collaboration subtask.",
+      "overviewTitle": "Subtask overview",
+      "feedbackTitle": "Feedback and progress",
+      "feedbackLead": "Add a short process note and optionally update the current status.",
+      "readOnlyTitle": "Read-only access",
+      "readOnlyLead": "You can view the subtask and process records, but cannot update progress.",
+      "timelineTitle": "Process records",
+      "emptyTimeline": "No process records yet.",
+      "noDescription": "No description provided.",
+      "task": "Task",
+      "assignee": "Assignee",
+      "dueAt": "Due at",
+      "notProvided": "Not provided",
+      "unknownActor": "Unknown user",
+      "statusChange": "Status change",
+      "statuses": {
+        "not_started": "Not started",
+        "in_progress": "In progress",
+        "blocked": "Blocked",
+        "completed": "Completed"
+      },
+      "feedbackForm": {
+        "status": "Status",
+        "message": "Feedback",
+        "submit": "Submit feedback",
+        "saving": "Submitting...",
+        "saved": "Feedback submitted.",
+        "failed": "Unable to submit feedback.",
+        "statuses": {
+          "not_started": "Not started",
+          "in_progress": "In progress",
+          "blocked": "Blocked",
+          "completed": "Completed"
+        }
       }
     }
   }

@@ -104,7 +104,7 @@ export function CollaborationMemberForm({ spaceId, members, adminOptions, labels
   );
 }
 
-export function CollaborationTaskForm({ spaceId, labels }) {
+export function CollaborationTaskForm({ spaceId, labels, locale }) {
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -132,7 +132,7 @@ export function CollaborationTaskForm({ spaceId, labels }) {
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || labels.failed);
-      window.location.reload();
+      window.location.href = result.task?.id ? `/${locale}/admin/collaboration/tasks/${result.task.id}/` : window.location.href;
     } catch (error) {
       setStatus({ type: "error", message: error.message });
     } finally {
@@ -213,7 +213,7 @@ export function CollaborationSubtaskForm({ taskId, members, labels, locale }) {
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || labels.failed);
-      window.location.reload();
+      window.location.href = result.subtask?.id ? `/${locale}/admin/collaboration/subtasks/${result.subtask.id}/` : window.location.href;
     } catch (error) {
       setStatus({ type: "error", message: error.message });
     } finally {
@@ -248,6 +248,70 @@ export function CollaborationSubtaskForm({ taskId, members, labels, locale }) {
       <Message status={status} />
       <button className="button secondary" type="submit" disabled={isSubmitting}>
         {isSubmitting ? labels.saving : labels.create}
+      </button>
+    </form>
+  );
+}
+
+export function SubtaskFeedbackForm({ subtask, labels, locale }) {
+  const [form, setForm] = useState({
+    status: subtask.status,
+    message: ""
+  });
+  const { status, setStatus, isSubmitting, setIsSubmitting } = useSubmitStatus();
+
+  function update(event) {
+    const { name, value } = event.target;
+    setForm((current) => ({ ...current, [name]: value }));
+  }
+
+  async function submit(event) {
+    event.preventDefault();
+    setIsSubmitting(true);
+    setStatus({ type: "idle", message: "" });
+    try {
+      const response = await fetch(`/api/admin/collaboration/subtasks/${subtask.id}/updates/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, locale })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || labels.failed);
+      setStatus({ type: "success", message: labels.saved });
+      setForm((current) => ({ ...current, message: "" }));
+      window.location.reload();
+    } catch (error) {
+      setStatus({ type: "error", message: error.message });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  return (
+    <form className="form-shell compact-form" onSubmit={submit}>
+      <div className="field">
+        <label htmlFor={`subtaskFeedbackStatus-${subtask.id}`}>{labels.status}</label>
+        <select id={`subtaskFeedbackStatus-${subtask.id}`} name="status" value={form.status} onChange={update}>
+          <option value="not_started">{labels.statuses.not_started}</option>
+          <option value="in_progress">{labels.statuses.in_progress}</option>
+          <option value="blocked">{labels.statuses.blocked}</option>
+          <option value="completed">{labels.statuses.completed}</option>
+        </select>
+      </div>
+      <div className="field">
+        <label htmlFor={`subtaskFeedbackMessage-${subtask.id}`}>{labels.message}</label>
+        <textarea
+          id={`subtaskFeedbackMessage-${subtask.id}`}
+          name="message"
+          value={form.message}
+          onChange={update}
+          rows={4}
+          required
+        />
+      </div>
+      <Message status={status} />
+      <button className="button primary" type="submit" disabled={isSubmitting}>
+        {isSubmitting ? labels.saving : labels.submit}
       </button>
     </form>
   );

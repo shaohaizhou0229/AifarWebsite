@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { getCollaborationTask, updateCollaborationTask } from "@/lib/collaboration";
+import { createCollaborationSubtaskUpdate } from "@/lib/collaboration";
 import { getProfile } from "@/lib/profiles";
+import { recordUserFootprint } from "@/lib/user-footprints";
 
 export const runtime = "nodejs";
 
@@ -15,25 +16,23 @@ function permissionError(error) {
   return null;
 }
 
-export async function GET(_request, { params }) {
-  try {
-    const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.collaboration);
-    const { id } = await params;
-    const task = await getCollaborationTask(id, user.id);
-    return NextResponse.json(task);
-  } catch (error) {
-    return permissionError(error) || NextResponse.json({ error: error.message || "Unable to load collaboration task." }, { status: 500 });
-  }
-}
-
-export async function PATCH(request, { params }) {
+export async function POST(request, { params }) {
   try {
     const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.collaboration);
     const { id } = await params;
     const payload = await request.json().catch(() => ({}));
-    const task = await updateCollaborationTask(id, payload, user.id);
-    return NextResponse.json({ task });
+    const result = await createCollaborationSubtaskUpdate(id, payload, user.id, String(payload.locale || "zh-CN"));
+    await recordUserFootprint({
+      userId: result.subtask.assigneeUserId || user.id,
+      actorUserId: user.id,
+      eventType: "collaboration.subtask_feedback_created",
+      summary: "Administrator added a collaboration subtask update.",
+      relatedType: "collaboration_subtask",
+      relatedId: result.subtask.id,
+      metadata: { status: result.subtask.status }
+    });
+    return NextResponse.json(result, { status: 201 });
   } catch (error) {
-    return permissionError(error) || NextResponse.json({ error: error.message || "Unable to update collaboration task." }, { status: 500 });
+    return permissionError(error) || NextResponse.json({ error: error.message || "Unable to create collaboration subtask update." }, { status: 500 });
   }
 }

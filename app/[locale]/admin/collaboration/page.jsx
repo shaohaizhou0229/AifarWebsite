@@ -101,7 +101,7 @@ export default async function AdminCollaborationPage({ params }) {
               <h2>{page.mySubtasksTitle}</h2>
               <div className="release-list">
                 {subtasks.length ? subtasks.map((subtask) => (
-                  <a className="release" key={subtask.id} href={localizedPath(locale, `/admin/collaboration/spaces/${subtask.spaceId}/`)}>
+                  <a className="release" key={subtask.id} href={localizedPath(locale, `/admin/collaboration/subtasks/${subtask.id}/`)}>
                     <div>
                       <span className="pill">{page.subtaskStatuses[subtask.status] || subtask.status}</span>
                       <h3>{subtask.title}</h3>
