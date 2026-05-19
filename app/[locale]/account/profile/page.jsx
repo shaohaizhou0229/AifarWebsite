@@ -5,6 +5,7 @@ import { PageHero } from "@/components/PageHero";
 import { ProfileForm } from "@/components/ProfileForm";
 import { getCurrentUser } from "@/lib/auth";
 import { ensureProfile, isProfileActive } from "@/lib/profiles";
+import { getNotificationPreferences } from "@/lib/notifications";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -25,10 +26,11 @@ export default async function AccountProfilePage({ params }) {
   const user = await getCurrentUser();
   if (!user) redirect(localizedPath(locale, "/login/"));
 
-  const [page, messages, profile] = await Promise.all([
+  const [page, messages, profile, notificationPreferences] = await Promise.all([
     getPageMessages(locale, "profile"),
     getLocaleMessages(locale),
-    ensureProfile(user)
+    ensureProfile(user),
+    getNotificationPreferences(user.id)
   ]);
 
   if (!isProfileActive(profile)) redirect(localizedPath(locale, "/login/"));
@@ -38,7 +40,7 @@ export default async function AccountProfilePage({ params }) {
       <PageHero eyebrow={page.eyebrow} title={page.title} lead={page.lead} />
       <section className="section alt">
         <div className="section-inner">
-          <ProfileForm profile={profile} labels={messages.forms} />
+          <ProfileForm profile={{ ...profile, notificationPreferences }} labels={messages.forms} />
           <AccountDeletionForm labels={page.deleteAccount} redirectPath={localizedPath(locale, "/login/")} />
         </div>
       </section>

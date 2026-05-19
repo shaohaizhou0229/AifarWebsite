@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { AuthRequiredError, clearAuthCookies, requireUser } from "@/lib/auth";
 import { ensureProfile, isProfileActive, selfDeleteProfile, updateProfile } from "@/lib/profiles";
+import { updateNotificationPreferences } from "@/lib/notifications";
 import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
 
 export const runtime = "nodejs";
@@ -44,6 +45,7 @@ export async function PATCH(request) {
       countryRegion: clean(payload.countryRegion),
       phone: clean(payload.phone)
     });
+    const notificationPreferences = await updateNotificationPreferences(user.id, payload.notificationPreferences || {});
     await recordUserFootprint({
       userId: user.id,
       actorUserId: user.id,
@@ -51,7 +53,7 @@ export async function PATCH(request) {
       summary: "User updated their profile."
     });
 
-    return NextResponse.json({ profile });
+    return NextResponse.json({ profile: { ...profile, notificationPreferences } });
   } catch (error) {
     return authError(error) || NextResponse.json({ error: "Unable to update profile." }, { status: 500 });
   }

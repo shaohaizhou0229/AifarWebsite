@@ -4,6 +4,7 @@ import { AdminNav } from "@/components/AdminNav";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PageHero } from "@/components/PageHero";
 import { AdminRequiredError, requireAdmin } from "@/lib/auth";
+import { listCollaborationSpaces } from "@/lib/collaboration";
 import { listAdminDownloadPlatforms } from "@/lib/downloads";
 import { getProfile, listAdminUsers } from "@/lib/profiles";
 import { listAdminTickets } from "@/lib/tickets";
@@ -26,8 +27,10 @@ export default async function AdminHomePage({ params }) {
   setRequestLocale(locale);
   const page = await getPageMessages(locale, "adminHome");
 
+  let user;
   try {
-    await requireAdmin(getProfile);
+    const context = await requireAdmin(getProfile);
+    user = context.user;
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return (
@@ -39,10 +42,11 @@ export default async function AdminHomePage({ params }) {
     redirect(localizedPath(locale, "/login/"));
   }
 
-  const [platforms, tickets, users] = await Promise.all([
+  const [platforms, tickets, users, spaces] = await Promise.all([
     listAdminDownloadPlatforms(),
     listAdminTickets(),
-    listAdminUsers()
+    listAdminUsers(),
+    listCollaborationSpaces(user.id)
   ]);
   const publishedCount = platforms.filter((platform) => platform.release.isPublished).length;
   const openTickets = tickets.filter((ticket) => ticket.status !== "closed").length;
@@ -53,7 +57,8 @@ export default async function AdminHomePage({ params }) {
     contact: String(openTickets),
     product: page.planned,
     docs: page.planned,
-    support: page.planned
+    support: page.planned,
+    collaboration: String(spaces.length)
   };
 
   return (

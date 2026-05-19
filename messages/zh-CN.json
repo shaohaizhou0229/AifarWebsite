@@ -12,7 +12,9 @@
       "contact": "联系",
       "admin": "管理后台",
       "account": "账户",
-      "signIn": "登录"
+      "signIn": "登录",
+      "notifications": "??",
+      "collaboration": "????"
     },
     "footer": {
       "full": "© 2026 Aifar。保留所有权利。",
@@ -79,7 +81,10 @@
       "save": "保存资料",
       "saving": "正在保存...",
       "success": "资料已更新。",
-      "failure": "资料更新失败。"
+      "failure": "资料更新失败。",
+      "notificationPreferences": "????",
+      "emailNotifications": "??????",
+      "inAppNotifications": "??????"
     },
     "admin": {
       "statusActions": "工单状态操作",
@@ -650,7 +655,10 @@
         "ticketsAction": "查看工单",
         "contactTitle": "联系 Aifar",
         "contactText": "提交新请求。",
-        "contactAction": "新建请求"
+        "contactAction": "新建请求",
+        "notificationsTitle": "????",
+        "notificationsText": "?? {count} ??????",
+        "notificationsAction": "????"
       }
     },
     "profile": {
@@ -720,7 +728,8 @@
         "docs": "文档",
         "support": "支持",
         "contact": "联系我们",
-        "users": "用户"
+        "users": "用户",
+        "collaboration": "????"
       },
       "modules": [
         {
@@ -763,6 +772,13 @@
           "href": "/admin/contact/",
           "title": "联系表单",
           "description": "查看并回复联系请求。",
+          "status": "active"
+        },
+        {
+          "key": "collaboration",
+          "href": "/admin/collaboration/",
+          "title": "????",
+          "description": "????????????????????????",
           "status": "active"
         }
       ]
@@ -1017,7 +1033,8 @@
         "downloads": "客户端下载",
         "docs": "在线文档",
         "support": "支持工单",
-        "contact": "联系请求"
+        "contact": "联系请求",
+        "collaboration": "????"
       },
       "invite": {
         "title": "邀请用户",
@@ -1041,7 +1058,8 @@
             "downloads": "客户端下载",
             "docs": "在线文档",
             "support": "支持工单",
-            "contact": "联系请求"
+            "contact": "联系请求",
+            "collaboration": "????"
           },
           "create": "创建邀请",
           "creating": "正在创建...",
@@ -1087,6 +1105,7 @@
         "admin": {
           "user_updated": "管理员更新",
           "user_deleted": "管理员注销用户",
+          "test_account_reset": "重置测试账号",
           "user_invited": "管理员邀请用户",
           "invitation_canceled": "取消邀请"
         },
@@ -1130,14 +1149,194 @@
           "downloads": "客户端下载",
           "docs": "在线文档",
           "support": "支持工单",
-          "contact": "联系请求"
+          "contact": "联系请求",
+          "collaboration": "????"
         },
         "delete": "注销账号",
         "deleting": "正在注销...",
         "deleted": "账号已注销。",
         "deleteFailed": "无法注销账号。",
         "deleteConfirm": "确认注销该用户账号？历史记录会继续保留。",
-        "deletedByAdmin": "管理员注销账号。"
+        "deletedByAdmin": "管理员注销账号。",
+        "resetTestAccount": {
+          "title": "重置测试账号",
+          "lead": "归档该资料，删除 Supabase Auth 用户，并释放原邮箱用于重新邀请。",
+          "placeholder": "请输入完整邮箱以确认",
+          "action": "重置测试账号",
+          "resetting": "正在重置...",
+          "success": "测试账号已归档，原邮箱可重新邀请。",
+          "failed": "无法重置测试账号。",
+          "reason": "UAT 测试账号重置"
+        }
+      }
+    },
+    "notifications": {
+      "seo": {
+        "title": "???? | Aifar",
+        "description": "?? Aifar ???????"
+      },
+      "eyebrow": "????",
+      "title": "?????",
+      "lead": "?????????????????????",
+      "unread": "??",
+      "read": "??",
+      "emptyTitle": "?????",
+      "emptyLead": "???????????????????",
+      "actions": {
+        "markRead": "????",
+        "markAllRead": "??????",
+        "saving": "????...",
+        "read": "??",
+        "allRead": "???????????",
+        "failed": "?????????"
+      }
+    },
+    "adminCollaboration": {
+      "seo": {
+        "title": "???? | Aifar",
+        "description": "???????????????"
+      },
+      "eyebrow": "????",
+      "deniedTitle": "????????",
+      "deniedLead": "?????????????",
+      "title": "?????",
+      "lead": "????????????????????????????????",
+      "breadcrumb": "????",
+      "spacesTitle": "????",
+      "mySubtasksTitle": "???????",
+      "leader": "???",
+      "tasks": "??",
+      "openSubtasks": "??????",
+      "dueAt": "????",
+      "noDescription": "??????",
+      "notProvided": "???",
+      "emptySpacesTitle": "???????",
+      "emptySpacesLead": "????????????????",
+      "emptySubtasksTitle": "????????",
+      "emptySubtasksLead": "??????????????????",
+      "statuses": {
+        "active": "???",
+        "closed": "???"
+      },
+      "subtaskStatuses": {
+        "not_started": "???",
+        "in_progress": "???",
+        "blocked": "??",
+        "completed": "???"
+      },
+      "createSpace": {
+        "title": "??????",
+        "lead": "????????? leader?????????????",
+        "form": {
+          "name": "????",
+          "description": "??",
+          "create": "????",
+          "saving": "????...",
+          "failed": "?????????"
+        }
+      }
+    },
+    "adminCollaborationSpace": {
+      "seo": {
+        "title": "?????? | Aifar",
+        "description": "?????????????????"
+      },
+      "eyebrow": "????",
+      "deniedTitle": "????????",
+      "deniedLead": "??????????????",
+      "noDescription": "??????",
+      "membersTitle": "?????",
+      "member": "??",
+      "createTaskTitle": "?????",
+      "dueAt": "????",
+      "notProvided": "???",
+      "progress": "??",
+      "repeat": "??",
+      "repeatLimit": "????",
+      "untilClosed": "??????",
+      "assignee": "???",
+      "noSubtasks": "??????",
+      "emptyTasksTitle": "?????",
+      "emptyTasksLead": "???????????????????",
+      "boolean": {
+        "yes": "?",
+        "no": "?"
+      },
+      "permissions": {
+        "cms": "CMS",
+        "downloads": "??",
+        "docs": "??",
+        "support": "????",
+        "contact": "????",
+        "collaboration": "??"
+      },
+      "taskTypes": {
+        "one_time": "???",
+        "recurring": "??"
+      },
+      "frequencies": {
+        "daily": "??",
+        "weekly": "??",
+        "monthly": "??"
+      },
+      "statuses": {
+        "not_started": "???",
+        "in_progress": "???",
+        "blocked": "??",
+        "completed": "???"
+      },
+      "memberForm": {
+        "member": "?????",
+        "add": "????",
+        "saving": "????...",
+        "failed": "???????"
+      },
+      "taskForm": {
+        "title": "????",
+        "description": "??",
+        "dueAt": "????",
+        "taskType": "????",
+        "repeatFrequency": "????",
+        "repeatLimit": "????",
+        "create": "????",
+        "saving": "????...",
+        "failed": "???????",
+        "types": {
+          "one_time": "?????",
+          "recurring": "????"
+        },
+        "frequencies": {
+          "daily": "??",
+          "weekly": "??",
+          "monthly": "??"
+        }
+      },
+      "subtaskForm": {
+        "title": "?????",
+        "description": "??",
+        "assignee": "???",
+        "dueAt": "????",
+        "create": "?????",
+        "saving": "????...",
+        "failed": "????????"
+      },
+      "subtaskStatusForm": {
+        "save": "??",
+        "saving": "????...",
+        "saved": "????",
+        "failed": "????????",
+        "statuses": {
+          "not_started": "???",
+          "in_progress": "???",
+          "blocked": "??",
+          "completed": "???"
+        }
+      },
+      "recurringActions": {
+        "closeRecurring": "??????",
+        "saving": "????...",
+        "closed": "????????",
+        "failed": "?????????"
       }
     }
   }

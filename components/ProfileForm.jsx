@@ -8,7 +8,8 @@ export function ProfileForm({ profile, labels }) {
     organization: profile?.organization || "",
     jobTitle: profile?.job_title || "",
     countryRegion: profile?.country_region || "",
-    phone: profile?.phone || ""
+    phone: profile?.phone || "",
+    notificationPreferences: profile?.notificationPreferences || { email: true, inApp: true }
   });
   const [status, setStatus] = useState({ type: "idle", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -16,6 +17,17 @@ export function ProfileForm({ profile, labels }) {
   function updateField(event) {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
+  }
+
+  function updateNotificationPreference(event) {
+    const { name, checked } = event.target;
+    setForm((current) => ({
+      ...current,
+      notificationPreferences: {
+        ...current.notificationPreferences,
+        [name]: checked
+      }
+    }));
   }
 
   async function handleSubmit(event) {
@@ -69,6 +81,27 @@ export function ProfileForm({ profile, labels }) {
         <label htmlFor="phone">{labels.profile.phone}</label>
         <input id="phone" name="phone" value={form.phone} onChange={updateField} autoComplete="tel" />
       </div>
+      <fieldset className="field checkbox-grid">
+        <legend>{labels.profile.notificationPreferences}</legend>
+        <label className="checkbox-line">
+          <input
+            type="checkbox"
+            name="email"
+            checked={form.notificationPreferences.email}
+            onChange={updateNotificationPreference}
+          />
+          <span>{labels.profile.emailNotifications}</span>
+        </label>
+        <label className="checkbox-line">
+          <input
+            type="checkbox"
+            name="inApp"
+            checked={form.notificationPreferences.inApp}
+            onChange={updateNotificationPreference}
+          />
+          <span>{labels.profile.inAppNotifications}</span>
+        </label>
+      </fieldset>
       {status.message ? <p className={`form-message ${status.type}`} role="status">{status.message}</p> : null}
       <button className="button primary" type="submit" disabled={isSubmitting}>
         {isSubmitting ? labels.profile.saving : labels.profile.save}

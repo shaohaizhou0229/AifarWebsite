@@ -1420,6 +1420,123 @@ h3 {
   max-width: 760px;
 }
 
+.dashboard-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.permission-matrix {
+  border: 1px solid rgba(183, 200, 213, 0.78);
+  border-radius: 8px;
+  overflow: auto;
+  background: #fff;
+}
+
+.permission-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.4fr) repeat(6, minmax(92px, 0.7fr));
+  min-width: 760px;
+  border-top: 1px solid rgba(183, 200, 213, 0.78);
+}
+
+.permission-row:first-child {
+  border-top: 0;
+}
+
+.permission-row > * {
+  padding: 12px;
+  border-left: 1px solid rgba(183, 200, 213, 0.78);
+}
+
+.permission-row > *:first-child {
+  border-left: 0;
+}
+
+.permission-row.header {
+  background: #f6f8fb;
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.permission-cell {
+  color: var(--muted);
+}
+
+.permission-cell.enabled {
+  color: #126c4d;
+  font-weight: 700;
+}
+
+.collaboration-task {
+  display: grid;
+  gap: 18px;
+}
+
+.task-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.task-progress {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border: 1px solid rgba(183, 200, 213, 0.78);
+  border-radius: 8px;
+  background: #f7fbf8;
+  flex: 0 0 auto;
+}
+
+.task-progress strong {
+  font-size: 1.35rem;
+}
+
+.subtask-list {
+  display: grid;
+  gap: 12px;
+}
+
+.subtask-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: start;
+  padding: 14px;
+  border: 1px solid rgba(183, 200, 213, 0.78);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.inline-status-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+  min-width: 260px;
+}
+
+.inline-status-form select {
+  min-width: 150px;
+}
+
+.compact-form {
+  padding-top: 12px;
+  border-top: 1px solid rgba(183, 200, 213, 0.78);
+}
+
+.button.compact {
+  padding: 8px 12px;
+  min-height: 36px;
+}
+
 .section-head.compact {
   align-items: flex-start;
   margin-bottom: 16px;
@@ -2090,8 +2207,19 @@ h3 {
   .document-meta,
   .version-item,
   .feature,
-  .admin-search {
+  .admin-search,
+  .dashboard-split,
+  .subtask-row {
     grid-template-columns: 1fr;
+  }
+
+  .task-heading {
+    display: grid;
+  }
+
+  .task-progress,
+  .inline-status-form {
+    width: 100%;
   }
 
   .admin-user-meta {

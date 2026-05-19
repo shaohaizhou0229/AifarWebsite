@@ -12,7 +12,9 @@
       "contact": "Contact",
       "admin": "Admin",
       "account": "Account",
-      "signIn": "Sign in"
+      "signIn": "Sign in",
+      "notifications": "Notifications",
+      "collaboration": "Collaboration"
     },
     "footer": {
       "full": "© 2026 Aifar. All rights reserved.",
@@ -79,7 +81,10 @@
       "save": "Save profile",
       "saving": "Saving...",
       "success": "Profile updated.",
-      "failure": "Profile update failed."
+      "failure": "Profile update failed.",
+      "notificationPreferences": "Notification preferences",
+      "emailNotifications": "Email notifications",
+      "inAppNotifications": "In-app notifications"
     },
     "admin": {
       "statusActions": "Ticket status actions",
@@ -650,7 +655,10 @@
         "ticketsAction": "View tickets",
         "contactTitle": "Contact Aifar",
         "contactText": "Submit a new request using your account information.",
-        "contactAction": "New request"
+        "contactAction": "New request",
+        "notificationsTitle": "Notifications",
+        "notificationsText": "{count} unread notifications.",
+        "notificationsAction": "View notifications"
       }
     },
     "profile": {
@@ -720,7 +728,8 @@
         "docs": "Docs",
         "support": "Support",
         "contact": "Contact us",
-        "users": "Users"
+        "users": "Users",
+        "collaboration": "Collaboration"
       },
       "modules": [
         {
@@ -763,6 +772,13 @@
           "href": "/admin/contact/",
           "title": "Contact forms",
           "description": "Review contact form requests, reply to visitors, and close handled requests.",
+          "status": "active"
+        },
+        {
+          "key": "collaboration",
+          "href": "/admin/collaboration/",
+          "title": "Collaboration",
+          "description": "Create spaces, assign tasks, track deadlines, and manage recurring work.",
           "status": "active"
         }
       ]
@@ -1017,7 +1033,8 @@
         "downloads": "Client downloads",
         "docs": "Online docs",
         "support": "Support tickets",
-        "contact": "Contact requests"
+        "contact": "Contact requests",
+        "collaboration": "Collaboration"
       },
       "invite": {
         "title": "Invite user",
@@ -1041,7 +1058,8 @@
             "downloads": "Client downloads",
             "docs": "Online docs",
             "support": "Support tickets",
-            "contact": "Contact requests"
+            "contact": "Contact requests",
+            "collaboration": "Collaboration"
           },
           "create": "Create invitation",
           "creating": "Creating...",
@@ -1087,6 +1105,7 @@
         "admin": {
           "user_updated": "Admin update",
           "user_deleted": "User deleted",
+          "test_account_reset": "Test account reset",
           "user_invited": "User invited",
           "invitation_canceled": "Invitation canceled"
         },
@@ -1130,14 +1149,194 @@
           "downloads": "Client downloads",
           "docs": "Online docs",
           "support": "Support tickets",
-          "contact": "Contact requests"
+          "contact": "Contact requests",
+          "collaboration": "Collaboration"
         },
         "delete": "Delete account",
         "deleting": "Deleting...",
         "deleted": "Account deleted.",
         "deleteFailed": "Unable to delete account.",
         "deleteConfirm": "Delete this user account? Historical records will be retained.",
-        "deletedByAdmin": "Deleted by administrator."
+        "deletedByAdmin": "Deleted by administrator.",
+        "resetTestAccount": {
+          "title": "Reset test account",
+          "lead": "Archive this profile, delete the Supabase Auth user, and release the original email for a new invitation.",
+          "placeholder": "Type the full email to confirm",
+          "action": "Reset test account",
+          "resetting": "Resetting...",
+          "success": "Test account archived. The original email can be invited again.",
+          "failed": "Unable to reset test account.",
+          "reason": "UAT test account reset"
+        }
+      }
+    },
+    "notifications": {
+      "seo": {
+        "title": "Notifications | Aifar",
+        "description": "View Aifar account notifications."
+      },
+      "eyebrow": "Notifications",
+      "title": "Notifications.",
+      "lead": "Read system, task, and support notifications linked to your account.",
+      "unread": "Unread",
+      "read": "Read",
+      "emptyTitle": "No notifications yet.",
+      "emptyLead": "New task, support, and account messages will appear here.",
+      "actions": {
+        "markRead": "Mark read",
+        "markAllRead": "Mark all read",
+        "saving": "Saving...",
+        "read": "Read",
+        "allRead": "All notifications marked as read.",
+        "failed": "Unable to update notification."
+      }
+    },
+    "adminCollaboration": {
+      "seo": {
+        "title": "Collaboration spaces | Aifar",
+        "description": "Manage administrator collaboration spaces and recurring tasks."
+      },
+      "eyebrow": "Collaboration",
+      "deniedTitle": "Administrator permission required.",
+      "deniedLead": "Your account does not have permission to manage collaboration spaces.",
+      "title": "Collaboration spaces.",
+      "lead": "Create shared workspaces, assign administrator tasks, track deadlines, and keep recurring work moving.",
+      "breadcrumb": "Collaboration",
+      "spacesTitle": "Spaces",
+      "mySubtasksTitle": "My active subtasks",
+      "leader": "Leader",
+      "tasks": "Tasks",
+      "openSubtasks": "Open subtasks",
+      "dueAt": "Due",
+      "noDescription": "No description provided.",
+      "notProvided": "Not provided",
+      "emptySpacesTitle": "No collaboration spaces yet.",
+      "emptySpacesLead": "Create a space to coordinate work across administrators.",
+      "emptySubtasksTitle": "No active subtasks.",
+      "emptySubtasksLead": "Assigned subtasks that still need progress will appear here.",
+      "statuses": {
+        "active": "Active",
+        "closed": "Closed"
+      },
+      "subtaskStatuses": {
+        "not_started": "Not started",
+        "in_progress": "In progress",
+        "blocked": "Blocked",
+        "completed": "Completed"
+      },
+      "createSpace": {
+        "title": "Create collaboration space",
+        "lead": "The creator becomes the space leader and can add administrator members.",
+        "form": {
+          "name": "Space name",
+          "description": "Description",
+          "create": "Create space",
+          "saving": "Creating...",
+          "failed": "Unable to create space."
+        }
+      }
+    },
+    "adminCollaborationSpace": {
+      "seo": {
+        "title": "Collaboration space | Aifar",
+        "description": "Manage collaboration members, permissions, tasks, and subtasks."
+      },
+      "eyebrow": "Collaboration space",
+      "deniedTitle": "Administrator permission required.",
+      "deniedLead": "Your account does not have permission to manage this collaboration space.",
+      "noDescription": "No description provided.",
+      "membersTitle": "Members and permissions",
+      "member": "Member",
+      "createTaskTitle": "Create main task",
+      "dueAt": "Due",
+      "notProvided": "Not provided",
+      "progress": "Progress",
+      "repeat": "Repeat",
+      "repeatLimit": "Repeat count",
+      "untilClosed": "Until manually closed",
+      "assignee": "Assignee",
+      "noSubtasks": "No subtasks yet.",
+      "emptyTasksTitle": "No tasks yet.",
+      "emptyTasksLead": "Create a main task, then break it into assigned subtasks.",
+      "boolean": {
+        "yes": "Yes",
+        "no": "No"
+      },
+      "permissions": {
+        "cms": "CMS",
+        "downloads": "Downloads",
+        "docs": "Docs",
+        "support": "Support",
+        "contact": "Contact",
+        "collaboration": "Collaboration"
+      },
+      "taskTypes": {
+        "one_time": "One-time",
+        "recurring": "Recurring"
+      },
+      "frequencies": {
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly"
+      },
+      "statuses": {
+        "not_started": "Not started",
+        "in_progress": "In progress",
+        "blocked": "Blocked",
+        "completed": "Completed"
+      },
+      "memberForm": {
+        "member": "Add administrator",
+        "add": "Add member",
+        "saving": "Adding...",
+        "failed": "Unable to add member."
+      },
+      "taskForm": {
+        "title": "Task title",
+        "description": "Description",
+        "dueAt": "Due date",
+        "taskType": "Task type",
+        "repeatFrequency": "Repeat frequency",
+        "repeatLimit": "Repeat count",
+        "create": "Create task",
+        "saving": "Creating...",
+        "failed": "Unable to create task.",
+        "types": {
+          "one_time": "One-time task",
+          "recurring": "Recurring task"
+        },
+        "frequencies": {
+          "daily": "Daily",
+          "weekly": "Weekly",
+          "monthly": "Monthly"
+        }
+      },
+      "subtaskForm": {
+        "title": "Subtask title",
+        "description": "Description",
+        "assignee": "Assignee",
+        "dueAt": "Due date",
+        "create": "Add subtask",
+        "saving": "Adding...",
+        "failed": "Unable to add subtask."
+      },
+      "subtaskStatusForm": {
+        "save": "Save",
+        "saving": "Saving...",
+        "saved": "Saved.",
+        "failed": "Unable to update subtask.",
+        "statuses": {
+          "not_started": "Not started",
+          "in_progress": "In progress",
+          "blocked": "Blocked",
+          "completed": "Completed"
+        }
+      },
+      "recurringActions": {
+        "closeRecurring": "Close recurring task",
+        "saving": "Closing...",
+        "closed": "Recurring task closed.",
+        "failed": "Unable to close recurring task."
       }
     }
   }

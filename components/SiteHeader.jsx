@@ -1,5 +1,6 @@
 import { getCurrentUser } from "@/lib/auth";
 import { getProfile, isProfileActive } from "@/lib/profiles";
+import { countUnreadNotifications } from "@/lib/notifications";
 import { localizedPath } from "@/i18n/routing";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { MobileMenuButton } from "@/components/MobileMenu";
@@ -17,6 +18,7 @@ const navLinks = [
 export async function SiteHeader({ locale, messages }) {
   const user = await getCurrentUser();
   const profile = user?.id ? await getProfile(user.id) : null;
+  const unreadNotifications = user?.id && isProfileActive(profile) ? await countUnreadNotifications(user.id) : 0;
   const nav = messages.layout.nav;
 
   return (
@@ -41,6 +43,9 @@ export async function SiteHeader({ locale, messages }) {
             {user && isProfileActive(profile) ? (
               <>
                 <a className="nav-account-link" href={localizedPath(locale, "/account/")}>{nav.account}</a>
+                <a className="nav-account-link" href={localizedPath(locale, "/account/notifications/")}>
+                  {nav.notifications}{unreadNotifications ? ` (${unreadNotifications})` : ""}
+                </a>
                 <SignOutButton labels={messages.layout.auth} redirectTo={localizedPath(locale, "/")} />
               </>
             ) : (

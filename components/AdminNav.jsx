@@ -7,7 +7,8 @@ const ADMIN_ITEMS = [
   ["users", "/admin/users/"],
   ["docs", "/admin/docs/"],
   ["support", "/admin/support/"],
-  ["contact", "/admin/contact/"]
+  ["contact", "/admin/contact/"],
+  ["collaboration", "/admin/collaboration/"]
 ];
 
 const FALLBACK_LABELS = {
@@ -17,7 +18,8 @@ const FALLBACK_LABELS = {
   users: "Users",
   docs: "Docs",
   support: "Support",
-  contact: "Contact"
+  contact: "Contact",
+  collaboration: "Collaboration"
 };
 
 export function AdminNav({ locale, labels = {}, current = "home" }) {
