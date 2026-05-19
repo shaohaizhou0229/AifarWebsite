@@ -5,6 +5,7 @@ import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { clientReleaseFileExists, getAdminDownloadPlatform, sanitizePlatform, updateClientRelease } from "@/lib/downloads";
 import { EMAIL_EVENTS, enqueueManyAndTrySend, getAdminNotificationEmails, getSiteUrl } from "@/lib/email";
 import { buildDownloadPublishedEmail } from "@/lib/email/templates";
+import { createNotificationsForPermission, NOTIFICATION_EVENTS } from "@/lib/notifications";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -92,6 +93,18 @@ export async function PATCH(request, { params }) {
     const emailQueued = isPublished && !before?.release?.isPublished
       ? await queueDownloadPublishedEmails(platformKey, release)
       : false;
+    if (isPublished && !before?.release?.isPublished) {
+      await createNotificationsForPermission(ADMIN_PERMISSIONS.downloads, {
+        eventType: NOTIFICATION_EVENTS.downloadPublished,
+        title: "客户端版本已发布",
+        body: `${platformKey} 客户端 ${release.version || ""} 已发布。`,
+        relatedType: "client_release",
+        relatedId: release.id || null,
+        metadata: { platform: platformKey, version: release.version },
+        url: `/zh-CN/admin/downloads/${platformKey}/`,
+        sendEmail: false
+      });
+    }
 
     return NextResponse.json({ release, emailQueued });
   } catch (error) {

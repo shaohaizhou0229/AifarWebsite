@@ -3,6 +3,7 @@ import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getAdminTicket, TICKET_CATEGORIES, TICKET_PRIORITIES, TICKET_STATUSES, updateTicketFields } from "@/lib/tickets";
+import { createNotification, NOTIFICATION_EVENTS } from "@/lib/notifications";
 
 export const runtime = "nodejs";
 
@@ -64,9 +65,27 @@ export async function PATCH(request, { params }) {
       input.assigneeUserId = typeof payload.assigneeUserId === "string" ? payload.assigneeUserId : "";
     }
 
+    const before = await getAdminTicket(id);
     const ticket = await updateTicketFields(id, input, user);
     if (!ticket) {
       return NextResponse.json({ error: "Ticket not found." }, { status: 404 });
+    }
+
+    const assigneeChanged = Object.prototype.hasOwnProperty.call(input, "assigneeUserId")
+      && ticket.assigneeUserId
+      && ticket.assigneeUserId !== before?.ticket?.assigneeUserId;
+    if (assigneeChanged) {
+      await createNotification({
+        recipientUserId: ticket.assigneeUserId,
+        eventType: NOTIFICATION_EVENTS.ticketAssigned,
+        title: "你被分配了支持工单",
+        body: `支持工单「${ticket.subject || ticket.name || ticket.workEmail}」已分配给你。`,
+        relatedType: "contact_request",
+        relatedId: ticket.id,
+        metadata: { assignedByUserId: user.id },
+        url: `/zh-CN/admin/tickets/${ticket.id}/`,
+        sendEmail: false
+      });
     }
 
     return NextResponse.json({ ticket });

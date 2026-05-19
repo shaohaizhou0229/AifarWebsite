@@ -51,9 +51,12 @@ export default async function AccountNotificationsPage({ params }) {
                   <p>{notification.body}</p>
                   <p className="muted-line">{formatDate(notification.createdAt, locale)}</p>
                 </div>
-                {notification.readAt ? <span className="pill">{page.read}</span> : (
-                  <NotificationActions notificationId={notification.id} labels={page.actions} />
-                )}
+                <NotificationActions
+                  notificationId={notification.id}
+                  labels={page.actions}
+                  url={notification.url}
+                  isAlreadyRead={Boolean(notification.readAt)}
+                />
               </article>
             )) : (
               <article className="card admin-empty-state">

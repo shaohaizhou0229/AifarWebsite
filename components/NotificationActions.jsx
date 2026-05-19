@@ -1,8 +1,10 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export function NotificationActions({ notificationId, labels }) {
+export function NotificationActions({ notificationId, labels, url = "", isAlreadyRead = false }) {
+  const router = useRouter();
   const [isRead, setIsRead] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -19,7 +21,29 @@ export function NotificationActions({ notificationId, labels }) {
     }
   }
 
-  if (isRead) return <span className="pill">{labels.read}</span>;
+  async function viewDetail() {
+    if (!url) return;
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(`/api/notifications/${notificationId}/`, { method: "PATCH" });
+      if (!response.ok) throw new Error(labels.failed);
+      setIsRead(true);
+      router.push(url);
+    } catch {
+      setIsRead(false);
+      setIsSubmitting(false);
+    }
+  }
+
+  if (url) {
+    return (
+      <button className="button secondary compact" type="button" disabled={isSubmitting} onClick={viewDetail}>
+        {isSubmitting ? labels.opening : labels.viewDetail}
+      </button>
+    );
+  }
+
+  if (isRead || isAlreadyRead) return null;
 
   return (
     <button className="button secondary compact" type="button" disabled={isSubmitting} onClick={markRead}>

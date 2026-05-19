@@ -3,6 +3,7 @@ import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { cancelUserInvitation, getProfile, getUserInvitation } from "@/lib/profiles";
 import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
+import { createNotificationsForPermission, NOTIFICATION_EVENTS } from "@/lib/notifications";
 
 export const runtime = "nodejs";
 
@@ -48,6 +49,16 @@ export async function DELETE(_request, { params }) {
       eventType: USER_FOOTPRINT_EVENTS.adminInvitationCanceled,
       summary: "Administrator canceled a user invitation.",
       metadata: { email: invitation.email }
+    });
+    await createNotificationsForPermission(ADMIN_PERMISSIONS.users, {
+      eventType: NOTIFICATION_EVENTS.userInvitationCanceled,
+      title: "用户邀请已取消",
+      body: `${invitation.email} 的账号邀请已取消。`,
+      relatedType: "user_invitation",
+      relatedId: invitation.id,
+      metadata: { email: invitation.email },
+      url: "/zh-CN/admin/users/",
+      sendEmail: false
     });
 
     return NextResponse.json({ invitation });

@@ -1185,7 +1185,9 @@
       "actions": {
         "markRead": "标记已读",
         "markAllRead": "全部标记已读",
+        "viewDetail": "查看详情",
         "saving": "正在保存...",
+        "opening": "正在打开...",
         "read": "已读",
         "allRead": "所有通知已标记为已读。",
         "failed": "无法更新通知。"

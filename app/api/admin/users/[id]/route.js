@@ -4,6 +4,7 @@ import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getAdminUser, getProfile, softDeleteAdminUser, updateAdminUserProfile } from "@/lib/profiles";
 import { listAdminTicketsForUser } from "@/lib/tickets";
 import { listUserFootprints, recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
+import { createNotificationsForPermission, NOTIFICATION_EVENTS } from "@/lib/notifications";
 
 export const runtime = "nodejs";
 
@@ -71,6 +72,16 @@ export async function PATCH(request, { params }) {
       relatedId: id,
       metadata: { role: user.role, accountStatus: user.accountStatus, adminPermissions: user.adminPermissions }
     });
+    await createNotificationsForPermission(ADMIN_PERMISSIONS.users, {
+      eventType: NOTIFICATION_EVENTS.userUpdated,
+      title: "用户资料已更新",
+      body: `${user.displayName || user.email} 的账号资料或权限已更新。`,
+      relatedType: "profile",
+      relatedId: id,
+      metadata: { role: user.role, accountStatus: user.accountStatus },
+      url: `/zh-CN/admin/users/${id}/`,
+      sendEmail: false
+    });
 
     return NextResponse.json({ user });
   } catch (error) {
@@ -97,6 +108,16 @@ export async function DELETE(request, { params }) {
       relatedType: "profile",
       relatedId: id,
       metadata: { reason: clean(payload.reason) || null }
+    });
+    await createNotificationsForPermission(ADMIN_PERMISSIONS.users, {
+      eventType: NOTIFICATION_EVENTS.userDeleted,
+      title: "用户账号已注销",
+      body: `${user.displayName || user.email} 的账号已被管理员注销。`,
+      relatedType: "profile",
+      relatedId: id,
+      metadata: { reason: clean(payload.reason) || null },
+      url: `/zh-CN/admin/users/${id}/`,
+      sendEmail: false
     });
 
     return NextResponse.json({ user });

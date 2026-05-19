@@ -32,7 +32,7 @@ function validateForm(form, labels) {
   return "";
 }
 
-export function ContactForm({ initialData = {}, isLoggedIn = false, labels }) {
+export function ContactForm({ initialData = {}, isLoggedIn = false, labels, locale = "zh-CN" }) {
   const [form, setForm] = useState({
     ...initialForm,
     ...initialData
@@ -68,7 +68,8 @@ export function ContactForm({ initialData = {}, isLoggedIn = false, labels }) {
           organization: form.organization,
           subject: form.subject,
           requestType: form.requestType,
-          message: form.message
+          message: form.message,
+          locale
         })
       });
 

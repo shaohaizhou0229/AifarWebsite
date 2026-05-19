@@ -3,6 +3,7 @@ import { AdminRequiredError, AuthConfigurationError, AuthRequiredError, deleteAu
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { assertCanResetTestAccount, getAdminUser, getProfile, resetTestAccount } from "@/lib/profiles";
 import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
+import { createNotificationsForPermission, NOTIFICATION_EVENTS } from "@/lib/notifications";
 
 export const runtime = "nodejs";
 
@@ -56,6 +57,21 @@ export async function POST(request, { params }) {
         canceledInvitationCount: resetResult.canceledInvitationCount,
         reason
       }
+    });
+    await createNotificationsForPermission(ADMIN_PERMISSIONS.users, {
+      eventType: NOTIFICATION_EVENTS.userTestAccountReset,
+      title: "测试账号已重置",
+      body: `${resetResult.originalEmail} 已归档并释放，可重新邀请。`,
+      relatedType: "profile",
+      relatedId: id,
+      metadata: {
+        originalEmail: resetResult.originalEmail,
+        archivedEmail: resetResult.archivedEmail,
+        authDeleted: authResult.deleted,
+        canceledInvitationCount: resetResult.canceledInvitationCount
+      },
+      url: `/zh-CN/admin/users/${id}/`,
+      sendEmail: false
     });
 
     return NextResponse.json({

@@ -4,6 +4,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
 import { EMAIL_EVENTS, enqueueManyAndTrySend, getAdminNotificationEmails, getSiteUrl } from "@/lib/email";
 import { buildContactRequestEmail } from "@/lib/email/templates";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
+import { createNotificationsForPermission, NOTIFICATION_EVENTS } from "@/lib/notifications";
 
 export const runtime = "nodejs";
 
@@ -27,6 +29,7 @@ function validatePayload(payload) {
   const subject = normalizeText(payload?.subject);
   const requestType = normalizeText(payload?.requestType);
   const message = normalizeText(payload?.message);
+  const locale = normalizeText(payload?.locale) || "zh-CN";
 
   if (!name || !workEmail || !requestType || !message) {
     return { error: "Please fill in all required fields." };
@@ -47,7 +50,8 @@ function validatePayload(payload) {
       organization: organization || null,
       subject: subject || null,
       requestType,
-      message
+      message,
+      locale
     }
   };
 }
@@ -99,7 +103,7 @@ export async function POST(request) {
   }
 
   const user = await getCurrentUser();
-  const { name, organization, subject, requestType, message } = validation.data;
+  const { name, organization, subject, requestType, message, locale } = validation.data;
   const workEmail = user?.email ? user.email.toLowerCase() : validation.data.workEmail;
 
   try {
@@ -135,6 +139,16 @@ export async function POST(request) {
     });
 
     const emailQueued = await queueContactRequestEmails(ticket);
+    await createNotificationsForPermission(ADMIN_PERMISSIONS.contact, {
+      eventType: NOTIFICATION_EVENTS.contactRequestSubmitted,
+      title: "新的联系请求",
+      body: `${name} 提交了联系请求：${subject || requestType}`,
+      relatedType: "contact_request",
+      relatedId: ticket.id,
+      metadata: { requestType },
+      url: `/${locale}/admin/contact/`,
+      sendEmail: false
+    });
 
     return NextResponse.json({ ok: true, emailQueued }, { status: 201 });
   } catch (error) {

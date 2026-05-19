@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { addAdminReply, getAdminTicket, normalizeText } from "@/lib/tickets";
+import { addAdminReply, getAdminTicket, getTicketOwnerProfile, normalizeText } from "@/lib/tickets";
 import { EMAIL_EVENTS, enqueueAndTrySend, getSiteUrl } from "@/lib/email";
 import { buildTicketReplyEmail } from "@/lib/email/templates";
+import { createNotification, NOTIFICATION_EVENTS } from "@/lib/notifications";
 
 export const runtime = "nodejs";
 
@@ -61,6 +62,20 @@ export async function POST(request, { params }) {
 
     await addAdminReply(id, user, message);
     const emailQueued = await queueTicketReplyEmail(id, message, user);
+    const owner = await getTicketOwnerProfile(id);
+    if (owner?.id) {
+      await createNotification({
+        recipientUserId: owner.id,
+        eventType: NOTIFICATION_EVENTS.ticketReplied,
+        title: "工单有新的回复",
+        body: "Aifar 团队已回复你的支持工单。",
+        relatedType: "contact_request",
+        relatedId: id,
+        metadata: { adminUserId: user.id },
+        url: `/zh-CN/account/tickets/${id}/`,
+        sendEmail: false
+      });
+    }
     return NextResponse.json({ ok: true, emailQueued }, { status: 201 });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: "Unable to add reply." }, { status: 500 });

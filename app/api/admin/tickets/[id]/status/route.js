@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { TICKET_STATUSES, updateTicketFields } from "@/lib/tickets";
+import { getTicketOwnerProfile, TICKET_STATUSES, updateTicketFields } from "@/lib/tickets";
 import { EMAIL_EVENTS, enqueueAndTrySend, getSiteUrl } from "@/lib/email";
 import { buildTicketStatusEmail } from "@/lib/email/templates";
+import { createNotification, NOTIFICATION_EVENTS } from "@/lib/notifications";
 
 export const runtime = "nodejs";
 
@@ -65,6 +66,22 @@ export async function PATCH(request, { params }) {
     }
 
     const emailQueued = await queueTicketStatusEmail(ticket, status);
+    if (NOTIFIED_STATUSES.has(status)) {
+      const owner = await getTicketOwnerProfile(ticket.id);
+      if (owner?.id) {
+        await createNotification({
+          recipientUserId: owner.id,
+          eventType: NOTIFICATION_EVENTS.ticketStatusUpdated,
+          title: "工单状态已更新",
+          body: `你的支持工单状态已更新为 ${status}。`,
+          relatedType: "contact_request",
+          relatedId: ticket.id,
+          metadata: { status },
+          url: `/zh-CN/account/tickets/${ticket.id}/`,
+          sendEmail: false
+        });
+      }
+    }
     return NextResponse.json({ ticket, emailQueued });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: "Unable to update ticket." }, { status: 500 });

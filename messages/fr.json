@@ -1185,7 +1185,9 @@
       "actions": {
         "markRead": "Mark read",
         "markAllRead": "Mark all read",
+        "viewDetail": "View details",
         "saving": "Saving...",
+        "opening": "Opening...",
         "read": "Read",
         "allRead": "All notifications marked as read.",
         "failed": "Unable to update notification."

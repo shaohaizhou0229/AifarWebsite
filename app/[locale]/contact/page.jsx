@@ -33,7 +33,7 @@ export default async function ContactPage({ params }) {
       <PageHero eyebrow={page.eyebrow} title={page.title} lead={page.lead} />
       <section className="section alt">
         <div className="section-inner">
-          <ContactForm initialData={initialData} isLoggedIn={Boolean(user)} labels={messages.forms} />
+          <ContactForm initialData={initialData} isLoggedIn={Boolean(user)} labels={messages.forms} locale={locale} />
         </div>
       </section>
     </main>

@@ -5,6 +5,7 @@ import { createUserInvitation, getProfile, listAdminUsers } from "@/lib/profiles
 import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
 import { EMAIL_EVENTS, enqueueAndTrySend, getSiteUrl } from "@/lib/email";
 import { buildInvitationEmail } from "@/lib/email/templates";
+import { createNotificationsForPermission, NOTIFICATION_EVENTS } from "@/lib/notifications";
 
 export const runtime = "nodejs";
 
@@ -88,6 +89,16 @@ export async function POST(request) {
       summary: "Administrator created a user invitation.",
       relatedType: "profile",
       metadata: { email: invitation.email, role: invitation.role }
+    });
+    await createNotificationsForPermission(ADMIN_PERMISSIONS.users, {
+      eventType: NOTIFICATION_EVENTS.userInvitationCreated,
+      title: "用户邀请已创建",
+      body: `${invitation.email} 的账号邀请已创建。`,
+      relatedType: "user_invitation",
+      relatedId: invitation.id,
+      metadata: { email: invitation.email, role: invitation.role },
+      url: "/zh-CN/admin/users/",
+      sendEmail: false
     });
 
     return NextResponse.json({ invitation, emailQueued }, { status: 201 });
