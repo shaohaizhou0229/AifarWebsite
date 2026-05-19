@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export function AuthForm({ mode, labels, accountPath, loginPath, registerPath, initialError = "", initialEmail = "" }) {
+export function AuthForm({ mode, labels, accountPath, loginPath, registerPath, initialError = "", initialEmail = "", authRedirectPath = "" }) {
   const isRegister = mode === "register";
   const googleUrl = `/api/auth/google/?next=${encodeURIComponent(accountPath)}`;
   const [form, setForm] = useState({
@@ -28,7 +28,7 @@ export function AuthForm({ mode, labels, accountPath, loginPath, registerPath, i
       const response = await fetch(isRegister ? "/api/auth/register/" : "/api/auth/login/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
+        body: JSON.stringify({ ...form, redirectPath: authRedirectPath || accountPath })
       });
       const result = await response.json().catch(() => ({}));
 

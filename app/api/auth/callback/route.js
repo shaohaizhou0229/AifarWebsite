@@ -23,7 +23,7 @@ export async function GET(request) {
 
   if (!code) {
     const responseUrl = new URL(loginPathFromNext(nextPath), request.url);
-    responseUrl.searchParams.set("error", "google_missing_code");
+    responseUrl.searchParams.set("error", "auth_missing_code");
     return NextResponse.redirect(responseUrl);
   }
 
@@ -44,7 +44,7 @@ export async function GET(request) {
         userId: user.id,
         actorUserId: user.id,
         eventType: USER_FOOTPRINT_EVENTS.oauthLoggedIn,
-        summary: "User signed in with Google OAuth."
+        summary: "User completed an authentication callback."
       });
     }
 
@@ -58,7 +58,7 @@ export async function GET(request) {
     return response;
   } catch (error) {
     const responseUrl = new URL(loginPathFromNext(nextPath), request.url);
-    responseUrl.searchParams.set("error", "google_failed");
+    responseUrl.searchParams.set("error", "auth_failed");
     return NextResponse.redirect(responseUrl);
   }
 }

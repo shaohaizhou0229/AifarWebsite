@@ -48,6 +48,7 @@
       "errors": {
         "google_failed": "Google sign in failed. Please try again.",
         "google_missing_code": "Google sign in callback is missing a code.",
+        "auth_missing_code": "Authentication callback is missing a code.",
         "auth_failed": "Sign in failed. Please check your account information and try again.",
         "auth_service_unavailable": "The account service is temporarily unavailable. Please try again later or contact the administrator.",
         "account_inactive": "This account is not active. Please contact the administrator."

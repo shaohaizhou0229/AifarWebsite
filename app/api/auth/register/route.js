@@ -9,12 +9,37 @@ function normalizeText(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function getRequestOrigin(request) {
+  const configuredOrigin = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL;
+  if (configuredOrigin) return configuredOrigin.replace(/\/$/, "");
+
+  const fallbackUrl = new URL(request.url);
+  const forwardedProto = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const host = forwardedHost || request.headers.get("host");
+  const proto = forwardedProto || fallbackUrl.protocol.replace(":", "") || "https";
+  return host ? `${proto}://${host}` : fallbackUrl.origin;
+}
+
+function sanitizeRedirectPath(value) {
+  if (!value || typeof value !== "string") return "/zh-CN/account/";
+  if (!value.startsWith("/") || value.startsWith("//")) return "/zh-CN/account/";
+  return value;
+}
+
+function buildEmailRedirectTo(request, redirectPath) {
+  const callbackUrl = new URL("/api/auth/callback/", getRequestOrigin(request));
+  callbackUrl.searchParams.set("next", sanitizeRedirectPath(redirectPath));
+  return callbackUrl.toString();
+}
+
 export async function POST(request) {
   const payload = await request.json().catch(() => ({}));
   const email = normalizeText(payload.email).toLowerCase();
   const password = normalizeText(payload.password);
   const displayName = normalizeText(payload.displayName);
   const organization = normalizeText(payload.organization);
+  const emailRedirectTo = buildEmailRedirectTo(request, payload.redirectPath);
 
   if (!email || !password) {
     return NextResponse.json({ error: "Email and password are required." }, { status: 400 });
@@ -28,7 +53,7 @@ export async function POST(request) {
     const session = await signUpWithPassword(email, password, {
       display_name: displayName || null,
       organization: organization || null
-    });
+    }, emailRedirectTo);
 
     const user = session.user;
     let profile = null;

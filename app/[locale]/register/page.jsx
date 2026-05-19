@@ -69,6 +69,7 @@ export default async function RegisterPage({ params, searchParams }) {
             registerPath={localizedPath(locale, "/register/")}
             initialError={initialError}
             initialEmail={invitationEmail}
+            authRedirectPath={localizedPath(locale, "/account/")}
           />
         </div>
       </section>

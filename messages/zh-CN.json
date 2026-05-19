@@ -48,6 +48,7 @@
       "errors": {
         "google_failed": "Google 登录失败，请重试。",
         "google_missing_code": "Google 登录回调缺少授权码。",
+        "auth_missing_code": "登录确认回调缺少授权码。",
         "auth_failed": "登录失败，请检查账号信息后重试。",
         "auth_service_unavailable": "账号服务暂时不可用，请稍后再试或联系管理员。",
         "account_inactive": "该账号未处于正常状态，请联系管理员。"
