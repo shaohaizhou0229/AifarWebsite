@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ensureProfile, isProfileActive } from "@/lib/profiles";
-import { AuthConfigurationError, setAuthCookies, signUpWithPassword } from "@/lib/auth";
+import { AuthConfigurationError, clearAuthCookies, setAuthCookies, signUpWithPassword } from "@/lib/auth";
 import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
 
 export const runtime = "nodejs";
@@ -52,6 +52,7 @@ export async function POST(request) {
       requiresConfirmation: !session.access_token
     });
 
+    clearAuthCookies(response);
     setAuthCookies(response, session);
     return response;
   } catch (error) {
