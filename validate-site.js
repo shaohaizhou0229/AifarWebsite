@@ -85,6 +85,16 @@ function collectMessageKeys(value, prefix = "") {
   );
 }
 
+function collectMessageValues(value, prefix = "") {
+  if (Array.isArray(value) || !value || typeof value !== "object") {
+    return typeof value === "string" ? [[prefix, value]] : [];
+  }
+
+  return Object.entries(value).flatMap(([key, child]) =>
+    collectMessageValues(child, prefix ? `${prefix}.${key}` : key)
+  );
+}
+
 function compareMessageKeys() {
   const baseKeys = collectMessageKeys(JSON.parse(readFile("messages/en.json"))).sort();
 
@@ -98,6 +108,22 @@ function compareMessageKeys() {
       if (missing.length) console.error(`  missing: ${missing.join(", ")}`);
       if (extra.length) console.error(`  extra: ${extra.join(", ")}`);
       failures += 1;
+    }
+  }
+}
+
+function validateCoreMessageQuality() {
+  for (const locale of ["en", "zh-CN"]) {
+    const values = collectMessageValues(JSON.parse(readFile(`messages/${locale}.json`)));
+    for (const [key, value] of values) {
+      if (!value.trim()) {
+        console.error(`messages/${locale}.json: empty message at ${key}`);
+        failures += 1;
+      }
+      if (value.includes("??")) {
+        console.error(`messages/${locale}.json: unresolved placeholder text at ${key}`);
+        failures += 1;
+      }
     }
   }
 }
@@ -179,6 +205,7 @@ for (const locale of locales) {
 }
 
 compareMessageKeys();
+validateCoreMessageQuality();
 
 for (const file of [
   ...pages,

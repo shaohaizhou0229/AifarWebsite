@@ -13,8 +13,8 @@
       "admin": "管理后台",
       "account": "账户",
       "signIn": "登录",
-      "notifications": "??",
-      "collaboration": "????"
+      "notifications": "通知",
+      "collaboration": "协作"
     },
     "footer": {
       "full": "© 2026 Aifar。保留所有权利。",
@@ -82,9 +82,9 @@
       "saving": "正在保存...",
       "success": "资料已更新。",
       "failure": "资料更新失败。",
-      "notificationPreferences": "????",
-      "emailNotifications": "??????",
-      "inAppNotifications": "??????"
+      "notificationPreferences": "通知偏好",
+      "emailNotifications": "邮件通知",
+      "inAppNotifications": "站内通知"
     },
     "admin": {
       "statusActions": "工单状态操作",
@@ -656,9 +656,9 @@
         "contactTitle": "联系 Aifar",
         "contactText": "提交新请求。",
         "contactAction": "新建请求",
-        "notificationsTitle": "????",
-        "notificationsText": "?? {count} ??????",
-        "notificationsAction": "????"
+        "notificationsTitle": "通知",
+        "notificationsText": "{count} 条未读通知。",
+        "notificationsAction": "查看通知"
       }
     },
     "profile": {
@@ -729,7 +729,7 @@
         "support": "支持",
         "contact": "联系我们",
         "users": "用户",
-        "collaboration": "????"
+        "collaboration": "协作空间"
       },
       "modules": [
         {
@@ -1034,7 +1034,7 @@
         "docs": "在线文档",
         "support": "支持工单",
         "contact": "联系请求",
-        "collaboration": "????"
+        "collaboration": "协作空间"
       },
       "invite": {
         "title": "邀请用户",
@@ -1059,7 +1059,7 @@
             "docs": "在线文档",
             "support": "支持工单",
             "contact": "联系请求",
-            "collaboration": "????"
+            "collaboration": "协作空间"
           },
           "create": "创建邀请",
           "creating": "正在创建...",
@@ -1150,7 +1150,7 @@
           "docs": "在线文档",
           "support": "支持工单",
           "contact": "联系请求",
-          "collaboration": "????"
+          "collaboration": "协作空间"
         },
         "delete": "注销账号",
         "deleting": "正在注销...",
@@ -1172,171 +1172,171 @@
     },
     "notifications": {
       "seo": {
-        "title": "???? | Aifar",
-        "description": "?? Aifar ???????"
+        "title": "通知 | Aifar",
+        "description": "查看 Aifar 账户通知。"
       },
-      "eyebrow": "????",
-      "title": "?????",
-      "lead": "?????????????????????",
-      "unread": "??",
-      "read": "??",
-      "emptyTitle": "?????",
-      "emptyLead": "???????????????????",
+      "eyebrow": "通知",
+      "title": "通知。",
+      "lead": "查看与你账户相关的系统、任务和支持通知。",
+      "unread": "未读",
+      "read": "已读",
+      "emptyTitle": "暂无通知。",
+      "emptyLead": "新的任务、支持和账户消息会显示在这里。",
       "actions": {
-        "markRead": "????",
-        "markAllRead": "??????",
-        "saving": "????...",
-        "read": "??",
-        "allRead": "???????????",
-        "failed": "?????????"
+        "markRead": "标记已读",
+        "markAllRead": "全部标记已读",
+        "saving": "正在保存...",
+        "read": "已读",
+        "allRead": "所有通知已标记为已读。",
+        "failed": "无法更新通知。"
       }
     },
     "adminCollaboration": {
       "seo": {
-        "title": "???? | Aifar",
-        "description": "???????????????"
+        "title": "协作空间 | Aifar",
+        "description": "管理管理员协作空间和周期任务。"
       },
-      "eyebrow": "????",
-      "deniedTitle": "????????",
-      "deniedLead": "?????????????",
-      "title": "?????",
-      "lead": "????????????????????????????????",
-      "breadcrumb": "????",
-      "spacesTitle": "????",
-      "mySubtasksTitle": "???????",
-      "leader": "???",
-      "tasks": "??",
-      "openSubtasks": "??????",
-      "dueAt": "????",
-      "noDescription": "??????",
-      "notProvided": "???",
-      "emptySpacesTitle": "???????",
-      "emptySpacesLead": "????????????????",
-      "emptySubtasksTitle": "????????",
-      "emptySubtasksLead": "??????????????????",
+      "eyebrow": "协作空间",
+      "deniedTitle": "需要管理员权限。",
+      "deniedLead": "你的账号没有管理协作空间的权限。",
+      "title": "协作空间。",
+      "lead": "创建共享工作区、分配管理员任务、跟踪截止时间，并推动周期性工作持续运转。",
+      "breadcrumb": "协作空间",
+      "spacesTitle": "空间",
+      "mySubtasksTitle": "我的待办子任务",
+      "leader": "负责人",
+      "tasks": "任务",
+      "openSubtasks": "未完成子任务",
+      "dueAt": "截止时间",
+      "noDescription": "未提供描述。",
+      "notProvided": "未提供",
+      "emptySpacesTitle": "暂无协作空间。",
+      "emptySpacesLead": "创建一个空间，用于协调管理员之间的工作。",
+      "emptySubtasksTitle": "暂无待办子任务。",
+      "emptySubtasksLead": "仍需推进的已分配子任务会显示在这里。",
       "statuses": {
-        "active": "???",
-        "closed": "???"
+        "active": "启用中",
+        "closed": "已关闭"
       },
       "subtaskStatuses": {
-        "not_started": "???",
-        "in_progress": "???",
-        "blocked": "??",
-        "completed": "???"
+        "not_started": "未开始",
+        "in_progress": "进行中",
+        "blocked": "受阻",
+        "completed": "已完成"
       },
       "createSpace": {
-        "title": "??????",
-        "lead": "????????? leader?????????????",
+        "title": "创建协作空间",
+        "lead": "创建人会成为空间负责人，并可添加管理员成员。",
         "form": {
-          "name": "????",
-          "description": "??",
-          "create": "????",
-          "saving": "????...",
-          "failed": "?????????"
+          "name": "空间名称",
+          "description": "描述",
+          "create": "创建空间",
+          "saving": "正在创建...",
+          "failed": "无法创建空间。"
         }
       }
     },
     "adminCollaborationSpace": {
       "seo": {
-        "title": "?????? | Aifar",
-        "description": "?????????????????"
+        "title": "协作空间 | Aifar",
+        "description": "管理协作成员、权限、任务和子任务。"
       },
-      "eyebrow": "????",
-      "deniedTitle": "????????",
-      "deniedLead": "??????????????",
-      "noDescription": "??????",
-      "membersTitle": "?????",
-      "member": "??",
-      "createTaskTitle": "?????",
-      "dueAt": "????",
-      "notProvided": "???",
-      "progress": "??",
-      "repeat": "??",
-      "repeatLimit": "????",
-      "untilClosed": "??????",
-      "assignee": "???",
-      "noSubtasks": "??????",
-      "emptyTasksTitle": "?????",
-      "emptyTasksLead": "???????????????????",
+      "eyebrow": "协作空间",
+      "deniedTitle": "需要管理员权限。",
+      "deniedLead": "你的账号没有管理该协作空间的权限。",
+      "noDescription": "未提供描述。",
+      "membersTitle": "成员和权限",
+      "member": "成员",
+      "createTaskTitle": "创建主任务",
+      "dueAt": "截止时间",
+      "notProvided": "未提供",
+      "progress": "进度",
+      "repeat": "重复",
+      "repeatLimit": "重复次数",
+      "untilClosed": "直到手动关闭",
+      "assignee": "负责人",
+      "noSubtasks": "暂无子任务。",
+      "emptyTasksTitle": "暂无任务。",
+      "emptyTasksLead": "创建一个主任务，然后拆分为可分配的子任务。",
       "boolean": {
-        "yes": "?",
-        "no": "?"
+        "yes": "是",
+        "no": "否"
       },
       "permissions": {
         "cms": "CMS",
-        "downloads": "??",
-        "docs": "??",
-        "support": "????",
-        "contact": "????",
-        "collaboration": "??"
+        "downloads": "下载",
+        "docs": "文档",
+        "support": "支持工单",
+        "contact": "联系请求",
+        "collaboration": "协作"
       },
       "taskTypes": {
-        "one_time": "???",
-        "recurring": "??"
+        "one_time": "一次性",
+        "recurring": "周期性"
       },
       "frequencies": {
-        "daily": "??",
-        "weekly": "??",
-        "monthly": "??"
+        "daily": "每天",
+        "weekly": "每周",
+        "monthly": "每月"
       },
       "statuses": {
-        "not_started": "???",
-        "in_progress": "???",
-        "blocked": "??",
-        "completed": "???"
+        "not_started": "未开始",
+        "in_progress": "进行中",
+        "blocked": "受阻",
+        "completed": "已完成"
       },
       "memberForm": {
-        "member": "?????",
-        "add": "????",
-        "saving": "????...",
-        "failed": "???????"
+        "member": "添加管理员",
+        "add": "添加成员",
+        "saving": "正在添加...",
+        "failed": "无法添加成员。"
       },
       "taskForm": {
-        "title": "????",
-        "description": "??",
-        "dueAt": "????",
-        "taskType": "????",
-        "repeatFrequency": "????",
-        "repeatLimit": "????",
-        "create": "????",
-        "saving": "????...",
-        "failed": "???????",
+        "title": "任务标题",
+        "description": "描述",
+        "dueAt": "截止日期",
+        "taskType": "任务类型",
+        "repeatFrequency": "重复频率",
+        "repeatLimit": "重复次数",
+        "create": "创建任务",
+        "saving": "正在创建...",
+        "failed": "无法创建任务。",
         "types": {
-          "one_time": "?????",
-          "recurring": "????"
+          "one_time": "一次性任务",
+          "recurring": "周期任务"
         },
         "frequencies": {
-          "daily": "??",
-          "weekly": "??",
-          "monthly": "??"
+          "daily": "每天",
+          "weekly": "每周",
+          "monthly": "每月"
         }
       },
       "subtaskForm": {
-        "title": "?????",
-        "description": "??",
-        "assignee": "???",
-        "dueAt": "????",
-        "create": "?????",
-        "saving": "????...",
-        "failed": "????????"
+        "title": "子任务标题",
+        "description": "描述",
+        "assignee": "负责人",
+        "dueAt": "截止日期",
+        "create": "添加子任务",
+        "saving": "正在添加...",
+        "failed": "无法添加子任务。"
       },
       "subtaskStatusForm": {
-        "save": "??",
-        "saving": "????...",
-        "saved": "????",
-        "failed": "????????",
+        "save": "保存",
+        "saving": "正在保存...",
+        "saved": "已保存。",
+        "failed": "无法更新子任务。",
         "statuses": {
-          "not_started": "???",
-          "in_progress": "???",
-          "blocked": "??",
-          "completed": "???"
+          "not_started": "未开始",
+          "in_progress": "进行中",
+          "blocked": "受阻",
+          "completed": "已完成"
         }
       },
       "recurringActions": {
-        "closeRecurring": "??????",
-        "saving": "????...",
-        "closed": "????????",
-        "failed": "?????????"
+        "closeRecurring": "关闭周期任务",
+        "saving": "正在关闭...",
+        "closed": "周期任务已关闭。",
+        "failed": "无法关闭周期任务。"
       }
     }
   }
