@@ -622,7 +622,15 @@
       },
       "eyebrow": "Présentation Aifar",
       "title": "Présentation Aifar",
-      "lead": "Informations structurées sur les capacités et services Aifar."
+      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "inviteMismatch": {
+        "title": "Changez de compte pour accepter cette invitation.",
+        "lead": "Cette invitation concerne une adresse e-mail différente du compte actuellement connecté dans ce navigateur.",
+        "signedInAs": "Connecté en tant que :",
+        "invitedEmail": "E-mail invité :",
+        "action": "Se déconnecter et continuer",
+        "accountAction": "Ouvrir le compte actuel"
+      }
     },
     "account": {
       "seo": {

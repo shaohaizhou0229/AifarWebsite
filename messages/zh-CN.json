@@ -622,7 +622,15 @@
       },
       "eyebrow": "账户",
       "title": "创建你的 Aifar 账户。",
-      "lead": "使用工作邮箱关联联系请求。"
+      "lead": "使用工作邮箱关联联系请求。",
+      "inviteMismatch": {
+        "title": "请切换账号后接受邀请。",
+        "lead": "这封邀请属于另一个邮箱，与当前浏览器已登录账号不一致。",
+        "signedInAs": "当前登录：",
+        "invitedEmail": "邀请邮箱：",
+        "action": "退出并继续注册",
+        "accountAction": "进入当前账户"
+      }
     },
     "account": {
       "seo": {

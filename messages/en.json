@@ -622,7 +622,15 @@
       },
       "eyebrow": "Account",
       "title": "Create your Aifar account.",
-      "lead": "Use your work email to connect future and historical contact requests."
+      "lead": "Use your work email to connect future and historical contact requests.",
+      "inviteMismatch": {
+        "title": "Switch accounts to accept this invitation.",
+        "lead": "This invitation is for a different email address than the account currently signed in on this browser.",
+        "signedInAs": "Signed in as:",
+        "invitedEmail": "Invitation email:",
+        "action": "Sign out and continue",
+        "accountAction": "Go to current account"
+      }
     },
     "account": {
       "seo": {

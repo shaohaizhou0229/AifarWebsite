@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 
-export function AuthForm({ mode, labels, accountPath, loginPath, registerPath, initialError = "" }) {
+export function AuthForm({ mode, labels, accountPath, loginPath, registerPath, initialError = "", initialEmail = "" }) {
   const isRegister = mode === "register";
   const googleUrl = `/api/auth/google/?next=${encodeURIComponent(accountPath)}`;
   const [form, setForm] = useState({
-    email: "",
+    email: initialEmail,
     password: "",
     displayName: "",
     organization: ""
