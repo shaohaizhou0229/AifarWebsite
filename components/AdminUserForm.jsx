@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 export function AdminUserForm({ user, labels }) {
+  const [currentEmail, setCurrentEmail] = useState(user?.email || "");
   const [form, setForm] = useState({
     displayName: user?.displayName || "",
     organization: user?.organization || "",
@@ -16,6 +17,9 @@ export function AdminUserForm({ user, labels }) {
   const [status, setStatus] = useState({ type: "idle", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+  const [resetConfirmEmail, setResetConfirmEmail] = useState("");
+  const canResetTestAccount = form.accountStatus === "deleted" || String(currentEmail).toLowerCase().includes("+aifar-test");
 
   function updateField(event) {
     const { name, value } = event.target;
@@ -83,11 +87,41 @@ export function AdminUserForm({ user, labels }) {
     }
   }
 
+  async function handleResetTestAccount() {
+    setIsResetting(true);
+    setStatus({ type: "idle", message: "" });
+
+    try {
+      const response = await fetch(`/api/admin/users/${user.id}/reset-test-account/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          confirmEmail: resetConfirmEmail,
+          reason: labels.resetTestAccount.reason
+        })
+      });
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(result.error || labels.resetTestAccount.failed);
+      }
+
+      setCurrentEmail(result.archivedEmail || currentEmail);
+      setResetConfirmEmail("");
+      setForm((current) => ({ ...current, accountStatus: "deleted" }));
+      setStatus({ type: "success", message: labels.resetTestAccount.success });
+    } catch (error) {
+      setStatus({ type: "error", message: error.message });
+    } finally {
+      setIsResetting(false);
+    }
+  }
+
   return (
     <form className="form-shell" onSubmit={handleSubmit}>
       <div className="field">
         <label>{labels.email}</label>
-        <input value={user.email || ""} disabled readOnly />
+        <input value={currentEmail} disabled readOnly />
       </div>
       <div className="field">
         <label htmlFor="displayName">{labels.name}</label>
@@ -142,12 +176,31 @@ export function AdminUserForm({ user, labels }) {
           );})}
         </fieldset>
       ) : null}
+      {canResetTestAccount ? (
+        <fieldset className="field danger-zone">
+          <legend>{labels.resetTestAccount.title}</legend>
+          <p className="muted-line">{labels.resetTestAccount.lead}</p>
+          <input
+            value={resetConfirmEmail}
+            onChange={(event) => setResetConfirmEmail(event.target.value)}
+            placeholder={labels.resetTestAccount.placeholder}
+          />
+          <button
+            className="button danger"
+            type="button"
+            disabled={isSubmitting || isDeleting || isResetting || resetConfirmEmail.toLowerCase() !== String(currentEmail).toLowerCase()}
+            onClick={handleResetTestAccount}
+          >
+            {isResetting ? labels.resetTestAccount.resetting : labels.resetTestAccount.action}
+          </button>
+        </fieldset>
+      ) : null}
       {status.message ? <p className={`form-message ${status.type}`} role="status">{status.message}</p> : null}
       <div className="actions">
-        <button className="button primary" type="submit" disabled={isSubmitting || isDeleting}>
+        <button className="button primary" type="submit" disabled={isSubmitting || isDeleting || isResetting}>
           {isSubmitting ? labels.saving : labels.save}
         </button>
-        <button className="button danger" type="button" disabled={isSubmitting || isDeleting || form.accountStatus === "deleted"} onClick={handleDelete}>
+        <button className="button danger" type="button" disabled={isSubmitting || isDeleting || isResetting || form.accountStatus === "deleted"} onClick={handleDelete}>
           {isDeleting ? labels.deleting : labels.delete}
         </button>
       </div>
