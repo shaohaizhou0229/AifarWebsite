@@ -50,7 +50,7 @@ export default async function AdminDocsPage({ params }) {
         { label: adminHome.nav.home, href: "/admin/" },
         { label: page.breadcrumb }
       ]}
-      actions={<Link className="button primary compact" href={localizedPath(locale, "/admin/docs/new/")}>{page.newDocument}</Link>}
+      actions={<Link className="button primary compact" href={localizedPath(locale, "/admin/docs/new/")} prefetch={false}>{page.newDocument}</Link>}
     />
       <AdminDocsClient locale={locale} page={page} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
     </>

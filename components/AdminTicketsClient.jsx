@@ -197,7 +197,7 @@ export function AdminSupportClient({ locale, page, messages, initialFilters, loa
           <input id="q" name="q" value={filters.q} placeholder={page.filters.keywordPlaceholder} onChange={(event) => updateFilter("q", event.target.value)} />
         </div>
         <button className="button primary compact" type="submit">{page.filters.apply}</button>
-        <Link className="button secondary compact" href={localizedPath(locale, "/admin/support/")}>{page.filters.reset}</Link>
+        <Link className="button secondary compact" href={localizedPath(locale, "/admin/support/")} prefetch={false}>{page.filters.reset}</Link>
       </form>
       <AdminAsyncState loading={loading} error={error} loadingLabel={loadingLabel} errorLabel={errorLabel}>
         <div className="ticket-table">

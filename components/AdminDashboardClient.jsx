@@ -127,11 +127,11 @@ export function AdminDashboardClient({ locale, page, rangeDays, loadingLabel, er
     <>
       <div className="admin-dashboard-toolbar">
         <nav className="admin-range-tabs" aria-label={page.ranges.label}>
-          <Link className={rangeDays === 1 ? "active" : ""} href={rangeHref(locale, 1)}>{page.ranges.today}</Link>
-          <Link className={rangeDays === 7 ? "active" : ""} href={rangeHref(locale, 7)}>{page.ranges.sevenDays}</Link>
-          <Link className={rangeDays === 30 ? "active" : ""} href={rangeHref(locale, 30)}>{page.ranges.thirtyDays}</Link>
+          <Link className={rangeDays === 1 ? "active" : ""} href={rangeHref(locale, 1)} prefetch={false}>{page.ranges.today}</Link>
+          <Link className={rangeDays === 7 ? "active" : ""} href={rangeHref(locale, 7)} prefetch={false}>{page.ranges.sevenDays}</Link>
+          <Link className={rangeDays === 30 ? "active" : ""} href={rangeHref(locale, 30)} prefetch={false}>{page.ranges.thirtyDays}</Link>
         </nav>
-        <Link className="admin-icon-button" href={rangeHref(locale, rangeDays)} aria-label={page.ranges.refresh}>
+        <Link className="admin-icon-button" href={rangeHref(locale, rangeDays)} prefetch={false} aria-label={page.ranges.refresh}>
           <RefreshCw aria-hidden="true" size={16} strokeWidth={1.8} />
         </Link>
       </div>
@@ -180,14 +180,14 @@ export function AdminDashboardClient({ locale, page, rangeDays, loadingLabel, er
                         <TrafficTable items={dashboard.analytics.languages} emptyText={page.traffic.empty} labels={page.traffic} nameLabel={page.traffic.language} total={dashboard.metrics.totalViews} />
                       </div>
                     </div>
-                    <Link className="admin-panel-footer-link" href={rangeHref(locale, 30)}>{page.traffic.viewFull} <ArrowRight aria-hidden="true" size={14} strokeWidth={1.8} /></Link>
+                    <Link className="admin-panel-footer-link" href={rangeHref(locale, 30)} prefetch={false}>{page.traffic.viewFull} <ArrowRight aria-hidden="true" size={14} strokeWidth={1.8} /></Link>
                   </>
                 ) : (
                   <p className="admin-empty-copy">{page.traffic.empty}</p>
                 )}
               </AdminDataPanel>
 
-              <AdminDataPanel title={page.pending.title} meta={page.pending.meta} action={<Link className="admin-panel-action" href={localizedPath(locale, "/admin/support/")}>{page.pending.viewAll}</Link>}>
+              <AdminDataPanel title={page.pending.title} meta={page.pending.meta} action={<Link className="admin-panel-action" href={localizedPath(locale, "/admin/support/")} prefetch={false}>{page.pending.viewAll}</Link>}>
                 <div className="admin-pending-list">
                   {dashboard.pendingWork.map((item) => (
                     <Link href={localizedPath(locale, item.href)} key={item.key} prefetch={false}>
@@ -201,14 +201,14 @@ export function AdminDashboardClient({ locale, page, rangeDays, loadingLabel, er
                     </Link>
                   ))}
                 </div>
-                <Link className="admin-panel-footer-link" href={localizedPath(locale, "/admin/collaboration/")}>{page.pending.myTasks} <ArrowRight aria-hidden="true" size={14} strokeWidth={1.8} /></Link>
+                <Link className="admin-panel-footer-link" href={localizedPath(locale, "/admin/collaboration/")} prefetch={false}>{page.pending.myTasks} <ArrowRight aria-hidden="true" size={14} strokeWidth={1.8} /></Link>
               </AdminDataPanel>
 
-              <AdminDataPanel title={page.activity.title} meta={page.activity.meta} action={<Link className="admin-panel-action" href={localizedPath(locale, "/admin/users/")}>{page.activity.viewAll}</Link>}>
+              <AdminDataPanel title={page.activity.title} meta={page.activity.meta} action={<Link className="admin-panel-action" href={localizedPath(locale, "/admin/users/")} prefetch={false}>{page.activity.viewAll}</Link>}>
                 <AdminActivityFeed items={dashboard.activity} emptyText={page.activity.empty} labels={page.activity} locale={locale} />
               </AdminDataPanel>
 
-              <AdminDataPanel title={page.health.title} meta={page.health.meta} action={<Link className="admin-panel-action" href={localizedPath(locale, "/admin/")}>{page.health.viewAll}</Link>}>
+              <AdminDataPanel title={page.health.title} meta={page.health.meta} action={<Link className="admin-panel-action" href={localizedPath(locale, "/admin/")} prefetch={false}>{page.health.viewAll}</Link>}>
                 <AdminHealthList items={localizeHealthItems(dashboard, page)} labels={page.health} locale={locale} />
               </AdminDataPanel>
             </section>

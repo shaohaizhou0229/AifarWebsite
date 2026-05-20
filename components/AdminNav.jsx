@@ -97,6 +97,7 @@ export function AdminNav({ locale, labels = {}, current = "", variant = "inline"
                 key={key}
                 className={`${isActive ? "active" : ""}${isPending ? " pending" : ""}`}
                 href={localizedHref}
+                prefetch={false}
                 aria-current={isActive ? "page" : undefined}
                 onClick={() => setPendingHref(localizedHref)}
               >

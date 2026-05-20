@@ -56,10 +56,10 @@ export default async function AdminContactPage({ params, searchParams }) {
       ]}
       actions={(
         <div className="admin-segmented">
-          <Link href={localizedPath(locale, "/admin/contact/")}>{page.all}</Link>
-          <Link href={`${localizedPath(locale, "/admin/contact/")}?status=new`}>{page.new}</Link>
-          <Link href={`${localizedPath(locale, "/admin/contact/")}?status=in_progress`}>{page.inProgress}</Link>
-          <Link href={`${localizedPath(locale, "/admin/contact/")}?status=closed`}>{page.closed}</Link>
+          <Link href={localizedPath(locale, "/admin/contact/")} prefetch={false}>{page.all}</Link>
+          <Link href={`${localizedPath(locale, "/admin/contact/")}?status=new`} prefetch={false}>{page.new}</Link>
+          <Link href={`${localizedPath(locale, "/admin/contact/")}?status=in_progress`} prefetch={false}>{page.inProgress}</Link>
+          <Link href={`${localizedPath(locale, "/admin/contact/")}?status=closed`} prefetch={false}>{page.closed}</Link>
         </div>
       )}
     />

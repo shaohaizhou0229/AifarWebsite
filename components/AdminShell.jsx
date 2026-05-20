@@ -35,7 +35,7 @@ export function AdminPageHeader({ locale, shell = {}, eyebrow, title, lead, brea
         <nav className="admin-breadcrumbs" aria-label={shell.breadcrumbs || "Breadcrumbs"}>
           {breadcrumbs.map((item, index) => (
             <span key={`${item.label}-${index}`}>
-              {item.href ? <Link href={localizedPath(locale, item.href)}>{item.label}</Link> : item.label}
+              {item.href ? <Link href={localizedPath(locale, item.href)} prefetch={false}>{item.label}</Link> : item.label}
             </span>
           ))}
         </nav>
@@ -70,7 +70,7 @@ export function AdminShell({
   return (
     <main className="admin-shell">
       <aside className="admin-sidebar">
-        <Link className="admin-sidebar-brand" href={localizedPath(locale, "/admin/")}>
+        <Link className="admin-sidebar-brand" href={localizedPath(locale, "/admin/")} prefetch={false}>
           <img className="admin-logo-full" src="/assets/images/aifar-logo-full.png" alt={shell.brand || "Aifar"} />
           <img className="admin-logo-mark" src="/assets/images/aifar-logo-mark.png" alt="" aria-hidden="true" />
         </Link>
@@ -84,7 +84,7 @@ export function AdminShell({
             <ChevronDown aria-hidden="true" size={14} strokeWidth={1.8} />
           </summary>
           <div className="admin-project-popover">
-            <Link className="active" href={localizedPath(locale, "/admin/")}>
+            <Link className="active" href={localizedPath(locale, "/admin/")} prefetch={false}>
               <span className="admin-project-mark">A</span>
               <span>
                 <strong>{shell.projectName || "Aifar Website"}</strong>
@@ -104,7 +104,7 @@ export function AdminShell({
         <div className="admin-sidebar-spacer" />
         <AdminSidebarCollapse collapseLabel={shell.collapse || "Collapse"} expandLabel={shell.expand || "Expand"} />
         <div className="admin-sidebar-user">
-          <Link className="admin-sidebar-avatar" href={localizedPath(locale, "/account/")}>{shellUser?.initials || "A"}</Link>
+          <Link className="admin-sidebar-avatar" href={localizedPath(locale, "/account/")} prefetch={false}>{shellUser?.initials || "A"}</Link>
           <div>
             <strong>{shellUser?.name || shell.userFallback || "Admin"}</strong>
             <span>{shellUser?.email || shell.userEmailFallback || "admin@aifar.com"}</span>
@@ -114,8 +114,8 @@ export function AdminShell({
               <MoreVertical aria-hidden="true" size={16} strokeWidth={1.8} />
             </summary>
             <div>
-              <Link href={localizedPath(locale, "/account/")}>{shell.account || "Account"}</Link>
-              <Link href={localizedPath(locale, "/account/notifications/")}>{shell.notifications || "Notifications"}</Link>
+              <Link href={localizedPath(locale, "/account/")} prefetch={false}>{shell.account || "Account"}</Link>
+              <Link href={localizedPath(locale, "/account/notifications/")} prefetch={false}>{shell.notifications || "Notifications"}</Link>
               <SignOutButton labels={shell.auth || { signOut: "Sign out", signingOut: "Signing out..." }} redirectTo={localizedPath(locale, "/")} />
             </div>
           </details>

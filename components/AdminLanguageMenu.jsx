@@ -27,6 +27,7 @@ export function AdminLanguageMenu({ locale, label }) {
             href={localizedPath(code, currentPath)}
             hrefLang={code}
             key={code}
+            prefetch={false}
           >
             <span>{shortLocale(code)}</span>
             <small>{localeLabels[code]}</small>

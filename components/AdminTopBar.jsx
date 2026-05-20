@@ -14,12 +14,12 @@ export function AdminTopBar({ locale, labels = {}, title = "", user = null }) {
         <strong>{title}</strong>
       </div>
       <div className="admin-topbar-actions">
-        <Link className="admin-icon-button" href={localizedPath(locale, "/account/notifications/")} aria-label={labels.notifications || "Notifications"}>
+        <Link className="admin-icon-button" href={localizedPath(locale, "/account/notifications/")} prefetch={false} aria-label={labels.notifications || "Notifications"}>
           <Bell aria-hidden="true" size={17} strokeWidth={1.8} />
           <span className="admin-notification-dot" />
         </Link>
         <AdminLanguageMenu locale={locale} label={labels.language || "Language"} />
-        <Link className="admin-avatar-link" href={localizedPath(locale, "/account/")} aria-label={labels.account || "Account"}>
+        <Link className="admin-avatar-link" href={localizedPath(locale, "/account/")} prefetch={false} aria-label={labels.account || "Account"}>
           {user?.initials || "A"}
         </Link>
         <details className="admin-action-menu">
@@ -29,9 +29,9 @@ export function AdminTopBar({ locale, labels = {}, title = "", user = null }) {
             <ChevronDown aria-hidden="true" size={14} strokeWidth={1.8} />
           </summary>
           <div className="admin-action-menu-list">
-            <Link href={localizedPath(locale, "/admin/users/")}>{actionLabels.inviteUser || "Invite user"}</Link>
-            <Link href={localizedPath(locale, "/admin/docs/new/")}>{actionLabels.newDocument || "New document"}</Link>
-            <Link href={localizedPath(locale, "/admin/downloads/")}>{actionLabels.manageDownloads || "Manage downloads"}</Link>
+            <Link href={localizedPath(locale, "/admin/users/")} prefetch={false}>{actionLabels.inviteUser || "Invite user"}</Link>
+            <Link href={localizedPath(locale, "/admin/docs/new/")} prefetch={false}>{actionLabels.newDocument || "New document"}</Link>
+            <Link href={localizedPath(locale, "/admin/downloads/")} prefetch={false}>{actionLabels.manageDownloads || "Manage downloads"}</Link>
             <SignOutButton labels={labels.auth || { signOut: "Sign out", signingOut: "Signing out..." }} redirectTo={localizedPath(locale, "/")} />
           </div>
         </details>
