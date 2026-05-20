@@ -3756,6 +3756,35 @@ body:has(.admin-shell)::before {
   min-height: 260px;
 }
 
+.admin-route-loading {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e6ebf2;
+}
+
+.admin-route-loading span {
+  display: block;
+  width: 42%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--admin-accent);
+  animation: admin-route-loading 0.9s ease-in-out infinite;
+}
+
+@keyframes admin-route-loading {
+  0% {
+    transform: translateX(-110%);
+  }
+
+  100% {
+    transform: translateX(250%);
+  }
+}
+
 .admin-dashboard-toolbar {
   display: flex;
   justify-content: flex-end;

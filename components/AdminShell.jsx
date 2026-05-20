@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronDown, Globe2, MoreVertical, Search } from "lucide-react";
 import { AdminNav } from "@/components/AdminNav";
+import { AdminRoutePreloader } from "@/components/AdminRoutePreloader";
 import { AdminSidebarCollapse } from "@/components/AdminSidebarCollapse";
 import { AdminTopBar } from "@/components/AdminTopBar";
 import { SignOutButton } from "@/components/SignOutButton";
@@ -69,6 +70,7 @@ export function AdminShell({
 
   return (
     <main className="admin-shell">
+      <AdminRoutePreloader locale={locale} />
       <aside className="admin-sidebar">
         <Link className="admin-sidebar-brand" href={localizedPath(locale, "/admin/")} prefetch={false}>
           <img className="admin-logo-full" src="/assets/images/aifar-logo-full.png" alt={shell.brand || "Aifar"} />
