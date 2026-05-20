@@ -1,7 +1,7 @@
 "use client";
 
 const SITE_SESSION_KEY = "aifar-site-session-v1";
-const SITE_SESSION_MAX_AGE_MS = 5 * 60 * 1000;
+const SITE_SESSION_MAX_AGE_MS = 30 * 60 * 1000;
 
 function isProfileActive(profile) {
   return !profile || !profile.accountStatus || profile.accountStatus === "active";
