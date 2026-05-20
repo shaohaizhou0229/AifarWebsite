@@ -776,7 +776,11 @@
         "support": "Présentation Aifar",
         "contact": "Présentation Aifar",
         "users": "Utilisateurs",
-        "collaboration": "Collaboration"
+        "collaboration": "Collaboration",
+        "groups": {
+          "workspace": "Espace de travail",
+          "operations": "Operations"
+        }
       },
       "modules": [
         {
@@ -852,7 +856,10 @@
           "inviteUser": "Inviter un utilisateur",
           "newDocument": "Nouveau document",
           "manageDownloads": "G?rer les t?l?chargements"
-        }
+        },
+        "expand": "Etendre",
+        "projectCurrent": "Site actuel",
+        "projectTenantHint": "Le changement multi-tenant est reserve pour une prochaine version."
       },
       "ranges": {
         "today": "Aujourd hui",

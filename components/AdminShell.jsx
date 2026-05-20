@@ -1,5 +1,6 @@
-import { ChevronDown, ChevronsLeft, Globe2, MoreVertical, Search } from "lucide-react";
+import { ChevronDown, Globe2, MoreVertical, Search } from "lucide-react";
 import { AdminNav } from "@/components/AdminNav";
+import { AdminSidebarCollapse } from "@/components/AdminSidebarCollapse";
 import { AdminTopBar } from "@/components/AdminTopBar";
 import { SignOutButton } from "@/components/SignOutButton";
 import { getCurrentUser } from "@/lib/auth";
@@ -61,13 +62,29 @@ export async function AdminShell({
     <main className="admin-shell">
       <aside className="admin-sidebar">
         <a className="admin-sidebar-brand" href={localizedPath(locale, "/admin/")}>
-          <img src="/assets/images/aifar-logo-full.png" alt={shell.brand || "Aifar"} />
+          <img className="admin-logo-full" src="/assets/images/aifar-logo-full.png" alt={shell.brand || "Aifar"} />
+          <img className="admin-logo-mark" src="/assets/images/aifar-logo-mark.png" alt="" aria-hidden="true" />
         </a>
-        <button className="admin-sidebar-project" type="button">
-          <Globe2 aria-hidden="true" size={15} strokeWidth={1.8} />
-          <strong>{shell.projectName || "Aifar Website"}</strong>
-          <ChevronDown aria-hidden="true" size={14} strokeWidth={1.8} />
-        </button>
+        <details className="admin-sidebar-project-menu">
+          <summary className="admin-sidebar-project">
+            <Globe2 aria-hidden="true" size={15} strokeWidth={1.8} />
+            <span className="admin-project-copy">
+              <small>{shell.projectLabel || "Project"}</small>
+              <strong>{shell.projectName || "Aifar Website"}</strong>
+            </span>
+            <ChevronDown aria-hidden="true" size={14} strokeWidth={1.8} />
+          </summary>
+          <div className="admin-project-popover">
+            <a className="active" href={localizedPath(locale, "/admin/")}>
+              <span className="admin-project-mark">A</span>
+              <span>
+                <strong>{shell.projectName || "Aifar Website"}</strong>
+                <small>{shell.projectCurrent || "Current site"}</small>
+              </span>
+            </a>
+            <p>{shell.projectTenantHint || "Multi-tenant switching is reserved for a later build."}</p>
+          </div>
+        </details>
         <label className="admin-sidebar-search">
           <Search aria-hidden="true" size={14} strokeWidth={1.8} />
           <span className="sr-only">{shell.search || "Search"}</span>
@@ -76,10 +93,7 @@ export async function AdminShell({
         </label>
         <AdminNav locale={locale} labels={labels.nav} current={current} variant="sidebar" />
         <div className="admin-sidebar-spacer" />
-        <button className="admin-sidebar-collapse" type="button">
-          <ChevronsLeft aria-hidden="true" size={14} strokeWidth={1.8} />
-          <span>{shell.collapse || "Collapse"}</span>
-        </button>
+        <AdminSidebarCollapse collapseLabel={shell.collapse || "Collapse"} expandLabel={shell.expand || "Expand"} />
         <div className="admin-sidebar-user">
           <a className="admin-sidebar-avatar" href={localizedPath(locale, "/account/")}>{shellUser?.initials || "A"}</a>
           <div>

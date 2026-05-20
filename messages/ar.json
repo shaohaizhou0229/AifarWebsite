@@ -776,7 +776,11 @@
         "support": "معلومات Aifar",
         "contact": "معلومات Aifar",
         "users": "Users",
-        "collaboration": "Collaboration"
+        "collaboration": "Collaboration",
+        "groups": {
+          "workspace": "مساحة العمل",
+          "operations": "العمليات"
+        }
       },
       "modules": [
         {
@@ -852,7 +856,10 @@
           "inviteUser": "دعوة مستخدم",
           "newDocument": "مستند جديد",
           "manageDownloads": "إدارة التنزيلات"
-        }
+        },
+        "expand": "توسيع",
+        "projectCurrent": "الموقع الحالي",
+        "projectTenantHint": "تم حجز تبديل المواقع متعددة المستأجرين لإصدار لاحق."
       },
       "ranges": {
         "today": "اليوم",

@@ -776,7 +776,11 @@
         "support": "Support",
         "contact": "Contact us",
         "users": "Users",
-        "collaboration": "Collaboration"
+        "collaboration": "Collaboration",
+        "groups": {
+          "workspace": "Workspace",
+          "operations": "Operations"
+        }
       },
       "modules": [
         {
@@ -852,7 +856,10 @@
           "inviteUser": "Invite user",
           "newDocument": "New document",
           "manageDownloads": "Manage downloads"
-        }
+        },
+        "expand": "Expand",
+        "projectCurrent": "Current site",
+        "projectTenantHint": "Multi-tenant switching is reserved for a later build."
       },
       "ranges": {
         "today": "Today",

@@ -3221,20 +3221,52 @@ body:has(.admin-shell)::before {
   width: 126px;
 }
 
+.admin-logo-mark {
+  display: none;
+}
+
+.admin-sidebar-project-menu {
+  position: relative;
+  margin: 0 0 16px;
+}
+
+.admin-sidebar-project-menu summary {
+  list-style: none;
+}
+
+.admin-sidebar-project-menu summary::-webkit-details-marker {
+  display: none;
+}
+
 .admin-sidebar-project {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   width: 100%;
   min-height: 38px;
-  margin: 0 0 16px;
+  margin: 0;
   border: 1px solid var(--admin-border);
   border-radius: 6px;
   background: #fff;
   color: var(--admin-ink);
+  cursor: pointer;
   gap: 9px;
   padding: 0 10px;
   text-align: start;
+}
+
+.admin-project-copy {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.admin-project-copy small,
+.admin-project-popover small,
+.admin-project-popover p {
+  color: var(--admin-muted);
+  font-size: 11px;
+  line-height: 1.3;
 }
 
 .admin-sidebar-project strong {
@@ -3243,6 +3275,50 @@ body:has(.admin-shell)::before {
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.admin-project-popover {
+  position: absolute;
+  z-index: 25;
+  top: calc(100% + 6px);
+  left: 0;
+  display: grid;
+  width: 100%;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+  padding: 6px;
+}
+
+.admin-project-popover a {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  border-radius: 6px;
+  color: var(--admin-ink);
+  gap: 9px;
+  padding: 8px;
+}
+
+.admin-project-popover a.active {
+  background: #f6f8fb;
+}
+
+.admin-project-popover p {
+  margin: 6px 8px 4px;
+}
+
+.admin-project-mark {
+  display: inline-grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 999px;
+  background: #111827;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .admin-sidebar-search {
@@ -3282,13 +3358,37 @@ body:has(.admin-shell)::before {
 }
 
 .admin-nav-sidebar {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-bottom: 0;
+}
+
+.admin-nav-group {
+  display: grid;
   gap: 2px;
+}
+
+.admin-nav-group-label {
+  display: block;
+  color: #8a8f98;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 2px 10px 7px;
+  text-transform: uppercase;
 }
 
 .admin-nav-sidebar a {
   position: relative;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  width: 100%;
   min-height: 36px;
+  border: 0;
   border-radius: 6px;
+  background: transparent;
   color: #2f3339;
   gap: 11px;
   font-size: 14px;
@@ -3332,6 +3432,10 @@ body:has(.admin-shell)::before {
   gap: 9px;
   font-size: 14px;
   padding: 0 11px;
+}
+
+.admin-sidebar-collapse:hover {
+  background: var(--admin-hover);
 }
 
 .admin-sidebar-user {
@@ -4107,6 +4211,85 @@ body:has(.admin-shell)::before {
   padding: 7px 9px;
 }
 
+.admin-shell.admin-sidebar-collapsed {
+  grid-template-columns: 72px minmax(0, 1fr);
+}
+
+.admin-shell.admin-sidebar-collapsed .admin-sidebar {
+  padding: 16px 10px;
+}
+
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-brand {
+  justify-content: center;
+  padding: 2px 0 24px;
+}
+
+.admin-shell.admin-sidebar-collapsed .admin-logo-full {
+  display: none;
+}
+
+.admin-shell.admin-sidebar-collapsed .admin-logo-mark {
+  display: block;
+  width: 34px;
+}
+
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-project {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  padding: 0;
+}
+
+.admin-shell.admin-sidebar-collapsed .admin-project-copy,
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-project > svg:last-child,
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-search input,
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-search kbd,
+.admin-shell.admin-sidebar-collapsed .admin-nav-group-label,
+.admin-shell.admin-sidebar-collapsed .admin-nav-sidebar a span,
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-collapse span,
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-user > div,
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-user details {
+  display: none;
+}
+
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-search {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  padding: 0;
+}
+
+.admin-shell.admin-sidebar-collapsed .admin-nav-sidebar {
+  gap: 10px;
+}
+
+.admin-shell.admin-sidebar-collapsed .admin-nav-group {
+  gap: 4px;
+}
+
+.admin-shell.admin-sidebar-collapsed .admin-nav-sidebar a {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  gap: 0;
+  padding: 0;
+}
+
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-collapse {
+  justify-content: center;
+  padding: 0;
+}
+
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-user {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  margin-inline: -10px;
+  padding-inline: 10px;
+}
+
+.admin-shell.admin-sidebar-collapsed .admin-project-popover {
+  top: 0;
+  left: calc(100% + 8px);
+  width: 220px;
+}
+
 @media (max-width: 1240px) {
   .admin-metric-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -4114,6 +4297,85 @@ body:has(.admin-shell)::before {
 }
 
 @media (max-width: 1040px) {
+  .admin-shell.admin-sidebar-collapsed {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-shell.admin-sidebar-collapsed .admin-sidebar {
+    align-items: stretch;
+  }
+
+  .admin-shell.admin-sidebar-collapsed .admin-sidebar-brand {
+    justify-content: flex-start;
+    padding: 2px 2px 24px;
+  }
+
+  .admin-shell.admin-sidebar-collapsed .admin-logo-full {
+    display: block;
+  }
+
+  .admin-shell.admin-sidebar-collapsed .admin-logo-mark {
+    display: none;
+  }
+
+  .admin-shell.admin-sidebar-collapsed .admin-sidebar-project {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    justify-items: stretch;
+    padding: 0 10px;
+  }
+
+  .admin-shell.admin-sidebar-collapsed .admin-project-copy {
+    display: grid;
+  }
+
+  .admin-shell.admin-sidebar-collapsed .admin-sidebar-project > svg:last-child,
+  .admin-shell.admin-sidebar-collapsed .admin-nav-sidebar a span,
+  .admin-shell.admin-sidebar-collapsed .admin-sidebar-collapse span {
+    display: inline-flex;
+  }
+
+  .admin-shell.admin-sidebar-collapsed .admin-sidebar-search {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    justify-items: stretch;
+    padding: 0 9px;
+  }
+
+  .admin-shell.admin-sidebar-collapsed .admin-sidebar-search input {
+    display: block;
+  }
+
+  .admin-shell.admin-sidebar-collapsed .admin-sidebar-search kbd,
+  .admin-shell.admin-sidebar-collapsed .admin-nav-group-label {
+    display: block;
+  }
+
+  .admin-shell.admin-sidebar-collapsed .admin-nav-sidebar a {
+    grid-template-columns: 18px minmax(0, 1fr);
+    justify-items: stretch;
+    gap: 11px;
+    padding: 0 10px;
+  }
+
+  .admin-shell.admin-sidebar-collapsed .admin-sidebar-collapse {
+    justify-content: flex-start;
+    padding: 0 11px;
+  }
+
+  .admin-shell.admin-sidebar-collapsed .admin-sidebar-user {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    justify-items: stretch;
+    margin-inline: -16px;
+    padding-inline: 16px;
+  }
+
+  .admin-shell.admin-sidebar-collapsed .admin-sidebar-user > div {
+    display: block;
+  }
+
+  .admin-shell.admin-sidebar-collapsed .admin-sidebar-user details {
+    display: block;
+  }
+
   .admin-content {
     width: min(100% - 32px, 900px);
   }

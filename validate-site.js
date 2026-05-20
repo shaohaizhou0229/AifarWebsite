@@ -170,6 +170,7 @@ for (const file of [
   "components/SignOutButton.jsx",
   "components/AdminTicketActions.jsx",
   "components/AdminShell.jsx",
+  "components/AdminSidebarCollapse.jsx",
   "components/AdminTopBar.jsx",
   "components/AdminLanguageMenu.jsx",
   "components/AdminMetricCard.jsx",
