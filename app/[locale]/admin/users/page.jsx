@@ -2,10 +2,10 @@ import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { AdminInviteUserForm } from "@/components/AdminInviteUserForm";
 import { AdminUsersClient } from "@/components/AdminUsersClient";
-import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
-import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
+import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
+import { AdminRequiredError } from "@/lib/auth";
+import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { getProfile } from "@/lib/profiles";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -30,7 +30,7 @@ export default async function AdminUsersPage({ params, searchParams }) {
   ]);
 
   try {
-    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.users);
+    await requireAdminPermissionCached(ADMIN_PERMISSIONS.users);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
@@ -43,10 +43,10 @@ export default async function AdminUsersPage({ params, searchParams }) {
   const status = typeof query?.status === "string" ? query.status : "all";
 
   return (
-    <AdminShell
+    <>
+      <AdminPageHeader
       locale={locale}
-      labels={adminHome}
-      current="users"
+      shell={adminHome.shell}
       eyebrow={page.eyebrow}
       title={page.title}
       lead={page.lead}
@@ -54,13 +54,13 @@ export default async function AdminUsersPage({ params, searchParams }) {
         { label: adminHome.nav.home, href: "/admin/" },
         { label: page.breadcrumb }
       ]}
-    >
+    />
       <article className="admin-panel detail-card">
         <h2>{page.invite.title}</h2>
         <p>{page.invite.lead}</p>
         <AdminInviteUserForm labels={page.invite.form} />
       </article>
       <AdminUsersClient locale={locale} page={page} initialQuery={q} initialStatus={status} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
-    </AdminShell>
+    </>
   );
 }

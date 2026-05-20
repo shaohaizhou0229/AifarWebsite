@@ -1,10 +1,10 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
-import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
+import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { AdminDownloadForm } from "@/components/AdminDownloadForm";
-import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
+import { AdminRequiredError } from "@/lib/auth";
+import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { formatFileSize, getAdminDownloadPlatform } from "@/lib/downloads";
-import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
@@ -35,7 +35,7 @@ export default async function AdminDownloadDetailPage({ params }) {
   const adminHome = await getPageMessages(locale, "adminHome");
 
   try {
-    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.downloads);
+    await requireAdminPermissionCached(ADMIN_PERMISSIONS.downloads);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
@@ -49,10 +49,10 @@ export default async function AdminDownloadDetailPage({ params }) {
   const release = platform.release;
 
   return (
-    <AdminShell
+    <>
+      <AdminPageHeader
       locale={locale}
-      labels={adminHome}
-      current="downloads"
+      shell={adminHome.shell}
       eyebrow={page.eyebrow}
       title={platform.label}
       lead={page.lead}
@@ -61,7 +61,7 @@ export default async function AdminDownloadDetailPage({ params }) {
         { label: adminHome.nav.downloads, href: "/admin/downloads/" },
         { label: platform.label }
       ]}
-    >
+    />
       <div className="admin-detail-layout">
         <article className="admin-panel detail-card">
           <h3>{page.current}</h3>
@@ -76,6 +76,6 @@ export default async function AdminDownloadDetailPage({ params }) {
         </article>
         <AdminDownloadForm platform={platform} labels={messages.forms.downloads} />
       </div>
-    </AdminShell>
+    </>
   );
 }

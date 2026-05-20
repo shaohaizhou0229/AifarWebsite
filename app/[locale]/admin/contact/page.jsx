@@ -2,9 +2,9 @@ import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { AdminContactTicketsClient } from "@/components/AdminTicketsClient";
-import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
-import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
-import { getProfile } from "@/lib/profiles";
+import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
+import { AdminRequiredError } from "@/lib/auth";
+import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { TICKET_STATUSES } from "@/lib/tickets";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
@@ -31,7 +31,7 @@ export default async function AdminContactPage({ params, searchParams }) {
   ]);
 
   try {
-    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.contact);
+    await requireAdminPermissionCached(ADMIN_PERMISSIONS.contact);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
@@ -43,10 +43,10 @@ export default async function AdminContactPage({ params, searchParams }) {
   const status = typeof query?.status === "string" && TICKET_STATUSES.has(query.status) ? query.status : "";
 
   return (
-    <AdminShell
+    <>
+      <AdminPageHeader
       locale={locale}
-      labels={adminHome}
-      current="contact"
+      shell={adminHome.shell}
       eyebrow={page.eyebrow}
       title={page.title}
       lead={page.lead}
@@ -62,8 +62,8 @@ export default async function AdminContactPage({ params, searchParams }) {
           <Link href={`${localizedPath(locale, "/admin/contact/")}?status=closed`}>{page.closed}</Link>
         </div>
       )}
-    >
+    />
       <AdminContactTicketsClient locale={locale} page={page} messages={messages} initialStatus={status} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
-    </AdminShell>
+    </>
   );
 }

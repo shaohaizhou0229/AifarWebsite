@@ -1,10 +1,10 @@
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
+import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { AdminDocumentForm } from "@/components/AdminDocumentForm";
-import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
+import { AdminRequiredError } from "@/lib/auth";
+import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { listDocumentCategories } from "@/lib/documents";
-import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
@@ -38,7 +38,7 @@ export default async function NewAdminDocumentPage({ params }) {
   ]);
 
   try {
-    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.docs);
+    await requireAdminPermissionCached(ADMIN_PERMISSIONS.docs);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
@@ -49,10 +49,10 @@ export default async function NewAdminDocumentPage({ params }) {
   const categories = localizeCategories(await listDocumentCategories(), adminDocs);
 
   return (
-    <AdminShell
+    <>
+      <AdminPageHeader
       locale={locale}
-      labels={adminHome}
-      current="docs"
+      shell={adminHome.shell}
       eyebrow={page.eyebrow}
       title={page.newTitle}
       lead={page.lead}
@@ -61,10 +61,10 @@ export default async function NewAdminDocumentPage({ params }) {
         { label: adminHome.nav.docs, href: "/admin/docs/" },
         { label: page.newBreadcrumb }
       ]}
-    >
+    />
       <div className="admin-detail-layout">
         <AdminDocumentForm categories={categories} labels={messages.forms.documents} locale={locale} />
       </div>
-    </AdminShell>
+    </>
   );
 }

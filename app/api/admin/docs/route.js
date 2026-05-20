@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, getCurrentAccessToken, requireAdminPermission } from "@/lib/auth";
+import { adminJson } from "@/lib/admin-response";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import {
@@ -41,7 +42,7 @@ export async function GET() {
   try {
     await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.docs);
     const documents = await listAdminDocuments();
-    return NextResponse.json({ documents });
+    return adminJson({ documents });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: error.message || "Could not list documents." }, { status: 400 });
   }

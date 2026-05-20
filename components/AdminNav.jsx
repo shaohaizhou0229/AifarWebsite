@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 import { localizedPath } from "@/i18n/routing";
 import {
   Box,
@@ -54,7 +58,28 @@ const ADMIN_ICONS = {
   collaboration: Workflow
 };
 
-export function AdminNav({ locale, labels = {}, current = "home", variant = "inline" }) {
+function normalizePath(value) {
+  if (!value) return "/";
+  return value.endsWith("/") ? value : `${value}/`;
+}
+
+function stripLocale(pathname, locale) {
+  const normalized = normalizePath(pathname);
+  const prefix = `/${locale}/`;
+  if (normalized === prefix) return "/";
+  if (normalized.startsWith(prefix)) return normalizePath(`/${normalized.slice(prefix.length)}`);
+  return normalized;
+}
+
+export function AdminNav({ locale, labels = {}, current = "", variant = "inline" }) {
+  const pathname = usePathname();
+  const [pendingHref, setPendingHref] = useState("");
+  const activePath = useMemo(() => stripLocale(pathname, locale), [pathname, locale]);
+
+  useEffect(() => {
+    setPendingHref("");
+  }, [pathname]);
+
   return (
     <nav className={`admin-nav admin-nav-${variant}`} aria-label={labels.label || "Admin sections"}>
       {ADMIN_GROUPS.map(([groupKey, itemKeys]) => (
@@ -63,12 +88,17 @@ export function AdminNav({ locale, labels = {}, current = "home", variant = "inl
           {itemKeys.map((key) => {
             const Icon = ADMIN_ICONS[key];
             const href = ADMIN_ITEMS[key];
+            const localizedHref = localizedPath(locale, href);
+            const normalizedHref = normalizePath(href);
+            const isActive = (current && current === key) || (key === "home" ? activePath === normalizedHref : activePath.startsWith(normalizedHref));
+            const isPending = pendingHref === localizedHref;
             return (
               <Link
                 key={key}
-                className={current === key ? "active" : ""}
-                href={localizedPath(locale, href)}
-                aria-current={current === key ? "page" : undefined}
+                className={`${isActive ? "active" : ""}${isPending ? " pending" : ""}`}
+                href={localizedHref}
+                aria-current={isActive ? "page" : undefined}
+                onClick={() => setPendingHref(localizedHref)}
               >
                 <Icon aria-hidden="true" size={16} strokeWidth={1.8} />
                 <span>{labels[key] || FALLBACK_LABELS[key]}</span>

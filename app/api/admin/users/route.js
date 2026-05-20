@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
+import { adminJson } from "@/lib/admin-response";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { createUserInvitation, getProfile, listAdminUsers } from "@/lib/profiles";
 import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
@@ -24,7 +25,7 @@ export async function GET(request) {
     await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.users);
     const url = new URL(request.url);
     const users = await listAdminUsers(url.searchParams.get("q") || "", url.searchParams.get("status") || "all");
-    return NextResponse.json({ users });
+    return adminJson({ users });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: "Unable to load users." }, { status: 500 });
   }

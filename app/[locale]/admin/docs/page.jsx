@@ -2,9 +2,9 @@ import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { AdminDocsClient } from "@/components/AdminDocsClient";
-import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
-import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
-import { getProfile } from "@/lib/profiles";
+import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
+import { AdminRequiredError } from "@/lib/auth";
+import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
@@ -30,7 +30,7 @@ export default async function AdminDocsPage({ params }) {
   ]);
 
   try {
-    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.docs);
+    await requireAdminPermissionCached(ADMIN_PERMISSIONS.docs);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
@@ -39,10 +39,10 @@ export default async function AdminDocsPage({ params }) {
   }
 
   return (
-    <AdminShell
+    <>
+      <AdminPageHeader
       locale={locale}
-      labels={adminHome}
-      current="docs"
+      shell={adminHome.shell}
       eyebrow={page.eyebrow}
       title={page.title}
       lead={page.lead}
@@ -51,8 +51,8 @@ export default async function AdminDocsPage({ params }) {
         { label: page.breadcrumb }
       ]}
       actions={<Link className="button primary compact" href={localizedPath(locale, "/admin/docs/new/")}>{page.newDocument}</Link>}
-    >
+    />
       <AdminDocsClient locale={locale} page={page} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
-    </AdminShell>
+    </>
   );
 }

@@ -1,11 +1,12 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
+import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { AdminUserForm } from "@/components/AdminUserForm";
-import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
+import { AdminRequiredError } from "@/lib/auth";
+import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { getAdminUser, getProfile } from "@/lib/profiles";
+import { getAdminUser } from "@/lib/profiles";
 import { listAdminTicketsForUser } from "@/lib/tickets";
 import { listUserFootprints } from "@/lib/user-footprints";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
@@ -42,7 +43,7 @@ export default async function AdminUserDetailPage({ params }) {
   ]);
 
   try {
-    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.users);
+    await requireAdminPermissionCached(ADMIN_PERMISSIONS.users);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
@@ -59,10 +60,10 @@ export default async function AdminUserDetailPage({ params }) {
   ]);
 
   return (
-    <AdminShell
+    <>
+      <AdminPageHeader
       locale={locale}
-      labels={adminHome}
-      current="users"
+      shell={adminHome.shell}
       eyebrow={page.eyebrow}
       title={user.displayName || user.email}
       lead={`${page.role}: ${page.form.roles[user.role] || user.role} - ${page.form.accountStatus}: ${page.form.statuses[user.accountStatus] || user.accountStatus} - ${page.createdAt} ${formatDate(user.createdAt, locale)}`}
@@ -71,7 +72,7 @@ export default async function AdminUserDetailPage({ params }) {
         { label: adminHome.nav.users, href: "/admin/users/" },
         { label: page.breadcrumb }
       ]}
-    >
+    />
       <div className="admin-detail-layout">
         <article className="admin-panel detail-card">
           <h2>{page.profileTitle}</h2>
@@ -101,6 +102,6 @@ export default async function AdminUserDetailPage({ params }) {
           )) : <p className="muted-line">{page.noFootprints}</p>}
         </div>
       </div>
-    </AdminShell>
+    </>
   );
 }

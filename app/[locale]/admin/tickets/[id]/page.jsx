@@ -1,9 +1,9 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
-import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
+import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { AdminTicketActions } from "@/components/AdminTicketActions";
-import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
-import { getProfile } from "@/lib/profiles";
+import { AdminRequiredError } from "@/lib/auth";
+import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { listAdminProfiles } from "@/lib/profiles";
 import { getAdminTicket } from "@/lib/tickets";
@@ -33,7 +33,7 @@ export default async function AdminTicketDetailPage({ params }) {
   const adminHome = await getPageMessages(locale, "adminHome");
 
   try {
-    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.support);
+    await requireAdminPermissionCached(ADMIN_PERMISSIONS.support);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
@@ -51,10 +51,10 @@ export default async function AdminTicketDetailPage({ params }) {
   const adminLabels = messages.forms.admin;
 
   return (
-    <AdminShell
+    <>
+      <AdminPageHeader
       locale={locale}
-      labels={adminHome}
-      current="support"
+      shell={adminHome.shell}
       eyebrow={page.eyebrow}
       title={ticket.subject || getRequestTypeLabel(messages.forms, ticket.requestType)}
       lead={`${ticket.name} - ${ticket.workEmail} - ${page.submitted} ${formatDate(ticket.createdAt, locale)}`}
@@ -63,7 +63,7 @@ export default async function AdminTicketDetailPage({ params }) {
         { label: adminHome.nav.support, href: "/admin/support/" },
         { label: page.breadcrumb }
       ]}
-    >
+    />
       <div className="ticket-detail-grid">
         <div className="ticket-conversation">
           <article className="admin-panel detail-card">
@@ -117,6 +117,6 @@ export default async function AdminTicketDetailPage({ params }) {
           </dl>
         </aside>
       </div>
-    </AdminShell>
+    </>
   );
 }

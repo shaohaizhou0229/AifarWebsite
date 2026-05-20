@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
+import { adminJson } from "@/lib/admin-response";
 import { getProfile, listAdminProfiles } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getAdminTicketStats, listAdminTickets } from "@/lib/tickets";
@@ -32,7 +33,7 @@ export async function GET(request) {
       getAdminTicketStats(),
       listAdminProfiles()
     ]);
-    return NextResponse.json({ tickets, stats, profiles });
+    return adminJson({ tickets, stats, profiles });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: "Unable to load tickets." }, { status: 500 });
   }

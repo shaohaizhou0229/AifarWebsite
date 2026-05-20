@@ -1,15 +1,16 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
+import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import {
   CollaborationMemberForm,
   CollaborationTaskForm
 } from "@/components/AdminCollaborationForms";
-import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
+import { AdminRequiredError } from "@/lib/auth";
+import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getCollaborationSpace } from "@/lib/collaboration";
-import { getProfile, listAdminProfiles } from "@/lib/profiles";
+import { listAdminProfiles } from "@/lib/profiles";
 import { getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -43,7 +44,7 @@ export default async function AdminCollaborationSpacePage({ params }) {
 
   let user;
   try {
-    const context = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.collaboration);
+    const context = await requireAdminPermissionCached(ADMIN_PERMISSIONS.collaboration);
     user = context.user;
   } catch (error) {
     if (error instanceof AdminRequiredError) {
@@ -60,10 +61,10 @@ export default async function AdminCollaborationSpacePage({ params }) {
   const isLeader = space.leaderUserId === user.id;
 
   return (
-    <AdminShell
+    <>
+      <AdminPageHeader
       locale={locale}
-      labels={adminHome}
-      current="collaboration"
+      shell={adminHome.shell}
       eyebrow={page.eyebrow}
       title={space.name}
       lead={space.description || page.noDescription}
@@ -72,7 +73,7 @@ export default async function AdminCollaborationSpacePage({ params }) {
         { label: listPage.breadcrumb, href: "/admin/collaboration/" },
         { label: space.name }
       ]}
-    >
+    />
       <div className="admin-detail-layout">
           <article className="admin-panel detail-card">
             <h2>{page.membersTitle}</h2>
@@ -166,6 +167,6 @@ export default async function AdminCollaborationSpacePage({ params }) {
             )}
           </div>
       </div>
-    </AdminShell>
+    </>
   );
 }

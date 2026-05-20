@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
+import { adminJson } from "@/lib/admin-response";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { createCollaborationSpace, listCollaborationSpaces, listMyCollaborationSubtasks } from "@/lib/collaboration";
 import { getProfile } from "@/lib/profiles";
@@ -29,7 +30,7 @@ export async function GET() {
       listCollaborationSpaces(user.id),
       listMyCollaborationSubtasks(user.id)
     ]);
-    return NextResponse.json({ spaces, subtasks });
+    return adminJson({ spaces, subtasks });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: "Unable to load collaboration spaces." }, { status: 500 });
   }

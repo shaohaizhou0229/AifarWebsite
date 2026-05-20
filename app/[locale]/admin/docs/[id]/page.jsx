@@ -1,10 +1,10 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
-import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
+import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { AdminDocumentForm } from "@/components/AdminDocumentForm";
-import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
+import { AdminRequiredError } from "@/lib/auth";
+import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { getAdminDocument, listDocumentCategories, listDocumentVersions } from "@/lib/documents";
-import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
@@ -42,7 +42,7 @@ export default async function EditAdminDocumentPage({ params }) {
   ]);
 
   try {
-    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.docs);
+    await requireAdminPermissionCached(ADMIN_PERMISSIONS.docs);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
@@ -58,10 +58,10 @@ export default async function EditAdminDocumentPage({ params }) {
   if (!document) notFound();
 
   return (
-    <AdminShell
+    <>
+      <AdminPageHeader
       locale={locale}
-      labels={adminHome}
-      current="docs"
+      shell={adminHome.shell}
       eyebrow={page.eyebrow}
       title={document.title}
       lead={page.lead}
@@ -70,7 +70,7 @@ export default async function EditAdminDocumentPage({ params }) {
         { label: adminHome.nav.docs, href: "/admin/docs/" },
         { label: document.title }
       ]}
-    >
+    />
       <div className="admin-detail-layout">
         <article className="admin-panel detail-card">
           <h3>{page.current}</h3>
@@ -93,6 +93,6 @@ export default async function EditAdminDocumentPage({ params }) {
           </div>
         </article>
       </div>
-    </AdminShell>
+    </>
   );
 }

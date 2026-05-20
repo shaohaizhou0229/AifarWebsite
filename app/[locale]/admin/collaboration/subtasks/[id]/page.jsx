@@ -1,11 +1,11 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
-import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
+import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { SubtaskFeedbackForm } from "@/components/AdminCollaborationForms";
-import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
+import { AdminRequiredError } from "@/lib/auth";
+import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getCollaborationSubtask } from "@/lib/collaboration";
-import { getProfile } from "@/lib/profiles";
 import { getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -35,7 +35,7 @@ export default async function AdminCollaborationSubtaskPage({ params }) {
 
   let user;
   try {
-    const context = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.collaboration);
+    const context = await requireAdminPermissionCached(ADMIN_PERMISSIONS.collaboration);
     user = context.user;
   } catch (error) {
     if (error instanceof AdminRequiredError) {
@@ -54,10 +54,10 @@ export default async function AdminCollaborationSubtaskPage({ params }) {
   const { subtask, task, space, updates, permissions } = details;
 
   return (
-    <AdminShell
+    <>
+      <AdminPageHeader
       locale={locale}
-      labels={adminHome}
-      current="collaboration"
+      shell={adminHome.shell}
       eyebrow={page.eyebrow}
       title={subtask.title}
       lead={subtask.description || page.noDescription}
@@ -68,7 +68,7 @@ export default async function AdminCollaborationSubtaskPage({ params }) {
         { label: task.title, href: `/admin/collaboration/tasks/${task.id}/` },
         { label: subtask.title }
       ]}
-    >
+    />
       <div className="admin-detail-layout">
           <article className="admin-panel detail-card">
             <div className="task-heading">
@@ -117,6 +117,6 @@ export default async function AdminCollaborationSubtaskPage({ params }) {
             </div>
           </article>
       </div>
-    </AdminShell>
+    </>
   );
 }

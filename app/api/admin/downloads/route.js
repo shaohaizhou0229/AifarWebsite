@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
+import { adminJson } from "@/lib/admin-response";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { listAdminDownloadPlatforms } from "@/lib/downloads";
@@ -11,7 +12,7 @@ export async function GET() {
   try {
     await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.downloads);
     const platforms = await listAdminDownloadPlatforms();
-    return NextResponse.json({ platforms });
+    return adminJson({ platforms });
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return NextResponse.json({ error: error.message }, { status: 403 });

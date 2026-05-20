@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdmin } from "@/lib/auth";
+import { adminJson } from "@/lib/admin-response";
 import { getAdminDashboardOverview } from "@/lib/admin-dashboard";
 import { getProfile } from "@/lib/profiles";
 
@@ -23,7 +24,7 @@ export async function GET(request) {
     const range = Number(searchParams.get("range") || 7);
     const dashboard = await getAdminDashboardOverview({ userId: context.user.id, analyticsDays: range });
 
-    return NextResponse.json({ dashboard });
+    return adminJson({ dashboard });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: "Unable to load dashboard." }, { status: 500 });
   }

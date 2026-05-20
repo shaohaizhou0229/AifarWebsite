@@ -3415,6 +3415,11 @@ body:has(.admin-shell)::before {
   font-weight: 550;
 }
 
+.admin-nav-sidebar a.pending {
+  background: #f5f8ff;
+  color: var(--admin-blue);
+}
+
 .admin-nav-sidebar a svg {
   flex: 0 0 auto;
   color: currentColor;
@@ -3692,6 +3697,63 @@ body:has(.admin-shell)::before {
   font-size: 14px;
   line-height: 1.55;
   margin-top: 6px;
+}
+
+.admin-loading {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-loading-header,
+.admin-loading-grid span,
+.admin-loading-panel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #edf1f6;
+}
+
+.admin-loading-header {
+  display: grid;
+  width: min(520px, 100%);
+  gap: 10px;
+  padding: 12px;
+}
+
+.admin-loading-header span,
+.admin-loading-header strong,
+.admin-loading-header p {
+  display: block;
+  height: 12px;
+  border-radius: 999px;
+  background: #dfe5ee;
+}
+
+.admin-loading-header span {
+  width: 120px;
+}
+
+.admin-loading-header strong {
+  width: min(320px, 80%);
+  height: 26px;
+}
+
+.admin-loading-header p {
+  width: min(460px, 90%);
+}
+
+.admin-loading-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-loading-grid span {
+  min-height: 88px;
+}
+
+.admin-loading-panel {
+  min-height: 260px;
 }
 
 .admin-dashboard-toolbar {

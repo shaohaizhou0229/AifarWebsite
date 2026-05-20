@@ -4,8 +4,6 @@ import { AdminNav } from "@/components/AdminNav";
 import { AdminSidebarCollapse } from "@/components/AdminSidebarCollapse";
 import { AdminTopBar } from "@/components/AdminTopBar";
 import { SignOutButton } from "@/components/SignOutButton";
-import { getCurrentUser } from "@/lib/auth";
-import { getProfile } from "@/lib/profiles";
 import { localizedPath } from "@/i18n/routing";
 
 export function AdminAccessDenied({ title, lead }) {
@@ -20,7 +18,7 @@ export function AdminAccessDenied({ title, lead }) {
   );
 }
 
-function getInitials(user, profile) {
+export function getAdminShellInitials(user, profile) {
   const name = profile?.displayName || user?.user_metadata?.name || user?.email || "A";
   const parts = String(name).trim().split(/\s+/).filter(Boolean);
   if (!parts.length) return "A";
@@ -28,26 +26,36 @@ function getInitials(user, profile) {
   return `${parts[0].slice(0, 1)}${parts[1].slice(0, 1)}`.toUpperCase();
 }
 
-async function resolveShellUser(currentUser) {
-  if (currentUser) return currentUser;
+export function AdminPageHeader({ locale, shell = {}, eyebrow, title, lead, breadcrumbs = [], actions = null }) {
+  if (!title && !lead && !eyebrow && !breadcrumbs.length && !actions) return null;
 
-  try {
-    const user = await getCurrentUser();
-    const profile = user?.id ? await getProfile(user.id) : null;
-    return {
-      name: profile?.displayName || user?.user_metadata?.name || user?.email || "Admin",
-      email: profile?.email || user?.email || "",
-      initials: getInitials(user, profile)
-    };
-  } catch {
-    return null;
-  }
+  return (
+    <>
+      {breadcrumbs.length ? (
+        <nav className="admin-breadcrumbs" aria-label={shell.breadcrumbs || "Breadcrumbs"}>
+          {breadcrumbs.map((item, index) => (
+            <span key={`${item.label}-${index}`}>
+              {item.href ? <Link href={localizedPath(locale, item.href)}>{item.label}</Link> : item.label}
+            </span>
+          ))}
+        </nav>
+      ) : null}
+      <header className="admin-page-header">
+        <div>
+          {eyebrow ? <span className="admin-eyebrow">{eyebrow}</span> : null}
+          {title ? <h1>{title}</h1> : null}
+          {lead ? <p>{lead}</p> : null}
+        </div>
+        {actions ? <div className="admin-page-actions">{actions}</div> : null}
+      </header>
+    </>
+  );
 }
 
-export async function AdminShell({
+export function AdminShell({
   locale,
   labels = {},
-  current = "home",
+  current = "",
   title,
   lead,
   eyebrow,
@@ -57,7 +65,7 @@ export async function AdminShell({
   children
 }) {
   const shell = labels.shell || {};
-  const shellUser = await resolveShellUser(user);
+  const shellUser = user;
 
   return (
     <main className="admin-shell">
@@ -116,23 +124,15 @@ export async function AdminShell({
       <section className="admin-main">
         <AdminTopBar locale={locale} labels={shell} title={title} user={shellUser} />
         <div className="admin-content">
-          {breadcrumbs.length ? (
-            <nav className="admin-breadcrumbs" aria-label={shell.breadcrumbs || "Breadcrumbs"}>
-              {breadcrumbs.map((item, index) => (
-                <span key={`${item.label}-${index}`}>
-                  {item.href ? <Link href={localizedPath(locale, item.href)}>{item.label}</Link> : item.label}
-                </span>
-              ))}
-            </nav>
-          ) : null}
-          <header className="admin-page-header">
-            <div>
-              {eyebrow ? <span className="admin-eyebrow">{eyebrow}</span> : null}
-              <h1>{title}</h1>
-              {lead ? <p>{lead}</p> : null}
-            </div>
-            {actions ? <div className="admin-page-actions">{actions}</div> : null}
-          </header>
+          <AdminPageHeader
+            locale={locale}
+            shell={shell}
+            eyebrow={eyebrow}
+            title={title}
+            lead={lead}
+            breadcrumbs={breadcrumbs}
+            actions={actions}
+          />
           {children}
         </div>
       </section>

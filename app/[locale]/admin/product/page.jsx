@@ -1,10 +1,10 @@
 import { setRequestLocale } from "next-intl/server";
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
-import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
+import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { AdminSiteContentForm } from "@/components/AdminSiteContentForm";
-import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
-import { getProfile } from "@/lib/profiles";
+import { AdminRequiredError } from "@/lib/auth";
+import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getAdminSitePageContent } from "@/lib/site-content";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
@@ -34,7 +34,7 @@ export default async function AdminProductPage({ params, searchParams }) {
   ]);
 
   try {
-    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.product);
+    await requireAdminPermissionCached(ADMIN_PERMISSIONS.product);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
@@ -49,10 +49,10 @@ export default async function AdminProductPage({ params, searchParams }) {
   const labels = messages.forms.siteContent;
 
   return (
-    <AdminShell
+    <>
+      <AdminPageHeader
       locale={locale}
-      labels={adminHome}
-      current="product"
+      shell={adminHome.shell}
       eyebrow={page.eyebrow}
       title={page.title}
       lead={page.lead}
@@ -60,7 +60,7 @@ export default async function AdminProductPage({ params, searchParams }) {
         { label: adminHome.nav.home, href: "/admin/" },
         { label: page.breadcrumb || page.title }
       ]}
-    >
+    />
       <div className="admin-detail-layout">
         <AdminSiteContentForm
           labels={labels}
@@ -75,6 +75,6 @@ export default async function AdminProductPage({ params, searchParams }) {
           localeOptions={locales.map((key) => ({ key, label: localeLabels[key] || key }))}
         />
       </div>
-    </AdminShell>
+    </>
   );
 }

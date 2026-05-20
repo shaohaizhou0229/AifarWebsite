@@ -1,9 +1,9 @@
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { AdminSupportClient } from "@/components/AdminTicketsClient";
-import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
-import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
-import { getProfile } from "@/lib/profiles";
+import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
+import { AdminRequiredError } from "@/lib/auth";
+import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { TICKET_CATEGORIES, TICKET_PRIORITIES, TICKET_STATUSES } from "@/lib/tickets";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
@@ -35,7 +35,7 @@ export default async function AdminSupportPage({ params, searchParams }) {
   ]);
 
   try {
-    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.support);
+    await requireAdminPermissionCached(ADMIN_PERMISSIONS.support);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
@@ -53,10 +53,10 @@ export default async function AdminSupportPage({ params, searchParams }) {
   };
 
   return (
-    <AdminShell
+    <>
+      <AdminPageHeader
       locale={locale}
-      labels={adminHome}
-      current="support"
+      shell={adminHome.shell}
       eyebrow={page.eyebrow}
       title={page.title}
       lead={page.lead}
@@ -64,8 +64,8 @@ export default async function AdminSupportPage({ params, searchParams }) {
         { label: adminHome.nav.home, href: "/admin/" },
         { label: page.breadcrumb }
       ]}
-    >
+    />
       <AdminSupportClient locale={locale} page={page} messages={messages} initialFilters={filters} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
-    </AdminShell>
+    </>
   );
 }
