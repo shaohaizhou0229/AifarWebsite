@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
+import { AdminRequiredError, AuthRequiredError, requireAdmin } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
-import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { getAdminTicket, TICKET_CATEGORIES, TICKET_PRIORITIES, TICKET_STATUSES, updateTicketFields } from "@/lib/tickets";
+import { ADMIN_PERMISSIONS, hasAdminPermission } from "@/lib/admin-permissions";
+import { getAdminTicket, getRequestWorkflow, TICKET_CATEGORIES, TICKET_PRIORITIES, TICKET_STATUSES, updateTicketFields } from "@/lib/tickets";
 import { createNotification, NOTIFICATION_EVENTS } from "@/lib/notifications";
 
 export const runtime = "nodejs";
@@ -17,9 +17,17 @@ function permissionError(error) {
   return null;
 }
 
+function assertTicketPermission(profile, ticket) {
+  const workflow = getRequestWorkflow(ticket?.requestType);
+  const permission = workflow === "support" ? ADMIN_PERMISSIONS.support : ADMIN_PERMISSIONS.contact;
+  if (!hasAdminPermission(profile, permission)) {
+    throw new AdminRequiredError("Administrator permission required.");
+  }
+}
+
 export async function GET(_request, { params }) {
   try {
-    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.support);
+    const { profile } = await requireAdmin(getProfile);
     const { id } = await params;
     const result = await getAdminTicket(id);
 
@@ -27,6 +35,7 @@ export async function GET(_request, { params }) {
       return NextResponse.json({ error: "Ticket not found." }, { status: 404 });
     }
 
+    assertTicketPermission(profile, result.ticket);
     return NextResponse.json(result);
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: "Unable to load ticket." }, { status: 500 });
@@ -35,7 +44,7 @@ export async function GET(_request, { params }) {
 
 export async function PATCH(request, { params }) {
   try {
-    const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.support);
+    const { user, profile } = await requireAdmin(getProfile);
     const { id } = await params;
     const payload = await request.json().catch(() => ({}));
     const input = {};
@@ -66,6 +75,10 @@ export async function PATCH(request, { params }) {
     }
 
     const before = await getAdminTicket(id);
+    if (!before) {
+      return NextResponse.json({ error: "Ticket not found." }, { status: 404 });
+    }
+    assertTicketPermission(profile, before.ticket);
     const ticket = await updateTicketFields(id, input, user);
     if (!ticket) {
       return NextResponse.json({ error: "Ticket not found." }, { status: 404 });

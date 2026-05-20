@@ -41,7 +41,7 @@ export default async function AdminContactPage({ params, searchParams }) {
 
   const query = await searchParams;
   const status = typeof query?.status === "string" && TICKET_STATUSES.has(query.status) ? query.status : "";
-  const initialTickets = await listAdminTickets({ status, limit: 20 });
+  const initialTickets = await listAdminTickets({ scope: "contact", status, limit: 20 });
 
   return (
     <>

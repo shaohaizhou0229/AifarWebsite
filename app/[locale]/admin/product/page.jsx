@@ -6,7 +6,7 @@ import { AdminSiteContentForm } from "@/components/AdminSiteContentForm";
 import { AdminRequiredError } from "@/lib/auth";
 import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { getAdminSitePageContent } from "@/lib/site-content";
+import { getAdminSitePageContent, listSiteContentSnapshots, listSitePageTemplates } from "@/lib/site-content";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localeLabels, locales, localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -45,7 +45,11 @@ export default async function AdminProductPage({ params, searchParams }) {
   const initialPageKey = query?.page === "product" ? "product" : "home";
   const initialLocale = locales.includes(query?.contentLocale) ? query.contentLocale : locale;
   const fallback = await getPageMessages(initialLocale, initialPageKey);
-  const contentState = await getAdminSitePageContent(initialPageKey, initialLocale, fallback);
+  const [contentState, snapshots, templates] = await Promise.all([
+    getAdminSitePageContent(initialPageKey, initialLocale, fallback),
+    listSiteContentSnapshots(initialPageKey, initialLocale),
+    listSitePageTemplates(initialPageKey, initialLocale)
+  ]);
   const labels = messages.forms.siteContent;
 
   return (
@@ -68,6 +72,8 @@ export default async function AdminProductPage({ params, searchParams }) {
           initialLocale={initialLocale}
           initialContent={contentState.content}
           initialEntry={contentState.entry}
+          initialSnapshots={snapshots}
+          initialTemplates={templates}
           pageOptions={[
             { key: "home", label: labels.homePage },
             { key: "product", label: labels.productPage }

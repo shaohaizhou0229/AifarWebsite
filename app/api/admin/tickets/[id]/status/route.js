@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
+import { AdminRequiredError, AuthRequiredError, requireAdmin } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
-import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { getTicketOwnerProfile, TICKET_STATUSES, updateTicketFields } from "@/lib/tickets";
+import { ADMIN_PERMISSIONS, hasAdminPermission } from "@/lib/admin-permissions";
+import { getAdminTicket, getRequestWorkflow, getTicketOwnerProfile, TICKET_STATUSES, updateTicketFields } from "@/lib/tickets";
 import { EMAIL_EVENTS, enqueueAndTrySend, getSiteUrl } from "@/lib/email";
 import { buildTicketStatusEmail } from "@/lib/email/templates";
 import { createNotification, NOTIFICATION_EVENTS } from "@/lib/notifications";
@@ -17,6 +17,14 @@ function permissionError(error) {
     return NextResponse.json({ error: error.message }, { status: 403 });
   }
   return null;
+}
+
+function assertTicketPermission(profile, ticket) {
+  const workflow = getRequestWorkflow(ticket?.requestType);
+  const permission = workflow === "support" ? ADMIN_PERMISSIONS.support : ADMIN_PERMISSIONS.contact;
+  if (!hasAdminPermission(profile, permission)) {
+    throw new AdminRequiredError("Administrator permission required.");
+  }
 }
 
 const NOTIFIED_STATUSES = new Set(["waiting_customer", "resolved", "closed"]);
@@ -51,7 +59,7 @@ async function queueTicketStatusEmail(ticket, status) {
 
 export async function PATCH(request, { params }) {
   try {
-    const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.support);
+    const { user, profile } = await requireAdmin(getProfile);
     const { id } = await params;
     const payload = await request.json().catch(() => ({}));
     const status = typeof payload.status === "string" ? payload.status : "";
@@ -60,6 +68,11 @@ export async function PATCH(request, { params }) {
       return NextResponse.json({ error: "Invalid ticket status." }, { status: 400 });
     }
 
+    const before = await getAdminTicket(id);
+    if (!before) {
+      return NextResponse.json({ error: "Ticket not found." }, { status: 404 });
+    }
+    assertTicketPermission(profile, before.ticket);
     const ticket = await updateTicketFields(id, { status }, user);
     if (!ticket) {
       return NextResponse.json({ error: "Ticket not found." }, { status: 404 });

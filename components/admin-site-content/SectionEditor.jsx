@@ -99,6 +99,35 @@ export function SectionEditor({ section, labels, uploadingSectionId, onPatchSect
         </>
       ) : null}
 
+      {section.type === "support_entry" ? (
+        <>
+          <div className="form-grid two">
+            <Field label={labels.variant}>
+              <select value={section.variant || "four"} onChange={(event) => onPatchSection(section.id, (current) => ({ ...current, variant: event.target.value }))}>
+                <option value="four">{labels.variants?.four}</option>
+                <option value="three">{labels.variants?.three}</option>
+              </select>
+            </Field>
+            <Field label={labels.sectionTone}>
+              <select value={section.settings?.tone || "alt"} onChange={(event) => onPatchSection(section.id, (current) => ({ ...current, settings: { ...(current.settings || {}), tone: event.target.value } }))}>
+                <option value="plain">{labels.tones?.plain}</option>
+                <option value="alt">{labels.tones?.alt}</option>
+              </select>
+            </Field>
+          </div>
+          <Field label={labels.anchorId}><TextInput value={section.settings?.anchorId} onChange={(value) => onPatchSection(section.id, (current) => ({ ...current, settings: { ...(current.settings || {}), anchorId: value } }))} /></Field>
+          <Field label={labels.title}><TextInput value={contentValues.title} onChange={(value) => onPatchSectionContent(section.id, "title", value)} /></Field>
+          <Field label={labels.lead}><TextInput multiline value={contentValues.lead} onChange={(value) => onPatchSectionContent(section.id, "lead", value)} /></Field>
+          <RowEditor
+            labels={labels}
+            rows={contentValues.items}
+            columns={5}
+            placeholders={[labels.icon, labels.itemTitle, labels.description, labels.actionHref, labels.defaultRequestType]}
+            onChange={(rows) => onPatchSectionContent(section.id, "items", rows)}
+          />
+        </>
+      ) : null}
+
       {section.type === "updates_list" ? (
         <>
           <Field label={labels.sectionTone}>

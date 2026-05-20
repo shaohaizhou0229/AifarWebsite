@@ -71,7 +71,12 @@
         "product_inquiry": "Product inquiry",
         "technical_support": "Technical support",
         "partnership": "Partnership",
-        "other": "Other"
+        "other": "Other",
+        "account_access": "Account issue",
+        "client_download": "Client download or install",
+        "installation": "Deployment or installation",
+        "product_usage": "Product usage",
+        "bug_report": "Issue or failure report"
       }
     },
     "profile": {
@@ -208,7 +213,7 @@
       "sections": "Page blocks",
       "inspector": "Block settings",
       "noSectionSelected": "Select or add a block to edit its fields.",
-      "templateApplied": "Template applied. Save the draft before publishing.",
+      "templateApplied": "Page plan applied to the draft.",
       "moveUp": "Move up",
       "moveDown": "Move down",
       "removeSection": "Remove block",
@@ -225,7 +230,7 @@
       "templateNames": {
         "home-current": "Current homepage",
         "product-current": "Current product page",
-        "conversion": "Marketing conversion"
+        "conversion": "Conversion page plan"
       },
       "sectionTypes": {
         "hero": "Hero",
@@ -235,7 +240,8 @@
         "capability_matrix": "Capability matrix",
         "media_feature": "Media feature",
         "updates_list": "Updates list",
-        "cta_band": "CTA band"
+        "cta_band": "CTA band",
+        "support_entry": "Support and request entry"
       },
       "variants": {
         "split": "Split hero",
@@ -289,7 +295,30 @@
       "publishing": "Publishing...",
       "published": "Published content updated.",
       "publishFailed": "Unable to publish content.",
-      "loadFailed": "Unable to load content."
+      "loadFailed": "Unable to load content.",
+      "anchorId": "Anchor ID",
+      "defaultRequestType": "Default request type",
+      "templateName": "Template name",
+      "templateDescription": "Template description",
+      "includeSeo": "Include SEO when applying",
+      "saveAsTemplate": "Save as page plan",
+      "updateTemplate": "Update this page plan",
+      "archiveTemplate": "Archive this page plan",
+      "templateSaved": "Page plan saved.",
+      "templateSaveFailed": "Unable to save page plan.",
+      "templateArchived": "Page plan archived.",
+      "templateArchiveFailed": "Unable to archive page plan.",
+      "history": "Content timeline",
+      "noHistory": "No snapshots yet.",
+      "restoreVersion": "Restore to draft",
+      "restored": "Version restored.",
+      "restoreFailed": "Unable to restore version.",
+      "snapshotTypes": {
+        "draft_saved": "Draft saved",
+        "published": "Published",
+        "restored": "Restored",
+        "template_applied": "Page plan applied"
+      }
     },
     "documents": {
       "markdownFile": "Markdown source file",
@@ -600,12 +629,12 @@
     },
     "contact": {
       "seo": {
-        "title": "Contact | Aifar",
-        "description": "Contact Aifar for government and enterprise collaboration product inquiries, technical support, and partnership discussions."
+        "title": "Submit a request | Aifar",
+        "description": "Submit product inquiries, partnership requests, technical support, account, deployment, and issue reports to Aifar."
       },
-      "eyebrow": "Contact",
-      "title": "Talk with the Aifar team.",
-      "lead": "Use this placeholder form for the first website version. Later it can submit directly into Aifar Forms, Workflow, Contact, and Email."
+      "eyebrow": "Submit request",
+      "title": "Tell us what you need from Aifar.",
+      "lead": "Choose the request type first. Product and partnership questions go to the contact queue; technical, account, deployment, and issue reports go to the support queue."
     },
     "security": {
       "seo": {
@@ -1218,7 +1247,24 @@
       "publishedAt": "Published",
       "noVersion": "No version configured",
       "noFile": "No file or external URL configured",
-      "originalFile": "Original file"
+      "originalFile": "Original file",
+      "history": "Release timeline",
+      "noHistory": "No release snapshots yet.",
+      "restoreVersion": "Restore this snapshot",
+      "restored": "Release restored.",
+      "restoreFailed": "Unable to restore release.",
+      "snapshotTypes": {
+        "details_saved": "Details saved",
+        "published": "Published",
+        "file_uploaded": "File uploaded",
+        "upload_started": "Upload started",
+        "upload_idle": "Upload reset",
+        "upload_uploading": "Uploading",
+        "upload_uploaded": "Upload completed",
+        "upload_failed": "Upload failed",
+        "file_cleared": "File removed",
+        "restored": "Restored"
+      }
     },
     "docDetail": {
       "seo": {
@@ -1252,7 +1298,11 @@
       "draft": "Draft",
       "category": "Category",
       "history": "Version history",
-      "noVersion": "No version"
+      "noVersion": "No version",
+      "noHistory": "No document versions yet.",
+      "restoreVersion": "Restore this version",
+      "restored": "Document version restored.",
+      "restoreFailed": "Unable to restore document version."
     },
     "adminUsers": {
       "seo": {

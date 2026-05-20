@@ -71,7 +71,12 @@
         "product_inquiry": "Demande produit",
         "technical_support": "Support technique",
         "partnership": "Partenariat",
-        "other": "Autre"
+        "other": "Autre",
+        "account_access": "Probleme de compte",
+        "client_download": "Telechargement ou installation client",
+        "installation": "Deploiement ou installation",
+        "product_usage": "Utilisation du produit",
+        "bug_report": "Incident ou panne"
       }
     },
     "profile": {
@@ -208,7 +213,7 @@
       "sections": "Blocs de page",
       "inspector": "Reglages du bloc",
       "noSectionSelected": "Selectionnez ou ajoutez un bloc pour modifier ses champs.",
-      "templateApplied": "Modele applique. Enregistrez le brouillon avant publication.",
+      "templateApplied": "Plan de page applique au brouillon.",
       "moveUp": "Monter",
       "moveDown": "Descendre",
       "removeSection": "Supprimer le bloc",
@@ -225,7 +230,7 @@
       "templateNames": {
         "home-current": "Accueil actuel",
         "product-current": "Page produit actuelle",
-        "conversion": "Conversion marketing"
+        "conversion": "Plan de page de conversion"
       },
       "sectionTypes": {
         "hero": "Hero",
@@ -235,7 +240,8 @@
         "capability_matrix": "Matrice de capacites",
         "media_feature": "Argument visuel",
         "updates_list": "Liste des mises a jour",
-        "cta_band": "Bandeau CTA"
+        "cta_band": "Bandeau CTA",
+        "support_entry": "Entree support et demandes"
       },
       "variants": {
         "split": "Hero divise",
@@ -289,7 +295,30 @@
       "publishing": "Publication...",
       "published": "Contenu publié mis à jour.",
       "publishFailed": "Impossible de publier le contenu.",
-      "loadFailed": "Impossible de charger le contenu."
+      "loadFailed": "Impossible de charger le contenu.",
+      "anchorId": "Ancre de page",
+      "defaultRequestType": "Type de demande par defaut",
+      "templateName": "Nom du modele",
+      "templateDescription": "Description du modele",
+      "includeSeo": "Inclure le SEO a appliquer",
+      "saveAsTemplate": "Enregistrer comme plan de page",
+      "updateTemplate": "Mettre a jour ce plan",
+      "archiveTemplate": "Archiver ce plan",
+      "templateSaved": "Plan de page enregistre.",
+      "templateSaveFailed": "Impossible d enregistrer le plan.",
+      "templateArchived": "Plan de page archive.",
+      "templateArchiveFailed": "Impossible d archiver le plan.",
+      "history": "Historique du contenu",
+      "noHistory": "Aucun instantane.",
+      "restoreVersion": "Restaurer en brouillon",
+      "restored": "Version restauree.",
+      "restoreFailed": "Impossible de restaurer.",
+      "snapshotTypes": {
+        "draft_saved": "Brouillon enregistre",
+        "published": "Publie",
+        "restored": "Restaure",
+        "template_applied": "Plan applique"
+      }
     },
     "documents": {
       "markdownFile": "Markdown source file",
@@ -600,12 +629,12 @@
     },
     "contact": {
       "seo": {
-        "title": "Présentation Aifar | Aifar",
-        "description": "Informations Aifar pour les équipes et les organisations."
+        "title": "Envoyer une demande | Aifar",
+        "description": "Envoyez a Aifar vos demandes produit, partenariat, support technique, compte, deploiement et incidents."
       },
-      "eyebrow": "Contact",
-      "title": "Présentation Aifar",
-      "lead": "Informations structurées sur les capacités et services Aifar."
+      "eyebrow": "Demande",
+      "title": "Dites-nous ce dont vous avez besoin.",
+      "lead": "Choisissez le type de demande. Les sujets commerciaux vont aux demandes de contact; les sujets techniques, compte, deploiement et incidents vont au support."
     },
     "security": {
       "seo": {
@@ -1218,7 +1247,24 @@
       "publishedAt": "Présentation Aifar",
       "noVersion": "Présentation Aifar",
       "noFile": "Présentation Aifar",
-      "originalFile": "Présentation Aifar"
+      "originalFile": "Présentation Aifar",
+      "history": "Historique de publication",
+      "noHistory": "Aucun instantane de publication.",
+      "restoreVersion": "Restaurer cet instantane",
+      "restored": "Publication restauree.",
+      "restoreFailed": "Impossible de restaurer la publication.",
+      "snapshotTypes": {
+        "details_saved": "Details enregistres",
+        "published": "Publie",
+        "file_uploaded": "Fichier envoye",
+        "upload_started": "Envoi demarre",
+        "upload_idle": "Envoi reinitialise",
+        "upload_uploading": "Envoi en cours",
+        "upload_uploaded": "Envoi termine",
+        "upload_failed": "Echec de l envoi",
+        "file_cleared": "Fichier retire",
+        "restored": "Restaure"
+      }
     },
     "docDetail": {
       "seo": {
@@ -1252,7 +1298,11 @@
       "draft": "Draft",
       "category": "Category",
       "history": "Version history",
-      "noVersion": "No version"
+      "noVersion": "No version",
+      "noHistory": "Aucune version de document.",
+      "restoreVersion": "Restaurer cette version",
+      "restored": "Version du document restauree.",
+      "restoreFailed": "Impossible de restaurer la version."
     },
     "adminUsers": {
       "seo": {

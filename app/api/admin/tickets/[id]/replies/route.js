@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
+import { AdminRequiredError, AuthRequiredError, requireAdmin } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
-import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { addAdminReply, getAdminTicket, getTicketOwnerProfile, normalizeText } from "@/lib/tickets";
+import { ADMIN_PERMISSIONS, hasAdminPermission } from "@/lib/admin-permissions";
+import { addAdminReply, getAdminTicket, getRequestWorkflow, getTicketOwnerProfile, normalizeText } from "@/lib/tickets";
 import { EMAIL_EVENTS, enqueueAndTrySend, getSiteUrl } from "@/lib/email";
 import { buildTicketReplyEmail } from "@/lib/email/templates";
 import { createNotification, NOTIFICATION_EVENTS } from "@/lib/notifications";
@@ -17,6 +17,14 @@ function permissionError(error) {
     return NextResponse.json({ error: error.message }, { status: 403 });
   }
   return null;
+}
+
+function assertTicketPermission(profile, ticket) {
+  const workflow = getRequestWorkflow(ticket?.requestType);
+  const permission = workflow === "support" ? ADMIN_PERMISSIONS.support : ADMIN_PERMISSIONS.contact;
+  if (!hasAdminPermission(profile, permission)) {
+    throw new AdminRequiredError("Administrator permission required.");
+  }
 }
 
 async function queueTicketReplyEmail(ticketId, message, adminUser) {
@@ -51,7 +59,7 @@ async function queueTicketReplyEmail(ticketId, message, adminUser) {
 
 export async function POST(request, { params }) {
   try {
-    const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.support);
+    const { user, profile } = await requireAdmin(getProfile);
     const { id } = await params;
     const payload = await request.json().catch(() => ({}));
     const message = normalizeText(payload.message);
@@ -60,6 +68,11 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: "Reply message is required." }, { status: 400 });
     }
 
+    const detail = await getAdminTicket(id);
+    if (!detail) {
+      return NextResponse.json({ error: "Ticket not found." }, { status: 404 });
+    }
+    assertTicketPermission(profile, detail.ticket);
     await addAdminReply(id, user, message);
     const emailQueued = await queueTicketReplyEmail(id, message, user);
     const owner = await getTicketOwnerProfile(id);

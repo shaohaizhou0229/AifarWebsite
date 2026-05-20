@@ -71,7 +71,12 @@
         "product_inquiry": "استفسار عن المنتج",
         "technical_support": "دعم فني",
         "partnership": "شراكة",
-        "other": "أخرى"
+        "other": "أخرى",
+        "account_access": "Account issue",
+        "client_download": "Client download or install",
+        "installation": "Deployment or installation",
+        "product_usage": "Product usage",
+        "bug_report": "Issue or failure report"
       }
     },
     "profile": {
@@ -208,7 +213,7 @@
       "sections": "أقسام الصفحة",
       "inspector": "إعدادات القسم",
       "noSectionSelected": "حدد أو أضف قسماً لتعديل حقوله.",
-      "templateApplied": "تم تطبيق القالب. احفظ المسودة قبل النشر.",
+      "templateApplied": "Page plan applied to the draft.",
       "moveUp": "تحريك للأعلى",
       "moveDown": "تحريك للأسفل",
       "removeSection": "إزالة القسم",
@@ -225,7 +230,7 @@
       "templateNames": {
         "home-current": "الصفحة الرئيسية الحالية",
         "product-current": "صفحة المنتج الحالية",
-        "conversion": "قالب تسويقي"
+        "conversion": "Conversion page plan"
       },
       "sectionTypes": {
         "hero": "البطل",
@@ -235,7 +240,8 @@
         "capability_matrix": "مصفوفة القدرات",
         "media_feature": "ميزة مع صورة",
         "updates_list": "قائمة التحديثات",
-        "cta_band": "شريط الدعوة"
+        "cta_band": "شريط الدعوة",
+        "support_entry": "Support and request entry"
       },
       "variants": {
         "split": "بطل مقسم",
@@ -289,7 +295,30 @@
       "publishing": "جار النشر...",
       "published": "تم تحديث المحتوى المنشور.",
       "publishFailed": "تعذر نشر المحتوى.",
-      "loadFailed": "تعذر تحميل المحتوى."
+      "loadFailed": "تعذر تحميل المحتوى.",
+      "anchorId": "Anchor ID",
+      "defaultRequestType": "Default request type",
+      "templateName": "Template name",
+      "templateDescription": "Template description",
+      "includeSeo": "Include SEO when applying",
+      "saveAsTemplate": "Save as page plan",
+      "updateTemplate": "Update this page plan",
+      "archiveTemplate": "Archive this page plan",
+      "templateSaved": "Page plan saved.",
+      "templateSaveFailed": "Unable to save page plan.",
+      "templateArchived": "Page plan archived.",
+      "templateArchiveFailed": "Unable to archive page plan.",
+      "history": "Content timeline",
+      "noHistory": "No snapshots yet.",
+      "restoreVersion": "Restore to draft",
+      "restored": "Version restored.",
+      "restoreFailed": "Unable to restore version.",
+      "snapshotTypes": {
+        "draft_saved": "Draft saved",
+        "published": "Published",
+        "restored": "Restored",
+        "template_applied": "Page plan applied"
+      }
     },
     "documents": {
       "markdownFile": "Markdown source file",
@@ -600,12 +629,12 @@
     },
     "contact": {
       "seo": {
-        "title": "معلومات Aifar | Aifar",
-        "description": "معلومات Aifar للفرق والمؤسسات."
+        "title": "Submit a request | Aifar",
+        "description": "Submit product, partnership, technical support, account, deployment, and issue requests to Aifar."
       },
-      "eyebrow": "Contact",
-      "title": "معلومات Aifar",
-      "lead": "معلومات منظمة حول قدرات Aifar وخدماته."
+      "eyebrow": "Request",
+      "title": "Tell us what you need from Aifar.",
+      "lead": "Choose the request type. Business questions go to contact requests; technical, account, deployment, and issue reports go to support tickets."
     },
     "security": {
       "seo": {
@@ -1218,7 +1247,24 @@
       "publishedAt": "معلومات Aifar",
       "noVersion": "معلومات Aifar",
       "noFile": "معلومات Aifar",
-      "originalFile": "معلومات Aifar"
+      "originalFile": "معلومات Aifar",
+      "history": "Release timeline",
+      "noHistory": "No release snapshots yet.",
+      "restoreVersion": "Restore this snapshot",
+      "restored": "Release restored.",
+      "restoreFailed": "Unable to restore release.",
+      "snapshotTypes": {
+        "details_saved": "Details saved",
+        "published": "Published",
+        "file_uploaded": "File uploaded",
+        "upload_started": "Upload started",
+        "upload_idle": "Upload reset",
+        "upload_uploading": "Uploading",
+        "upload_uploaded": "Upload completed",
+        "upload_failed": "Upload failed",
+        "file_cleared": "File removed",
+        "restored": "Restored"
+      }
     },
     "docDetail": {
       "seo": {
@@ -1252,7 +1298,11 @@
       "draft": "Draft",
       "category": "Category",
       "history": "Version history",
-      "noVersion": "No version"
+      "noVersion": "No version",
+      "noHistory": "No document versions yet.",
+      "restoreVersion": "Restore this version",
+      "restored": "Document version restored.",
+      "restoreFailed": "Unable to restore document version."
     },
     "adminUsers": {
       "seo": {

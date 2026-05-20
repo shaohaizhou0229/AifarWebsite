@@ -2,9 +2,10 @@ import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { AdminDownloadForm } from "@/components/AdminDownloadForm";
+import { AdminVersionTimeline } from "@/components/AdminVersionTimeline";
 import { AdminRequiredError } from "@/lib/auth";
 import { requireAdminPermissionCached } from "@/lib/admin-context";
-import { formatFileSize, getAdminDownloadPlatform } from "@/lib/downloads";
+import { formatFileSize, getAdminDownloadPlatform, listClientReleaseVersions } from "@/lib/downloads";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
@@ -43,7 +44,10 @@ export default async function AdminDownloadDetailPage({ params }) {
     redirect(localizedPath(locale, "/login/"));
   }
 
-  const platform = await getAdminDownloadPlatform(platformKey);
+  const [platform, versions] = await Promise.all([
+    getAdminDownloadPlatform(platformKey),
+    listClientReleaseVersions(platformKey)
+  ]);
   if (!platform) notFound();
 
   const release = platform.release;
@@ -75,6 +79,25 @@ export default async function AdminDownloadDetailPage({ params }) {
           {release.publishedAt ? <p className="muted-line">{page.publishedAt}: {formatDate(release.publishedAt, locale)}</p> : null}
         </article>
         <AdminDownloadForm platform={platform} labels={messages.forms.downloads} />
+        <AdminVersionTimeline
+          title={page.history}
+          emptyText={page.noHistory}
+          restoreLabel={page.restoreVersion}
+          restoredLabel={page.restored}
+          failedLabel={page.restoreFailed}
+          locale={locale}
+          items={versions.map((version) => ({
+            id: version.id,
+            label: page.snapshotTypes?.[version.snapshotType] || version.snapshotType,
+            summary: [
+              version.version || page.noVersion,
+              version.originalFilename,
+              getUploadStatusLabel(messages.forms.downloads, version.uploadStatus)
+            ].filter(Boolean).join(" - "),
+            createdAt: version.createdAt,
+            restoreUrl: `/api/admin/downloads/${platform.key}/versions/${version.id}/restore/`
+          }))}
+        />
       </div>
     </>
   );

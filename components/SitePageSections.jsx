@@ -187,6 +187,33 @@ function MediaFeatureSection({ section }) {
   );
 }
 
+function SupportEntrySection({ section, locale }) {
+  const content = section.content || {};
+  const items = Array.isArray(content.items) ? content.items : [];
+  const columns = section.variant === "three" ? "three" : "four";
+  const anchorId = section.settings?.anchorId || undefined;
+
+  return (
+    <section className={sectionTone(section)} id={anchorId}>
+      <div className="section-inner">
+        <SectionHead title={content.title} lead={content.lead} />
+        <div className={`support-entry-grid grid ${columns}`}>
+          {items.map(([icon, title, description, href, requestType], index) => {
+            const actionHref = href || (requestType ? `/contact/?type=${requestType}` : "");
+            return (
+              <SiteActionLink className="support-entry-card card" href={resolveHref(locale, actionHref)} key={`${title}-${index}`}>
+                <span className="icon">{icon}</span>
+                <h3>{title}</h3>
+                <p>{description}</p>
+              </SiteActionLink>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function UpdatesSection({ section, locale }) {
   const content = section.content || {};
   const items = Array.isArray(content.items) ? content.items : [];
@@ -234,6 +261,7 @@ export function SitePageSections({ page, locale }) {
         if (section.type === "card_grid" || section.type === "capability_matrix") return <CardGridSection section={section} locale={locale} key={section.id} />;
         if (section.type === "feature_list") return <FeatureListSection section={section} key={section.id} />;
         if (section.type === "media_feature") return <MediaFeatureSection section={section} key={section.id} />;
+        if (section.type === "support_entry") return <SupportEntrySection section={section} locale={locale} key={section.id} />;
         if (section.type === "updates_list") return <UpdatesSection section={section} locale={locale} key={section.id} />;
         if (section.type === "cta_band") return <CtaSection section={section} locale={locale} key={section.id} />;
         return null;

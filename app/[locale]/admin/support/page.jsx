@@ -53,7 +53,7 @@ export default async function AdminSupportPage({ params, searchParams }) {
     q: typeof query?.q === "string" ? query.q.trim() : ""
   };
   const [tickets, stats, profiles] = await Promise.all([
-    listAdminTickets({ ...filters, limit: 20 }),
+    listAdminTickets({ ...filters, scope: "support", limit: 20 }),
     getAdminTicketStats(),
     listAdminProfiles()
   ]);

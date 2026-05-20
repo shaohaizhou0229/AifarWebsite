@@ -1,11 +1,16 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
 import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { getAdminSitePageContent, listSiteContentSnapshots, listSitePageTemplates, publishSitePageDraft, sanitizeSiteLocale, sanitizeSitePageKey } from "@/lib/site-content";
+import {
+  applySitePageTemplateToDraft,
+  getAdminSitePageContent,
+  listSiteContentSnapshots,
+  listSitePageTemplates,
+  sanitizeSiteLocale,
+  sanitizeSitePageKey
+} from "@/lib/site-content";
 import { getPageMessages } from "@/i18n/messages";
-import { localizedPath } from "@/i18n/routing";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,21 +25,12 @@ function permissionError(error) {
   return null;
 }
 
-function revalidatePublicSitePage(pageKey, locale) {
-  const pathnameByPage = {
-    home: "/",
-    product: "/product/"
-  };
-  const pathname = pathnameByPage[pageKey];
-  if (pathname) {
-    revalidatePath(localizedPath(locale, pathname));
-  }
-}
+export async function POST(request, { params }) {
+  const { id } = await params;
 
-export async function POST(request) {
   try {
     const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.product);
-    const body = await request.json();
+    const body = await request.json().catch(() => ({}));
     const pageKey = sanitizeSitePageKey(body.pageKey);
     const locale = sanitizeSiteLocale(body.locale);
 
@@ -42,9 +38,11 @@ export async function POST(request) {
       return NextResponse.json({ error: "Unknown page or locale." }, { status: 400 });
     }
 
-    const entry = await publishSitePageDraft(pageKey, locale, user);
-    revalidatePublicSitePage(pageKey, locale);
     const fallback = await getPageMessages(locale, pageKey);
+    const entry = await applySitePageTemplateToDraft(id, pageKey, locale, user, fallback);
+    if (!entry) {
+      return NextResponse.json({ error: "Template not found." }, { status: 404 });
+    }
     const [result, snapshots, templates] = await Promise.all([
       getAdminSitePageContent(pageKey, locale, fallback),
       listSiteContentSnapshots(pageKey, locale),
@@ -52,6 +50,6 @@ export async function POST(request) {
     ]);
     return NextResponse.json({ ...result, entry, snapshots, templates });
   } catch (error) {
-    return permissionError(error) || NextResponse.json({ error: error.message || "Could not publish site content." }, { status: 400 });
+    return permissionError(error) || NextResponse.json({ error: error.message || "Could not apply template." }, { status: 400 });
   }
 }

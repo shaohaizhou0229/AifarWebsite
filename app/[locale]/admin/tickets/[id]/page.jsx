@@ -2,11 +2,11 @@ import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { AdminTicketActions } from "@/components/AdminTicketActions";
-import { AdminRequiredError } from "@/lib/auth";
-import { requireAdminPermissionCached } from "@/lib/admin-context";
-import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
+import { AdminRequiredError, requireAdmin } from "@/lib/auth";
+import { ADMIN_PERMISSIONS, hasAdminPermission } from "@/lib/admin-permissions";
 import { listAdminProfiles } from "@/lib/profiles";
-import { getAdminTicket } from "@/lib/tickets";
+import { getProfile } from "@/lib/profiles";
+import { getAdminTicket, getRequestWorkflow } from "@/lib/tickets";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -32,8 +32,9 @@ export default async function AdminTicketDetailPage({ params }) {
   const [page, messages] = await Promise.all([getPageMessages(locale, "adminTicketDetail"), getLocaleMessages(locale)]);
   const adminHome = await getPageMessages(locale, "adminHome");
 
+  let profile;
   try {
-    await requireAdminPermissionCached(ADMIN_PERMISSIONS.support);
+    ({ profile } = await requireAdmin(getProfile));
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
@@ -48,7 +49,15 @@ export default async function AdminTicketDetailPage({ params }) {
   if (!result) notFound();
 
   const { ticket, replies, internalNotes } = result;
+  const workflow = getRequestWorkflow(ticket.requestType);
+  const requiredPermission = workflow === "support" ? ADMIN_PERMISSIONS.support : ADMIN_PERMISSIONS.contact;
+  if (!hasAdminPermission(profile, requiredPermission)) {
+    return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
+  }
   const adminLabels = messages.forms.admin;
+  const parentBreadcrumb = workflow === "support"
+    ? { label: adminHome.nav.support, href: "/admin/support/" }
+    : { label: adminHome.nav.contact, href: "/admin/contact/" };
 
   return (
     <>
@@ -60,7 +69,7 @@ export default async function AdminTicketDetailPage({ params }) {
       lead={`${ticket.name} - ${ticket.workEmail} - ${page.submitted} ${formatDate(ticket.createdAt, locale)}`}
       breadcrumbs={[
         { label: adminHome.nav.home, href: "/admin/" },
-        { label: adminHome.nav.support, href: "/admin/support/" },
+        parentBreadcrumb,
         { label: page.breadcrumb }
       ]}
     />

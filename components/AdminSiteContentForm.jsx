@@ -1,14 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { SITE_LAYOUT_VERSION, createBlankSection, createSitePageTemplate } from "@/lib/site-page-builder";
+import { useEffect, useMemo, useState } from "react";
+import { SITE_LAYOUT_VERSION, createBlankSection } from "@/lib/site-page-builder";
+import { AdminVersionTimeline } from "@/components/AdminVersionTimeline";
 import { CmsToolbar } from "@/components/admin-site-content/CmsToolbar";
 import { ContentStatusPanel } from "@/components/admin-site-content/ContentStatusPanel";
 import { SectionEditor } from "@/components/admin-site-content/SectionEditor";
 import { SectionList } from "@/components/admin-site-content/SectionList";
 import { SectionSidebar } from "@/components/admin-site-content/SectionSidebar";
 import { SeoEditor } from "@/components/admin-site-content/SeoEditor";
-import { EMPTY_ENTRY, TEMPLATE_KEYS, ensureLayout, moveItem, updateSectionAt, updateSeo } from "@/components/admin-site-content/form-utils";
+import { EMPTY_ENTRY, ensureLayout, moveItem, updateSectionAt, updateSeo } from "@/components/admin-site-content/form-utils";
 
 export function AdminSiteContentForm({
   labels,
@@ -16,6 +17,8 @@ export function AdminSiteContentForm({
   initialLocale,
   initialContent,
   initialEntry,
+  initialSnapshots = [],
+  initialTemplates = [],
   pageOptions,
   localeOptions
 }) {
@@ -31,6 +34,10 @@ export function AdminSiteContentForm({
   const [uploadingSectionId, setUploadingSectionId] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [snapshots, setSnapshots] = useState(initialSnapshots);
+  const [templates, setTemplates] = useState(initialTemplates);
+  const [templateDraft, setTemplateDraft] = useState({ name: "", description: "", includeSeo: false });
+  const [templateSaving, setTemplateSaving] = useState(false);
 
   const currentPage = useMemo(
     () => pageOptions.find((option) => option.key === pageKey) || pageOptions[0],
@@ -38,6 +45,16 @@ export function AdminSiteContentForm({
   );
   const sections = Array.isArray(content.sections) ? content.sections : [];
   const selectedSection = sections.find((section) => section.id === selectedSectionId) || sections[0] || null;
+
+  useEffect(() => {
+    setSnapshots(initialSnapshots);
+    setTemplates(initialTemplates);
+  }, [initialSnapshots, initialTemplates]);
+
+  function updateServerState(data) {
+    if (Array.isArray(data.snapshots)) setSnapshots(data.snapshots);
+    if (Array.isArray(data.templates)) setTemplates(data.templates);
+  }
 
   async function loadContent(nextPageKey, nextLocale) {
     setLoading(true);
@@ -58,6 +75,7 @@ export function AdminSiteContentForm({
       setContent(nextContent);
       setEntry(data.entry || EMPTY_ENTRY);
       setSelectedSectionId(nextContent.sections[0]?.id || "");
+      updateServerState(data);
     } catch (loadError) {
       setError(loadError.message || labels.loadFailed);
     } finally {
@@ -87,6 +105,7 @@ export function AdminSiteContentForm({
       setContent(nextContent);
       setEntry(data.entry || EMPTY_ENTRY);
       setSelectedSectionId((current) => current || nextContent.sections[0]?.id || "");
+      updateServerState(data);
       setMessage(labels.saved);
     } catch (saveError) {
       setError(saveError.message || labels.saveFailed);
@@ -115,6 +134,7 @@ export function AdminSiteContentForm({
       const nextContent = ensureLayout(data.content);
       setContent(nextContent);
       setEntry(data.entry || EMPTY_ENTRY);
+      updateServerState(data);
       setMessage(labels.published);
     } catch (publishError) {
       setError(publishError.message || labels.publishFailed);
@@ -182,15 +202,102 @@ export function AdminSiteContentForm({
     }));
   }
 
-  function applyTemplate(templateKey) {
-    const template = createSitePageTemplate(templateKey, pageKey, content);
-    setContent(ensureLayout({
-      ...template,
-      seo: content.seo || template.seo
-    }));
-    setSelectedSectionId(template.sections[0]?.id || "");
-    setMessage(labels.templateApplied);
+  async function applyTemplate(templateRecord) {
+    setTemplateSaving(true);
+    setMessage("");
     setError("");
+    try {
+      const response = await fetch(`/api/admin/site-content/templates/${templateRecord.id}/apply/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pageKey, locale })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || labels.templateSaveFailed);
+      const nextContent = ensureLayout(data.content);
+      setContent(nextContent);
+      setEntry(data.entry || EMPTY_ENTRY);
+      setSelectedSectionId(nextContent.sections[0]?.id || "");
+      updateServerState(data);
+      setMessage(labels.templateApplied);
+    } catch (templateError) {
+      setError(templateError.message || labels.templateSaveFailed);
+    } finally {
+      setTemplateSaving(false);
+    }
+  }
+
+  async function createTemplate() {
+    setTemplateSaving(true);
+    setMessage("");
+    setError("");
+    try {
+      const response = await fetch("/api/admin/site-content/templates/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...templateDraft, pageKey, locale, content: ensureLayout(content) })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || labels.templateSaveFailed);
+      setTemplates((current) => [...current, data.template]);
+      setTemplateDraft({ name: "", description: "", includeSeo: false });
+      setMessage(labels.templateSaved);
+    } catch (templateError) {
+      setError(templateError.message || labels.templateSaveFailed);
+    } finally {
+      setTemplateSaving(false);
+    }
+  }
+
+  async function updateTemplate(template) {
+    setTemplateSaving(true);
+    setMessage("");
+    setError("");
+    try {
+      const response = await fetch(`/api/admin/site-content/templates/${template.id}/`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: template.name,
+          description: template.description,
+          includeSeo: template.includeSeo,
+          content: ensureLayout(content)
+        })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || labels.templateSaveFailed);
+      setTemplates((current) => current.map((item) => (item.id === template.id ? data.template : item)));
+      setMessage(labels.templateSaved);
+    } catch (templateError) {
+      setError(templateError.message || labels.templateSaveFailed);
+    } finally {
+      setTemplateSaving(false);
+    }
+  }
+
+  async function archiveTemplate(template) {
+    setMessage("");
+    setError("");
+    try {
+      const response = await fetch(`/api/admin/site-content/templates/${template.id}/`, { method: "DELETE" });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || labels.templateArchiveFailed);
+      setTemplates((current) => current.filter((item) => item.id !== template.id));
+      setMessage(labels.templateArchived);
+    } catch (templateError) {
+      setError(templateError.message || labels.templateArchiveFailed);
+    }
+  }
+
+  async function restoreSnapshot(snapshot) {
+    const response = await fetch(`/api/admin/site-content/snapshots/${snapshot.id}/restore/`, { method: "POST" });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || labels.restoreFailed);
+    const nextContent = ensureLayout(data.content);
+    setContent(nextContent);
+    setEntry(data.entry || EMPTY_ENTRY);
+    setSelectedSectionId(nextContent.sections[0]?.id || "");
+    updateServerState(data);
   }
 
   function addSection(type) {
@@ -249,7 +356,18 @@ export function AdminSiteContentForm({
       />
 
       <section className="builder-shell">
-        <SectionSidebar labels={labels} templateKeys={TEMPLATE_KEYS} onApplyTemplate={applyTemplate} onAddSection={addSection} />
+        <SectionSidebar
+          labels={labels}
+          templates={templates}
+          templateDraft={templateDraft}
+          templateSaving={templateSaving}
+          onTemplateDraftChange={setTemplateDraft}
+          onCreateTemplate={createTemplate}
+          onUpdateTemplate={updateTemplate}
+          onArchiveTemplate={archiveTemplate}
+          onApplyTemplate={applyTemplate}
+          onAddSection={addSection}
+        />
 
         <SectionList
           labels={labels}
@@ -282,6 +400,21 @@ export function AdminSiteContentForm({
           {publishing ? labels.publishing : labels.publish}
         </button>
       </div>
+      <AdminVersionTimeline
+        title={labels.history}
+        emptyText={labels.noHistory}
+        restoreLabel={labels.restoreVersion}
+        restoredLabel={labels.restored}
+        failedLabel={labels.restoreFailed}
+        locale={locale}
+        items={snapshots.map((snapshot) => ({
+          id: snapshot.id,
+          title: labels.snapshotTypes?.[snapshot.snapshotType] || snapshot.snapshotType,
+          meta: snapshot.summary || snapshot.actorName || snapshot.actorEmail || "",
+          createdAt: snapshot.createdAt
+        }))}
+        onRestore={restoreSnapshot}
+      />
       {message ? <p className="form-message success">{message}</p> : null}
       {error ? <p className="form-message error">{error}</p> : null}
     </form>

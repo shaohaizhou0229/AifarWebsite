@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { AdminDocumentForm } from "@/components/AdminDocumentForm";
+import { AdminVersionTimeline } from "@/components/AdminVersionTimeline";
 import { AdminRequiredError } from "@/lib/auth";
 import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { getAdminDocument, listDocumentCategories, listDocumentVersions } from "@/lib/documents";
@@ -18,10 +19,6 @@ export async function generateMetadata({ params }) {
   const { locale } = await params;
   const page = await getPageMessages(locale, "adminDocEdit");
   return buildMetadata({ locale, pathname, title: page.seo.title, description: page.seo.description });
-}
-
-function formatDate(value, locale) {
-  return value ? new Date(value).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" }) : "";
 }
 
 function localizeCategories(categories, adminDocs) {
@@ -80,18 +77,21 @@ export default async function EditAdminDocumentPage({ params }) {
           {document.checksumSha256 ? <code className="checksum-line">SHA-256: {document.checksumSha256}</code> : null}
         </article>
         <AdminDocumentForm document={document} categories={localizeCategories(categories, adminDocs)} labels={messages.forms.documents} locale={locale} />
-        <article className="admin-panel detail-card">
-          <h3>{page.history}</h3>
-          <div className="version-list">
-            {versions.map((version) => (
-              <div className="version-item" key={version.id}>
-                <strong>{version.versionLabel}</strong>
-                <span>{formatDate(version.createdAt, locale)}</span>
-                {version.originalFilename ? <span>{version.originalFilename}</span> : null}
-              </div>
-            ))}
-          </div>
-        </article>
+        <AdminVersionTimeline
+          title={page.history}
+          emptyText={page.noHistory}
+          restoreLabel={page.restoreVersion}
+          restoredLabel={page.restored}
+          failedLabel={page.restoreFailed}
+          locale={locale}
+          items={versions.map((version) => ({
+            id: version.id,
+            label: version.versionLabel || page.noVersion,
+            summary: version.originalFilename || version.checksumSha256 || page.current,
+            createdAt: version.createdAt,
+            restoreUrl: `/api/admin/docs/${document.id}/versions/${version.id}/restore/`
+          }))}
+        />
       </div>
     </>
   );

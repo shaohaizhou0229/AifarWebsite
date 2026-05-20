@@ -14,6 +14,11 @@ const initialForm = {
 const requestTypes = [
   ["product_inquiry", "Product inquiry"],
   ["technical_support", "Technical support"],
+  ["account_access", "Account access"],
+  ["client_download", "Client download"],
+  ["installation", "Installation and deployment"],
+  ["product_usage", "Product usage"],
+  ["bug_report", "Bug report"],
   ["partnership", "Partnership"],
   ["other", "Other"]
 ];

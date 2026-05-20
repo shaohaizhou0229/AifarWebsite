@@ -6,15 +6,9 @@ import { EMAIL_EVENTS, enqueueManyAndTrySend, getAdminNotificationEmails, getSit
 import { buildContactRequestEmail } from "@/lib/email/templates";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { createNotificationsForPermission, NOTIFICATION_EVENTS } from "@/lib/notifications";
+import { PUBLIC_REQUEST_TYPES, getCategoryForRequestType, getRequestWorkflow } from "@/lib/tickets";
 
 export const runtime = "nodejs";
-
-const REQUEST_TYPES = new Set([
-  "product_inquiry",
-  "technical_support",
-  "partnership",
-  "other"
-]);
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -39,7 +33,7 @@ function validatePayload(payload) {
     return { error: "Please enter a valid work email." };
   }
 
-  if (!REQUEST_TYPES.has(requestType)) {
+  if (!PUBLIC_REQUEST_TYPES.has(requestType)) {
     return { error: "Please choose a valid request type." };
   }
 
@@ -56,14 +50,14 @@ function validatePayload(payload) {
   };
 }
 
-async function queueContactRequestEmails(ticket) {
+async function queueContactRequestEmails(ticket, adminPath = "/zh-CN/admin/contact/") {
   const recipients = getAdminNotificationEmails();
   if (!recipients.length) return false;
 
   try {
     const email = buildContactRequestEmail({
       ticket,
-      adminUrl: new URL("/zh-CN/admin/contact/", getSiteUrl()).toString()
+      adminUrl: new URL(adminPath, getSiteUrl()).toString()
     });
 
     await enqueueManyAndTrySend(recipients.map((recipient) => ({
@@ -105,17 +99,21 @@ export async function POST(request) {
   const user = await getCurrentUser();
   const { name, organization, subject, requestType, message, locale } = validation.data;
   const workEmail = user?.email ? user.email.toLowerCase() : validation.data.workEmail;
+  const workflow = getRequestWorkflow(requestType);
+  const category = getCategoryForRequestType(requestType);
+  const permission = workflow === "support" ? ADMIN_PERMISSIONS.support : ADMIN_PERMISSIONS.contact;
+  const adminPath = workflow === "support" ? `/${locale}/admin/support/` : `/${locale}/admin/contact/`;
 
   try {
     const pool = getPostgresPool();
 
     const result = await pool.query(
       `insert into public.contact_requests
-        (user_id, name, work_email, organization, subject, request_type, message)
+        (user_id, name, work_email, organization, subject, request_type, category, message)
        values
-        ($1, $2, $3, $4, $5, $6, $7)
+        ($1, $2, $3, $4, $5, $6, $7, $8)
        returning id`,
-      [user?.id || null, name, workEmail, organization, subject, requestType, message]
+      [user?.id || null, name, workEmail, organization, subject, requestType, category, message]
     );
 
     const ticket = {
@@ -125,6 +123,7 @@ export async function POST(request) {
       organization,
       subject,
       requestType,
+      category,
       message
     };
 
@@ -138,15 +137,15 @@ export async function POST(request) {
       metadata: { requestType }
     });
 
-    const emailQueued = await queueContactRequestEmails(ticket);
-    await createNotificationsForPermission(ADMIN_PERMISSIONS.contact, {
+    const emailQueued = await queueContactRequestEmails(ticket, adminPath);
+    await createNotificationsForPermission(permission, {
       eventType: NOTIFICATION_EVENTS.contactRequestSubmitted,
-      title: "新的联系请求",
-      body: `${name} 提交了联系请求：${subject || requestType}`,
+      title: workflow === "support" ? "新的支持工单" : "新的联系请求",
+      body: `${name} 提交了${workflow === "support" ? "支持工单" : "联系请求"}：${subject || requestType}`,
       relatedType: "contact_request",
       relatedId: ticket.id,
-      metadata: { requestType },
-      url: `/${locale}/admin/contact/`,
+      metadata: { requestType, workflow },
+      url: adminPath,
       sendEmail: false
     });
 

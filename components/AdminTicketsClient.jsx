@@ -48,6 +48,7 @@ export function AdminContactTicketsClient({ locale, page, messages, initialStatu
         const query = buildQuery({ status: initialStatus });
         const params = new URLSearchParams(query);
         params.set("limit", "20");
+        params.set("scope", "contact");
         const response = await fetch(`/api/admin/tickets/?${params.toString()}`);
         const result = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(result.error || errorLabel);
@@ -118,6 +119,7 @@ export function AdminSupportClient({ locale, page, messages, initialFilters, ini
         const query = buildQuery(filters);
         const params = new URLSearchParams(query);
         params.set("limit", "20");
+        params.set("scope", "support");
         const response = await fetch(`/api/admin/tickets/?${params.toString()}`);
         const result = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(result.error || errorLabel);

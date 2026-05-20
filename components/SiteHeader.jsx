@@ -9,9 +9,7 @@ const navLinks = [
   ["product", "/product/"],
   ["downloads", "/downloads/"],
   ["whatsNew", "/whats-new/"],
-  ["docs", "/docs/"],
-  ["support", "/support/"],
-  ["contact", "/contact/"]
+  ["docs", "/docs/"]
 ];
 
 export function SiteHeader({ locale, messages }) {
