@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { loadAdminDashboard } from "@/components/admin-dashboard-cache";
 import { localizedPath } from "@/i18n/routing";
 
 const PRIMARY_ADMIN_PATHS = [
@@ -21,6 +22,10 @@ function normalizePath(value) {
 
 function routeKey(pathname, search = "") {
   return `${normalizePath(pathname)}${search}`;
+}
+
+function isAdminHomePath(pathname, locale) {
+  return normalizePath(pathname) === `/${locale}/admin/`;
 }
 
 function idle(callback) {
@@ -67,6 +72,10 @@ export function AdminRoutePreloader({ locale }) {
     if (currentKey === key || prefetched.current.has(key)) return;
 
     prefetched.current.add(key);
+    if (isAdminHomePath(url.pathname, locale)) {
+      loadAdminDashboard(locale, Number(url.searchParams.get("range") || 7)).catch(() => {});
+    }
+
     try {
       router.prefetch(target, {
         onInvalidate: () => {
@@ -76,7 +85,7 @@ export function AdminRoutePreloader({ locale }) {
     } catch {
       prefetched.current.delete(key);
     }
-  }, [localePrefix, pathname, router]);
+  }, [locale, localePrefix, pathname, router]);
 
   useEffect(() => {
     const timers = [];
@@ -85,6 +94,12 @@ export function AdminRoutePreloader({ locale }) {
         const timer = window.setTimeout(() => prefetch(href), index * 140);
         timers.push(timer);
       });
+      if (!isAdminHomePath(pathname, locale)) {
+        const dashboardTimer = window.setTimeout(() => {
+          loadAdminDashboard(locale, 7).catch(() => {});
+        }, primaryRoutes.length * 140 + 180);
+        timers.push(dashboardTimer);
+      }
     });
 
     return () => {

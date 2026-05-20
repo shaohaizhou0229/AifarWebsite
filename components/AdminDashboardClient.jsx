@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowRight,
   Download,
@@ -18,6 +18,7 @@ import { AdminDataPanel } from "@/components/AdminDataPanel";
 import { AdminHealthList } from "@/components/AdminHealthList";
 import { AdminMetricCard } from "@/components/AdminMetricCard";
 import { AdminStatusPill } from "@/components/AdminStatusPill";
+import { loadAdminDashboard, readCachedAdminDashboard, writeCachedAdminDashboard } from "@/components/admin-dashboard-cache";
 import { localizedPath } from "@/i18n/routing";
 
 function maxTrendValue(trend = []) {
@@ -86,29 +87,31 @@ function localizeHealthItems(dashboard, page) {
 }
 
 export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard = null, loadingLabel, errorLabel }) {
-  const skipInitialFetch = useRef(Boolean(initialDashboard));
-  const [dashboard, setDashboard] = useState(initialDashboard);
-  const [loading, setLoading] = useState(!initialDashboard);
+  const [dashboard, setDashboard] = useState(() => initialDashboard || readCachedAdminDashboard(locale, rangeDays, 5 * 60 * 1000));
+  const [loading, setLoading] = useState(() => !initialDashboard && !readCachedAdminDashboard(locale, rangeDays, 5 * 60 * 1000));
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (skipInitialFetch.current) {
-      skipInitialFetch.current = false;
+    if (initialDashboard) {
+      writeCachedAdminDashboard(locale, rangeDays, initialDashboard);
       return undefined;
     }
 
     let cancelled = false;
+    const cached = readCachedAdminDashboard(locale, rangeDays, 5 * 60 * 1000);
+    if (cached) {
+      setDashboard(cached);
+      setLoading(false);
+    }
 
     async function loadDashboard() {
-      setLoading(true);
+      setLoading(!cached);
       setError("");
       try {
-        const response = await fetch(`/api/admin/dashboard/?range=${rangeDays}`);
-        const result = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(result.error || errorLabel);
-        if (!cancelled) setDashboard(result.dashboard || null);
+        const nextDashboard = await loadAdminDashboard(locale, rangeDays);
+        if (!cancelled) setDashboard(nextDashboard);
       } catch (loadError) {
-        if (!cancelled) setError(loadError.message || errorLabel);
+        if (!cancelled && !cached) setError(loadError.message || errorLabel);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -118,7 +121,7 @@ export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard
     return () => {
       cancelled = true;
     };
-  }, [rangeDays, errorLabel]);
+  }, [initialDashboard, locale, rangeDays, errorLabel]);
 
   const metricCards = dashboard ? [
     ["todayViews", dashboard.metrics.todayViews, `${dashboard.metrics.totalViews} ${page.metrics.details.totalInRange}`, "good", "positive", UserRound],
