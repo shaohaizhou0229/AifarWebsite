@@ -131,6 +131,7 @@ a {
 }
 
 .nav-links a {
+  position: relative;
   border-radius: 999px;
   color: var(--muted);
   font-size: 0.92rem;
@@ -158,9 +159,22 @@ a {
 
 .nav-links a:hover,
 .nav-links a[aria-current="page"],
+.nav-links a[data-active="true"],
 .nav-action:hover {
   background: rgba(232, 241, 251, 0.92);
   color: var(--ink);
+}
+
+.nav-links a[data-active="true"]::after {
+  position: absolute;
+  right: 13px;
+  bottom: 4px;
+  left: 13px;
+  height: 2px;
+  min-width: 16px;
+  border-radius: 999px;
+  background: var(--teal);
+  content: "";
 }
 
 .nav-login-link,
@@ -179,6 +193,10 @@ a {
 .nav-login-link:hover {
   background: #223042 !important;
   color: white !important;
+}
+
+.nav-login-link[data-active="true"]::after {
+  background: rgba(255, 255, 255, 0.86);
 }
 
 .nav-admin-link {

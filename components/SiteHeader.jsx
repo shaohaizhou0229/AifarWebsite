@@ -2,6 +2,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getProfile, isProfileActive } from "@/lib/profiles";
 import { countUnreadNotifications } from "@/lib/notifications";
 import { localizedPath } from "@/i18n/routing";
+import { ActiveNavLink } from "@/components/ActiveNavLink";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { MobileMenuButton } from "@/components/MobileMenu";
 import { SignOutButton } from "@/components/SignOutButton";
@@ -31,25 +32,32 @@ export async function SiteHeader({ locale, messages }) {
         <nav id="site-navigation" className="nav-links" data-nav>
           <span className="nav-primary">
             {navLinks.map(([key, href]) => (
-              <a key={href} href={localizedPath(locale, href)}>
+              <ActiveNavLink key={href} href={localizedPath(locale, href)} activePaths={[href]}>
                 {nav[key]}
-              </a>
+              </ActiveNavLink>
             ))}
           </span>
           <span className="nav-session">
             {profile?.role === "admin" && isProfileActive(profile) ? (
-              <a className="nav-admin-link" href={localizedPath(locale, "/admin/")}>{nav.admin}</a>
+              <ActiveNavLink className="nav-admin-link" href={localizedPath(locale, "/admin/")} activePaths={["/admin/"]}>{nav.admin}</ActiveNavLink>
             ) : null}
             {user && isProfileActive(profile) ? (
               <>
-                <a className="nav-account-link" href={localizedPath(locale, "/account/")}>{nav.account}</a>
-                <a className="nav-account-link" href={localizedPath(locale, "/account/notifications/")}>
+                <ActiveNavLink
+                  className="nav-account-link"
+                  href={localizedPath(locale, "/account/")}
+                  exactActivePaths={["/account/"]}
+                  activePaths={["/account/profile/", "/account/tickets/"]}
+                >
+                  {nav.account}
+                </ActiveNavLink>
+                <ActiveNavLink className="nav-account-link" href={localizedPath(locale, "/account/notifications/")} activePaths={["/account/notifications/"]}>
                   {nav.notifications}{unreadNotifications ? ` (${unreadNotifications})` : ""}
-                </a>
+                </ActiveNavLink>
                 <SignOutButton labels={messages.layout.auth} redirectTo={localizedPath(locale, "/")} />
               </>
             ) : (
-              <a className="nav-login-link" href={localizedPath(locale, "/login/")}>{nav.signIn}</a>
+              <ActiveNavLink className="nav-login-link" href={localizedPath(locale, "/login/")} activePaths={["/login/", "/register/"]}>{nav.signIn}</ActiveNavLink>
             )}
           </span>
           <LanguageSwitcher locale={locale} label={messages.layout.language} />
