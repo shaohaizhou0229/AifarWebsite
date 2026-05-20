@@ -15,15 +15,24 @@ function isAccountPath(pathname, locale) {
   return pathname === `/${locale}/account/` || pathname?.startsWith(`/${locale}/account/`);
 }
 
+function isAuthPath(pathname, locale) {
+  return pathname === `/${locale}/login/` || pathname === `/${locale}/register/`;
+}
+
 export function SiteSessionNav({ locale, nav, authLabels }) {
   const pathname = usePathname();
   const isAdminPath = pathname === `/${locale}/admin/` || pathname?.startsWith(`/${locale}/admin/`);
   const [session, setSession] = useState(() => (
-    isAccountPath(pathname, locale) ? { user: { id: "account-page" }, profile: null, unreadCount: 0 } : { user: null, profile: null, unreadCount: 0 }
+    isAccountPath(pathname, locale) && !isAuthPath(pathname, locale) ? { user: { id: "account-page" }, profile: null, unreadCount: 0 } : { user: null, profile: null, unreadCount: 0 }
   ));
 
   useEffect(() => {
     if (isAdminPath) return undefined;
+    if (isAuthPath(pathname, locale)) {
+      clearSiteSessionCache();
+      setSession({ user: null, profile: null, unreadCount: 0 });
+      return undefined;
+    }
 
     const controller = new AbortController();
     const cachedSession = readSiteSessionCache();
