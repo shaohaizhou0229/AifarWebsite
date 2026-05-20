@@ -21,6 +21,18 @@ function SiteActionLink({ className, href, children }) {
   return <a className={className} href={href}>{children}</a>;
 }
 
+function hasText(value) {
+  return typeof value === "string" ? value.trim().length > 0 : Boolean(value);
+}
+
+function cleanRows(items, minColumns = 1) {
+  if (!Array.isArray(items)) return [];
+  return items
+    .filter(Array.isArray)
+    .map((row) => row.map((cell) => (typeof cell === "string" ? cell.trim() : cell)))
+    .filter((row) => row.slice(0, minColumns).some(hasText));
+}
+
 function sectionTone(section) {
   return section?.settings?.tone === "alt" ? " section alt" : "section";
 }
@@ -44,6 +56,7 @@ function HeroSection({ section, locale }) {
   const content = section.content || {};
   const hasActions = content.primaryCta || content.secondaryCta;
   const hasImage = content.heroImageUrl || content.heroImagePath;
+  const imageSrc = content.heroImageUrl || content.heroImagePath;
 
   if (section.variant === "simple") {
     return (
@@ -58,13 +71,18 @@ function HeroSection({ section, locale }) {
               {content.secondaryCta ? <SiteActionLink className="button secondary" href={resolveHref(locale, content.secondaryHref)}>{content.secondaryCta}</SiteActionLink> : null}
             </div>
           ) : null}
+          {hasImage ? (
+            <div className="hero-media product-page-media simple-hero-media">
+              <img src={imageSrc} alt={content.heroAlt || content.title || ""} />
+            </div>
+          ) : null}
         </div>
       </section>
     );
   }
 
   return (
-    <section className="hero home-hero" style={{ "--home-hero-image": `url("${content.heroImageUrl || "/assets/images/aifar-hero.png"}")` }}>
+    <section className="hero home-hero" style={{ "--home-hero-image": `url("${imageSrc || "/assets/images/aifar-hero.png"}")` }}>
       <div className="section-inner hero-grid home-hero-grid">
         <div className="hero-copy">
           {content.eyebrow ? <p className="eyebrow">{content.eyebrow}</p> : null}
@@ -79,7 +97,7 @@ function HeroSection({ section, locale }) {
         </div>
         {hasImage ? (
           <div className="hero-media product-stage">
-            <img src={content.heroImageUrl || content.heroImagePath} alt={content.heroAlt || content.title || ""} />
+            <img src={imageSrc} alt={content.heroAlt || content.title || ""} />
           </div>
         ) : null}
       </div>
@@ -89,7 +107,7 @@ function HeroSection({ section, locale }) {
 
 function TrustBarSection({ section }) {
   const content = section.content || {};
-  const items = Array.isArray(content.items) ? content.items : [];
+  const items = cleanRows(content.items, 1);
   if (!items.length) return null;
 
   return (
@@ -108,7 +126,7 @@ function TrustBarSection({ section }) {
 
 function CardGridSection({ section, locale }) {
   const content = section.content || {};
-  const items = Array.isArray(content.items) ? content.items : [];
+  const items = cleanRows(content.items, 2);
   const columns = section.variant === "three" ? "three" : "four";
 
   return (
@@ -127,7 +145,7 @@ function CardGridSection({ section, locale }) {
 
 function FeatureListSection({ section }) {
   const content = section.content || {};
-  const items = Array.isArray(content.items) ? content.items : [];
+  const items = cleanRows(content.items, 1);
 
   return (
     <section className={sectionTone(section)}>
@@ -148,15 +166,18 @@ function FeatureListSection({ section }) {
 
 function MediaFeatureSection({ section }) {
   const content = section.content || {};
-  const items = Array.isArray(content.items) ? content.items : [];
+  const items = cleanRows(content.items, 1);
   const isImageOnly = section.variant === "image-only";
+  const imageSrc = content.imageUrl || content.imagePath;
+
+  if (isImageOnly && !imageSrc) return null;
 
   return (
     <section className={sectionTone(section)}>
       <div className="section-inner">
         {isImageOnly ? (
           <div className="hero-media product-page-media">
-            <img src={content.imageUrl || content.imagePath} alt={content.imageAlt || content.title || ""} />
+            <img src={imageSrc} alt={content.imageAlt || content.title || ""} />
           </div>
         ) : (
           <div className="media-feature">
@@ -175,9 +196,9 @@ function MediaFeatureSection({ section }) {
                 </div>
               ) : null}
             </div>
-            {content.imageUrl || content.imagePath ? (
+            {imageSrc ? (
               <div className="hero-media">
-                <img src={content.imageUrl || content.imagePath} alt={content.imageAlt || content.title || ""} />
+                <img src={imageSrc} alt={content.imageAlt || content.title || ""} />
               </div>
             ) : null}
           </div>
@@ -187,9 +208,163 @@ function MediaFeatureSection({ section }) {
   );
 }
 
+function ScenarioSplitSection({ section }) {
+  const content = section.content || {};
+  const items = cleanRows(content.items, 1);
+  if (!content.title && !content.lead && !items.length) return null;
+
+  return (
+    <section className={sectionTone(section)}>
+      <div className="section-inner scenario-split">
+        <div>
+          {content.eyebrow ? <p className="eyebrow">{content.eyebrow}</p> : null}
+          {content.title ? <h2>{content.title}</h2> : null}
+          {content.lead ? <p>{content.lead}</p> : null}
+        </div>
+        <div className="scenario-card-grid">
+          {items.map(([title, description], index) => (
+            <article className="scenario-card" key={`${title}-${index}`}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <h3>{title}</h3>
+              {description ? <p>{description}</p> : null}
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function WorkflowStepsSection({ section }) {
+  const content = section.content || {};
+  const items = cleanRows(content.items, 2);
+  if (!content.title && !items.length) return null;
+
+  return (
+    <section className={sectionTone(section)}>
+      <div className="section-inner">
+        <SectionHead title={content.title} lead={content.lead} />
+        <div className="workflow-steps">
+          {items.map(([step, title, description], index) => (
+            <article className="workflow-step" key={`${title}-${index}`}>
+              <span>{step || String(index + 1).padStart(2, "0")}</span>
+              <h3>{title}</h3>
+              {description ? <p>{description}</p> : null}
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ModuleShowcaseSection({ section }) {
+  const content = section.content || {};
+  const items = cleanRows(content.items, 1);
+  if (!content.title && !items.length) return null;
+
+  return (
+    <section className={sectionTone(section)}>
+      <div className="section-inner">
+        <SectionHead title={content.title} lead={content.lead} />
+        <div className="module-showcase-grid">
+          {items.map(([title, description], index) => (
+            <article className="module-showcase-card" key={`${title}-${index}`}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <h3>{title}</h3>
+              {description ? <p>{description}</p> : null}
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SecurityAssuranceSection({ section }) {
+  const content = section.content || {};
+  const items = cleanRows(content.items, 1);
+  if (!content.title && !items.length) return null;
+
+  return (
+    <section className={sectionTone(section)}>
+      <div className="section-inner security-assurance">
+        <div>
+          {content.eyebrow ? <p className="eyebrow">{content.eyebrow}</p> : null}
+          {content.title ? <h2>{content.title}</h2> : null}
+          {content.lead ? <p>{content.lead}</p> : null}
+        </div>
+        <div className="security-checklist">
+          {items.map(([title, description], index) => (
+            <article key={`${title}-${index}`}>
+              <span aria-hidden="true">OK</span>
+              <div>
+                <h3>{title}</h3>
+                {description ? <p>{description}</p> : null}
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function DownloadPanelSection({ section, locale }) {
+  const content = section.content || {};
+  const items = cleanRows(content.items, 1);
+  if (!content.title && !content.primaryCta && !items.length) return null;
+
+  return (
+    <section className={sectionTone(section)}>
+      <div className="section-inner download-panel-section">
+        <div>
+          {content.eyebrow ? <p className="eyebrow">{content.eyebrow}</p> : null}
+          {content.title ? <h2>{content.title}</h2> : null}
+          {content.lead ? <p>{content.lead}</p> : null}
+          <div className="actions">
+            {content.primaryCta ? <SiteActionLink className="button primary" href={resolveHref(locale, content.primaryHref)}>{content.primaryCta}</SiteActionLink> : null}
+            {content.secondaryCta ? <SiteActionLink className="button secondary" href={resolveHref(locale, content.secondaryHref)}>{content.secondaryCta}</SiteActionLink> : null}
+          </div>
+        </div>
+        <div className="download-panel-list">
+          {items.map(([title, description], index) => (
+            <article key={`${title}-${index}`}>
+              <strong>{title}</strong>
+              {description ? <span>{description}</span> : null}
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FaqBandSection({ section }) {
+  const content = section.content || {};
+  const items = cleanRows(content.items, 1);
+  if (!content.title && !items.length) return null;
+
+  return (
+    <section className={sectionTone(section)}>
+      <div className="section-inner">
+        <SectionHead title={content.title} lead={content.lead} />
+        <div className="faq-band-list">
+          {items.map(([question, answer], index) => (
+            <article key={`${question}-${index}`}>
+              <h3>{question}</h3>
+              {answer ? <p>{answer}</p> : null}
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function SupportEntrySection({ section, locale }) {
   const content = section.content || {};
-  const items = Array.isArray(content.items) ? content.items : [];
+  const items = cleanRows(content.items, 2);
   const columns = section.variant === "three" ? "three" : "four";
   const anchorId = section.settings?.anchorId || undefined;
 
@@ -200,6 +375,15 @@ function SupportEntrySection({ section, locale }) {
         <div className={`support-entry-grid grid ${columns}`}>
           {items.map(([icon, title, description, href, requestType], index) => {
             const actionHref = href || (requestType ? `/contact/?type=${requestType}` : "");
+            if (!actionHref) {
+              return (
+                <article className="support-entry-card card" key={`${title}-${index}`}>
+                  <span className="icon">{icon}</span>
+                  <h3>{title}</h3>
+                  <p>{description}</p>
+                </article>
+              );
+            }
             return (
               <SiteActionLink className="support-entry-card card" href={resolveHref(locale, actionHref)} key={`${title}-${index}`}>
                 <span className="icon">{icon}</span>
@@ -216,7 +400,7 @@ function SupportEntrySection({ section, locale }) {
 
 function UpdatesSection({ section, locale }) {
   const content = section.content || {};
-  const items = Array.isArray(content.items) ? content.items : [];
+  const items = cleanRows(content.items, 1);
 
   return (
     <section className={sectionTone(section)}>
@@ -234,6 +418,7 @@ function UpdatesSection({ section, locale }) {
 
 function CtaSection({ section, locale }) {
   const content = section.content || {};
+  if (!content.eyebrow && !content.title && !content.lead && !content.primaryCta && !content.secondaryCta) return null;
 
   return (
     <section className={sectionTone(section)}>
@@ -261,6 +446,12 @@ export function SitePageSections({ page, locale }) {
         if (section.type === "card_grid" || section.type === "capability_matrix") return <CardGridSection section={section} locale={locale} key={section.id} />;
         if (section.type === "feature_list") return <FeatureListSection section={section} key={section.id} />;
         if (section.type === "media_feature") return <MediaFeatureSection section={section} key={section.id} />;
+        if (section.type === "scenario_split") return <ScenarioSplitSection section={section} key={section.id} />;
+        if (section.type === "workflow_steps") return <WorkflowStepsSection section={section} key={section.id} />;
+        if (section.type === "module_showcase") return <ModuleShowcaseSection section={section} key={section.id} />;
+        if (section.type === "security_assurance") return <SecurityAssuranceSection section={section} key={section.id} />;
+        if (section.type === "download_panel") return <DownloadPanelSection section={section} locale={locale} key={section.id} />;
+        if (section.type === "faq_band") return <FaqBandSection section={section} key={section.id} />;
         if (section.type === "support_entry") return <SupportEntrySection section={section} locale={locale} key={section.id} />;
         if (section.type === "updates_list") return <UpdatesSection section={section} locale={locale} key={section.id} />;
         if (section.type === "cta_band") return <CtaSection section={section} locale={locale} key={section.id} />;

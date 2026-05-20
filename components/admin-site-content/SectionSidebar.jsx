@@ -1,4 +1,6 @@
+import { Archive, Layers, Save, Sparkles } from "lucide-react";
 import { SITE_SECTION_LABELS, SITE_SECTION_TYPES } from "@/lib/site-page-builder";
+import { SectionMiniPreview, TemplateMiniPreview } from "./SectionPreview";
 
 export function SectionSidebar({
   labels,
@@ -10,21 +12,33 @@ export function SectionSidebar({
   onUpdateTemplate,
   onArchiveTemplate,
   onApplyTemplate,
-  onAddSection
+  onAddSection,
+  getTemplatePreviewContent
 }) {
   return (
     <aside className="builder-panel">
-      <p className="eyebrow">{labels.templates}</p>
-      <div className="builder-button-list">
+      <div className="builder-panel-head">
+        <p className="eyebrow">{labels.templates}</p>
+        <Layers size={16} aria-hidden="true" />
+      </div>
+      <div className="template-card-list">
         {templates.map((template) => (
           <div className="template-row" key={template.id || template.key}>
-            <button className="button secondary compact" type="button" onClick={() => onApplyTemplate(template)}>
-              {labels.templateNames?.[template.key] || template.name || template.key}
+            <button className="template-card" type="button" onClick={() => onApplyTemplate(template)}>
+              <TemplateMiniPreview content={getTemplatePreviewContent?.(template)} labels={labels} />
+              <span>
+                <strong>{labels.templateNames?.[template.key] || template.name || template.key}</strong>
+                {template.description ? <small>{template.description}</small> : null}
+              </span>
             </button>
             {!template.isSystem ? (
               <div className="template-row-actions">
-                <button className="icon-button" type="button" onClick={() => onUpdateTemplate(template)} title={labels.updateTemplate}>U</button>
-                <button className="icon-button danger" type="button" onClick={() => onArchiveTemplate(template)} title={labels.archiveTemplate}>-</button>
+                <button className="icon-button" type="button" onClick={() => onUpdateTemplate(template)} title={labels.updateTemplate}>
+                  <Save size={15} aria-hidden="true" />
+                </button>
+                <button className="icon-button danger" type="button" onClick={() => onArchiveTemplate(template)} title={labels.archiveTemplate}>
+                  <Archive size={15} aria-hidden="true" />
+                </button>
               </div>
             ) : null}
           </div>
@@ -53,14 +67,31 @@ export function SectionSidebar({
           {templateSaving ? labels.saving : labels.saveAsTemplate}
         </button>
       </div>
-      <p className="eyebrow">{labels.addSection}</p>
-      <div className="builder-button-list">
+      <div className="builder-panel-head">
+        <p className="eyebrow">{labels.addSection}</p>
+        <Sparkles size={16} aria-hidden="true" />
+      </div>
+      <div className="section-palette-grid">
         {SITE_SECTION_TYPES.map((type) => (
-          <button className="button secondary compact" type="button" key={type} onClick={() => onAddSection(type)}>
-            {labels.sectionTypes?.[type] || SITE_SECTION_LABELS[type]}
+          <button className="section-palette-card" type="button" key={type} onClick={() => onAddSection(type)}>
+            <SectionMiniPreview section={createPaletteSection(type, labels)} labels={labels} />
+            <strong>{labels.sectionTypes?.[type] || SITE_SECTION_LABELS[type]}</strong>
+            <small>{labels.sectionDescriptions?.[type] || labels.addSection}</small>
           </button>
         ))}
       </div>
     </aside>
   );
+}
+
+function createPaletteSection(type, labels) {
+  return {
+    id: `palette-${type}`,
+    type,
+    content: {
+      title: labels.sectionTypes?.[type] || SITE_SECTION_LABELS[type],
+      lead: "",
+      items: [["", "", ""]]
+    }
+  };
 }

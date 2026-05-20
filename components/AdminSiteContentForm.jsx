@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { SITE_LAYOUT_VERSION, createBlankSection } from "@/lib/site-page-builder";
+import { SITE_LAYOUT_VERSION, createBlankSection, createSitePageTemplate } from "@/lib/site-page-builder";
 import { AdminVersionTimeline } from "@/components/AdminVersionTimeline";
+import { SitePageSections } from "@/components/SitePageSections";
 import { CmsToolbar } from "@/components/admin-site-content/CmsToolbar";
 import { ContentStatusPanel } from "@/components/admin-site-content/ContentStatusPanel";
 import { SectionEditor } from "@/components/admin-site-content/SectionEditor";
@@ -38,6 +39,7 @@ export function AdminSiteContentForm({
   const [templates, setTemplates] = useState(initialTemplates);
   const [templateDraft, setTemplateDraft] = useState({ name: "", description: "", includeSeo: false });
   const [templateSaving, setTemplateSaving] = useState(false);
+  const [previewMode, setPreviewMode] = useState("desktop");
 
   const currentPage = useMemo(
     () => pageOptions.find((option) => option.key === pageKey) || pageOptions[0],
@@ -54,6 +56,16 @@ export function AdminSiteContentForm({
   function updateServerState(data) {
     if (Array.isArray(data.snapshots)) setSnapshots(data.snapshots);
     if (Array.isArray(data.templates)) setTemplates(data.templates);
+  }
+
+  function getTemplatePreviewContent(template) {
+    if (template.isSystem) {
+      return createSitePageTemplate(template.key, pageKey, content);
+    }
+    return {
+      ...(template.content || {}),
+      seo: template.includeSeo ? template.content?.seo : content.seo
+    };
   }
 
   async function loadContent(nextPageKey, nextLocale) {
@@ -83,17 +95,16 @@ export function AdminSiteContentForm({
     }
   }
 
-  async function saveDraft(event) {
-    event.preventDefault();
+  async function saveDraftContent(nextContent = content, showMessage = true) {
     setSaving(true);
-    setMessage("");
+    if (showMessage) setMessage("");
     setError("");
 
     try {
       const response = await fetch("/api/admin/site-content/", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pageKey, locale, content: ensureLayout(content) })
+        body: JSON.stringify({ pageKey, locale, content: ensureLayout(nextContent) })
       });
       const data = await response.json().catch(() => ({}));
 
@@ -106,12 +117,19 @@ export function AdminSiteContentForm({
       setEntry(data.entry || EMPTY_ENTRY);
       setSelectedSectionId((current) => current || nextContent.sections[0]?.id || "");
       updateServerState(data);
-      setMessage(labels.saved);
+      if (showMessage) setMessage(labels.saved);
+      return nextContent;
     } catch (saveError) {
       setError(saveError.message || labels.saveFailed);
+      throw saveError;
     } finally {
       setSaving(false);
     }
+  }
+
+  async function saveDraft(event) {
+    event.preventDefault();
+    await saveDraftContent(content, true).catch(() => null);
   }
 
   async function publishDraft() {
@@ -120,6 +138,7 @@ export function AdminSiteContentForm({
     setError("");
 
     try {
+      await saveDraftContent(content, false);
       const response = await fetch("/api/admin/site-content/publish/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -135,7 +154,7 @@ export function AdminSiteContentForm({
       setContent(nextContent);
       setEntry(data.entry || EMPTY_ENTRY);
       updateServerState(data);
-      setMessage(labels.published);
+      setMessage(labels.previewPublished || labels.published);
     } catch (publishError) {
       setError(publishError.message || labels.publishFailed);
     } finally {
@@ -329,92 +348,118 @@ export function AdminSiteContentForm({
 
   return (
     <form className="admin-actions site-content-form" onSubmit={saveDraft}>
-      <CmsToolbar
-        labels={labels}
-        pageKey={pageKey}
-        locale={locale}
-        pageOptions={pageOptions}
-        localeOptions={localeOptions}
-        disabled={loading || saving || publishing}
-        onLoadContent={loadContent}
-      />
-
-      <ContentStatusPanel
-        labels={labels}
-        currentPage={currentPage}
-        entry={entry}
-        locale={locale}
-        publishing={publishing}
-        disabled={publishing || saving || loading}
-        onPublish={publishDraft}
-      />
-
-      <SeoEditor
-        labels={labels}
-        content={content}
-        onChange={(key, value) => setContent((current) => updateSeo(current, key, value))}
-      />
-
-      <section className="builder-shell">
-        <SectionSidebar
-          labels={labels}
-          templates={templates}
-          templateDraft={templateDraft}
-          templateSaving={templateSaving}
-          onTemplateDraftChange={setTemplateDraft}
-          onCreateTemplate={createTemplate}
-          onUpdateTemplate={updateTemplate}
-          onArchiveTemplate={archiveTemplate}
-          onApplyTemplate={applyTemplate}
-          onAddSection={addSection}
-        />
-
-        <SectionList
-          labels={labels}
-          sections={sections}
-          selectedSection={selectedSection}
-          onSelect={setSelectedSectionId}
-          onDragStart={setDragIndex}
-          onDrop={onDropSection}
-          onMove={moveSection}
-          onRemove={removeSection}
-        />
-
-        <section className="builder-panel">
-          <SectionEditor
-            section={selectedSection}
+      <section className="cms-workbench">
+        <div className="cms-workbench-top">
+          <CmsToolbar
             labels={labels}
-            uploadingSectionId={uploadingSectionId}
-            onPatchSection={patchSection}
-            onPatchSectionContent={patchSectionContent}
-            onUploadImage={uploadImage}
+            pageKey={pageKey}
+            locale={locale}
+            pageOptions={pageOptions}
+            localeOptions={localeOptions}
+            disabled={loading || saving || publishing}
+            onLoadContent={loadContent}
           />
-        </section>
-      </section>
+          <ContentStatusPanel
+            labels={labels}
+            currentPage={currentPage}
+            entry={entry}
+            locale={locale}
+            saving={saving}
+            publishing={publishing}
+            disabled={publishing || saving || loading}
+            onPublish={publishDraft}
+          />
+          <div className="cms-workbench-actions">
+            <button className="button primary" type="submit" disabled={saving || publishing || loading}>
+              {saving ? labels.saving : labels.save}
+            </button>
+            <button className="button secondary" type="button" onClick={publishDraft} disabled={publishing || saving || loading}>
+              {publishing ? labels.publishing : labels.publishCurrentPreview || labels.publish}
+            </button>
+          </div>
+        </div>
 
-      <div className="card-actions">
-        <button className="button primary" type="submit" disabled={saving || publishing || loading}>
-          {saving ? labels.saving : labels.save}
-        </button>
-        <button className="button secondary" type="button" onClick={publishDraft} disabled={publishing || saving || loading}>
-          {publishing ? labels.publishing : labels.publish}
-        </button>
-      </div>
-      <AdminVersionTimeline
-        title={labels.history}
-        emptyText={labels.noHistory}
-        restoreLabel={labels.restoreVersion}
-        restoredLabel={labels.restored}
-        failedLabel={labels.restoreFailed}
-        locale={locale}
-        items={snapshots.map((snapshot) => ({
-          id: snapshot.id,
-          title: labels.snapshotTypes?.[snapshot.snapshotType] || snapshot.snapshotType,
-          meta: snapshot.summary || snapshot.actorName || snapshot.actorEmail || "",
-          createdAt: snapshot.createdAt
-        }))}
-        onRestore={restoreSnapshot}
-      />
+        <div className="cms-workbench-grid">
+          <aside className="cms-workbench-left">
+            <SectionList
+              labels={labels}
+              sections={sections}
+              selectedSection={selectedSection}
+              onSelect={setSelectedSectionId}
+              onDragStart={setDragIndex}
+              onDrop={onDropSection}
+              onMove={moveSection}
+              onRemove={removeSection}
+            />
+            <AdminVersionTimeline
+              title={labels.history}
+              emptyText={labels.noHistory}
+              restoreLabel={labels.restoreVersion}
+              restoredLabel={labels.restored}
+              failedLabel={labels.restoreFailed}
+              locale={locale}
+              items={snapshots.map((snapshot) => ({
+                id: snapshot.id,
+                title: labels.snapshotTypes?.[snapshot.snapshotType] || snapshot.snapshotType,
+                meta: snapshot.summary || snapshot.actorName || snapshot.actorEmail || "",
+                createdAt: snapshot.createdAt
+              }))}
+              onRestore={restoreSnapshot}
+            />
+          </aside>
+
+          <main className="cms-workbench-main">
+            <SectionSidebar
+              labels={labels}
+              templates={templates}
+              templateDraft={templateDraft}
+              templateSaving={templateSaving}
+              onTemplateDraftChange={setTemplateDraft}
+              onCreateTemplate={createTemplate}
+              onUpdateTemplate={updateTemplate}
+              onArchiveTemplate={archiveTemplate}
+              onApplyTemplate={applyTemplate}
+              onAddSection={addSection}
+              getTemplatePreviewContent={getTemplatePreviewContent}
+            />
+            <section className="builder-panel">
+              <SectionEditor
+                section={selectedSection}
+                labels={labels}
+                uploadingSectionId={uploadingSectionId}
+                onPatchSection={patchSection}
+                onPatchSectionContent={patchSectionContent}
+                onUploadImage={uploadImage}
+              />
+            </section>
+            <SeoEditor
+              labels={labels}
+              content={content}
+              onChange={(key, value) => setContent((current) => updateSeo(current, key, value))}
+            />
+          </main>
+
+          <aside className="cms-preview-column">
+            <div className="cms-preview-toolbar">
+              <div>
+                <p className="eyebrow">{labels.livePreview}</p>
+                <strong>{currentPage.label}</strong>
+              </div>
+              <div className="preview-mode-toggle" aria-label={labels.previewMode}>
+                <button type="button" className={previewMode === "desktop" ? "active" : ""} onClick={() => setPreviewMode("desktop")}>
+                  {labels.desktopPreview}
+                </button>
+                <button type="button" className={previewMode === "mobile" ? "active" : ""} onClick={() => setPreviewMode("mobile")}>
+                  {labels.mobilePreview}
+                </button>
+              </div>
+            </div>
+            <div className={`cms-live-preview ${previewMode}`}>
+              <SitePageSections page={ensureLayout(content)} locale={locale} />
+            </div>
+          </aside>
+        </div>
+      </section>
       {message ? <p className="form-message success">{message}</p> : null}
       {error ? <p className="form-message error">{error}</p> : null}
     </form>

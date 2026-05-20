@@ -1,6 +1,6 @@
 import { formatDate } from "./form-utils";
 
-export function ContentStatusPanel({ labels, currentPage, entry, locale, publishing, disabled, onPublish }) {
+export function ContentStatusPanel({ labels, currentPage, entry, locale, saving, publishing, disabled, onPublish }) {
   return (
     <div className="cms-status-panel">
       <div>
@@ -13,7 +13,7 @@ export function ContentStatusPanel({ labels, currentPage, entry, locale, publish
         </p>
       </div>
       <button className="button secondary" type="button" onClick={onPublish} disabled={disabled}>
-        {publishing ? labels.publishing : labels.publish}
+        {publishing ? labels.publishing : saving ? labels.saving : labels.publishCurrentPreview || labels.publish}
       </button>
     </div>
   );

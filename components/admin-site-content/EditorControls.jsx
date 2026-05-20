@@ -1,3 +1,5 @@
+import { Plus, Trash2 } from "lucide-react";
+
 function normalizeRows(value, columns) {
   const rows = Array.isArray(value) ? value : [];
   return rows.map((row) => {
@@ -54,11 +56,14 @@ export function RowEditor({ labels, rows, columns, placeholders, onChange }) {
             />
           ))}
           <button className="icon-button danger" type="button" onClick={() => removeRow(rowIndex)} title={labels.removeItem}>
-            -
+            <Trash2 size={14} aria-hidden="true" />
           </button>
         </div>
       ))}
-      <button className="button secondary compact" type="button" onClick={addRow}>{labels.addItem}</button>
+      <button className="button secondary compact" type="button" onClick={addRow}>
+        <Plus size={15} aria-hidden="true" />
+        {labels.addItem}
+      </button>
     </div>
   );
 }

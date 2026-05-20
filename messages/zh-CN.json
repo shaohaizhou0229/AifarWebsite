@@ -230,7 +230,7 @@
       "templateNames": {
         "home-current": "当前首页",
         "product-current": "当前产品页",
-          "conversion": "转化型页面方案"
+        "conversion": "转化型页面方案"
       },
       "sectionTypes": {
         "hero": "主视觉",
@@ -241,7 +241,13 @@
         "media_feature": "图文卖点",
         "updates_list": "更新列表",
         "cta_band": "行动区",
-        "support_entry": "支持与请求入口"
+        "support_entry": "支持与咨询入口",
+        "scenario_split": "场景分栏",
+        "workflow_steps": "流程步骤",
+        "module_showcase": "模块展示",
+        "security_assurance": "安全保障",
+        "download_panel": "下载引导",
+        "faq_band": "常见问题"
       },
       "variants": {
         "split": "左右主视觉",
@@ -314,10 +320,47 @@
       "restored": "版本已恢复。",
       "restoreFailed": "版本恢复失败。",
       "snapshotTypes": {
-        "draft_saved": "保存草稿",
-        "published": "发布内容",
-        "restored": "恢复版本",
-        "template_applied": "套用页面方案"
+        "draft_saved": "草稿已保存",
+        "published": "已发布",
+        "restored": "已恢复",
+        "template_applied": "已应用页面方案"
+      },
+      "pageBlueprint": "页面蓝图",
+      "blueprintLead": "按发布顺序搭建页面。",
+      "publishCurrentPreview": "发布当前预览",
+      "previewPublished": "当前预览已保存并发布。",
+      "livePreview": "实时预览",
+      "previewMode": "预览模式",
+      "desktopPreview": "桌面",
+      "mobilePreview": "手机",
+      "previewUnavailable": "暂无预览",
+      "emptyPreview": "暂无可预览内容。",
+      "previewLeadFallback": "添加内容后会实时更新预览。",
+      "heroPreviewEyebrow": "主视觉",
+      "imageReady": "图片已就绪",
+      "scenarioTitle": "场景标题",
+      "step": "步骤",
+      "moduleName": "模块名称",
+      "assuranceName": "保障项",
+      "clientName": "客户端",
+      "question": "问题",
+      "answer": "回答",
+      "sectionDescriptions": {
+        "hero": "展示页面定位、行动按钮和主视觉。",
+        "trust_bar": "展示紧凑的可信数据和亮点。",
+        "card_grid": "用卡片呈现模块或价值点。",
+        "feature_list": "解释成组的产品细节。",
+        "capability_matrix": "用更紧凑的网格比较能力。",
+        "media_feature": "用产品图片配合说明文案。",
+        "scenario_split": "解释政府和企业两类场景。",
+        "workflow_steps": "展示上线或运营流程。",
+        "module_showcase": "展示核心产品模块。",
+        "security_assurance": "汇总安全和治理证明。",
+        "download_panel": "引导访客下载客户端。",
+        "faq_band": "回答评估阶段常见问题。",
+        "updates_list": "展示版本或更新亮点。",
+        "cta_band": "用行动按钮完成转化。",
+        "support_entry": "引导访客进入支持、文档和咨询。"
       }
     },
     "documents": {

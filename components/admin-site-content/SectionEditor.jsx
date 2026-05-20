@@ -99,6 +99,99 @@ export function SectionEditor({ section, labels, uploadingSectionId, onPatchSect
         </>
       ) : null}
 
+      {section.type === "scenario_split" ? (
+        <>
+          <Field label={labels.sectionTone}>
+            <select value={section.settings?.tone || "alt"} onChange={(event) => onPatchSection(section.id, (current) => ({ ...current, settings: { ...(current.settings || {}), tone: event.target.value } }))}>
+              <option value="plain">{labels.tones?.plain}</option>
+              <option value="alt">{labels.tones?.alt}</option>
+            </select>
+          </Field>
+          <Field label={labels.eyebrow}><TextInput value={contentValues.eyebrow} onChange={(value) => onPatchSectionContent(section.id, "eyebrow", value)} /></Field>
+          <Field label={labels.title}><TextInput value={contentValues.title} onChange={(value) => onPatchSectionContent(section.id, "title", value)} /></Field>
+          <Field label={labels.lead}><TextInput multiline value={contentValues.lead} onChange={(value) => onPatchSectionContent(section.id, "lead", value)} /></Field>
+          <RowEditor labels={labels} rows={contentValues.items} columns={2} placeholders={[labels.scenarioTitle, labels.description]} onChange={(rows) => onPatchSectionContent(section.id, "items", rows)} />
+        </>
+      ) : null}
+
+      {section.type === "workflow_steps" ? (
+        <>
+          <Field label={labels.sectionTone}>
+            <select value={section.settings?.tone || "plain"} onChange={(event) => onPatchSection(section.id, (current) => ({ ...current, settings: { ...(current.settings || {}), tone: event.target.value } }))}>
+              <option value="plain">{labels.tones?.plain}</option>
+              <option value="alt">{labels.tones?.alt}</option>
+            </select>
+          </Field>
+          <Field label={labels.title}><TextInput value={contentValues.title} onChange={(value) => onPatchSectionContent(section.id, "title", value)} /></Field>
+          <Field label={labels.lead}><TextInput multiline value={contentValues.lead} onChange={(value) => onPatchSectionContent(section.id, "lead", value)} /></Field>
+          <RowEditor labels={labels} rows={contentValues.items} columns={3} placeholders={[labels.step, labels.itemTitle, labels.description]} onChange={(rows) => onPatchSectionContent(section.id, "items", rows)} />
+        </>
+      ) : null}
+
+      {section.type === "module_showcase" ? (
+        <>
+          <Field label={labels.sectionTone}>
+            <select value={section.settings?.tone || "alt"} onChange={(event) => onPatchSection(section.id, (current) => ({ ...current, settings: { ...(current.settings || {}), tone: event.target.value } }))}>
+              <option value="plain">{labels.tones?.plain}</option>
+              <option value="alt">{labels.tones?.alt}</option>
+            </select>
+          </Field>
+          <Field label={labels.title}><TextInput value={contentValues.title} onChange={(value) => onPatchSectionContent(section.id, "title", value)} /></Field>
+          <Field label={labels.lead}><TextInput multiline value={contentValues.lead} onChange={(value) => onPatchSectionContent(section.id, "lead", value)} /></Field>
+          <RowEditor labels={labels} rows={contentValues.items} columns={2} placeholders={[labels.moduleName, labels.description]} onChange={(rows) => onPatchSectionContent(section.id, "items", rows)} />
+        </>
+      ) : null}
+
+      {section.type === "security_assurance" ? (
+        <>
+          <Field label={labels.sectionTone}>
+            <select value={section.settings?.tone || "plain"} onChange={(event) => onPatchSection(section.id, (current) => ({ ...current, settings: { ...(current.settings || {}), tone: event.target.value } }))}>
+              <option value="plain">{labels.tones?.plain}</option>
+              <option value="alt">{labels.tones?.alt}</option>
+            </select>
+          </Field>
+          <Field label={labels.eyebrow}><TextInput value={contentValues.eyebrow} onChange={(value) => onPatchSectionContent(section.id, "eyebrow", value)} /></Field>
+          <Field label={labels.title}><TextInput value={contentValues.title} onChange={(value) => onPatchSectionContent(section.id, "title", value)} /></Field>
+          <Field label={labels.lead}><TextInput multiline value={contentValues.lead} onChange={(value) => onPatchSectionContent(section.id, "lead", value)} /></Field>
+          <RowEditor labels={labels} rows={contentValues.items} columns={2} placeholders={[labels.assuranceName, labels.description]} onChange={(rows) => onPatchSectionContent(section.id, "items", rows)} />
+        </>
+      ) : null}
+
+      {section.type === "download_panel" ? (
+        <>
+          <Field label={labels.sectionTone}>
+            <select value={section.settings?.tone || "alt"} onChange={(event) => onPatchSection(section.id, (current) => ({ ...current, settings: { ...(current.settings || {}), tone: event.target.value } }))}>
+              <option value="plain">{labels.tones?.plain}</option>
+              <option value="alt">{labels.tones?.alt}</option>
+            </select>
+          </Field>
+          <Field label={labels.eyebrow}><TextInput value={contentValues.eyebrow} onChange={(value) => onPatchSectionContent(section.id, "eyebrow", value)} /></Field>
+          <Field label={labels.title}><TextInput value={contentValues.title} onChange={(value) => onPatchSectionContent(section.id, "title", value)} /></Field>
+          <Field label={labels.lead}><TextInput multiline value={contentValues.lead} onChange={(value) => onPatchSectionContent(section.id, "lead", value)} /></Field>
+          <div className="form-grid two">
+            <Field label={labels.primaryCta}><TextInput value={contentValues.primaryCta} onChange={(value) => onPatchSectionContent(section.id, "primaryCta", value)} /></Field>
+            <Field label={labels.primaryHref}><TextInput value={contentValues.primaryHref} onChange={(value) => onPatchSectionContent(section.id, "primaryHref", value)} /></Field>
+            <Field label={labels.secondaryCta}><TextInput value={contentValues.secondaryCta} onChange={(value) => onPatchSectionContent(section.id, "secondaryCta", value)} /></Field>
+            <Field label={labels.secondaryHref}><TextInput value={contentValues.secondaryHref} onChange={(value) => onPatchSectionContent(section.id, "secondaryHref", value)} /></Field>
+          </div>
+          <RowEditor labels={labels} rows={contentValues.items} columns={2} placeholders={[labels.clientName, labels.description]} onChange={(rows) => onPatchSectionContent(section.id, "items", rows)} />
+        </>
+      ) : null}
+
+      {section.type === "faq_band" ? (
+        <>
+          <Field label={labels.sectionTone}>
+            <select value={section.settings?.tone || "plain"} onChange={(event) => onPatchSection(section.id, (current) => ({ ...current, settings: { ...(current.settings || {}), tone: event.target.value } }))}>
+              <option value="plain">{labels.tones?.plain}</option>
+              <option value="alt">{labels.tones?.alt}</option>
+            </select>
+          </Field>
+          <Field label={labels.title}><TextInput value={contentValues.title} onChange={(value) => onPatchSectionContent(section.id, "title", value)} /></Field>
+          <Field label={labels.lead}><TextInput multiline value={contentValues.lead} onChange={(value) => onPatchSectionContent(section.id, "lead", value)} /></Field>
+          <RowEditor labels={labels} rows={contentValues.items} columns={2} placeholders={[labels.question, labels.answer]} onChange={(rows) => onPatchSectionContent(section.id, "items", rows)} />
+        </>
+      ) : null}
+
       {section.type === "support_entry" ? (
         <>
           <div className="form-grid two">
