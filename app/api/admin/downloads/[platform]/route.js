@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
@@ -6,6 +7,7 @@ import { clientReleaseFileExists, getAdminDownloadPlatform, sanitizePlatform, up
 import { EMAIL_EVENTS, enqueueManyAndTrySend, getAdminNotificationEmails, getSiteUrl } from "@/lib/email";
 import { buildDownloadPublishedEmail } from "@/lib/email/templates";
 import { createNotificationsForPermission, NOTIFICATION_EVENTS } from "@/lib/notifications";
+import { localizedPath, locales } from "@/i18n/routing";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -54,6 +56,12 @@ async function queueDownloadPublishedEmails(platformKey, release) {
   }
 }
 
+function revalidatePublicDownloadsPages() {
+  locales.forEach((locale) => {
+    revalidatePath(localizedPath(locale, "/downloads/"));
+  });
+}
+
 export async function PATCH(request, { params }) {
   const { platform } = await params;
   const platformKey = sanitizePlatform(platform);
@@ -89,6 +97,7 @@ export async function PATCH(request, { params }) {
       externalUrl,
       isPublished
     });
+    revalidatePublicDownloadsPages();
 
     const emailQueued = isPublished && !before?.release?.isPublished
       ? await queueDownloadPublishedEmails(platformKey, release)

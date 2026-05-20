@@ -6,7 +6,7 @@ import { getPageMessages } from "@/i18n/messages";
 import { buildMetadata } from "@/i18n/seo";
 
 const pathname = "/downloads/";
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export async function generateMetadata({ params }) {
   const { locale } = await params;

@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getAdminSitePageContent, publishSitePageDraft, sanitizeSiteLocale, sanitizeSitePageKey } from "@/lib/site-content";
 import { getPageMessages } from "@/i18n/messages";
+import { localizedPath } from "@/i18n/routing";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,6 +20,17 @@ function permissionError(error) {
   return null;
 }
 
+function revalidatePublicSitePage(pageKey, locale) {
+  const pathnameByPage = {
+    home: "/",
+    product: "/product/"
+  };
+  const pathname = pathnameByPage[pageKey];
+  if (pathname) {
+    revalidatePath(localizedPath(locale, pathname));
+  }
+}
+
 export async function POST(request) {
   try {
     const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.product);
@@ -30,6 +43,7 @@ export async function POST(request) {
     }
 
     const entry = await publishSitePageDraft(pageKey, locale, user);
+    revalidatePublicSitePage(pageKey, locale);
     const fallback = await getPageMessages(locale, pageKey);
     const result = await getAdminSitePageContent(pageKey, locale, fallback);
     return NextResponse.json({ ...result, entry });

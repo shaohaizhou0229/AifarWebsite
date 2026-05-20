@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
@@ -8,9 +9,16 @@ import {
   sanitizePlatform,
   updateClientReleaseFile
 } from "@/lib/downloads";
+import { localizedPath, locales } from "@/i18n/routing";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+function revalidatePublicDownloadsPages() {
+  locales.forEach((locale) => {
+    revalidatePath(localizedPath(locale, "/downloads/"));
+  });
+}
 
 function isSha256(value = "") {
   return /^[a-f0-9]{64}$/i.test(value);
@@ -56,6 +64,7 @@ export async function POST(request, { params }) {
       originalFilename,
       contentType
     });
+    revalidatePublicDownloadsPages();
 
     return NextResponse.json({ release });
   } catch (error) {

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { AdminRequiredError, createUserSupabaseClient, getCurrentAccessToken, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
@@ -12,9 +13,16 @@ import {
   sanitizePlatform,
   updateClientReleaseFile
 } from "@/lib/downloads";
+import { localizedPath, locales } from "@/i18n/routing";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+function revalidatePublicDownloadsPages() {
+  locales.forEach((locale) => {
+    revalidatePath(localizedPath(locale, "/downloads/"));
+  });
+}
 
 export async function POST(request, { params }) {
   const { platform } = await params;
@@ -55,6 +63,7 @@ export async function POST(request, { params }) {
     }
 
     const release = await updateClientReleaseFile(platformKey, user, upload);
+    revalidatePublicDownloadsPages();
     return NextResponse.json({ release });
   } catch (error) {
     if (error instanceof AdminRequiredError) {
@@ -88,6 +97,7 @@ export async function DELETE(_request, { params }) {
     }
 
     const release = await clearClientReleaseFile(platformKey, user);
+    revalidatePublicDownloadsPages();
     return NextResponse.json({ release });
   } catch (error) {
     if (error instanceof AdminRequiredError) {
