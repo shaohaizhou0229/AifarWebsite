@@ -760,26 +760,26 @@
         "title": "Admin | Aifar",
         "description": "Manage Aifar website content, downloads, documents, support feedback, and contact requests."
       },
-      "eyebrow": "Admin",
+      "eyebrow": "Operations",
       "deniedTitle": "Administrator access required.",
       "deniedLead": "Your account does not have permission to manage Aifar website operations.",
-      "title": "Management overview",
-      "lead": "Website operations, pending work, and module activity at a glance.",
+      "title": "Operations overview",
+      "lead": "Pending work, traffic signals, and module status in one operating workspace.",
       "active": "Ready",
       "planned": "Planned",
       "nav": {
         "label": "Admin sections",
-        "home": "Management",
-        "product": "Product",
-        "downloads": "Downloads",
-        "docs": "Docs",
-        "support": "Support",
-        "contact": "Contact us",
-        "users": "Users",
-        "collaboration": "Collaboration",
+        "home": "Operations overview",
+        "product": "Website content",
+        "downloads": "Client releases",
+        "docs": "Documentation center",
+        "support": "Support tickets",
+        "contact": "Contact requests",
+        "users": "Users and permissions",
+        "collaboration": "Collaboration tasks",
         "groups": {
-          "workspace": "Workspace",
-          "operations": "Operations"
+          "workspace": "Operating workspace",
+          "operations": "Requests and tasks"
         }
       },
       "modules": [
@@ -835,7 +835,7 @@
       ],
       "shell": {
         "brand": "Aifar",
-        "projectLabel": "Project",
+        "projectLabel": "Site",
         "projectName": "Aifar Website",
         "workspace": "Admin console",
         "notifications": "Notifications",
@@ -846,20 +846,40 @@
           "signOut": "Sign out",
           "signingOut": "Signing out..."
         },
-        "search": "Search",
+        "search": "Quick jump",
         "searchShortcut": "Ctrl K",
         "collapse": "Collapse",
         "userFallback": "Admin",
         "userEmailFallback": "admin@aifar.com",
         "actions": {
-          "newAction": "New action",
+          "newAction": "New",
           "inviteUser": "Invite user",
-          "newDocument": "New document",
-          "manageDownloads": "Manage downloads"
+          "newDocument": "Create document",
+          "manageDownloads": "Manage downloads",
+          "publishClient": "Publish client",
+          "createSpace": "Create collaboration space"
         },
         "expand": "Expand",
         "projectCurrent": "Current site",
-        "projectTenantHint": "Multi-tenant switching is reserved for a later build."
+        "projectTenantHint": "Multi-site switching is reserved for a later build.",
+        "adminNotifications": "Admin notifications",
+        "notificationPreferences": "Notification preferences",
+        "frontSite": "Return to website",
+        "frontSiteShort": "Website",
+        "searchPlaceholder": "Jump to a module",
+        "close": "Close",
+        "emptySearch": "No matching module.",
+        "commands": {
+          "home": "Operations overview",
+          "product": "Website content",
+          "downloads": "Client releases",
+          "users": "Users and permissions",
+          "docs": "Documentation center",
+          "support": "Support tickets",
+          "contact": "Contact requests",
+          "collaboration": "Collaboration tasks",
+          "notifications": "Admin notifications"
+        }
       },
       "ranges": {
         "today": "Today",
@@ -871,7 +891,7 @@
       "metrics": {
         "todayViews": "Visitors today",
         "totalViews": "Total visits",
-        "downloadClicks": "Downloads",
+        "downloadClicks": "Total downloads",
         "newContacts": "New contacts",
         "openTickets": "Open tickets",
         "newUsers": "New users",
@@ -887,21 +907,27 @@
       },
       "traffic": {
         "title": "Website traffic",
-        "meta": "Anonymous public-site visits and download clicks.",
+        "meta": "Public visits and download activity by source.",
         "empty": "No traffic data yet. New public page visits will appear here.",
         "topPages": "Top pages",
         "languages": "Languages",
-        "downloads": "Downloads",
+        "downloads": "Total downloads",
         "page": "Page",
         "views": "Views",
         "language": "Language",
         "share": "Share",
-        "viewFull": "View 30-day traffic",
+        "viewFull": "View 30-day data",
         "tabsLabel": "Traffic series",
         "tabs": {
-          "visitors": "Visitors",
+          "visitors": "Visits",
           "downloads": "Downloads"
-        }
+        },
+        "clientDownloads": "Client downloads",
+        "documentDownloads": "Document downloads",
+        "downloadSources": "Download sources",
+        "source": "Source",
+        "count": "Count",
+        "downloadEmpty": "No download activity yet."
       },
       "pending": {
         "title": "Pending work",
@@ -922,7 +948,8 @@
           "pending": "Pending",
           "overdue": "Overdue",
           "clear": "Clear"
-        }
+        },
+        "enter": "Enter"
       },
       "activity": {
         "title": "Latest activity",
@@ -949,7 +976,7 @@
           "downloadUpdated": "Client release updated.",
           "collaborationUpdated": "Collaboration space updated."
         },
-        "viewAll": "View users",
+        "viewAll": "View all activity",
         "metaLabels": {
           "publishedDocument": "Published document",
           "draftDocument": "Draft document",
@@ -1012,7 +1039,7 @@
         "reviewContacts": "Review contacts",
         "publishDownloads": "Publish downloads",
         "createSpace": "Create space",
-        "manageDownloads": "Manage downloads"
+        "manageDownloads": "Publish client"
       }
     },
     "adminProduct": {
@@ -1667,6 +1694,30 @@
           "blocked": "Blocked",
           "completed": "Completed"
         }
+      }
+    },
+    "adminNotifications": {
+      "seo": {
+        "title": "Admin notifications | Aifar",
+        "description": "Review admin work notifications in the Aifar management console."
+      },
+      "title": "Admin notifications",
+      "lead": "Work notifications stay inside the management console; personal preferences remain in the account area.",
+      "filtersLabel": "Notification filter",
+      "filters": {
+        "all": "All",
+        "unread": "Unread"
+      },
+      "unread": "Unread",
+      "read": "Read",
+      "emptyTitle": "No admin notifications.",
+      "emptyLead": "Collaboration, support, contact, release, user, and document notifications will appear here.",
+      "loadFailed": "Unable to load admin notifications.",
+      "actions": {
+        "markAllRead": "Mark visible as read",
+        "saving": "Saving...",
+        "open": "Open",
+        "failed": "Unable to update notification."
       }
     }
   }

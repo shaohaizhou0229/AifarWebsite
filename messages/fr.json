@@ -760,26 +760,26 @@
         "title": "Présentation Aifar | Aifar",
         "description": "Informations Aifar pour les équipes et les organisations."
       },
-      "eyebrow": "Présentation Aifar",
+      "eyebrow": "Operations",
       "deniedTitle": "Présentation Aifar",
       "deniedLead": "Présentation Aifar",
-      "title": "Vue d'ensemble de gestion",
-      "lead": "Suivez les op?rations du site, les t?ches en attente et l'activit? des modules.",
+      "title": "Vue operations",
+      "lead": "Travaux en attente, trafic et etat des modules dans un seul espace.",
       "active": "Présentation Aifar",
       "planned": "Présentation Aifar",
       "nav": {
-        "label": "Présentation Aifar",
-        "home": "Présentation Aifar",
-        "product": "Présentation Aifar",
-        "downloads": "Présentation Aifar",
-        "docs": "Présentation Aifar",
-        "support": "Présentation Aifar",
-        "contact": "Présentation Aifar",
-        "users": "Utilisateurs",
-        "collaboration": "Collaboration",
+        "label": "Sections admin",
+        "home": "Vue operations",
+        "product": "Contenu site",
+        "downloads": "Versions client",
+        "docs": "Centre docs",
+        "support": "Tickets support",
+        "contact": "Demandes contact",
+        "users": "Utilisateurs et droits",
+        "collaboration": "Taches collaboration",
         "groups": {
-          "workspace": "Espace de travail",
-          "operations": "Operations"
+          "workspace": "Espace operations",
+          "operations": "Demandes et taches"
         }
       },
       "modules": [
@@ -835,7 +835,7 @@
       ],
       "shell": {
         "brand": "Aifar",
-        "projectLabel": "Projet",
+        "projectLabel": "Site",
         "projectName": "Aifar Website",
         "workspace": "Console admin",
         "notifications": "Notifications",
@@ -846,20 +846,40 @@
           "signOut": "Se deconnecter",
           "signingOut": "Deconnexion..."
         },
-        "search": "Rechercher",
+        "search": "Acces rapide",
         "searchShortcut": "Ctrl K",
-        "collapse": "R?duire",
+        "collapse": "Reduire",
         "userFallback": "Admin",
         "userEmailFallback": "admin@aifar.com",
         "actions": {
-          "newAction": "Nouvelle action",
-          "inviteUser": "Inviter un utilisateur",
-          "newDocument": "Nouveau document",
-          "manageDownloads": "G?rer les t?l?chargements"
+          "newAction": "Nouveau",
+          "inviteUser": "Inviter utilisateur",
+          "newDocument": "Creer document",
+          "manageDownloads": "Gerer telechargements",
+          "publishClient": "Publier client",
+          "createSpace": "Creer espace"
         },
         "expand": "Etendre",
         "projectCurrent": "Site actuel",
-        "projectTenantHint": "Le changement multi-tenant est reserve pour une prochaine version."
+        "projectTenantHint": "La bascule multi-site est reservee pour une version ulterieure.",
+        "adminNotifications": "Notifications admin",
+        "notificationPreferences": "Preferences notifications",
+        "frontSite": "Retour au site",
+        "frontSiteShort": "Site",
+        "searchPlaceholder": "Aller a un module",
+        "close": "Fermer",
+        "emptySearch": "Aucun module correspondant.",
+        "commands": {
+          "home": "Vue operations",
+          "product": "Contenu site",
+          "downloads": "Versions client",
+          "users": "Utilisateurs et droits",
+          "docs": "Centre docs",
+          "support": "Tickets support",
+          "contact": "Demandes contact",
+          "collaboration": "Taches collaboration",
+          "notifications": "Notifications admin"
+        }
       },
       "ranges": {
         "today": "Aujourd hui",
@@ -871,7 +891,7 @@
       "metrics": {
         "todayViews": "Visiteurs aujourd'hui",
         "totalViews": "Visites totales",
-        "downloadClicks": "T?l?chargements",
+        "downloadClicks": "Telechargements",
         "newContacts": "Nouveaux contacts",
         "openTickets": "Tickets ouverts",
         "newUsers": "Nouveaux utilisateurs",
@@ -886,22 +906,28 @@
         }
       },
       "traffic": {
-        "title": "Trafic du site",
-        "meta": "Visites anonymes du site public et clics de telechargement.",
+        "title": "Analyse du trafic",
+        "meta": "Visites publiques et telechargements par source.",
         "empty": "Aucune donnee de trafic pour le moment.",
         "topPages": "Pages principales",
         "languages": "Langues",
-        "downloads": "Telechargements",
+        "downloads": "Total telechargements",
         "page": "Page",
         "views": "Vues",
         "language": "Langue",
         "share": "Part",
-        "viewFull": "Voir le trafic sur 30 jours",
+        "viewFull": "Voir 30 jours",
         "tabsLabel": "Series de trafic",
         "tabs": {
           "visitors": "Visites",
           "downloads": "Telechargements"
-        }
+        },
+        "clientDownloads": "Telechargements client",
+        "documentDownloads": "Telechargements docs",
+        "downloadSources": "Sources de telechargement",
+        "source": "Source",
+        "count": "Nombre",
+        "downloadEmpty": "Aucune activite de telechargement."
       },
       "pending": {
         "title": "Travail en attente",
@@ -922,7 +948,8 @@
           "pending": "En attente",
           "overdue": "En retard",
           "clear": "Normal"
-        }
+        },
+        "enter": "Entrer"
       },
       "activity": {
         "title": "Activite recente",
@@ -949,7 +976,7 @@
           "downloadUpdated": "Version client mise ? jour.",
           "collaborationUpdated": "Espace de collaboration mis ? jour."
         },
-        "viewAll": "Voir les utilisateurs",
+        "viewAll": "Voir toute activite",
         "metaLabels": {
           "publishedDocument": "Document publie",
           "draftDocument": "Brouillon de document",
@@ -1012,7 +1039,7 @@
         "reviewContacts": "Voir les contacts",
         "publishDownloads": "Publier telechargements",
         "createSpace": "Creer un espace",
-        "manageDownloads": "G?rer les t?l?chargements"
+        "manageDownloads": "Publier client"
       }
     },
     "adminProduct": {
@@ -1667,6 +1694,30 @@
           "blocked": "Blocked",
           "completed": "Completed"
         }
+      }
+    },
+    "adminNotifications": {
+      "seo": {
+        "title": "Notifications admin | Aifar",
+        "description": "Consulter les notifications de travail admin dans la console Aifar."
+      },
+      "title": "Notifications admin",
+      "lead": "Les notifications de travail restent dans la console; les preferences personnelles restent dans le compte.",
+      "filtersLabel": "Filtre notifications",
+      "filters": {
+        "all": "Toutes",
+        "unread": "Non lues"
+      },
+      "unread": "Non lue",
+      "read": "Lue",
+      "emptyTitle": "Aucune notification admin.",
+      "emptyLead": "Les notifications de collaboration, support, contact, version, utilisateur et document apparaitront ici.",
+      "loadFailed": "Impossible de charger les notifications admin.",
+      "actions": {
+        "markAllRead": "Marquer visibles comme lues",
+        "saving": "Enregistrement...",
+        "open": "Ouvrir",
+        "failed": "Impossible de mettre a jour."
       }
     }
   }

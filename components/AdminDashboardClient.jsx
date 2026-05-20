@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   ArrowRight,
+  ClipboardList,
   Download,
   FileText,
   LifeBuoy,
@@ -21,21 +22,25 @@ import { AdminStatusPill } from "@/components/AdminStatusPill";
 import { loadAdminDashboard, readCachedAdminDashboard, writeCachedAdminDashboard } from "@/components/admin-dashboard-cache";
 import { localizedPath } from "@/i18n/routing";
 
-function maxTrendValue(trend = []) {
-  return Math.max(1, ...trend.flatMap((point) => [point.views, point.downloads]));
+function maxTrendValue(trend = [], mode = "visitors") {
+  if (mode === "downloads") {
+    return Math.max(1, ...trend.flatMap((point) => [point.downloads, point.clientDownloads, point.documentDownloads]));
+  }
+  return Math.max(1, ...trend.map((point) => point.views));
 }
 
-function TrafficChart({ trend = [], labels }) {
-  const max = maxTrendValue(trend);
+function TrafficChart({ trend = [], labels, mode }) {
+  const max = maxTrendValue(trend, mode);
   const points = trend.map((point, index) => {
     const x = trend.length <= 1 ? 0 : (index / (trend.length - 1)) * 100;
-    const y = 100 - (point.views / max) * 86 - 7;
+    const value = mode === "downloads" ? point.downloads : point.views;
+    const y = 100 - (value / max) * 86 - 7;
     return `${x},${y}`;
   }).join(" ");
   const areaPoints = points ? `0,100 ${points} 100,100` : "";
 
   return (
-    <div className="admin-traffic-chart" aria-label={labels.title}>
+    <div className={`admin-traffic-chart admin-traffic-chart-${mode}`} aria-label={labels.title}>
       <svg viewBox="0 0 100 100" role="img" preserveAspectRatio="none">
         {areaPoints ? <polygon points={areaPoints} /> : null}
         <polyline points={points} />
@@ -43,7 +48,8 @@ function TrafficChart({ trend = [], labels }) {
       <div className="admin-traffic-bars">
         {trend.map((point) => (
           <div key={point.date}>
-            <span style={{ height: `${Math.max(4, (point.downloads / max) * 80)}%` }} />
+            <span className="admin-traffic-bar-client" style={{ height: `${Math.max(4, ((point.clientDownloads || point.downloads || 0) / max) * 80)}%` }} />
+            <span className="admin-traffic-bar-document" style={{ height: `${Math.max(4, ((point.documentDownloads || 0) / max) * 80)}%` }} />
             <small>{point.label}</small>
           </div>
         ))}
@@ -52,19 +58,19 @@ function TrafficChart({ trend = [], labels }) {
   );
 }
 
-function TrafficTable({ items = [], emptyText, labels, nameLabel, total = 0 }) {
+function TrafficTable({ items = [], emptyText, labels, nameLabel, valueLabel, total = 0 }) {
   if (!items.length) return <p className="admin-empty-copy">{emptyText}</p>;
 
   return (
     <div className="admin-traffic-table">
       <div>
         <span>{nameLabel || labels.page || "Page"}</span>
-        <span>{labels.views || "Views"}</span>
+        <span>{valueLabel || labels.views || "Views"}</span>
         <span>{labels.share || "Share"}</span>
       </div>
       {items.map((item) => (
-        <div key={item.path || item.locale}>
-          <span>{item.path || item.locale}</span>
+        <div key={item.path || item.locale || item.name}>
+          <span>{item.path || item.locale || item.name}</span>
           <strong>{item.count}</strong>
           <strong>{total ? `${Math.round((item.count / total) * 100)}%` : "-"}</strong>
         </div>
@@ -77,6 +83,12 @@ function rangeHref(locale, days) {
   return `${localizedPath(locale, "/admin/")}?range=${days}`;
 }
 
+function localizedAdminHref(locale, href) {
+  const value = String(href || "/admin/");
+  const [pathname, query = ""] = value.split("?");
+  return `${localizedPath(locale, pathname)}${query ? `?${query}` : ""}`;
+}
+
 function localizeHealthItems(dashboard, page) {
   return dashboard.moduleHealth.map((item) => ({
     ...item,
@@ -86,10 +98,19 @@ function localizeHealthItems(dashboard, page) {
   }));
 }
 
+const PENDING_ICONS = {
+  newContacts: Mail,
+  unassignedTickets: LifeBuoy,
+  draftContent: FileText,
+  downloadGaps: Download,
+  overdueSubtasks: ClipboardList
+};
+
 export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard = null, loadingLabel, errorLabel }) {
   const [dashboard, setDashboard] = useState(() => initialDashboard || readCachedAdminDashboard(locale, rangeDays, 5 * 60 * 1000));
   const [loading, setLoading] = useState(() => !initialDashboard && !readCachedAdminDashboard(locale, rangeDays, 5 * 60 * 1000));
   const [error, setError] = useState("");
+  const [trafficMode, setTrafficMode] = useState("visitors");
 
   useEffect(() => {
     if (initialDashboard) {
@@ -131,6 +152,11 @@ export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard
     ["newUsers", dashboard.metrics.newUsers, page.metrics.details.today, "neutral", "neutral", Users],
     ["draftContent", dashboard.metrics.draftContent, dashboard.metrics.draftContent ? page.metrics.details.needsReview : page.metrics.details.clear, dashboard.metrics.draftContent ? "attention" : "neutral", dashboard.metrics.draftContent ? "warning" : "positive", FileText]
   ] : [];
+  const downloadSources = dashboard ? [
+    { name: page.traffic.clientDownloads, count: dashboard.analytics.downloads?.client || 0 },
+    { name: page.traffic.documentDownloads, count: dashboard.analytics.downloads?.document || 0 }
+  ] : [];
+  const totalDownloadSources = downloadSources.reduce((sum, item) => sum + item.count, 0);
 
   return (
     <>
@@ -155,71 +181,105 @@ export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard
             </section>
 
             <section className="admin-dashboard-grid">
-              <AdminDataPanel
-                title={page.traffic.title}
-                meta={page.traffic.meta}
-                action={(
-                  <div className="admin-panel-tabs" aria-label={page.traffic.tabsLabel}>
-                    <span className="active">{page.traffic.tabs.visitors}</span>
-                    <span>{page.traffic.tabs.downloads}</span>
+              <div className="admin-dashboard-column admin-dashboard-column-main">
+                <AdminDataPanel
+                  title={page.traffic.title}
+                  meta={page.traffic.meta}
+                  action={(
+                    <div className="admin-panel-tabs" aria-label={page.traffic.tabsLabel}>
+                      <button type="button" className={trafficMode === "visitors" ? "active" : ""} onClick={() => setTrafficMode("visitors")}>{page.traffic.tabs.visitors}</button>
+                      <button type="button" className={trafficMode === "downloads" ? "active" : ""} onClick={() => setTrafficMode("downloads")}>{page.traffic.tabs.downloads}</button>
+                    </div>
+                  )}
+                  className="admin-traffic-panel"
+                >
+                  {dashboard.analytics.hasData || trafficMode === "downloads" ? (
+                    <>
+                      <div className="admin-traffic-summary">
+                        {trafficMode === "downloads" ? (
+                          <>
+                            <div>
+                              <span>{page.traffic.clientDownloads}</span>
+                              <strong>{dashboard.analytics.downloads?.client || 0}</strong>
+                            </div>
+                            <div>
+                              <span>{page.traffic.documentDownloads}</span>
+                              <strong>{dashboard.analytics.downloads?.document || 0}</strong>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div>
+                              <span>{page.metrics.totalViews}</span>
+                              <strong>{dashboard.metrics.totalViews}</strong>
+                            </div>
+                            <div>
+                              <span>{page.traffic.downloads}</span>
+                              <strong>{dashboard.metrics.downloadClicks}</strong>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                      <TrafficChart trend={dashboard.analytics.trend} labels={page.traffic} mode={trafficMode} />
+                      <div className="admin-dashboard-split">
+                        {trafficMode === "downloads" ? (
+                          <div>
+                            <h3>{page.traffic.downloadSources}</h3>
+                            <TrafficTable items={downloadSources} emptyText={page.traffic.downloadEmpty} labels={page.traffic} nameLabel={page.traffic.source} valueLabel={page.traffic.count} total={totalDownloadSources} />
+                          </div>
+                        ) : (
+                          <>
+                            <div>
+                              <h3>{page.traffic.topPages}</h3>
+                              <TrafficTable items={dashboard.analytics.topPages} emptyText={page.traffic.empty} labels={page.traffic} nameLabel={page.traffic.page} total={dashboard.metrics.totalViews} />
+                            </div>
+                            <div>
+                              <h3>{page.traffic.languages}</h3>
+                              <TrafficTable items={dashboard.analytics.languages} emptyText={page.traffic.empty} labels={page.traffic} nameLabel={page.traffic.language} total={dashboard.metrics.totalViews} />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                      <Link className="admin-panel-footer-link" href={rangeHref(locale, 30)} prefetch={false}>{page.traffic.viewFull} <ArrowRight aria-hidden="true" size={14} strokeWidth={1.8} /></Link>
+                    </>
+                  ) : (
+                    <p className="admin-empty-copy">{page.traffic.empty}</p>
+                  )}
+                </AdminDataPanel>
+
+                <AdminDataPanel title={page.activity.title} meta={page.activity.meta}>
+                  <AdminActivityFeed items={dashboard.activity.slice(0, 6)} emptyText={page.activity.empty} labels={page.activity} locale={locale} />
+                  <Link className="admin-panel-footer-link" href={localizedPath(locale, "/admin/users/")} prefetch={false}>{page.activity.viewAll} <ArrowRight aria-hidden="true" size={14} strokeWidth={1.8} /></Link>
+                </AdminDataPanel>
+              </div>
+
+              <div className="admin-dashboard-column admin-dashboard-column-side">
+                <AdminDataPanel title={page.pending.title} meta={page.pending.meta} action={<Link className="admin-panel-action" href={localizedPath(locale, "/admin/support/")} prefetch={false}>{page.pending.viewAll}</Link>}>
+                  <div className="admin-pending-list">
+                    {dashboard.pendingWork.map((item) => {
+                      const Icon = PENDING_ICONS[item.key] || ClipboardList;
+                      return (
+                        <Link href={localizedAdminHref(locale, item.href)} key={item.key} prefetch={false}>
+                          <span className="admin-pending-icon" aria-hidden="true">
+                            <Icon size={15} strokeWidth={1.8} />
+                          </span>
+                          <div>
+                            <strong>{page.pending.items[item.key]}</strong>
+                            <span>{item.count}</span>
+                          </div>
+                          <AdminStatusPill tone={item.tone}>{page.pending.statuses[item.count ? item.statusKey : "clear"]}</AdminStatusPill>
+                          <span className="admin-pending-enter">{page.pending.enter}</span>
+                        </Link>
+                      );
+                    })}
                   </div>
-                )}
-                className="admin-traffic-panel"
-              >
-                {dashboard.analytics.hasData ? (
-                  <>
-                    <div className="admin-traffic-summary">
-                      <div>
-                        <span>{page.metrics.totalViews}</span>
-                        <strong>{dashboard.metrics.totalViews}</strong>
-                      </div>
-                      <div>
-                        <span>{page.traffic.downloads}</span>
-                        <strong>{dashboard.metrics.downloadClicks}</strong>
-                      </div>
-                    </div>
-                    <TrafficChart trend={dashboard.analytics.trend} labels={page.traffic} />
-                    <div className="admin-dashboard-split">
-                      <div>
-                        <h3>{page.traffic.topPages}</h3>
-                        <TrafficTable items={dashboard.analytics.topPages} emptyText={page.traffic.empty} labels={page.traffic} nameLabel={page.traffic.page} total={dashboard.metrics.totalViews} />
-                      </div>
-                      <div>
-                        <h3>{page.traffic.languages}</h3>
-                        <TrafficTable items={dashboard.analytics.languages} emptyText={page.traffic.empty} labels={page.traffic} nameLabel={page.traffic.language} total={dashboard.metrics.totalViews} />
-                      </div>
-                    </div>
-                    <Link className="admin-panel-footer-link" href={rangeHref(locale, 30)} prefetch={false}>{page.traffic.viewFull} <ArrowRight aria-hidden="true" size={14} strokeWidth={1.8} /></Link>
-                  </>
-                ) : (
-                  <p className="admin-empty-copy">{page.traffic.empty}</p>
-                )}
-              </AdminDataPanel>
+                  <Link className="admin-panel-footer-link" href={localizedPath(locale, "/admin/collaboration/")} prefetch={false}>{page.pending.myTasks} <ArrowRight aria-hidden="true" size={14} strokeWidth={1.8} /></Link>
+                </AdminDataPanel>
 
-              <AdminDataPanel title={page.pending.title} meta={page.pending.meta} action={<Link className="admin-panel-action" href={localizedPath(locale, "/admin/support/")} prefetch={false}>{page.pending.viewAll}</Link>}>
-                <div className="admin-pending-list">
-                  {dashboard.pendingWork.map((item) => (
-                    <Link href={localizedPath(locale, item.href)} key={item.key} prefetch={false}>
-                      <span className="admin-check-box" aria-hidden="true" />
-                      <div>
-                        <strong>{page.pending.items[item.key]}</strong>
-                        <span>{item.count}</span>
-                      </div>
-                      <AdminStatusPill tone={item.tone}>{page.pending.statuses[item.count ? item.statusKey : "clear"]}</AdminStatusPill>
-                      <ArrowRight aria-hidden="true" size={15} strokeWidth={1.8} />
-                    </Link>
-                  ))}
-                </div>
-                <Link className="admin-panel-footer-link" href={localizedPath(locale, "/admin/collaboration/")} prefetch={false}>{page.pending.myTasks} <ArrowRight aria-hidden="true" size={14} strokeWidth={1.8} /></Link>
-              </AdminDataPanel>
-
-              <AdminDataPanel title={page.activity.title} meta={page.activity.meta} action={<Link className="admin-panel-action" href={localizedPath(locale, "/admin/users/")} prefetch={false}>{page.activity.viewAll}</Link>}>
-                <AdminActivityFeed items={dashboard.activity} emptyText={page.activity.empty} labels={page.activity} locale={locale} />
-              </AdminDataPanel>
-
-              <AdminDataPanel title={page.health.title} meta={page.health.meta} action={<Link className="admin-panel-action" href={localizedPath(locale, "/admin/")} prefetch={false}>{page.health.viewAll}</Link>}>
-                <AdminHealthList items={localizeHealthItems(dashboard, page)} labels={page.health} locale={locale} />
-              </AdminDataPanel>
+                <AdminDataPanel title={page.health.title} meta={page.health.meta} action={<Link className="admin-panel-action" href={localizedPath(locale, "/admin/")} prefetch={false}>{page.health.viewAll}</Link>}>
+                  <AdminHealthList items={localizeHealthItems(dashboard, page)} labels={page.health} locale={locale} />
+                </AdminDataPanel>
+              </div>
             </section>
           </>
         ) : null}

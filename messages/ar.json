@@ -760,26 +760,26 @@
         "title": "معلومات Aifar | Aifar",
         "description": "معلومات Aifar للفرق والمؤسسات."
       },
-      "eyebrow": "معلومات Aifar",
+      "eyebrow": "Operations",
       "deniedTitle": "معلومات Aifar",
       "deniedLead": "معلومات Aifar",
-      "title": "نظرة عامة على الإدارة",
-      "lead": "عمليات الموقع والعمل المعلّق ونشاط الوحدات في لمحة واحدة.",
+      "title": "نظرة تشغيلية",
+      "lead": "الأعمال المعلقة والزيارات وحالة الوحدات في مساحة تشغيل واحدة.",
       "active": "معلومات Aifar",
       "planned": "معلومات Aifar",
       "nav": {
-        "label": "معلومات Aifar",
-        "home": "معلومات Aifar",
-        "product": "معلومات Aifar",
-        "downloads": "معلومات Aifar",
-        "docs": "معلومات Aifar",
-        "support": "معلومات Aifar",
-        "contact": "معلومات Aifar",
-        "users": "Users",
-        "collaboration": "Collaboration",
+        "label": "أقسام الإدارة",
+        "home": "نظرة تشغيلية",
+        "product": "محتوى الموقع",
+        "downloads": "إصدارات العميل",
+        "docs": "مركز الوثائق",
+        "support": "تذاكر الدعم",
+        "contact": "طلبات التواصل",
+        "users": "المستخدمون والصلاحيات",
+        "collaboration": "مهام التعاون",
         "groups": {
-          "workspace": "مساحة العمل",
-          "operations": "العمليات"
+          "workspace": "مساحة التشغيل",
+          "operations": "الطلبات والمهام"
         }
       },
       "modules": [
@@ -835,7 +835,7 @@
       ],
       "shell": {
         "brand": "Aifar",
-        "projectLabel": "المشروع",
+        "projectLabel": "الموقع",
         "projectName": "Aifar Website",
         "workspace": "لوحة الإدارة",
         "notifications": "الإشعارات",
@@ -844,22 +844,42 @@
         "breadcrumbs": "المسار",
         "auth": {
           "signOut": "تسجيل الخروج",
-          "signingOut": "جار تسجيل الخروج..."
+          "signingOut": "جار الخروج..."
         },
-        "search": "بحث",
+        "search": "انتقال سريع",
         "searchShortcut": "Ctrl K",
         "collapse": "طي",
-        "userFallback": "مدير",
+        "userFallback": "مسؤول",
         "userEmailFallback": "admin@aifar.com",
         "actions": {
-          "newAction": "إجراء جديد",
+          "newAction": "جديد",
           "inviteUser": "دعوة مستخدم",
-          "newDocument": "مستند جديد",
-          "manageDownloads": "إدارة التنزيلات"
+          "newDocument": "إنشاء وثيقة",
+          "manageDownloads": "إدارة التنزيلات",
+          "publishClient": "نشر العميل",
+          "createSpace": "إنشاء مساحة تعاون"
         },
         "expand": "توسيع",
         "projectCurrent": "الموقع الحالي",
-        "projectTenantHint": "تم حجز تبديل المواقع متعددة المستأجرين لإصدار لاحق."
+        "projectTenantHint": "تبديل المواقع المتعددة محفوظ لإصدار لاحق.",
+        "adminNotifications": "إشعارات الإدارة",
+        "notificationPreferences": "تفضيلات الإشعارات",
+        "frontSite": "العودة للموقع",
+        "frontSiteShort": "الموقع",
+        "searchPlaceholder": "انتقل إلى وحدة",
+        "close": "إغلاق",
+        "emptySearch": "لا توجد وحدة مطابقة.",
+        "commands": {
+          "home": "نظرة تشغيلية",
+          "product": "محتوى الموقع",
+          "downloads": "إصدارات العميل",
+          "users": "المستخدمون والصلاحيات",
+          "docs": "مركز الوثائق",
+          "support": "تذاكر الدعم",
+          "contact": "طلبات التواصل",
+          "collaboration": "مهام التعاون",
+          "notifications": "إشعارات الإدارة"
+        }
       },
       "ranges": {
         "today": "اليوم",
@@ -871,7 +891,7 @@
       "metrics": {
         "todayViews": "زوار اليوم",
         "totalViews": "إجمالي الزيارات",
-        "downloadClicks": "التنزيلات",
+        "downloadClicks": "إجمالي التنزيلات",
         "newContacts": "طلبات تواصل جديدة",
         "openTickets": "تذاكر مفتوحة",
         "newUsers": "مستخدمون جدد",
@@ -886,22 +906,28 @@
         }
       },
       "traffic": {
-        "title": "حركة الموقع",
-        "meta": "زيارات مجهولة للموقع العام ونقرات التنزيل.",
+        "title": "تحليل زيارات الموقع",
+        "meta": "زيارات الصفحات العامة ونشاط التنزيل حسب المصدر.",
         "empty": "لا توجد بيانات زيارات بعد.",
         "topPages": "أهم الصفحات",
         "languages": "اللغات",
-        "downloads": "التنزيلات",
+        "downloads": "إجمالي التنزيلات",
         "page": "الصفحة",
         "views": "الزيارات",
         "language": "اللغة",
         "share": "الحصة",
-        "viewFull": "عرض زيارات 30 يوما",
+        "viewFull": "عرض بيانات 30 يوما",
         "tabsLabel": "سلسلة حركة الزيارات",
         "tabs": {
           "visitors": "الزيارات",
           "downloads": "التنزيلات"
-        }
+        },
+        "clientDownloads": "تنزيلات العميل",
+        "documentDownloads": "تنزيلات الوثائق",
+        "downloadSources": "مصادر التنزيل",
+        "source": "المصدر",
+        "count": "العدد",
+        "downloadEmpty": "لا يوجد نشاط تنزيل بعد."
       },
       "pending": {
         "title": "العمل المعلق",
@@ -922,7 +948,8 @@
           "pending": "قيد الانتظار",
           "overdue": "متأخر",
           "clear": "طبيعي"
-        }
+        },
+        "enter": "دخول"
       },
       "activity": {
         "title": "آخر النشاطات",
@@ -949,7 +976,7 @@
           "downloadUpdated": "تم تحديث إصدار العميل.",
           "collaborationUpdated": "تم تحديث مساحة تعاون."
         },
-        "viewAll": "عرض المستخدمين",
+        "viewAll": "عرض كل النشاط",
         "metaLabels": {
           "publishedDocument": "مستند منشور",
           "draftDocument": "مسودة مستند",
@@ -1012,7 +1039,7 @@
         "reviewContacts": "مراجعة الطلبات",
         "publishDownloads": "نشر التنزيلات",
         "createSpace": "إنشاء مساحة",
-        "manageDownloads": "إدارة التنزيلات"
+        "manageDownloads": "نشر العميل"
       }
     },
     "adminProduct": {
@@ -1667,6 +1694,30 @@
           "blocked": "Blocked",
           "completed": "Completed"
         }
+      }
+    },
+    "adminNotifications": {
+      "seo": {
+        "title": "إشعارات الإدارة | Aifar",
+        "description": "مراجعة إشعارات العمل الإدارية في لوحة Aifar."
+      },
+      "title": "إشعارات الإدارة",
+      "lead": "تبقى إشعارات العمل داخل الإدارة، وتبقى التفضيلات الشخصية في منطقة الحساب.",
+      "filtersLabel": "تصفية الإشعارات",
+      "filters": {
+        "all": "الكل",
+        "unread": "غير مقروء"
+      },
+      "unread": "غير مقروء",
+      "read": "مقروء",
+      "emptyTitle": "لا توجد إشعارات إدارية.",
+      "emptyLead": "ستظهر هنا إشعارات التعاون والدعم والتواصل والإصدارات والمستخدمين والوثائق.",
+      "loadFailed": "تعذر تحميل إشعارات الإدارة.",
+      "actions": {
+        "markAllRead": "تمييز الظاهر كمقروء",
+        "saving": "جار الحفظ...",
+        "open": "فتح",
+        "failed": "تعذر تحديث الإشعار."
       }
     }
   }

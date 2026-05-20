@@ -4460,6 +4460,292 @@ body:has(.admin-shell)::before {
   padding: 7px 9px;
 }
 
+.admin-sidebar-search {
+  width: 100%;
+  cursor: pointer;
+  text-align: start;
+}
+
+.admin-sidebar-search span {
+  overflow: hidden;
+  color: var(--admin-ink);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-frontsite-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--admin-ink);
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 0 10px;
+}
+
+.admin-frontsite-link:hover {
+  background: var(--admin-hover);
+}
+
+.admin-quick-jump {
+  position: relative;
+}
+
+.admin-command-overlay {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  display: grid;
+  align-items: start;
+  justify-items: center;
+  background: rgba(15, 23, 42, 0.24);
+  padding-top: 12vh;
+}
+
+.admin-command-panel {
+  display: grid;
+  width: min(520px, calc(100vw - 32px));
+  overflow: hidden;
+  border: 1px solid var(--admin-border);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
+}
+
+.admin-command-search {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 48px;
+  border-bottom: 1px solid var(--admin-border);
+  color: var(--admin-muted);
+  gap: 10px;
+  padding: 0 12px;
+}
+
+.admin-command-search input {
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--admin-ink);
+  font-size: 14px;
+  outline: 0;
+}
+
+.admin-command-search button {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--admin-muted);
+}
+
+.admin-command-search button:hover {
+  background: var(--admin-hover);
+  color: var(--admin-ink);
+}
+
+.admin-command-list {
+  display: grid;
+  gap: 2px;
+  max-height: 320px;
+  overflow: auto;
+  padding: 8px;
+}
+
+.admin-command-list a,
+.admin-command-list p {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 38px;
+  border-radius: 7px;
+  color: var(--admin-ink);
+  font-size: 13px;
+  font-weight: 500;
+  gap: 12px;
+  margin: 0;
+  padding: 0 10px;
+}
+
+.admin-command-list a:hover {
+  background: var(--admin-hover);
+}
+
+.admin-panel-tabs button {
+  min-height: 30px;
+  border: 0;
+  border-right: 1px solid var(--admin-border);
+  background: transparent;
+  color: var(--admin-muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 10px;
+}
+
+.admin-panel-tabs button:last-child {
+  border-right: 0;
+}
+
+.admin-panel-tabs button.active {
+  background: #f8fbff;
+  color: var(--admin-blue);
+}
+
+.admin-dashboard-grid {
+  align-items: start;
+}
+
+.admin-dashboard-column {
+  display: grid;
+  min-width: 0;
+  gap: 16px;
+}
+
+.admin-traffic-chart-downloads .admin-traffic-bars span {
+  display: block;
+  width: 6px;
+  border-radius: 999px 999px 0 0;
+}
+
+.admin-traffic-bar-client {
+  background: var(--admin-blue);
+}
+
+.admin-traffic-bar-document {
+  background: #14b8a6;
+}
+
+.admin-pending-list a {
+  min-height: 46px;
+  gap: 10px;
+}
+
+.admin-pending-icon {
+  display: inline-grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border: 1px solid #dbe7ff;
+  border-radius: 999px;
+  background: #f3f7ff;
+  color: var(--admin-blue);
+}
+
+.admin-pending-enter {
+  color: var(--admin-blue) !important;
+  font-size: 12px;
+}
+
+.admin-activity-feed {
+  max-height: 330px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.admin-notifications-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-notifications-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-notifications-list {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-notification-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  background: #fff;
+  gap: 12px;
+  padding: 12px;
+}
+
+.admin-notification-row.is-unread {
+  background: #f8fbff;
+  border-color: #cfe0ff;
+}
+
+.admin-notification-icon {
+  display: inline-grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid #dbe7ff;
+  border-radius: 999px;
+  background: #f3f7ff;
+  color: var(--admin-blue);
+}
+
+.admin-notification-row-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-notification-row strong {
+  color: var(--admin-ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.admin-notification-row p {
+  margin-top: 4px;
+  color: var(--admin-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.admin-notification-row time {
+  display: block;
+  margin-top: 6px;
+  color: var(--admin-subtle);
+  font-size: 12px;
+}
+
+.admin-inline-action {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--admin-blue);
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 0 10px;
+}
+
+.admin-inline-action:hover {
+  background: var(--admin-hover);
+}
+
+.admin-inline-action:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 .admin-shell.admin-sidebar-collapsed {
   grid-template-columns: 72px minmax(0, 1fr);
 }
@@ -4490,6 +4776,7 @@ body:has(.admin-shell)::before {
 
 .admin-shell.admin-sidebar-collapsed .admin-project-copy,
 .admin-shell.admin-sidebar-collapsed .admin-sidebar-project > svg:last-child,
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-search span,
 .admin-shell.admin-sidebar-collapsed .admin-sidebar-search input,
 .admin-shell.admin-sidebar-collapsed .admin-sidebar-search kbd,
 .admin-shell.admin-sidebar-collapsed .admin-nav-group-label,
@@ -4589,6 +4876,7 @@ body:has(.admin-shell)::before {
     padding: 0 9px;
   }
 
+  .admin-shell.admin-sidebar-collapsed .admin-sidebar-search span,
   .admin-shell.admin-sidebar-collapsed .admin-sidebar-search input {
     display: block;
   }
@@ -4629,6 +4917,10 @@ body:has(.admin-shell)::before {
     width: min(100% - 32px, 900px);
   }
 
+  .admin-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
   .admin-dashboard-toolbar {
     justify-content: flex-start;
     margin-top: 0;
@@ -4660,6 +4952,19 @@ body:has(.admin-shell)::before {
 
   .admin-action-menu summary span {
     display: none;
+  }
+
+  .admin-frontsite-link span {
+    display: none;
+  }
+
+  .admin-notifications-toolbar {
+    flex-direction: column;
+  }
+
+  .admin-notification-row {
+    align-items: stretch;
+    grid-template-columns: 1fr;
   }
 
   .admin-metric-grid,

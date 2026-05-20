@@ -1,6 +1,8 @@
 import Link from "next/link";
-import { ChevronDown, Globe2, MoreVertical, Search } from "lucide-react";
+import { ChevronDown, Globe2, MoreVertical } from "lucide-react";
+import { AdminAutoCloseDetails } from "@/components/AdminAutoCloseDetails";
 import { AdminNav } from "@/components/AdminNav";
+import { AdminQuickJump } from "@/components/AdminQuickJump";
 import { AdminRoutePreloader } from "@/components/AdminRoutePreloader";
 import { AdminSidebarCollapse } from "@/components/AdminSidebarCollapse";
 import { AdminTopBar } from "@/components/AdminTopBar";
@@ -76,15 +78,20 @@ export function AdminShell({
           <img className="admin-logo-full" src="/assets/images/aifar-logo-full.png" alt={shell.brand || "Aifar"} />
           <img className="admin-logo-mark" src="/assets/images/aifar-logo-mark.png" alt="" aria-hidden="true" />
         </Link>
-        <details className="admin-sidebar-project-menu">
-          <summary className="admin-sidebar-project">
+        <AdminAutoCloseDetails
+          className="admin-sidebar-project-menu"
+          summaryClassName="admin-sidebar-project"
+          summaryLabel={shell.projectName || "Aifar Website"}
+          summary={(
+            <>
             <Globe2 aria-hidden="true" size={15} strokeWidth={1.8} />
             <span className="admin-project-copy">
-              <small>{shell.projectLabel || "Project"}</small>
               <strong>{shell.projectName || "Aifar Website"}</strong>
             </span>
             <ChevronDown aria-hidden="true" size={14} strokeWidth={1.8} />
-          </summary>
+            </>
+          )}
+        >
           <div className="admin-project-popover">
             <Link className="active" href={localizedPath(locale, "/admin/")} prefetch={false}>
               <span className="admin-project-mark">A</span>
@@ -95,13 +102,8 @@ export function AdminShell({
             </Link>
             <p>{shell.projectTenantHint || "Multi-tenant switching is reserved for a later build."}</p>
           </div>
-        </details>
-        <label className="admin-sidebar-search">
-          <Search aria-hidden="true" size={14} strokeWidth={1.8} />
-          <span className="sr-only">{shell.search || "Search"}</span>
-          <input placeholder={shell.search || "Search"} />
-          <kbd>{shell.searchShortcut || "Ctrl K"}</kbd>
-        </label>
+        </AdminAutoCloseDetails>
+        <AdminQuickJump locale={locale} labels={shell} navLabels={labels.nav} />
         <AdminNav locale={locale} labels={labels.nav} current={current} variant="sidebar" />
         <div className="admin-sidebar-spacer" />
         <AdminSidebarCollapse collapseLabel={shell.collapse || "Collapse"} expandLabel={shell.expand || "Expand"} />
@@ -111,16 +113,16 @@ export function AdminShell({
             <strong>{shellUser?.name || shell.userFallback || "Admin"}</strong>
             <span>{shellUser?.email || shell.userEmailFallback || "admin@aifar.com"}</span>
           </div>
-          <details>
-            <summary aria-label={shell.account || "Account"}>
-              <MoreVertical aria-hidden="true" size={16} strokeWidth={1.8} />
-            </summary>
+          <AdminAutoCloseDetails
+            summaryLabel={shell.account || "Account"}
+            summary={<MoreVertical aria-hidden="true" size={16} strokeWidth={1.8} />}
+          >
             <div>
               <Link href={localizedPath(locale, "/account/")} prefetch={false}>{shell.account || "Account"}</Link>
-              <Link href={localizedPath(locale, "/account/notifications/")} prefetch={false}>{shell.notifications || "Notifications"}</Link>
+              <Link href={localizedPath(locale, "/account/profile/")} prefetch={false}>{shell.notificationPreferences || "Notification preferences"}</Link>
               <SignOutButton labels={shell.auth || { signOut: "Sign out", signingOut: "Signing out..." }} redirectTo={localizedPath(locale, "/")} />
             </div>
-          </details>
+          </AdminAutoCloseDetails>
         </div>
       </aside>
       <section className="admin-main">

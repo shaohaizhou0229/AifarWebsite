@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { AdminAutoCloseDetails } from "@/components/AdminAutoCloseDetails";
 import { localeLabels, locales, stripLocale, localizedPath } from "@/i18n/routing";
 
 function shortLocale(code) {
@@ -15,11 +16,16 @@ export function AdminLanguageMenu({ locale, label }) {
   const currentPath = stripLocale(pathname);
 
   return (
-    <details className="admin-language-menu">
-      <summary aria-label={label}>
+    <AdminAutoCloseDetails
+      className="admin-language-menu"
+      summaryLabel={label}
+      summary={(
+        <>
         <span>{shortLocale(locale)}</span>
         <ChevronDown aria-hidden="true" size={14} strokeWidth={1.8} />
-      </summary>
+        </>
+      )}
+    >
       <div className="admin-language-menu-list">
         {locales.map((code) => (
           <Link
@@ -34,6 +40,6 @@ export function AdminLanguageMenu({ locale, label }) {
           </Link>
         ))}
       </div>
-    </details>
+    </AdminAutoCloseDetails>
   );
 }

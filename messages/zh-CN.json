@@ -760,26 +760,26 @@
         "title": "管理后台 | Aifar",
         "description": "管理 Aifar 网站运营。"
       },
-      "eyebrow": "管理后台",
+      "eyebrow": "运营",
       "deniedTitle": "需要管理员权限。",
       "deniedLead": "你的账户无权管理 Aifar 网站运营。",
-      "title": "管理总览",
-      "lead": "集中查看网站运营、待处理工作和模块最新动态。",
+      "title": "运营总览",
+      "lead": "待处理事项、访问数据和模块状态集中处理。",
       "active": "可用",
       "planned": "规划中",
       "nav": {
         "label": "管理区域",
-        "home": "管理中心",
-        "product": "产品",
-        "downloads": "下载",
-        "docs": "文档",
-        "support": "支持",
-        "contact": "联系我们",
-        "users": "用户",
-        "collaboration": "协作空间",
+        "home": "运营总览",
+        "product": "官网内容",
+        "downloads": "客户端发布",
+        "docs": "文档中心",
+        "support": "支持工单",
+        "contact": "联系请求",
+        "users": "用户与权限",
+        "collaboration": "协作任务",
         "groups": {
-          "workspace": "工作台",
-          "operations": "运营处理"
+          "workspace": "运营工作台",
+          "operations": "请求与任务"
         }
       },
       "modules": [
@@ -835,7 +835,7 @@
       ],
       "shell": {
         "brand": "Aifar",
-        "projectLabel": "项目",
+        "projectLabel": "站点",
         "projectName": "Aifar Website",
         "workspace": "后台控制台",
         "notifications": "通知",
@@ -846,20 +846,40 @@
           "signOut": "退出登录",
           "signingOut": "正在退出..."
         },
-        "search": "搜索",
+        "search": "快速跳转",
         "searchShortcut": "Ctrl K",
         "collapse": "收起",
         "userFallback": "管理员",
         "userEmailFallback": "admin@aifar.com",
         "actions": {
-          "newAction": "新建操作",
+          "newAction": "新建",
           "inviteUser": "邀请用户",
-          "newDocument": "新建文档",
-          "manageDownloads": "管理下载"
+          "newDocument": "创建文档",
+          "manageDownloads": "管理下载",
+          "publishClient": "发布客户端",
+          "createSpace": "创建协作空间"
         },
         "expand": "展开",
         "projectCurrent": "当前站点",
-        "projectTenantHint": "多租户站点切换已预留，后续可接入更多站点。"
+        "projectTenantHint": "多站点切换已预留，后续可接入更多站点。",
+        "adminNotifications": "后台通知",
+        "notificationPreferences": "通知偏好",
+        "frontSite": "返回前台",
+        "frontSiteShort": "前台",
+        "searchPlaceholder": "跳转到模块",
+        "close": "关闭",
+        "emptySearch": "没有匹配的模块。",
+        "commands": {
+          "home": "运营总览",
+          "product": "官网内容",
+          "downloads": "客户端发布",
+          "users": "用户与权限",
+          "docs": "文档中心",
+          "support": "支持工单",
+          "contact": "联系请求",
+          "collaboration": "协作任务",
+          "notifications": "后台通知"
+        }
       },
       "ranges": {
         "today": "今天",
@@ -871,7 +891,7 @@
       "metrics": {
         "todayViews": "今日访客",
         "totalViews": "总访问量",
-        "downloadClicks": "下载点击",
+        "downloadClicks": "总下载",
         "newContacts": "新联系请求",
         "openTickets": "未处理工单",
         "newUsers": "新用户",
@@ -887,21 +907,27 @@
       },
       "traffic": {
         "title": "网站访问分析",
-        "meta": "匿名统计公开页面访问与下载点击。",
+        "meta": "按来源查看公开页面访问和下载活动。",
         "empty": "暂无访问数据。新的公开页面访问会显示在这里。",
         "topPages": "热门页面",
         "languages": "语言分布",
-        "downloads": "下载",
+        "downloads": "总下载",
         "page": "页面",
         "views": "访问量",
         "language": "语言",
         "share": "占比",
-        "viewFull": "查看 30 天访问",
+        "viewFull": "查看 30 天数据",
         "tabsLabel": "访问数据序列",
         "tabs": {
           "visitors": "访问",
           "downloads": "下载"
-        }
+        },
+        "clientDownloads": "客户端下载",
+        "documentDownloads": "文档下载",
+        "downloadSources": "下载来源",
+        "source": "来源",
+        "count": "数量",
+        "downloadEmpty": "暂无下载活动。"
       },
       "pending": {
         "title": "待处理事项",
@@ -922,7 +948,8 @@
           "pending": "待处理",
           "overdue": "逾期",
           "clear": "正常"
-        }
+        },
+        "enter": "进入"
       },
       "activity": {
         "title": "最新活动",
@@ -949,7 +976,7 @@
           "downloadUpdated": "客户端版本已更新。",
           "collaborationUpdated": "协作空间已更新。"
         },
-        "viewAll": "查看用户",
+        "viewAll": "查看全部活动",
         "metaLabels": {
           "publishedDocument": "已发布文档",
           "draftDocument": "文档草稿",
@@ -1012,7 +1039,7 @@
         "reviewContacts": "查看联系请求",
         "publishDownloads": "发布下载",
         "createSpace": "创建协作空间",
-        "manageDownloads": "管理下载"
+        "manageDownloads": "发布客户端"
       }
     },
     "adminProduct": {
@@ -1667,6 +1694,30 @@
           "blocked": "受阻",
           "completed": "已完成"
         }
+      }
+    },
+    "adminNotifications": {
+      "seo": {
+        "title": "后台通知 | Aifar",
+        "description": "在 Aifar 管理台查看管理员工作通知。"
+      },
+      "title": "后台通知",
+      "lead": "后台工作通知在管理台内处理；个人通知偏好仍保留在账户资料中。",
+      "filtersLabel": "通知筛选",
+      "filters": {
+        "all": "全部",
+        "unread": "未读"
+      },
+      "unread": "未读",
+      "read": "已读",
+      "emptyTitle": "暂无后台通知。",
+      "emptyLead": "协作、工单、联系请求、版本发布、用户和文档处理通知会显示在这里。",
+      "loadFailed": "无法加载后台通知。",
+      "actions": {
+        "markAllRead": "可见通知标记已读",
+        "saving": "正在保存...",
+        "open": "打开",
+        "failed": "无法更新通知。"
       }
     }
   }
