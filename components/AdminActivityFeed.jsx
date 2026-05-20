@@ -32,7 +32,8 @@ function resolveHref(locale, href) {
 
 function resolveTitle(item, labels) {
   const events = labels?.events || {};
-  return events[item.activityKey] || events[item.eventType] || item.title;
+  const eventKey = String(item.eventType || "").replaceAll(".", "_");
+  return events[item.activityKey] || events[eventKey] || item.title;
 }
 
 function resolveMeta(item, labels) {

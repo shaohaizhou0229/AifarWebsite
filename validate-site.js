@@ -97,6 +97,18 @@ function collectMessageValues(value, prefix = "") {
   );
 }
 
+function collectDottedMessageKeys(value, prefix = "") {
+  if (Array.isArray(value) || !value || typeof value !== "object") {
+    return [];
+  }
+
+  return Object.entries(value).flatMap(([key, child]) => {
+    const currentPath = prefix ? `${prefix}.${key}` : key;
+    const current = key.includes(".") ? [currentPath] : [];
+    return current.concat(collectDottedMessageKeys(child, currentPath));
+  });
+}
+
 function compareMessageKeys() {
   const baseKeys = collectMessageKeys(JSON.parse(readFile("messages/en.json"))).sort();
 
@@ -126,6 +138,14 @@ function validateCoreMessageQuality() {
         console.error(`messages/${locale}.json: unresolved placeholder text at ${key}`);
         failures += 1;
       }
+    }
+  }
+
+  for (const locale of locales) {
+    const dottedKeys = collectDottedMessageKeys(JSON.parse(readFile(`messages/${locale}.json`)));
+    if (dottedKeys.length) {
+      console.error(`messages/${locale}.json: next-intl unsafe dotted keys: ${dottedKeys.join(", ")}`);
+      failures += 1;
     }
   }
 }
