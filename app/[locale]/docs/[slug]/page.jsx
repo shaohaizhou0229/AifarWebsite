@@ -12,14 +12,13 @@ import { buildMetadata } from "@/i18n/seo";
 
 const pathname = "/docs/";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export async function generateMetadata({ params }) {
   const { locale, slug } = await params;
   const page = await getPageMessages(locale, "docDetail");
   const safeSlug = normalizeDocumentSlug(slug);
-  const user = await getCurrentUser();
-  const document = safeSlug ? await getPublicDocumentBySlug(safeSlug, { includeLoginGated: Boolean(user) }).catch(() => null) : null;
+  const document = safeSlug ? await getPublicDocumentBySlug(safeSlug).catch(() => null) : null;
   return buildMetadata({
     locale,
     pathname,
@@ -35,23 +34,29 @@ function formatDate(value, locale) {
 export default async function DocDetailPage({ params }) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
-  const [page, docsPage, user] = await Promise.all([
+  const [page, docsPage] = await Promise.all([
     getPageMessages(locale, "docDetail"),
-    getPageMessages(locale, "docs"),
-    getCurrentUser()
+    getPageMessages(locale, "docs")
   ]);
   const safeSlug = normalizeDocumentSlug(slug);
   if (!safeSlug) notFound();
 
-  const document = await getPublicDocumentBySlug(safeSlug, { includeLoginGated: Boolean(user) });
+  let document = await getPublicDocumentBySlug(safeSlug);
+  let currentUser = null;
   if (!document) {
+    currentUser = await getCurrentUser();
     const gatedDocument = await getPublicDocumentBySlug(safeSlug, { includeLoginGated: true });
-    if (gatedDocument?.requiresLoginToView && !user) {
+    if (gatedDocument?.requiresLoginToView && !currentUser) {
       redirect(localizedPath(locale, "/login/"));
     }
+    document = gatedDocument;
+  }
+
+  if (!document) {
     notFound();
   }
 
+  const user = currentUser || (document.requiresLoginToView || document.allowAuthenticatedDownload ? await getCurrentUser() : null);
   const canDownload = Boolean(user && document.allowAuthenticatedDownload && document.storagePath);
   const tocItems = getMarkdownTableOfContents(document.markdownContent);
 

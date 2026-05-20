@@ -1,11 +1,11 @@
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
+import { AdminDownloadsClient } from "@/components/AdminDownloadsClient";
 import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
 import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
-import { listAdminDownloadPlatforms } from "@/lib/downloads";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { getPageMessages } from "@/i18n/messages";
+import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
 
@@ -19,16 +19,13 @@ export async function generateMetadata({ params }) {
   return buildMetadata({ locale, pathname, title: page.seo.title, description: page.seo.description });
 }
 
-function formatStatus(release, page) {
-  return release.isPublished ? page.published : page.draft;
-}
-
 export default async function AdminDownloadsPage({ params }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const [page, adminHome] = await Promise.all([
+  const [page, adminHome, messages] = await Promise.all([
     getPageMessages(locale, "adminDownloads"),
-    getPageMessages(locale, "adminHome")
+    getPageMessages(locale, "adminHome"),
+    getLocaleMessages(locale)
   ]);
   const adminNav = adminHome.nav;
 
@@ -40,8 +37,6 @@ export default async function AdminDownloadsPage({ params }) {
     }
     redirect(localizedPath(locale, "/login/"));
   }
-
-  const platforms = await listAdminDownloadPlatforms();
 
   return (
     <AdminShell
@@ -56,18 +51,7 @@ export default async function AdminDownloadsPage({ params }) {
         { label: page.breadcrumb }
       ]}
     >
-      <div className="admin-table-list">
-        {platforms.map((platform) => (
-          <a className="admin-table-row" key={platform.key} href={localizedPath(locale, `/admin/downloads/${platform.key}/`)}>
-            <div>
-              <h3>{platform.label}</h3>
-              <p>{platform.release.version || page.noVersion}</p>
-            </div>
-            <span>{platform.release.buildNumber || "-"}</span>
-            <span className="admin-status admin-status-neutral">{formatStatus(platform.release, page)}</span>
-          </a>
-        ))}
-      </div>
+      <AdminDownloadsClient locale={locale} page={page} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
     </AdminShell>
   );
 }

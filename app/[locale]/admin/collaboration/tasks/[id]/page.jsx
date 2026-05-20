@@ -1,5 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
 import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
 import {
   CollaborationSubtaskForm,
@@ -99,7 +100,7 @@ export default async function AdminCollaborationTaskPage({ params }) {
             <h2>{page.subtasksTitle}</h2>
             <div className="subtask-list">
               {task.subtasks.length ? task.subtasks.map((subtask) => (
-                <a className="subtask-row" key={subtask.id} href={localizedPath(locale, `/admin/collaboration/subtasks/${subtask.id}/`)}>
+                <Link className="subtask-row" key={subtask.id} href={localizedPath(locale, `/admin/collaboration/subtasks/${subtask.id}/`)}>
                   <div>
                     <span className="admin-status admin-status-neutral">{page.statuses[subtask.status] || subtask.status}</span>
                     <h3>{subtask.title}</h3>
@@ -110,7 +111,7 @@ export default async function AdminCollaborationTaskPage({ params }) {
                       {page.dueAt}: {formatDate(subtask.dueAt, locale) || page.notProvided}
                     </p>
                   </div>
-                </a>
+                </Link>
               )) : <p className="muted-line">{page.noSubtasks}</p>}
             </div>
           </article>

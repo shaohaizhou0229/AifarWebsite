@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
-import { getProfile } from "@/lib/profiles";
+import { getProfile, listAdminProfiles } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getAdminTicketStats, listAdminTickets } from "@/lib/tickets";
 
@@ -27,11 +27,12 @@ export async function GET(request) {
       assignee: searchParams.get("assignee") || "",
       q: searchParams.get("q") || ""
     };
-    const [tickets, stats] = await Promise.all([
+    const [tickets, stats, profiles] = await Promise.all([
       listAdminTickets(filters),
-      getAdminTicketStats()
+      getAdminTicketStats(),
+      listAdminProfiles()
     ]);
-    return NextResponse.json({ tickets, stats });
+    return NextResponse.json({ tickets, stats, profiles });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: "Unable to load tickets." }, { status: 500 });
   }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { MarkdownEditor } from "@/components/MarkdownEditor";
 
 function slugify(value) {
@@ -13,6 +14,7 @@ function slugify(value) {
 }
 
 export function AdminDocumentForm({ document, categories, labels, locale }) {
+  const router = useRouter();
   const isEditing = Boolean(document?.id);
   const initial = useMemo(() => ({
     title: document?.title || "",
@@ -161,9 +163,9 @@ export function AdminDocumentForm({ document, categories, labels, locale }) {
       skipUnloadWarningRef.current = true;
       const nextId = data.document?.id || document?.id;
       if (nextId) {
-        window.location.href = `/${locale}/admin/docs/${nextId}/`;
+        router.push(`/${locale}/admin/docs/${nextId}/`);
       } else {
-        window.location.reload();
+        router.refresh();
       }
     } catch (saveError) {
       setError(saveError.message || labels.saveFailed);
@@ -189,7 +191,7 @@ export function AdminDocumentForm({ document, categories, labels, locale }) {
       }
 
       skipUnloadWarningRef.current = true;
-      window.location.href = `/${locale}/admin/docs/`;
+      router.push(`/${locale}/admin/docs/`);
     } catch (archiveError) {
       setError(archiveError.message || labels.archiveFailed);
     } finally {

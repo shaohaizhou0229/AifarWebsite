@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { localizedPath } from "@/i18n/routing";
 import {
   Box,
@@ -63,7 +64,7 @@ export function AdminNav({ locale, labels = {}, current = "home", variant = "inl
             const Icon = ADMIN_ICONS[key];
             const href = ADMIN_ITEMS[key];
             return (
-              <a
+              <Link
                 key={key}
                 className={current === key ? "active" : ""}
                 href={localizedPath(locale, href)}
@@ -71,7 +72,7 @@ export function AdminNav({ locale, labels = {}, current = "home", variant = "inl
               >
                 <Icon aria-hidden="true" size={16} strokeWidth={1.8} />
                 <span>{labels[key] || FALLBACK_LABELS[key]}</span>
-              </a>
+              </Link>
             );
           })}
         </div>

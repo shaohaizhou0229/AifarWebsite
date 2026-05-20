@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AdminStatusPill } from "@/components/AdminStatusPill";
 import { localizedPath } from "@/i18n/routing";
 
@@ -24,7 +25,7 @@ export function AdminHealthList({ items = [], labels = {}, locale }) {
         <span>{labels.action || "Action"}</span>
       </div>
       {items.map((item) => (
-        <a className="admin-health-row" href={resolveHref(locale, item.href)} key={item.key}>
+        <Link className="admin-health-row" href={resolveHref(locale, item.href)} key={item.key}>
           <div>
             <strong>{item.label}</strong>
             <p>{item.summary}</p>
@@ -33,7 +34,7 @@ export function AdminHealthList({ items = [], labels = {}, locale }) {
           <span>{item.count}</span>
           <time>{formatDate(item.updatedAt, locale) || labels.notAvailable}</time>
           <small>{labels.open || "Open"}</small>
-        </a>
+        </Link>
       ))}
     </div>
   );

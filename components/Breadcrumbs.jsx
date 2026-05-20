@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { localizedPath } from "@/i18n/routing";
 
 export function Breadcrumbs({ locale, items = [] }) {
@@ -10,7 +11,7 @@ export function Breadcrumbs({ locale, items = [] }) {
         return (
           <span key={`${item.label}-${index}`} className="breadcrumb-item">
             {item.href && !isLast ? (
-              <a href={localizedPath(locale, item.href)}>{item.label}</a>
+              <Link href={localizedPath(locale, item.href)}>{item.label}</Link>
             ) : (
               <span aria-current={isLast ? "page" : undefined}>{item.label}</span>
             )}
@@ -20,4 +21,3 @@ export function Breadcrumbs({ locale, items = [] }) {
     </nav>
   );
 }
-

@@ -1,5 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
 import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
 import {
   CollaborationMemberForm,
@@ -134,7 +135,7 @@ export default async function AdminCollaborationSpacePage({ params }) {
                 ) : null}
                 <div className="subtask-list">
                   {task.subtasks.map((subtask) => (
-                    <a
+                    <Link
                       className="subtask-row"
                       key={subtask.id}
                       href={localizedPath(locale, `/admin/collaboration/subtasks/${subtask.id}/`)}
@@ -149,13 +150,13 @@ export default async function AdminCollaborationSpacePage({ params }) {
                           {page.dueAt}: {formatDate(subtask.dueAt, locale) || page.notProvided}
                         </p>
                       </div>
-                    </a>
+                    </Link>
                   ))}
                   {!task.subtasks.length ? <p className="muted-line">{page.noSubtasks}</p> : null}
                 </div>
-                <a className="button secondary compact" href={localizedPath(locale, `/admin/collaboration/tasks/${task.id}/`)}>
+                <Link className="button secondary compact" href={localizedPath(locale, `/admin/collaboration/tasks/${task.id}/`)}>
                   {page.openTask}
-                </a>
+                </Link>
               </article>
             )) : (
               <article className="admin-panel admin-empty-state">

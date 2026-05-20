@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { getTicketCategoryLabel, getTicketPriorityLabel, getTicketStatusLabel } from "@/i18n/labels";
 
 const STATUS_OPTIONS = ["new", "in_progress", "waiting_customer", "resolved", "closed"];
@@ -8,6 +9,7 @@ const PRIORITY_OPTIONS = ["low", "normal", "high", "urgent"];
 const CATEGORY_OPTIONS = ["account_access", "client_download", "installation", "product_usage", "bug_report", "partnership", "other"];
 
 export function AdminTicketActions({ ticket, labels, profiles = [], internalNotes = [] }) {
+  const router = useRouter();
   const [status, setStatus] = useState(ticket.status);
   const [priority, setPriority] = useState(ticket.priority || "normal");
   const [category, setCategory] = useState(ticket.category || "other");
@@ -75,7 +77,9 @@ export function AdminTicketActions({ ticket, labels, profiles = [], internalNote
       return;
     }
 
-    window.location.reload();
+    setMessage("");
+    setIsSubmitting(false);
+    router.refresh();
   }
 
   async function addNote(event) {
@@ -102,7 +106,9 @@ export function AdminTicketActions({ ticket, labels, profiles = [], internalNote
       return;
     }
 
-    window.location.reload();
+    setNote("");
+    setIsAddingNote(false);
+    router.refresh();
   }
 
   return (

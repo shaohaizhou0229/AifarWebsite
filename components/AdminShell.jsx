@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ChevronDown, Globe2, MoreVertical, Search } from "lucide-react";
 import { AdminNav } from "@/components/AdminNav";
 import { AdminSidebarCollapse } from "@/components/AdminSidebarCollapse";
@@ -61,10 +62,10 @@ export async function AdminShell({
   return (
     <main className="admin-shell">
       <aside className="admin-sidebar">
-        <a className="admin-sidebar-brand" href={localizedPath(locale, "/admin/")}>
+        <Link className="admin-sidebar-brand" href={localizedPath(locale, "/admin/")}>
           <img className="admin-logo-full" src="/assets/images/aifar-logo-full.png" alt={shell.brand || "Aifar"} />
           <img className="admin-logo-mark" src="/assets/images/aifar-logo-mark.png" alt="" aria-hidden="true" />
-        </a>
+        </Link>
         <details className="admin-sidebar-project-menu">
           <summary className="admin-sidebar-project">
             <Globe2 aria-hidden="true" size={15} strokeWidth={1.8} />
@@ -75,13 +76,13 @@ export async function AdminShell({
             <ChevronDown aria-hidden="true" size={14} strokeWidth={1.8} />
           </summary>
           <div className="admin-project-popover">
-            <a className="active" href={localizedPath(locale, "/admin/")}>
+            <Link className="active" href={localizedPath(locale, "/admin/")}>
               <span className="admin-project-mark">A</span>
               <span>
                 <strong>{shell.projectName || "Aifar Website"}</strong>
                 <small>{shell.projectCurrent || "Current site"}</small>
               </span>
-            </a>
+            </Link>
             <p>{shell.projectTenantHint || "Multi-tenant switching is reserved for a later build."}</p>
           </div>
         </details>
@@ -95,7 +96,7 @@ export async function AdminShell({
         <div className="admin-sidebar-spacer" />
         <AdminSidebarCollapse collapseLabel={shell.collapse || "Collapse"} expandLabel={shell.expand || "Expand"} />
         <div className="admin-sidebar-user">
-          <a className="admin-sidebar-avatar" href={localizedPath(locale, "/account/")}>{shellUser?.initials || "A"}</a>
+          <Link className="admin-sidebar-avatar" href={localizedPath(locale, "/account/")}>{shellUser?.initials || "A"}</Link>
           <div>
             <strong>{shellUser?.name || shell.userFallback || "Admin"}</strong>
             <span>{shellUser?.email || shell.userEmailFallback || "admin@aifar.com"}</span>
@@ -105,8 +106,8 @@ export async function AdminShell({
               <MoreVertical aria-hidden="true" size={16} strokeWidth={1.8} />
             </summary>
             <div>
-              <a href={localizedPath(locale, "/account/")}>{shell.account || "Account"}</a>
-              <a href={localizedPath(locale, "/account/notifications/")}>{shell.notifications || "Notifications"}</a>
+              <Link href={localizedPath(locale, "/account/")}>{shell.account || "Account"}</Link>
+              <Link href={localizedPath(locale, "/account/notifications/")}>{shell.notifications || "Notifications"}</Link>
               <SignOutButton labels={shell.auth || { signOut: "Sign out", signingOut: "Signing out..." }} redirectTo={localizedPath(locale, "/")} />
             </div>
           </details>
@@ -119,7 +120,7 @@ export async function AdminShell({
             <nav className="admin-breadcrumbs" aria-label={shell.breadcrumbs || "Breadcrumbs"}>
               {breadcrumbs.map((item, index) => (
                 <span key={`${item.label}-${index}`}>
-                  {item.href ? <a href={localizedPath(locale, item.href)}>{item.label}</a> : item.label}
+                  {item.href ? <Link href={localizedPath(locale, item.href)}>{item.label}</Link> : item.label}
                 </span>
               ))}
             </nav>

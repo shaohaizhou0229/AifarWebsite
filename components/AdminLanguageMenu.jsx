@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { localeLabels, locales, stripLocale, localizedPath } from "@/i18n/routing";
@@ -21,7 +22,7 @@ export function AdminLanguageMenu({ locale, label }) {
       </summary>
       <div className="admin-language-menu-list">
         {locales.map((code) => (
-          <a
+          <Link
             aria-current={code === locale ? "true" : undefined}
             href={localizedPath(code, currentPath)}
             hrefLang={code}
@@ -29,7 +30,7 @@ export function AdminLanguageMenu({ locale, label }) {
           >
             <span>{shortLocale(code)}</span>
             <small>{localeLabels[code]}</small>
-          </a>
+          </Link>
         ))}
       </div>
     </details>

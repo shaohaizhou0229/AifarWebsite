@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import * as tus from "tus-js-client";
 
 async function calculateSha256(file) {
@@ -20,6 +21,7 @@ function getUploadErrorMessage(error, labels) {
 }
 
 export function useReleaseUpload({ platform, release, labels, setMessage, setError }) {
+  const router = useRouter();
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadPaused, setUploadPaused] = useState(false);
@@ -199,7 +201,7 @@ export function useReleaseUpload({ platform, release, labels, setMessage, setErr
       setUploadProgress(100);
       setUploadPhase("complete");
       setMessage(labels.uploaded);
-      window.location.reload();
+      router.refresh();
     } catch (uploadError) {
       if (!uploadPausedRef.current) {
         setUploadPhase("failed");

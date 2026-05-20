@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const initialForm = {
   name: "",
@@ -37,8 +37,37 @@ export function ContactForm({ initialData = {}, isLoggedIn = false, labels, loca
     ...initialForm,
     ...initialData
   });
+  const [profileLocked, setProfileLocked] = useState(isLoggedIn);
   const [status, setStatus] = useState({ type: "idle", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSessionProfile() {
+      try {
+        const response = await fetch("/api/auth/me/");
+        if (!response.ok) return;
+        const result = await response.json();
+        if (!result.user?.id || cancelled) return;
+
+        setForm((current) => ({
+          ...current,
+          name: current.name || result.profile?.displayName || result.user.user_metadata?.name || "",
+          workEmail: current.workEmail || result.user.email || "",
+          organization: current.organization || result.profile?.organization || ""
+        }));
+        setProfileLocked(true);
+      } catch {
+        // Keep the public contact form usable even if session lookup fails.
+      }
+    }
+
+    loadSessionProfile();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function updateField(event) {
     const { name, value } = event.target;
@@ -120,7 +149,7 @@ export function ContactForm({ initialData = {}, isLoggedIn = false, labels, loca
           autoComplete="email"
           value={form.workEmail}
           onChange={updateField}
-          readOnly={isLoggedIn}
+          readOnly={profileLocked}
           required
         />
       </div>

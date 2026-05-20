@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { ReleaseDetailsForm } from "@/components/admin-downloads/ReleaseDetailsForm";
 import { ReleaseFilePanel } from "@/components/admin-downloads/ReleaseFilePanel";
 import { UploadProgressPanel } from "@/components/admin-downloads/UploadProgressPanel";
 import { useReleaseUpload } from "@/components/admin-downloads/useReleaseUpload";
 
 export function AdminDownloadForm({ platform, labels }) {
+  const router = useRouter();
   const release = platform.release;
   const [form, setForm] = useState({
     version: release.version,
@@ -48,7 +50,7 @@ export function AdminDownloadForm({ platform, labels }) {
       }
 
       setMessage(labels.saved);
-      window.location.reload();
+      router.refresh();
     } catch (saveError) {
       setError(saveError.message || labels.saveFailed);
     } finally {
@@ -75,7 +77,7 @@ export function AdminDownloadForm({ platform, labels }) {
       }
 
       setMessage(labels.fileDeleted || "Release file deleted.");
-      window.location.reload();
+      router.refresh();
     } catch (deleteError) {
       setError(deleteError.message || labels.deleteFileFailed || labels.uploadFailed);
     } finally {

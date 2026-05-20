@@ -1,11 +1,12 @@
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { AdminDocsClient } from "@/components/AdminDocsClient";
 import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
 import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
-import { listAdminDocuments } from "@/lib/documents";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { getPageMessages } from "@/i18n/messages";
+import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
 
@@ -19,20 +20,13 @@ export async function generateMetadata({ params }) {
   return buildMetadata({ locale, pathname, title: page.seo.title, description: page.seo.description });
 }
 
-function formatDate(value, locale) {
-  return value ? new Date(value).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" }) : "";
-}
-
-function categoryLabel(page, categoryKey, fallback) {
-  return page.categories?.[categoryKey]?.label || fallback || categoryKey;
-}
-
 export default async function AdminDocsPage({ params }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const [page, adminHome] = await Promise.all([
+  const [page, adminHome, messages] = await Promise.all([
     getPageMessages(locale, "adminDocs"),
-    getPageMessages(locale, "adminHome")
+    getPageMessages(locale, "adminHome"),
+    getLocaleMessages(locale)
   ]);
 
   try {
@@ -43,8 +37,6 @@ export default async function AdminDocsPage({ params }) {
     }
     redirect(localizedPath(locale, "/login/"));
   }
-
-  const documents = await listAdminDocuments();
 
   return (
     <AdminShell
@@ -58,29 +50,9 @@ export default async function AdminDocsPage({ params }) {
         { label: adminHome.nav.home, href: "/admin/" },
         { label: page.breadcrumb }
       ]}
-      actions={<a className="button primary compact" href={localizedPath(locale, "/admin/docs/new/")}>{page.newDocument}</a>}
+      actions={<Link className="button primary compact" href={localizedPath(locale, "/admin/docs/new/")}>{page.newDocument}</Link>}
     >
-      <div className="admin-table-list">
-        {documents.map((document) => (
-          <a className="admin-table-row" key={document.id} href={localizedPath(locale, `/admin/docs/${document.id}/`)}>
-            <div>
-              <h3>{document.title}</h3>
-              <p>{document.summary || page.noSummary}</p>
-            </div>
-            <span>{categoryLabel(page, document.categoryKey, document.categoryLabel)}</span>
-            <span>{document.currentVersionLabel || page.noVersion}</span>
-            <span className="admin-status admin-status-neutral">{document.isPublished ? page.published : page.draft}</span>
-            <time>{formatDate(document.updatedAt, locale)}</time>
-          </a>
-        ))}
-        {!documents.length ? (
-          <article className="admin-panel admin-empty-state">
-            <span className="admin-status admin-status-neutral">{page.emptyStatus}</span>
-            <h2>{page.emptyTitle}</h2>
-            <p>{page.emptyLead}</p>
-          </article>
-        ) : null}
-      </div>
+      <AdminDocsClient locale={locale} page={page} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
     </AdminShell>
   );
 }

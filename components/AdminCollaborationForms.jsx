@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 function useSubmitStatus() {
   const [status, setStatus] = useState({ type: "idle", message: "" });
@@ -13,6 +14,7 @@ function Message({ status }) {
 }
 
 export function CollaborationSpaceForm({ labels }) {
+  const router = useRouter();
   const [form, setForm] = useState({ name: "", description: "" });
   const { status, setStatus, isSubmitting, setIsSubmitting } = useSubmitStatus();
 
@@ -33,7 +35,11 @@ export function CollaborationSpaceForm({ labels }) {
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || labels.failed);
-      window.location.href = result.space?.id ? `spaces/${result.space.id}/` : window.location.href;
+      if (result.space?.id) {
+        router.push(`spaces/${result.space.id}/`);
+      } else {
+        router.refresh();
+      }
     } catch (error) {
       setStatus({ type: "error", message: error.message });
     } finally {
@@ -60,6 +66,7 @@ export function CollaborationSpaceForm({ labels }) {
 }
 
 export function CollaborationMemberForm({ spaceId, members, adminOptions, labels, locale }) {
+  const router = useRouter();
   const currentMemberIds = new Set(members.map((member) => member.userId));
   const options = adminOptions.filter((admin) => !currentMemberIds.has(admin.id));
   const [userId, setUserId] = useState(options[0]?.id || "");
@@ -78,7 +85,7 @@ export function CollaborationMemberForm({ spaceId, members, adminOptions, labels
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || labels.failed);
-      window.location.reload();
+      router.refresh();
     } catch (error) {
       setStatus({ type: "error", message: error.message });
     } finally {
@@ -105,6 +112,7 @@ export function CollaborationMemberForm({ spaceId, members, adminOptions, labels
 }
 
 export function CollaborationTaskForm({ spaceId, labels, locale }) {
+  const router = useRouter();
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -132,7 +140,11 @@ export function CollaborationTaskForm({ spaceId, labels, locale }) {
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || labels.failed);
-      window.location.href = result.task?.id ? `/${locale}/admin/collaboration/tasks/${result.task.id}/` : window.location.href;
+      if (result.task?.id) {
+        router.push(`/${locale}/admin/collaboration/tasks/${result.task.id}/`);
+      } else {
+        router.refresh();
+      }
     } catch (error) {
       setStatus({ type: "error", message: error.message });
     } finally {
@@ -188,6 +200,7 @@ export function CollaborationTaskForm({ spaceId, labels, locale }) {
 }
 
 export function CollaborationSubtaskForm({ taskId, members, labels, locale }) {
+  const router = useRouter();
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -213,7 +226,11 @@ export function CollaborationSubtaskForm({ taskId, members, labels, locale }) {
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || labels.failed);
-      window.location.href = result.subtask?.id ? `/${locale}/admin/collaboration/subtasks/${result.subtask.id}/` : window.location.href;
+      if (result.subtask?.id) {
+        router.push(`/${locale}/admin/collaboration/subtasks/${result.subtask.id}/`);
+      } else {
+        router.refresh();
+      }
     } catch (error) {
       setStatus({ type: "error", message: error.message });
     } finally {
@@ -254,6 +271,7 @@ export function CollaborationSubtaskForm({ taskId, members, labels, locale }) {
 }
 
 export function SubtaskFeedbackForm({ subtask, labels, locale }) {
+  const router = useRouter();
   const [form, setForm] = useState({
     status: subtask.status,
     message: ""
@@ -279,7 +297,7 @@ export function SubtaskFeedbackForm({ subtask, labels, locale }) {
       if (!response.ok) throw new Error(result.error || labels.failed);
       setStatus({ type: "success", message: labels.saved });
       setForm((current) => ({ ...current, message: "" }));
-      window.location.reload();
+      router.refresh();
     } catch (error) {
       setStatus({ type: "error", message: error.message });
     } finally {

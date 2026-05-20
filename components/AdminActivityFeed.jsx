@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { localizedPath } from "@/i18n/routing";
 import {
   Download,
@@ -55,7 +56,7 @@ export function AdminActivityFeed({ items = [], emptyText, labels = {}, locale }
         const Icon = ACTIVITY_ICONS[item.type] || ACTIVITY_ICONS.footprint;
         const meta = resolveMeta(item, labels);
         return (
-          <a className="admin-activity-item" href={resolveHref(locale, item.href)} key={item.id}>
+          <Link className="admin-activity-item" href={resolveHref(locale, item.href)} key={item.id}>
             <span className="admin-activity-icon">
               <Icon aria-hidden="true" size={15} strokeWidth={1.8} />
             </span>
@@ -64,7 +65,7 @@ export function AdminActivityFeed({ items = [], emptyText, labels = {}, locale }
               {meta ? <p>{meta}</p> : null}
             </div>
             <time>{formatDate(item.createdAt, locale)}</time>
-          </a>
+          </Link>
         );
       })}
     </div>

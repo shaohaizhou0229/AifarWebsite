@@ -1,5 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { CollaborationSpaceForm } from "@/components/AdminCollaborationForms";
 import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
 import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
@@ -71,7 +72,7 @@ export default async function AdminCollaborationPage({ params }) {
           <h2>{page.spacesTitle}</h2>
           <div className="release-list">
             {spaces.length ? spaces.map((space) => (
-              <a className="release" key={space.id} href={localizedPath(locale, `/admin/collaboration/spaces/${space.id}/`)}>
+              <Link className="release" key={space.id} href={localizedPath(locale, `/admin/collaboration/spaces/${space.id}/`)}>
                 <div>
                   <span className="admin-status admin-status-good">{page.statuses[space.status] || space.status}</span>
                   <h3>{space.name}</h3>
@@ -82,7 +83,7 @@ export default async function AdminCollaborationPage({ params }) {
                   <span>{page.tasks}: {space.taskCount}</span>
                   <span>{page.openSubtasks}: {space.openSubtaskCount}</span>
                 </div>
-              </a>
+              </Link>
             )) : (
               <article className="admin-empty-state">
                 <h2>{page.emptySpacesTitle}</h2>
@@ -95,14 +96,14 @@ export default async function AdminCollaborationPage({ params }) {
           <h2>{page.mySubtasksTitle}</h2>
           <div className="release-list">
             {subtasks.length ? subtasks.map((subtask) => (
-              <a className="release" key={subtask.id} href={localizedPath(locale, `/admin/collaboration/subtasks/${subtask.id}/`)}>
+              <Link className="release" key={subtask.id} href={localizedPath(locale, `/admin/collaboration/subtasks/${subtask.id}/`)}>
                 <div>
                   <span className="admin-status admin-status-neutral">{page.subtaskStatuses[subtask.status] || subtask.status}</span>
                   <h3>{subtask.title}</h3>
                   <p>{subtask.spaceName} - {subtask.taskTitle}</p>
                   <p className="muted-line">{page.dueAt}: {formatDate(subtask.dueAt, locale) || page.notProvided}</p>
                 </div>
-              </a>
+              </Link>
             )) : (
               <article className="admin-empty-state">
                 <h2>{page.emptySubtasksTitle}</h2>
