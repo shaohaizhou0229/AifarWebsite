@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { localizedPath, stripLocale } from "@/i18n/routing";
 
@@ -16,9 +17,9 @@ export function SiteFooter({ locale, messages }) {
           <span>{full ? footer.full : footer.short}</span>
         </span>
         <div className="footer-links">
-          <a href={localizedPath(locale, "/security/")}>{footer.security}</a>
-          <a href={localizedPath(locale, "/docs/")}>{footer.docs}</a>
-          <a href={localizedPath(locale, "/contact/")}>{footer.contact}</a>
+          <Link href={localizedPath(locale, "/security/")}>{footer.security}</Link>
+          <Link href={localizedPath(locale, "/docs/")}>{footer.docs}</Link>
+          <Link href={localizedPath(locale, "/contact/")}>{footer.contact}</Link>
         </div>
       </div>
     </footer>

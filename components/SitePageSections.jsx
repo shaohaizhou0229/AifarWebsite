@@ -1,11 +1,24 @@
+import Link from "next/link";
 import { Card } from "@/components/Card";
 import { Release } from "@/components/Rows";
 import { localizedPath } from "@/i18n/routing";
 
-function link(locale, href = "") {
+function resolveHref(locale, href = "") {
   if (!href) return "";
   if (href.startsWith("http://") || href.startsWith("https://") || href.startsWith("#")) return href;
   return localizedPath(locale, href);
+}
+
+function isClientRoutableHref(href = "") {
+  return href.startsWith("/") && !href.startsWith("/api/");
+}
+
+function SiteActionLink({ className, href, children }) {
+  if (!href) return null;
+  if (isClientRoutableHref(href)) {
+    return <Link className={className} href={href}>{children}</Link>;
+  }
+  return <a className={className} href={href}>{children}</a>;
 }
 
 function sectionTone(section) {
@@ -20,7 +33,9 @@ function SectionHead({ title, lead, actionLabel, actionHref, locale }) {
         {title ? <h2>{title}</h2> : null}
         {lead ? <p>{lead}</p> : null}
       </div>
-      {actionLabel && actionHref ? <a className="button secondary" href={link(locale, actionHref)}>{actionLabel}</a> : null}
+      {actionLabel && actionHref ? (
+        <SiteActionLink className="button secondary" href={resolveHref(locale, actionHref)}>{actionLabel}</SiteActionLink>
+      ) : null}
     </div>
   );
 }
@@ -39,8 +54,8 @@ function HeroSection({ section, locale }) {
           {content.lead ? <p className="lead">{content.lead}</p> : null}
           {hasActions ? (
             <div className="actions">
-              {content.primaryCta ? <a className="button primary" href={link(locale, content.primaryHref)}>{content.primaryCta}</a> : null}
-              {content.secondaryCta ? <a className="button secondary" href={link(locale, content.secondaryHref)}>{content.secondaryCta}</a> : null}
+              {content.primaryCta ? <SiteActionLink className="button primary" href={resolveHref(locale, content.primaryHref)}>{content.primaryCta}</SiteActionLink> : null}
+              {content.secondaryCta ? <SiteActionLink className="button secondary" href={resolveHref(locale, content.secondaryHref)}>{content.secondaryCta}</SiteActionLink> : null}
             </div>
           ) : null}
         </div>
@@ -57,8 +72,8 @@ function HeroSection({ section, locale }) {
           {content.lead ? <p className="lead">{content.lead}</p> : null}
           {hasActions ? (
             <div className="actions">
-              {content.primaryCta ? <a className="button primary" href={link(locale, content.primaryHref)}>{content.primaryCta}</a> : null}
-              {content.secondaryCta ? <a className="button secondary" href={link(locale, content.secondaryHref)}>{content.secondaryCta}</a> : null}
+              {content.primaryCta ? <SiteActionLink className="button primary" href={resolveHref(locale, content.primaryHref)}>{content.primaryCta}</SiteActionLink> : null}
+              {content.secondaryCta ? <SiteActionLink className="button secondary" href={resolveHref(locale, content.secondaryHref)}>{content.secondaryCta}</SiteActionLink> : null}
             </div>
           ) : null}
         </div>
@@ -200,8 +215,8 @@ function CtaSection({ section, locale }) {
         <h2>{content.title}</h2>
         {content.lead ? <p>{content.lead}</p> : null}
         <div className="actions">
-          {content.primaryCta ? <a className="button primary" href={link(locale, content.primaryHref)}>{content.primaryCta}</a> : null}
-          {content.secondaryCta ? <a className="button secondary" href={link(locale, content.secondaryHref)}>{content.secondaryCta}</a> : null}
+          {content.primaryCta ? <SiteActionLink className="button primary" href={resolveHref(locale, content.primaryHref)}>{content.primaryCta}</SiteActionLink> : null}
+          {content.secondaryCta ? <SiteActionLink className="button secondary" href={resolveHref(locale, content.secondaryHref)}>{content.secondaryCta}</SiteActionLink> : null}
         </div>
       </div>
     </section>

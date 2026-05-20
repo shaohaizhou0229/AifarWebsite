@@ -20,7 +20,8 @@ export const localeDirections = {
 export const routing = defineRouting({
   locales,
   defaultLocale,
-  localePrefix: "always"
+  localePrefix: "always",
+  localeCookie: false
 });
 
 export function isLocale(value) {

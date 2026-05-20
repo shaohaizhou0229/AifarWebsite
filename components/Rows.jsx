@@ -1,3 +1,9 @@
+import Link from "next/link";
+
+function isClientRoutableHref(href = "") {
+  return href.startsWith("/") && !href.startsWith("/api/");
+}
+
 export function DownloadRow({
   title,
   description,
@@ -24,13 +30,23 @@ export function DownloadRow({
 }
 
 export function DocLink({ title, description, pill, href = "#", action = "" }) {
-  return (
-    <a className="doc-link" href={href}>
+  const content = (
+    <>
       <div>
         <h3>{title}</h3>
         <p>{description}</p>
       </div>
       <span className="pill">{action || pill}</span>
+    </>
+  );
+
+  if (isClientRoutableHref(href)) {
+    return <Link className="doc-link" href={href}>{content}</Link>;
+  }
+
+  return (
+    <a className="doc-link" href={href}>
+      {content}
     </a>
   );
 }

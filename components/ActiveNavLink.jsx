@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { normalizePathname, stripLocale } from "@/i18n/routing";
 
@@ -20,13 +21,13 @@ export function ActiveNavLink({ href, activePaths = [], exactActivePaths = [], c
   const isActive = isExactPathActive(currentPath, exactActivePaths) || isPathActive(currentPath, activePaths);
 
   return (
-    <a
+    <Link
       className={className}
       href={href}
       aria-current={isActive ? "page" : undefined}
       data-active={isActive ? "true" : undefined}
     >
       {children}
-    </a>
+    </Link>
   );
 }
