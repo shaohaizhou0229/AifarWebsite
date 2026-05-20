@@ -42,7 +42,7 @@ export function AdminDownloadsClient({ locale, page, loadingLabel, errorLabel })
     <AdminAsyncState loading={loading} error={error} loadingLabel={loadingLabel} errorLabel={errorLabel}>
       <div className="admin-table-list">
         {platforms.map((platform) => (
-          <Link className="admin-table-row" key={platform.key} href={localizedPath(locale, `/admin/downloads/${platform.key}/`)}>
+          <Link className="admin-table-row" key={platform.key} href={localizedPath(locale, `/admin/downloads/${platform.key}/`)} prefetch={false}>
             <div>
               <h3>{platform.label}</h3>
               <p>{platform.release.version || page.noVersion}</p>

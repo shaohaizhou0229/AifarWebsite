@@ -140,6 +140,7 @@ export default async function AdminCollaborationSpacePage({ params }) {
                       className="subtask-row"
                       key={subtask.id}
                       href={localizedPath(locale, `/admin/collaboration/subtasks/${subtask.id}/`)}
+                      prefetch={false}
                     >
                       <div>
                         <span className="admin-status admin-status-neutral">{page.statuses[subtask.status] || subtask.status}</span>
@@ -155,7 +156,7 @@ export default async function AdminCollaborationSpacePage({ params }) {
                   ))}
                   {!task.subtasks.length ? <p className="muted-line">{page.noSubtasks}</p> : null}
                 </div>
-                <Link className="button secondary compact" href={localizedPath(locale, `/admin/collaboration/tasks/${task.id}/`)}>
+                <Link className="button secondary compact" href={localizedPath(locale, `/admin/collaboration/tasks/${task.id}/`)} prefetch={false}>
                   {page.openTask}
                 </Link>
               </article>

@@ -38,10 +38,11 @@ function normalizeInput(body) {
   };
 }
 
-export async function GET() {
+export async function GET(request) {
   try {
     await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.docs);
-    const documents = await listAdminDocuments();
+    const searchParams = new URL(request.url).searchParams;
+    const documents = await listAdminDocuments({ limit: searchParams.get("limit") || 20 });
     return adminJson({ documents });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: error.message || "Could not list documents." }, { status: 400 });

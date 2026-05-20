@@ -56,7 +56,7 @@ export function AdminActivityFeed({ items = [], emptyText, labels = {}, locale }
         const Icon = ACTIVITY_ICONS[item.type] || ACTIVITY_ICONS.footprint;
         const meta = resolveMeta(item, labels);
         return (
-          <Link className="admin-activity-item" href={resolveHref(locale, item.href)} key={item.id}>
+          <Link className="admin-activity-item" href={resolveHref(locale, item.href)} key={item.id} prefetch={false}>
             <span className="admin-activity-icon">
               <Icon aria-hidden="true" size={15} strokeWidth={1.8} />
             </span>

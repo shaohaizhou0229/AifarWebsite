@@ -35,6 +35,7 @@ export function AdminUsersClient({ locale, page, initialQuery = "", initialStatu
         const params = new URLSearchParams();
         if (q) params.set("q", q);
         if (status) params.set("status", status);
+        params.set("limit", "20");
         const response = await fetch(`/api/admin/users/?${params.toString()}`);
         const result = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(result.error || errorLabel);
@@ -89,7 +90,7 @@ export function AdminUsersClient({ locale, page, initialQuery = "", initialStatu
               <AdminInvitationActions invitationId={user.id} labels={page.invite.cancel} />
             </article>
           ) : (
-            <Link className="admin-table-row" key={user.id} href={localizedPath(locale, `/admin/users/${user.id}/`)}>
+            <Link className="admin-table-row" key={user.id} href={localizedPath(locale, `/admin/users/${user.id}/`)} prefetch={false}>
               <div>
                 <h3>{user.displayName || user.email}</h3>
                 <p>{user.email} - {user.organization || page.notProvided}</p>

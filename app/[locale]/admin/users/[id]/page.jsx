@@ -81,7 +81,7 @@ export default async function AdminUserDetailPage({ params }) {
         <div className="reply-list admin-panel">
           <h2>{page.ticketsTitle}</h2>
           {tickets.length ? tickets.map((ticket) => (
-            <Link className="release" key={ticket.id} href={localizedPath(locale, `/admin/tickets/${ticket.id}/`)}>
+            <Link className="release" key={ticket.id} href={localizedPath(locale, `/admin/tickets/${ticket.id}/`)} prefetch={false}>
               <div>
                 <h3>{ticket.subject || getRequestTypeLabel(messages.forms, ticket.requestType)}</h3>
                 <p>{formatDate(ticket.createdAt, locale)} - {ticket.workEmail}</p>

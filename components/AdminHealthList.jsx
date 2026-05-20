@@ -25,7 +25,7 @@ export function AdminHealthList({ items = [], labels = {}, locale }) {
         <span>{labels.action || "Action"}</span>
       </div>
       {items.map((item) => (
-        <Link className="admin-health-row" href={resolveHref(locale, item.href)} key={item.key}>
+        <Link className="admin-health-row" href={resolveHref(locale, item.href)} key={item.key} prefetch={false}>
           <div>
             <strong>{item.label}</strong>
             <p>{item.summary}</p>

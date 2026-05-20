@@ -40,7 +40,9 @@ export function AdminContactTicketsClient({ locale, page, messages, initialStatu
       setError("");
       try {
         const query = buildQuery({ status: initialStatus });
-        const response = await fetch(`/api/admin/tickets/${query ? `?${query}` : ""}`);
+        const params = new URLSearchParams(query);
+        params.set("limit", "20");
+        const response = await fetch(`/api/admin/tickets/?${params.toString()}`);
         const result = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(result.error || errorLabel);
         if (!cancelled) setTickets(result.tickets || []);
@@ -61,7 +63,7 @@ export function AdminContactTicketsClient({ locale, page, messages, initialStatu
     <AdminAsyncState loading={loading} error={error} loadingLabel={loadingLabel} errorLabel={errorLabel}>
       <div className="admin-table-list">
         {tickets.length ? tickets.map((ticket) => (
-          <Link className="admin-table-row" key={ticket.id} href={localizedPath(locale, `/admin/tickets/${ticket.id}/`)}>
+          <Link className="admin-table-row" key={ticket.id} href={localizedPath(locale, `/admin/tickets/${ticket.id}/`)} prefetch={false}>
             <div>
               <h3>{ticket.subject || getRequestTypeLabel(messages.forms, ticket.requestType)}</h3>
               <p>{ticket.name} - {ticket.workEmail}</p>
@@ -102,7 +104,9 @@ export function AdminSupportClient({ locale, page, messages, initialFilters, loa
       setError("");
       try {
         const query = buildQuery(filters);
-        const response = await fetch(`/api/admin/tickets/${query ? `?${query}` : ""}`);
+        const params = new URLSearchParams(query);
+        params.set("limit", "20");
+        const response = await fetch(`/api/admin/tickets/?${params.toString()}`);
         const result = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(result.error || errorLabel);
         if (!cancelled) {
@@ -198,7 +202,7 @@ export function AdminSupportClient({ locale, page, messages, initialFilters, loa
       <AdminAsyncState loading={loading} error={error} loadingLabel={loadingLabel} errorLabel={errorLabel}>
         <div className="ticket-table">
           {tickets.length ? tickets.map((ticket) => (
-            <Link className="ticket-row" key={ticket.id} href={localizedPath(locale, `/admin/tickets/${ticket.id}/`)}>
+            <Link className="ticket-row" key={ticket.id} href={localizedPath(locale, `/admin/tickets/${ticket.id}/`)} prefetch={false}>
               <div className="ticket-main">
                 <h3>{ticket.subject || getRequestTypeLabel(messages.forms, ticket.requestType)}</h3>
                 <p>{ticket.name} - {ticket.workEmail}</p>

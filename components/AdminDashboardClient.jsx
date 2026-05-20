@@ -190,7 +190,7 @@ export function AdminDashboardClient({ locale, page, rangeDays, loadingLabel, er
               <AdminDataPanel title={page.pending.title} meta={page.pending.meta} action={<Link className="admin-panel-action" href={localizedPath(locale, "/admin/support/")}>{page.pending.viewAll}</Link>}>
                 <div className="admin-pending-list">
                   {dashboard.pendingWork.map((item) => (
-                    <Link href={localizedPath(locale, item.href)} key={item.key}>
+                    <Link href={localizedPath(locale, item.href)} key={item.key} prefetch={false}>
                       <span className="admin-check-box" aria-hidden="true" />
                       <div>
                         <strong>{page.pending.items[item.key]}</strong>

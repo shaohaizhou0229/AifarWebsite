@@ -26,7 +26,8 @@ export async function GET(request) {
       priority: searchParams.get("priority") || "",
       category: searchParams.get("category") || "",
       assignee: searchParams.get("assignee") || "",
-      q: searchParams.get("q") || ""
+      q: searchParams.get("q") || "",
+      limit: searchParams.get("limit") || 20
     };
     const [tickets, stats, profiles] = await Promise.all([
       listAdminTickets(filters),

@@ -25,7 +25,7 @@ export function AdminDocsClient({ locale, page, loadingLabel, errorLabel }) {
       setLoading(true);
       setError("");
       try {
-        const response = await fetch("/api/admin/docs/");
+        const response = await fetch("/api/admin/docs/?limit=20");
         const result = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(result.error || errorLabel);
         if (!cancelled) setDocuments(result.documents || []);
@@ -46,7 +46,7 @@ export function AdminDocsClient({ locale, page, loadingLabel, errorLabel }) {
     <AdminAsyncState loading={loading} error={error} loadingLabel={loadingLabel} errorLabel={errorLabel}>
       <div className="admin-table-list">
         {documents.map((document) => (
-          <Link className="admin-table-row" key={document.id} href={localizedPath(locale, `/admin/docs/${document.id}/`)}>
+          <Link className="admin-table-row" key={document.id} href={localizedPath(locale, `/admin/docs/${document.id}/`)} prefetch={false}>
             <div>
               <h3>{document.title}</h3>
               <p>{document.summary || page.noSummary}</p>

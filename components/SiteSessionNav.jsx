@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { ActiveNavLink } from "@/components/ActiveNavLink";
 import { SignOutButton } from "@/components/SignOutButton";
 import { localizedPath } from "@/i18n/routing";
@@ -14,9 +15,13 @@ function countUnread(notifications = []) {
 }
 
 export function SiteSessionNav({ locale, nav, authLabels }) {
+  const pathname = usePathname();
+  const isAdminPath = pathname === `/${locale}/admin/` || pathname?.startsWith(`/${locale}/admin/`);
   const [session, setSession] = useState({ user: null, profile: null, unreadCount: 0 });
 
   useEffect(() => {
+    if (isAdminPath) return undefined;
+
     const controller = new AbortController();
 
     async function loadSession() {
@@ -59,7 +64,9 @@ export function SiteSessionNav({ locale, nav, authLabels }) {
 
     loadSession();
     return () => controller.abort();
-  }, []);
+  }, [isAdminPath]);
+
+  if (isAdminPath) return null;
 
   const { user, profile, unreadCount } = session;
 

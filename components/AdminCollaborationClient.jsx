@@ -50,7 +50,7 @@ export function AdminCollaborationClient({ locale, page, loadingLabel, errorLabe
         <h2>{page.spacesTitle}</h2>
         <div className="release-list">
           {state.spaces.length ? state.spaces.map((space) => (
-            <Link className="release" key={space.id} href={localizedPath(locale, `/admin/collaboration/spaces/${space.id}/`)}>
+            <Link className="release" key={space.id} href={localizedPath(locale, `/admin/collaboration/spaces/${space.id}/`)} prefetch={false}>
               <div>
                 <span className="admin-status admin-status-good">{page.statuses[space.status] || space.status}</span>
                 <h3>{space.name}</h3>
@@ -74,7 +74,7 @@ export function AdminCollaborationClient({ locale, page, loadingLabel, errorLabe
         <h2>{page.mySubtasksTitle}</h2>
         <div className="release-list">
           {state.subtasks.length ? state.subtasks.map((subtask) => (
-            <Link className="release" key={subtask.id} href={localizedPath(locale, `/admin/collaboration/subtasks/${subtask.id}/`)}>
+            <Link className="release" key={subtask.id} href={localizedPath(locale, `/admin/collaboration/subtasks/${subtask.id}/`)} prefetch={false}>
               <div>
                 <span className="admin-status admin-status-neutral">{page.subtaskStatuses[subtask.status] || subtask.status}</span>
                 <h3>{subtask.title}</h3>

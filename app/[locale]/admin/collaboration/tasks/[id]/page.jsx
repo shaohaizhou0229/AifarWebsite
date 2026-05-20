@@ -100,7 +100,7 @@ export default async function AdminCollaborationTaskPage({ params }) {
             <h2>{page.subtasksTitle}</h2>
             <div className="subtask-list">
               {task.subtasks.length ? task.subtasks.map((subtask) => (
-                <Link className="subtask-row" key={subtask.id} href={localizedPath(locale, `/admin/collaboration/subtasks/${subtask.id}/`)}>
+                <Link className="subtask-row" key={subtask.id} href={localizedPath(locale, `/admin/collaboration/subtasks/${subtask.id}/`)} prefetch={false}>
                   <div>
                     <span className="admin-status admin-status-neutral">{page.statuses[subtask.status] || subtask.status}</span>
                     <h3>{subtask.title}</h3>

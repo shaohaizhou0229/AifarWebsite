@@ -24,7 +24,9 @@ export async function GET(request) {
   try {
     await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.users);
     const url = new URL(request.url);
-    const users = await listAdminUsers(url.searchParams.get("q") || "", url.searchParams.get("status") || "all");
+    const users = await listAdminUsers(url.searchParams.get("q") || "", url.searchParams.get("status") || "all", {
+      limit: url.searchParams.get("limit") || 20
+    });
     return adminJson({ users });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: "Unable to load users." }, { status: 500 });
