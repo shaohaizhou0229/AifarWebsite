@@ -2,7 +2,7 @@ export function AdminMetricCard({ label, value, meta, metaTone = "neutral", tone
   return (
     <article className={`admin-metric-card admin-metric-${tone}`}>
       <div className="admin-metric-card-label">
-        {Icon ? <Icon aria-hidden="true" size={17} strokeWidth={1.8} /> : null}
+        {Icon ? <Icon aria-hidden="true" size={16} strokeWidth={1.8} /> : null}
         <span>{label}</span>
       </div>
       <strong>{value}</strong>

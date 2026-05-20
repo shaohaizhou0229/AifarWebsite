@@ -3194,13 +3194,17 @@ body:has(.admin-shell)::before {
 .admin-shell {
   --admin-bg: #fff;
   --admin-panel: #fff;
-  --admin-border: #e5e5e5;
-  --admin-border-strong: #d8d8d8;
-  --admin-ink: #09090b;
-  --admin-muted: #666a73;
-  --admin-soft: #f5f5f5;
-  --admin-hover: #f0f0f0;
+  --admin-border: #e6e8ee;
+  --admin-border-strong: #d7dce5;
+  --admin-ink: #0a0d14;
+  --admin-muted: #667085;
+  --admin-subtle: #8a94a6;
+  --admin-soft: #f6f7f9;
+  --admin-hover: #f2f4f7;
   --admin-blue: #2563eb;
+  --admin-success: #039855;
+  --admin-warning: #dc6803;
+  --admin-danger: #d92d20;
   grid-template-columns: 248px minmax(0, 1fr);
   background: var(--admin-bg);
   font-family: "Geist", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -3209,8 +3213,8 @@ body:has(.admin-shell)::before {
 
 .admin-sidebar {
   border-right: 1px solid var(--admin-border);
-  background: #fafafa;
-  padding: 16px;
+  background: #fbfbfc;
+  padding: 14px 16px;
 }
 
 .admin-sidebar-brand {
@@ -3326,7 +3330,7 @@ body:has(.admin-shell)::before {
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   min-height: 36px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   border: 1px solid var(--admin-border);
   border-radius: 6px;
   background: #fff;
@@ -3360,23 +3364,23 @@ body:has(.admin-shell)::before {
 .admin-nav-sidebar {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 14px;
+  gap: 12px;
   margin-bottom: 0;
 }
 
 .admin-nav-group {
   display: grid;
-  gap: 2px;
+  gap: 3px;
 }
 
 .admin-nav-group-label {
   display: block;
-  color: #8a8f98;
-  font-size: 11px;
-  font-weight: 600;
+  color: var(--admin-subtle);
+  font-size: 12px;
+  font-weight: 500;
   line-height: 1;
-  padding: 2px 10px 7px;
-  text-transform: uppercase;
+  padding: 8px 10px 6px;
+  text-transform: none;
 }
 
 .admin-nav-sidebar a {
@@ -3385,14 +3389,14 @@ body:has(.admin-shell)::before {
   grid-template-columns: 18px minmax(0, 1fr);
   align-items: center;
   width: 100%;
-  min-height: 36px;
+  min-height: 34px;
   border: 0;
   border-radius: 6px;
   background: transparent;
   color: #2f3339;
   gap: 11px;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 450;
   padding: 0 10px;
 }
 
@@ -3405,14 +3409,19 @@ body:has(.admin-shell)::before {
 }
 
 .admin-nav-sidebar a.active {
-  background: var(--admin-hover);
-  color: var(--admin-blue);
+  background: #eef4ff;
+  color: var(--admin-ink);
   box-shadow: inset 3px 0 0 var(--admin-blue);
+  font-weight: 550;
 }
 
 .admin-nav-sidebar a svg {
   flex: 0 0 auto;
   color: currentColor;
+}
+
+.admin-nav-sidebar a.active svg {
+  color: var(--admin-blue);
 }
 
 .admin-sidebar-spacer {
@@ -3424,13 +3433,13 @@ body:has(.admin-shell)::before {
   align-items: center;
   justify-content: flex-start;
   width: 100%;
-  min-height: 40px;
+  min-height: 36px;
   border: 1px solid var(--admin-border);
   border-radius: 6px;
   background: #fff;
   color: #2f3339;
   gap: 9px;
-  font-size: 14px;
+  font-size: 13px;
   padding: 0 11px;
 }
 
@@ -3447,7 +3456,7 @@ body:has(.admin-shell)::before {
   border-top: 1px solid var(--admin-border);
   background: #fff;
   gap: 10px;
-  padding: 14px 16px;
+  padding: 12px 16px;
 }
 
 .admin-sidebar-avatar,
@@ -3555,7 +3564,7 @@ body:has(.admin-shell)::before {
 
 .admin-topbar {
   display: grid;
-  min-height: 60px;
+  min-height: 56px;
   grid-template-columns: 1fr auto 1fr;
   border-bottom: 1px solid var(--admin-border);
   background: rgba(255, 255, 255, 0.9);
@@ -3567,7 +3576,7 @@ body:has(.admin-shell)::before {
 }
 
 .admin-topbar-title strong {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
 }
 
@@ -3649,10 +3658,10 @@ body:has(.admin-shell)::before {
 }
 
 .admin-content {
-  width: min(1188px, calc(100% - 48px));
+  width: min(1200px, calc(100% - 48px));
   margin: 0 auto;
-  gap: 18px;
-  padding: 24px 0 32px;
+  gap: 16px;
+  padding: 24px 0 34px;
 }
 
 .admin-breadcrumbs,
@@ -3671,7 +3680,7 @@ body:has(.admin-shell)::before {
 
 .admin-page-header h1 {
   font-family: inherit;
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 650;
   letter-spacing: 0;
   line-height: 1.15;
@@ -3688,8 +3697,8 @@ body:has(.admin-shell)::before {
 .admin-dashboard-toolbar {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: -56px;
+  gap: 8px;
+  margin-top: -54px;
   pointer-events: none;
 }
 
@@ -3730,13 +3739,13 @@ body:has(.admin-shell)::before {
 }
 
 .admin-metric-card {
-  min-height: 120px;
+  min-height: 110px;
   align-content: start;
   border: 1px solid var(--admin-border);
-  border-radius: 7px;
-  box-shadow: none;
-  gap: 9px;
-  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035);
+  gap: 8px;
+  padding: 14px 15px;
 }
 
 .admin-metric-good,
@@ -3748,7 +3757,7 @@ body:has(.admin-shell)::before {
   display: flex;
   align-items: center;
   color: var(--admin-muted);
-  gap: 10px;
+  gap: 9px;
 }
 
 .admin-metric-card span,
@@ -3759,9 +3768,11 @@ body:has(.admin-shell)::before {
 }
 
 .admin-metric-card strong {
-  font-size: 32px;
-  font-weight: 500;
+  color: var(--admin-ink);
+  font-size: 30px;
+  font-weight: 520;
   letter-spacing: 0;
+  line-height: 1.05;
 }
 
 .admin-metric-meta {
@@ -3791,32 +3802,35 @@ body:has(.admin-shell)::before {
 }
 
 .admin-dashboard-grid {
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.92fr);
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr);
   gap: 16px;
 }
 
 .admin-panel {
   border: 1px solid var(--admin-border);
-  border-radius: 7px;
-  box-shadow: none;
-  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035);
+  padding: 15px 16px;
 }
 
 .admin-panel-header {
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .admin-panel-header h2,
 .admin-panel h2 {
-  font-size: 16px;
+  color: var(--admin-ink);
+  font-size: 15px;
   font-weight: 600;
+  line-height: 1.3;
 }
 
 .admin-panel-header p,
 .admin-panel p {
   color: var(--admin-muted);
   font-size: 13px;
+  line-height: 1.45;
 }
 
 .admin-panel-action {
@@ -3859,14 +3873,15 @@ body:has(.admin-shell)::before {
 .admin-traffic-summary {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
   margin-bottom: 12px;
 }
 
 .admin-traffic-summary div {
   border: 1px solid var(--admin-border);
   border-radius: 6px;
-  padding: 10px 12px;
+  background: #fbfcfe;
+  padding: 9px 11px;
 }
 
 .admin-traffic-summary span {
@@ -3878,15 +3893,17 @@ body:has(.admin-shell)::before {
 .admin-traffic-summary strong {
   display: block;
   margin-top: 3px;
-  font-size: 20px;
+  color: var(--admin-ink);
+  font-size: 19px;
   font-weight: 550;
 }
 
 .admin-traffic-chart {
-  height: 176px;
+  height: 168px;
+  border: 1px solid var(--admin-border);
   border-radius: 6px;
   background:
-    linear-gradient(#ededed 1px, transparent 1px) 0 0 / 100% 25%,
+    linear-gradient(#eef0f4 1px, transparent 1px) 0 0 / 100% 25%,
     #fff;
 }
 
@@ -3896,7 +3913,7 @@ body:has(.admin-shell)::before {
 
 .admin-traffic-chart polyline {
   stroke: var(--admin-blue);
-  stroke-width: 2;
+  stroke-width: 1.8;
 }
 
 .admin-traffic-bars span {
@@ -3912,10 +3929,11 @@ body:has(.admin-shell)::before {
 }
 
 .admin-dashboard-split {
-  gap: 14px;
+  gap: 12px;
 }
 
 .admin-dashboard-split h3 {
+  color: var(--admin-ink);
   font-size: 13px;
   font-weight: 600;
 }
@@ -3930,6 +3948,10 @@ body:has(.admin-shell)::before {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 78px 64px;
   border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-traffic-table div:first-child {
+  background: #fafbfc;
 }
 
 .admin-traffic-table div:last-child {
@@ -3966,7 +3988,8 @@ body:has(.admin-shell)::before {
 
 .admin-pending-list a {
   grid-template-columns: auto minmax(0, 1fr) auto auto;
-  min-height: 42px;
+  min-height: 40px;
+  border-color: var(--admin-border);
   border-radius: 6px;
   padding: 0 10px;
 }
@@ -4000,29 +4023,36 @@ body:has(.admin-shell)::before {
 }
 
 .admin-status {
-  min-height: 22px;
-  border-radius: 6px;
+  min-height: 20px;
+  border-radius: 999px;
   font-size: 12px;
   font-weight: 500;
-  padding: 2px 8px;
+  line-height: 1;
+  padding: 3px 7px;
+}
+
+.admin-status-neutral {
+  border-color: #d7dce5;
+  background: #f8fafc;
+  color: #475467;
 }
 
 .admin-status-good {
-  border-color: #bbf7d0;
-  background: #f0fdf4;
-  color: #166534;
+  border-color: #abefc6;
+  background: #ecfdf3;
+  color: #067647;
 }
 
 .admin-status-attention {
-  border-color: #fed7aa;
-  background: #fff7ed;
-  color: #c2410c;
+  border-color: #fedf89;
+  background: #fffaeb;
+  color: #b54708;
 }
 
 .admin-status-danger {
-  border-color: #fecaca;
-  background: #fef2f2;
-  color: #dc2626;
+  border-color: #fecdca;
+  background: #fef3f2;
+  color: #b42318;
 }
 
 .admin-activity-feed {
@@ -4035,7 +4065,8 @@ body:has(.admin-shell)::before {
   border: 0;
   border-radius: 6px;
   background: transparent;
-  padding: 8px 10px;
+  min-height: 46px;
+  padding: 7px 9px;
 }
 
 .admin-activity-item:hover {
@@ -4044,12 +4075,12 @@ body:has(.admin-shell)::before {
 
 .admin-activity-icon {
   display: inline-grid;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   place-items: center;
-  border: 1px solid #dbeafe;
+  border: 1px solid #dbe7ff;
   border-radius: 999px;
-  background: #eff6ff;
+  background: #f3f7ff;
   color: var(--admin-blue);
 }
 
@@ -4077,9 +4108,9 @@ body:has(.admin-shell)::before {
 .admin-health-head,
 .admin-health-row {
   display: grid;
-  grid-template-columns: minmax(150px, 1.2fr) 118px 96px minmax(140px, 1fr) 74px;
+  grid-template-columns: minmax(112px, 1.15fr) 82px 58px minmax(98px, 0.9fr) 48px;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .admin-health-head {
@@ -4087,14 +4118,14 @@ body:has(.admin-shell)::before {
   background: #fafafa;
   color: var(--admin-muted);
   font-size: 12px;
-  padding: 9px 12px;
+  padding: 8px 10px;
 }
 
 .admin-health-row {
   border: 0;
   border-bottom: 1px solid var(--admin-border);
   border-radius: 0;
-  padding: 10px 12px;
+  padding: 9px 10px;
 }
 
 .admin-health-row:last-child {
@@ -4116,8 +4147,15 @@ body:has(.admin-shell)::before {
 }
 
 .admin-health-row > span {
+  color: var(--admin-ink);
   font-size: 13px;
   font-weight: 500;
+}
+
+.admin-health-row time {
+  color: var(--admin-muted);
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .admin-health-row small {
@@ -4130,7 +4168,7 @@ body:has(.admin-shell)::before {
   background: #fff;
   color: var(--admin-ink);
   font-size: 12px;
-  padding: 4px 8px;
+  padding: 3px 7px;
 }
 
 .admin-table-list,
@@ -4138,25 +4176,34 @@ body:has(.admin-shell)::before {
 .admin-shell .release,
 .admin-shell .ticket-row {
   border-color: var(--admin-border);
-  border-radius: 7px;
-  box-shadow: none;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035);
 }
 
 .admin-table-row {
   grid-template-columns: minmax(260px, 1fr) repeat(4, minmax(84px, auto));
   gap: 12px;
-  padding: 12px 14px;
+  min-height: 50px;
+  padding: 11px 14px;
 }
 
 .admin-table-row h3,
 .ticket-row h3,
 .release h3 {
-  font-size: 14px;
+  color: var(--admin-ink);
+  font-size: 13px;
   font-weight: 600;
 }
 
 .admin-table-row p {
   font-size: 12px;
+}
+
+.admin-table-row > span,
+.admin-table-row time {
+  color: var(--admin-muted);
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .admin-filter-bar input,
@@ -4179,6 +4226,117 @@ body:has(.admin-shell)::before {
   border-radius: 6px;
   font-size: 13px;
   font-weight: 500;
+}
+
+.ticket-stat-grid {
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.ticket-stat {
+  border-color: var(--admin-border);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035);
+  padding: 14px;
+}
+
+.ticket-stat span {
+  color: var(--admin-muted);
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.ticket-stat strong {
+  color: var(--admin-ink);
+  font-size: 24px;
+  font-weight: 550;
+  line-height: 1.1;
+}
+
+.ticket-filter-bar,
+.ticket-control-grid {
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.ticket-filter-bar.admin-panel {
+  padding: 14px;
+}
+
+.admin-shell .field label {
+  color: var(--admin-ink);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-bottom: 5px;
+}
+
+.ticket-row {
+  gap: 14px;
+  border-color: var(--admin-border);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035);
+  padding: 13px 14px;
+}
+
+.ticket-row:hover,
+.admin-table-row:hover,
+.admin-shell .release:hover {
+  border-color: #cfd6e2;
+  background: #fbfcfe;
+  box-shadow: none;
+  transform: none;
+}
+
+.ticket-main h3 {
+  margin-bottom: 4px;
+}
+
+.ticket-main p,
+.ticket-main span,
+.ticket-meta span {
+  color: var(--admin-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.ticket-meta {
+  gap: 7px 10px;
+}
+
+.admin-shell .release {
+  border-color: var(--admin-border);
+  border-radius: 8px;
+  background: #fff;
+  padding: 13px 14px;
+}
+
+.admin-shell .release p,
+.muted-line,
+.admin-user-meta span {
+  color: var(--admin-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.dashboard-split {
+  gap: 16px;
+}
+
+.admin-segmented {
+  border-color: var(--admin-border);
+  border-radius: 7px;
+  padding: 2px;
+}
+
+.admin-segmented a {
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 9px;
 }
 
 .admin-sidebar-search input {
