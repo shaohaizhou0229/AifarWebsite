@@ -146,7 +146,7 @@ for (const page of pages) {
     }
   }
 
-  if (!source.includes("<h1") && !source.includes("PageHero") && !source.includes("AdminPlaceholderPage")) {
+  if (!source.includes("<h1") && !source.includes("PageHero") && !source.includes("SitePageSections") && !source.includes("AdminPlaceholderPage")) {
     console.error(`${page}: missing page heading`);
     failures += 1;
   }
@@ -162,6 +162,7 @@ for (const file of [
   "components/LanguageSwitcher.jsx",
   "components/MobileMenu.jsx",
   "components/PageHero.jsx",
+  "components/SitePageSections.jsx",
   "components/Card.jsx",
   "components/Rows.jsx",
   "components/AuthForms.jsx",
