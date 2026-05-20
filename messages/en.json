@@ -763,8 +763,8 @@
       "eyebrow": "Admin",
       "deniedTitle": "Administrator access required.",
       "deniedLead": "Your account does not have permission to manage Aifar website operations.",
-      "title": "Aifar management center.",
-      "lead": "Choose the area you want to operate. Existing capabilities are available now; planned areas are reserved for the next build.",
+      "title": "Management overview.",
+      "lead": "Website operations, pending work, and module activity at a glance.",
       "active": "Ready",
       "planned": "Planned",
       "nav": {
@@ -828,7 +828,110 @@
           "description": "Create spaces, assign tasks, track deadlines, and manage recurring work.",
           "status": "active"
         }
-      ]
+      ],
+      "shell": {
+        "brand": "Aifar",
+        "projectLabel": "Project",
+        "projectName": "Aifar Website",
+        "workspace": "Admin console",
+        "notifications": "Notifications",
+        "account": "Account",
+        "language": "Language",
+        "breadcrumbs": "Breadcrumbs",
+        "auth": {
+          "signOut": "Sign out",
+          "signingOut": "Signing out..."
+        }
+      },
+      "ranges": {
+        "today": "Today",
+        "sevenDays": "7 days",
+        "thirtyDays": "30 days"
+      },
+      "metrics": {
+        "todayViews": "Visits today",
+        "totalViews": "Total visits",
+        "downloadClicks": "Downloads",
+        "newContacts": "New contacts",
+        "openTickets": "Open tickets",
+        "newUsers": "New users",
+        "draftContent": "Draft content",
+        "collaborationTodo": "Collaboration tasks"
+      },
+      "traffic": {
+        "title": "Website traffic",
+        "meta": "Anonymous public-site visits and download clicks.",
+        "empty": "No traffic data yet. New public page visits will appear here.",
+        "topPages": "Top pages",
+        "languages": "Languages",
+        "downloads": "Downloads"
+      },
+      "pending": {
+        "title": "Pending work",
+        "meta": "Cross-module items that need admin action.",
+        "empty": "No pending work right now.",
+        "items": {
+          "newContacts": "Review new contact requests",
+          "unassignedTickets": "Assign support tickets",
+          "draftContent": "Review draft content",
+          "downloadGaps": "Publish or configure downloads",
+          "overdueSubtasks": "Check overdue collaboration tasks"
+        }
+      },
+      "activity": {
+        "title": "Latest activity",
+        "meta": "Recent website, support, user, document, download, and collaboration changes.",
+        "empty": "No activity has been recorded yet."
+      },
+      "health": {
+        "title": "Module health",
+        "meta": "Operational readiness by module.",
+        "notAvailable": "Not available",
+        "open": "Open",
+        "statuses": {
+          "ready": "Ready",
+          "needsReview": "Needs review",
+          "active": "Active"
+        },
+        "modules": {
+          "product": {
+            "label": "Product",
+            "summary": "Website content and page drafts"
+          },
+          "downloads": {
+            "label": "Downloads",
+            "summary": "Client releases and file status"
+          },
+          "users": {
+            "label": "Users",
+            "summary": "Accounts, roles, and invitations"
+          },
+          "docs": {
+            "label": "Docs",
+            "summary": "Published and draft documents"
+          },
+          "support": {
+            "label": "Support",
+            "summary": "Support ticket queue"
+          },
+          "contact": {
+            "label": "Contact",
+            "summary": "Contact form requests"
+          },
+          "collaboration": {
+            "label": "Collaboration",
+            "summary": "Spaces, tasks, and subtasks"
+          }
+        }
+      },
+      "quickActions": {
+        "inviteUser": "Invite user",
+        "newDocument": "New document",
+        "reviewTickets": "Review tickets",
+        "reviewContacts": "Review contacts",
+        "publishDownloads": "Publish downloads",
+        "createSpace": "Create space"
+      }
     },
     "adminProduct": {
       "seo": {

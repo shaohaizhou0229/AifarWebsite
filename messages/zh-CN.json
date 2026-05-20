@@ -763,8 +763,8 @@
       "eyebrow": "管理后台",
       "deniedTitle": "需要管理员权限。",
       "deniedLead": "你的账户无权管理 Aifar 网站运营。",
-      "title": "Aifar 管理中心。",
-      "lead": "选择要操作的区域。",
+      "title": "管理总览。",
+      "lead": "集中查看网站运营、待处理事项和各模块最新活动。",
       "active": "可用",
       "planned": "规划中",
       "nav": {
@@ -821,14 +821,117 @@
           "description": "查看并回复联系请求。",
           "status": "active"
         },
-      {
-        "key": "collaboration",
-        "href": "/admin/collaboration/",
-        "title": "协作空间",
-        "description": "创建共享工作区、拆分任务并跟踪管理员协作进度。",
-        "status": "active"
+        {
+          "key": "collaboration",
+          "href": "/admin/collaboration/",
+          "title": "协作空间",
+          "description": "创建共享工作区、拆分任务并跟踪管理员协作进度。",
+          "status": "active"
+        }
+      ],
+      "shell": {
+        "brand": "Aifar",
+        "projectLabel": "项目",
+        "projectName": "Aifar Website",
+        "workspace": "后台控制台",
+        "notifications": "通知",
+        "account": "账户",
+        "language": "语言",
+        "breadcrumbs": "面包屑",
+        "auth": {
+          "signOut": "退出登录",
+          "signingOut": "正在退出..."
+        }
+      },
+      "ranges": {
+        "today": "今天",
+        "sevenDays": "7 天",
+        "thirtyDays": "30 天"
+      },
+      "metrics": {
+        "todayViews": "今日访问",
+        "totalViews": "总访问量",
+        "downloadClicks": "下载点击",
+        "newContacts": "新联系请求",
+        "openTickets": "未处理工单",
+        "newUsers": "新用户",
+        "draftContent": "草稿内容",
+        "collaborationTodo": "协作待办"
+      },
+      "traffic": {
+        "title": "网站访问分析",
+        "meta": "匿名统计公开页面访问与下载点击。",
+        "empty": "暂无访问数据。新的公开页面访问会显示在这里。",
+        "topPages": "热门页面",
+        "languages": "语言分布",
+        "downloads": "下载"
+      },
+      "pending": {
+        "title": "待处理事项",
+        "meta": "需要管理员处理的跨模块事项。",
+        "empty": "当前没有待处理事项。",
+        "items": {
+          "newContacts": "查看新的联系请求",
+          "unassignedTickets": "分配支持工单",
+          "draftContent": "审核草稿内容",
+          "downloadGaps": "发布或配置下载版本",
+          "overdueSubtasks": "检查逾期协作任务"
+        }
+      },
+      "activity": {
+        "title": "最新活动",
+        "meta": "最近的网站、支持、用户、文档、下载和协作变更。",
+        "empty": "暂无活动记录。"
+      },
+      "health": {
+        "title": "模块健康状态",
+        "meta": "按模块查看当前运营状态。",
+        "notAvailable": "暂无",
+        "open": "进入",
+        "statuses": {
+          "ready": "正常",
+          "needsReview": "需处理",
+          "active": "活跃"
+        },
+        "modules": {
+          "product": {
+            "label": "产品内容",
+            "summary": "官网内容与页面草稿"
+          },
+          "downloads": {
+            "label": "客户端下载",
+            "summary": "客户端版本与文件状态"
+          },
+          "users": {
+            "label": "用户",
+            "summary": "账户、角色与邀请"
+          },
+          "docs": {
+            "label": "文档",
+            "summary": "已发布与草稿文档"
+          },
+          "support": {
+            "label": "支持工单",
+            "summary": "支持请求队列"
+          },
+          "contact": {
+            "label": "联系请求",
+            "summary": "官网联系表单请求"
+          },
+          "collaboration": {
+            "label": "协作",
+            "summary": "空间、任务与子任务"
+          }
+        }
+      },
+      "quickActions": {
+        "inviteUser": "邀请用户",
+        "newDocument": "新建文档",
+        "reviewTickets": "查看工单",
+        "reviewContacts": "查看联系请求",
+        "publishDownloads": "发布下载",
+        "createSpace": "创建协作空间"
       }
-      ]
     },
     "adminProduct": {
       "seo": {

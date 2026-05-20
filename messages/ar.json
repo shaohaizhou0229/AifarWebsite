@@ -763,8 +763,8 @@
       "eyebrow": "معلومات Aifar",
       "deniedTitle": "معلومات Aifar",
       "deniedLead": "معلومات Aifar",
-      "title": "معلومات Aifar",
-      "lead": "معلومات منظمة حول قدرات Aifar وخدماته.",
+      "title": "نظرة عامة للإدارة.",
+      "lead": "عمليات الموقع والعمل المعلق ونشاط الوحدات في مكان واحد.",
       "active": "معلومات Aifar",
       "planned": "معلومات Aifar",
       "nav": {
@@ -828,7 +828,110 @@
           "description": "Create spaces, assign tasks, track deadlines, and manage recurring work.",
           "status": "active"
         }
-      ]
+      ],
+      "shell": {
+        "brand": "Aifar",
+        "projectLabel": "المشروع",
+        "projectName": "Aifar Website",
+        "workspace": "لوحة الإدارة",
+        "notifications": "الإشعارات",
+        "account": "الحساب",
+        "language": "اللغة",
+        "breadcrumbs": "المسار",
+        "auth": {
+          "signOut": "تسجيل الخروج",
+          "signingOut": "جار تسجيل الخروج..."
+        }
+      },
+      "ranges": {
+        "today": "اليوم",
+        "sevenDays": "7 أيام",
+        "thirtyDays": "30 يوما"
+      },
+      "metrics": {
+        "todayViews": "زيارات اليوم",
+        "totalViews": "إجمالي الزيارات",
+        "downloadClicks": "التنزيلات",
+        "newContacts": "طلبات تواصل جديدة",
+        "openTickets": "تذاكر مفتوحة",
+        "newUsers": "مستخدمون جدد",
+        "draftContent": "محتوى مسودة",
+        "collaborationTodo": "مهام التعاون"
+      },
+      "traffic": {
+        "title": "حركة الموقع",
+        "meta": "زيارات مجهولة للموقع العام ونقرات التنزيل.",
+        "empty": "لا توجد بيانات زيارات بعد.",
+        "topPages": "أهم الصفحات",
+        "languages": "اللغات",
+        "downloads": "التنزيلات"
+      },
+      "pending": {
+        "title": "العمل المعلق",
+        "meta": "عناصر تحتاج إجراء من المدير.",
+        "empty": "لا يوجد عمل معلق حاليا.",
+        "items": {
+          "newContacts": "مراجعة طلبات التواصل الجديدة",
+          "unassignedTickets": "إسناد تذاكر الدعم",
+          "draftContent": "مراجعة محتوى المسودة",
+          "downloadGaps": "نشر أو إعداد التنزيلات",
+          "overdueSubtasks": "فحص مهام التعاون المتأخرة"
+        }
+      },
+      "activity": {
+        "title": "آخر النشاطات",
+        "meta": "تغييرات حديثة في الموقع والدعم والمستخدمين والوثائق والتنزيلات والتعاون.",
+        "empty": "لا يوجد نشاط مسجل."
+      },
+      "health": {
+        "title": "حالة الوحدات",
+        "meta": "جاهزية التشغيل حسب الوحدة.",
+        "notAvailable": "غير متاح",
+        "open": "فتح",
+        "statuses": {
+          "ready": "جاهز",
+          "needsReview": "بحاجة مراجعة",
+          "active": "نشط"
+        },
+        "modules": {
+          "product": {
+            "label": "المنتج",
+            "summary": "محتوى الموقع والمسودات"
+          },
+          "downloads": {
+            "label": "التنزيلات",
+            "summary": "إصدارات العميل وحالة الملفات"
+          },
+          "users": {
+            "label": "المستخدمون",
+            "summary": "الحسابات والأدوار والدعوات"
+          },
+          "docs": {
+            "label": "الوثائق",
+            "summary": "وثائق منشورة ومسودات"
+          },
+          "support": {
+            "label": "الدعم",
+            "summary": "قائمة تذاكر الدعم"
+          },
+          "contact": {
+            "label": "التواصل",
+            "summary": "طلبات نموذج التواصل"
+          },
+          "collaboration": {
+            "label": "التعاون",
+            "summary": "المساحات والمهام والمهام الفرعية"
+          }
+        }
+      },
+      "quickActions": {
+        "inviteUser": "دعوة مستخدم",
+        "newDocument": "وثيقة جديدة",
+        "reviewTickets": "مراجعة التذاكر",
+        "reviewContacts": "مراجعة الطلبات",
+        "publishDownloads": "نشر التنزيلات",
+        "createSpace": "إنشاء مساحة"
+      }
     },
     "adminProduct": {
       "seo": {

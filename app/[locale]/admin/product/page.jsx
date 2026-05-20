@@ -1,10 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
-import { AdminNav } from "@/components/AdminNav";
+import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
 import { AdminSiteContentForm } from "@/components/AdminSiteContentForm";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { PageHero } from "@/components/PageHero";
 import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
@@ -39,11 +37,7 @@ export default async function AdminProductPage({ params, searchParams }) {
     await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.product);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
-      return (
-        <main>
-          <PageHero eyebrow={page.eyebrow} title={page.deniedTitle} lead={page.deniedLead} />
-        </main>
-      );
+      return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
     }
     redirect(localizedPath(locale, "/login/"));
   }
@@ -55,32 +49,32 @@ export default async function AdminProductPage({ params, searchParams }) {
   const labels = messages.forms.siteContent;
 
   return (
-    <main>
-      <PageHero eyebrow={page.eyebrow} title={page.title} lead={page.lead} />
-      <section className="section alt">
-        <div className="section-inner detail-layout">
-          <Breadcrumbs
-            locale={locale}
-            items={[
-              { label: adminHome.nav.home, href: "/admin/" },
-              { label: page.breadcrumb || page.title }
-            ]}
-          />
-          <AdminNav locale={locale} labels={adminHome.nav} current="product" />
-          <AdminSiteContentForm
-            labels={labels}
-            initialPageKey={initialPageKey}
-            initialLocale={initialLocale}
-            initialContent={contentState.content}
-            initialEntry={contentState.entry}
-            pageOptions={[
-              { key: "home", label: labels.homePage },
-              { key: "product", label: labels.productPage }
-            ]}
-            localeOptions={locales.map((key) => ({ key, label: localeLabels[key] || key }))}
-          />
-        </div>
-      </section>
-    </main>
+    <AdminShell
+      locale={locale}
+      labels={adminHome}
+      current="product"
+      eyebrow={page.eyebrow}
+      title={page.title}
+      lead={page.lead}
+      breadcrumbs={[
+        { label: adminHome.nav.home, href: "/admin/" },
+        { label: page.breadcrumb || page.title }
+      ]}
+    >
+      <div className="admin-detail-layout">
+        <AdminSiteContentForm
+          labels={labels}
+          initialPageKey={initialPageKey}
+          initialLocale={initialLocale}
+          initialContent={contentState.content}
+          initialEntry={contentState.entry}
+          pageOptions={[
+            { key: "home", label: labels.homePage },
+            { key: "product", label: labels.productPage }
+          ]}
+          localeOptions={locales.map((key) => ({ key, label: localeLabels[key] || key }))}
+        />
+      </div>
+    </AdminShell>
   );
 }

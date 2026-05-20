@@ -1,12 +1,10 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
-import { AdminNav } from "@/components/AdminNav";
+import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
 import {
   CollaborationSubtaskForm,
   CloseRecurringTaskButton
 } from "@/components/AdminCollaborationForms";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { PageHero } from "@/components/PageHero";
 import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getCollaborationTask } from "@/lib/collaboration";
@@ -44,11 +42,7 @@ export default async function AdminCollaborationTaskPage({ params }) {
     user = context.user;
   } catch (error) {
     if (error instanceof AdminRequiredError) {
-      return (
-        <main>
-          <PageHero eyebrow={page.eyebrow} title={page.deniedTitle} lead={page.deniedLead} />
-        </main>
-      );
+      return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
     }
     redirect(localizedPath(locale, "/login/"));
   }
@@ -63,24 +57,25 @@ export default async function AdminCollaborationTaskPage({ params }) {
   const { task, space, canCreateSubtask } = details;
 
   return (
-    <main>
-      <PageHero eyebrow={page.eyebrow} title={task.title} lead={task.description || page.noDescription} />
-      <section className="section alt">
-        <div className="section-inner detail-layout">
-          <Breadcrumbs
-            locale={locale}
-            items={[
-              { label: adminHome.nav.home, href: "/admin/" },
-              { label: listPage.breadcrumb, href: "/admin/collaboration/" },
-              { label: space.name, href: `/admin/collaboration/spaces/${space.id}/` },
-              { label: task.title }
-            ]}
-          />
-          <AdminNav locale={locale} labels={adminHome.nav} current="collaboration" />
-          <article className="card detail-card">
+    <AdminShell
+      locale={locale}
+      labels={adminHome}
+      current="collaboration"
+      eyebrow={page.eyebrow}
+      title={task.title}
+      lead={task.description || page.noDescription}
+      breadcrumbs={[
+        { label: adminHome.nav.home, href: "/admin/" },
+        { label: listPage.breadcrumb, href: "/admin/collaboration/" },
+        { label: space.name, href: `/admin/collaboration/spaces/${space.id}/` },
+        { label: task.title }
+      ]}
+    >
+      <div className="admin-detail-layout">
+          <article className="admin-panel detail-card">
             <div className="task-heading">
               <div>
-                <span className="pill">{page.taskTypes[task.taskType] || task.taskType}</span>
+                <span className="admin-status admin-status-neutral">{page.taskTypes[task.taskType] || task.taskType}</span>
                 <h2>{page.overviewTitle}</h2>
                 <p className="muted-line">{page.createdBy}: {task.createdByName || task.createdByEmail || page.notProvided}</p>
                 <p className="muted-line">{page.dueAt}: {formatDate(task.dueAt, locale) || page.notProvided}</p>
@@ -100,13 +95,13 @@ export default async function AdminCollaborationTaskPage({ params }) {
               </div>
             ) : null}
           </article>
-          <article className="card detail-card">
+          <article className="admin-panel detail-card">
             <h2>{page.subtasksTitle}</h2>
             <div className="subtask-list">
               {task.subtasks.length ? task.subtasks.map((subtask) => (
                 <a className="subtask-row" key={subtask.id} href={localizedPath(locale, `/admin/collaboration/subtasks/${subtask.id}/`)}>
                   <div>
-                    <span className="pill">{page.statuses[subtask.status] || subtask.status}</span>
+                    <span className="admin-status admin-status-neutral">{page.statuses[subtask.status] || subtask.status}</span>
                     <h3>{subtask.title}</h3>
                     <p>{subtask.description || page.noDescription}</p>
                     <p className="muted-line">
@@ -120,13 +115,12 @@ export default async function AdminCollaborationTaskPage({ params }) {
             </div>
           </article>
           {canCreateSubtask ? (
-            <article className="card detail-card">
+            <article className="admin-panel detail-card">
               <h2>{page.createSubtaskTitle}</h2>
               <CollaborationSubtaskForm taskId={task.id} members={space.members} labels={page.subtaskForm} locale={locale} />
             </article>
           ) : null}
-        </div>
-      </section>
-    </main>
+      </div>
+    </AdminShell>
   );
 }

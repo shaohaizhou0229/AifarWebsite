@@ -2,9 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { AdminInvitationActions } from "@/components/AdminInvitationActions";
 import { AdminInviteUserForm } from "@/components/AdminInviteUserForm";
-import { AdminNav } from "@/components/AdminNav";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { PageHero } from "@/components/PageHero";
+import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
 import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getProfile, listAdminUsers } from "@/lib/profiles";
@@ -38,11 +36,7 @@ export default async function AdminUsersPage({ params, searchParams }) {
     await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.users);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
-      return (
-        <main>
-          <PageHero eyebrow={page.eyebrow} title={page.deniedTitle} lead={page.deniedLead} />
-        </main>
-      );
+      return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
     }
     redirect(localizedPath(locale, "/login/"));
   }
@@ -59,75 +53,66 @@ export default async function AdminUsersPage({ params, searchParams }) {
   }
 
   return (
-    <main>
-      <PageHero eyebrow={page.eyebrow} title={page.title} lead={page.lead} />
-      <section className="section alt">
-        <div className="section-inner">
-          <Breadcrumbs
-            locale={locale}
-            items={[
-              { label: adminHome.nav.home, href: "/admin/" },
-              { label: page.breadcrumb }
-            ]}
-          />
-          <AdminNav locale={locale} labels={adminHome.nav} current="users" />
-          <form className="admin-search" action={localizedPath(locale, "/admin/users/")}>
-            <label className="sr-only" htmlFor="q">{page.searchLabel}</label>
-            <input id="q" name="q" defaultValue={q} placeholder={page.searchPlaceholder} />
-            <label className="sr-only" htmlFor="status">{page.statusFilter}</label>
-            <select id="status" name="status" defaultValue={status}>
-              <option value="all">{page.statuses.all}</option>
-              <option value="active">{page.statuses.active}</option>
-              <option value="deactivated">{page.statuses.deactivated}</option>
-              <option value="deleted">{page.statuses.deleted}</option>
-              <option value="pending">{page.statuses.pending}</option>
-            </select>
-            <button className="button secondary" type="submit">{page.searchAction}</button>
-          </form>
-          <article className="card detail-card">
-            <h2>{page.invite.title}</h2>
-            <p>{page.invite.lead}</p>
-            <AdminInviteUserForm labels={page.invite.form} />
+    <AdminShell
+      locale={locale}
+      labels={adminHome}
+      current="users"
+      eyebrow={page.eyebrow}
+      title={page.title}
+      lead={page.lead}
+      breadcrumbs={[
+        { label: adminHome.nav.home, href: "/admin/" },
+        { label: page.breadcrumb }
+      ]}
+    >
+      <form className="admin-filter-bar" action={localizedPath(locale, "/admin/users/")}>
+        <label className="sr-only" htmlFor="q">{page.searchLabel}</label>
+        <input id="q" name="q" defaultValue={q} placeholder={page.searchPlaceholder} />
+        <label className="sr-only" htmlFor="status">{page.statusFilter}</label>
+        <select id="status" name="status" defaultValue={status}>
+          <option value="all">{page.statuses.all}</option>
+          <option value="active">{page.statuses.active}</option>
+          <option value="deactivated">{page.statuses.deactivated}</option>
+          <option value="deleted">{page.statuses.deleted}</option>
+          <option value="pending">{page.statuses.pending}</option>
+        </select>
+        <button className="button secondary compact" type="submit">{page.searchAction}</button>
+      </form>
+      <article className="admin-panel detail-card">
+        <h2>{page.invite.title}</h2>
+        <p>{page.invite.lead}</p>
+        <AdminInviteUserForm labels={page.invite.form} />
+      </article>
+      <div className="admin-table-list">
+        {users.length ? users.map((user) => user.recordType === "invitation" ? (
+          <article className="admin-table-row" key={user.id}>
+            <div>
+              <h3>{user.displayName || user.email}</h3>
+              <p>{user.email} - {user.organization || page.notProvided}</p>
+            </div>
+            <span className="admin-status admin-status-attention">{page.statuses.pending}</span>
+            <span>{page.roles[user.role] || user.role}</span>
+            <span>{permissionSummary(user)}</span>
+            <AdminInvitationActions invitationId={user.id} labels={page.invite.cancel} />
           </article>
-          <div className="release-list">
-            {users.length ? users.map((user) => user.recordType === "invitation" ? (
-              <article className="release" key={user.id}>
-                <div>
-                  <h3>{user.displayName || user.email}</h3>
-                  <p>{user.email} - {user.organization || page.notProvided}</p>
-                  <p className="muted-line">{page.createdAt}: {formatDate(user.createdAt, locale)}</p>
-                </div>
-                <div className="admin-user-meta">
-                  <span className="pill">{page.statuses.pending}</span>
-                  <span>{page.roles[user.role] || user.role}</span>
-                  <span>{permissionSummary(user)}</span>
-                  <AdminInvitationActions invitationId={user.id} labels={page.invite.cancel} />
-                </div>
-              </article>
-            ) : (
-              <a className="release" key={user.id} href={localizedPath(locale, `/admin/users/${user.id}/`)}>
-                <div>
-                  <h3>{user.displayName || user.email}</h3>
-                  <p>{user.email} - {user.organization || page.notProvided}</p>
-                  <p className="muted-line">{page.createdAt}: {formatDate(user.createdAt, locale)}</p>
-                </div>
-                <div className="admin-user-meta">
-                  <span className="pill">{page.roles[user.role] || user.role}</span>
-                  <span>{page.statuses[user.accountStatus] || user.accountStatus}</span>
-                  <span>{permissionSummary(user)}</span>
-                  <span>{page.tickets}: {user.ticketCount}</span>
-                  <span>{page.lastFootprint}: {formatDate(user.lastFootprintAt, locale) || page.notProvided}</span>
-                </div>
-              </a>
-            )) : (
-              <article className="card admin-empty-state">
-                <h2>{page.emptyTitle}</h2>
-                <p>{page.emptyLead}</p>
-              </article>
-            )}
-          </div>
-        </div>
-      </section>
-    </main>
+        ) : (
+          <a className="admin-table-row" key={user.id} href={localizedPath(locale, `/admin/users/${user.id}/`)}>
+            <div>
+              <h3>{user.displayName || user.email}</h3>
+              <p>{user.email} - {user.organization || page.notProvided}</p>
+            </div>
+            <span className="admin-status admin-status-neutral">{page.roles[user.role] || user.role}</span>
+            <span>{page.statuses[user.accountStatus] || user.accountStatus}</span>
+            <span>{page.tickets}: {user.ticketCount}</span>
+            <time>{formatDate(user.lastFootprintAt, locale) || page.notProvided}</time>
+          </a>
+        )) : (
+          <article className="admin-panel admin-empty-state">
+            <h2>{page.emptyTitle}</h2>
+            <p>{page.emptyLead}</p>
+          </article>
+        )}
+      </div>
+    </AdminShell>
   );
 }

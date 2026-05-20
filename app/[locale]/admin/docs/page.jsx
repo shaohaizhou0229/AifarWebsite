@@ -1,8 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { AdminNav } from "@/components/AdminNav";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { PageHero } from "@/components/PageHero";
+import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
 import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { listAdminDocuments } from "@/lib/documents";
 import { getProfile } from "@/lib/profiles";
@@ -41,11 +39,7 @@ export default async function AdminDocsPage({ params }) {
     await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.docs);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
-      return (
-        <main>
-          <PageHero eyebrow={page.eyebrow} title={page.deniedTitle} lead={page.deniedLead} />
-        </main>
-      );
+      return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
     }
     redirect(localizedPath(locale, "/login/"));
   }
@@ -53,45 +47,40 @@ export default async function AdminDocsPage({ params }) {
   const documents = await listAdminDocuments();
 
   return (
-    <main>
-      <PageHero eyebrow={page.eyebrow} title={page.title} lead={page.lead} />
-      <section className="section alt">
-        <div className="section-inner">
-          <Breadcrumbs
-            locale={locale}
-            items={[
-              { label: adminHome.nav.home, href: "/admin/" },
-              { label: page.breadcrumb }
-            ]}
-          />
-          <AdminNav locale={locale} labels={adminHome.nav} current="docs" />
-          <div className="status-actions">
-            <a className="button primary" href={localizedPath(locale, "/admin/docs/new/")}>{page.newDocument}</a>
-          </div>
-          <div className="release-list">
-            {documents.map((document) => (
-              <a className="release" key={document.id} href={localizedPath(locale, `/admin/docs/${document.id}/`)}>
-                <div>
-                  <h3>{document.title}</h3>
-                  <p>{document.summary || page.noSummary}</p>
-                  <p className="muted-line">
-                    {categoryLabel(page, document.categoryKey, document.categoryLabel)} - {page.version}: {document.currentVersionLabel || page.noVersion}
-                    {document.updatedAt ? ` - ${formatDate(document.updatedAt, locale)}` : ""}
-                  </p>
-                </div>
-                <span className="pill">{document.isPublished ? page.published : page.draft}</span>
-              </a>
-            ))}
-            {!documents.length ? (
-              <article className="card admin-empty-state">
-                <span className="pill">{page.emptyStatus}</span>
-                <h2>{page.emptyTitle}</h2>
-                <p>{page.emptyLead}</p>
-              </article>
-            ) : null}
-          </div>
-        </div>
-      </section>
-    </main>
+    <AdminShell
+      locale={locale}
+      labels={adminHome}
+      current="docs"
+      eyebrow={page.eyebrow}
+      title={page.title}
+      lead={page.lead}
+      breadcrumbs={[
+        { label: adminHome.nav.home, href: "/admin/" },
+        { label: page.breadcrumb }
+      ]}
+      actions={<a className="button primary compact" href={localizedPath(locale, "/admin/docs/new/")}>{page.newDocument}</a>}
+    >
+      <div className="admin-table-list">
+        {documents.map((document) => (
+          <a className="admin-table-row" key={document.id} href={localizedPath(locale, `/admin/docs/${document.id}/`)}>
+            <div>
+              <h3>{document.title}</h3>
+              <p>{document.summary || page.noSummary}</p>
+            </div>
+            <span>{categoryLabel(page, document.categoryKey, document.categoryLabel)}</span>
+            <span>{document.currentVersionLabel || page.noVersion}</span>
+            <span className="admin-status admin-status-neutral">{document.isPublished ? page.published : page.draft}</span>
+            <time>{formatDate(document.updatedAt, locale)}</time>
+          </a>
+        ))}
+        {!documents.length ? (
+          <article className="admin-panel admin-empty-state">
+            <span className="admin-status admin-status-neutral">{page.emptyStatus}</span>
+            <h2>{page.emptyTitle}</h2>
+            <p>{page.emptyLead}</p>
+          </article>
+        ) : null}
+      </div>
+    </AdminShell>
   );
 }

@@ -1,9 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { AdminNav } from "@/components/AdminNav";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CollaborationSpaceForm } from "@/components/AdminCollaborationForms";
-import { PageHero } from "@/components/PageHero";
+import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
 import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { listCollaborationSpaces, listMyCollaborationSubtasks } from "@/lib/collaboration";
@@ -40,11 +38,7 @@ export default async function AdminCollaborationPage({ params }) {
     user = context.user;
   } catch (error) {
     if (error instanceof AdminRequiredError) {
-      return (
-        <main>
-          <PageHero eyebrow={page.eyebrow} title={page.deniedTitle} lead={page.deniedLead} />
-        </main>
-      );
+      return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
     }
     redirect(localizedPath(locale, "/login/"));
   }
@@ -55,71 +49,69 @@ export default async function AdminCollaborationPage({ params }) {
   ]);
 
   return (
-    <main>
-      <PageHero eyebrow={page.eyebrow} title={page.title} lead={page.lead} />
-      <section className="section alt">
-        <div className="section-inner">
-          <Breadcrumbs
-            locale={locale}
-            items={[
-              { label: adminHome.nav.home, href: "/admin/" },
-              { label: page.breadcrumb }
-            ]}
-          />
-          <AdminNav locale={locale} labels={adminHome.nav} current="collaboration" />
-          <article className="card detail-card">
-            <h2>{page.createSpace.title}</h2>
-            <p>{page.createSpace.lead}</p>
-            <CollaborationSpaceForm labels={page.createSpace.form} />
-          </article>
-          <div className="dashboard-split">
-            <section>
-              <h2>{page.spacesTitle}</h2>
-              <div className="release-list">
-                {spaces.length ? spaces.map((space) => (
-                  <a className="release" key={space.id} href={localizedPath(locale, `/admin/collaboration/spaces/${space.id}/`)}>
-                    <div>
-                      <span className="pill">{page.statuses[space.status] || space.status}</span>
-                      <h3>{space.name}</h3>
-                      <p>{space.description || page.noDescription}</p>
-                      <p className="muted-line">{page.leader}: {space.leaderName || space.leaderEmail}</p>
-                    </div>
-                    <div className="admin-user-meta">
-                      <span>{page.tasks}: {space.taskCount}</span>
-                      <span>{page.openSubtasks}: {space.openSubtaskCount}</span>
-                    </div>
-                  </a>
-                )) : (
-                  <article className="card admin-empty-state">
-                    <h2>{page.emptySpacesTitle}</h2>
-                    <p>{page.emptySpacesLead}</p>
-                  </article>
-                )}
-              </div>
-            </section>
-            <section>
-              <h2>{page.mySubtasksTitle}</h2>
-              <div className="release-list">
-                {subtasks.length ? subtasks.map((subtask) => (
-                  <a className="release" key={subtask.id} href={localizedPath(locale, `/admin/collaboration/subtasks/${subtask.id}/`)}>
-                    <div>
-                      <span className="pill">{page.subtaskStatuses[subtask.status] || subtask.status}</span>
-                      <h3>{subtask.title}</h3>
-                      <p>{subtask.spaceName} - {subtask.taskTitle}</p>
-                      <p className="muted-line">{page.dueAt}: {formatDate(subtask.dueAt, locale) || page.notProvided}</p>
-                    </div>
-                  </a>
-                )) : (
-                  <article className="card admin-empty-state">
-                    <h2>{page.emptySubtasksTitle}</h2>
-                    <p>{page.emptySubtasksLead}</p>
-                  </article>
-                )}
-              </div>
-            </section>
+    <AdminShell
+      locale={locale}
+      labels={adminHome}
+      current="collaboration"
+      eyebrow={page.eyebrow}
+      title={page.title}
+      lead={page.lead}
+      breadcrumbs={[
+        { label: adminHome.nav.home, href: "/admin/" },
+        { label: page.breadcrumb }
+      ]}
+    >
+      <article className="admin-panel detail-card">
+        <h2>{page.createSpace.title}</h2>
+        <p>{page.createSpace.lead}</p>
+        <CollaborationSpaceForm labels={page.createSpace.form} />
+      </article>
+      <div className="dashboard-split">
+        <section className="admin-panel">
+          <h2>{page.spacesTitle}</h2>
+          <div className="release-list">
+            {spaces.length ? spaces.map((space) => (
+              <a className="release" key={space.id} href={localizedPath(locale, `/admin/collaboration/spaces/${space.id}/`)}>
+                <div>
+                  <span className="admin-status admin-status-good">{page.statuses[space.status] || space.status}</span>
+                  <h3>{space.name}</h3>
+                  <p>{space.description || page.noDescription}</p>
+                  <p className="muted-line">{page.leader}: {space.leaderName || space.leaderEmail}</p>
+                </div>
+                <div className="admin-user-meta">
+                  <span>{page.tasks}: {space.taskCount}</span>
+                  <span>{page.openSubtasks}: {space.openSubtaskCount}</span>
+                </div>
+              </a>
+            )) : (
+              <article className="admin-empty-state">
+                <h2>{page.emptySpacesTitle}</h2>
+                <p>{page.emptySpacesLead}</p>
+              </article>
+            )}
           </div>
-        </div>
-      </section>
-    </main>
+        </section>
+        <section className="admin-panel">
+          <h2>{page.mySubtasksTitle}</h2>
+          <div className="release-list">
+            {subtasks.length ? subtasks.map((subtask) => (
+              <a className="release" key={subtask.id} href={localizedPath(locale, `/admin/collaboration/subtasks/${subtask.id}/`)}>
+                <div>
+                  <span className="admin-status admin-status-neutral">{page.subtaskStatuses[subtask.status] || subtask.status}</span>
+                  <h3>{subtask.title}</h3>
+                  <p>{subtask.spaceName} - {subtask.taskTitle}</p>
+                  <p className="muted-line">{page.dueAt}: {formatDate(subtask.dueAt, locale) || page.notProvided}</p>
+                </div>
+              </a>
+            )) : (
+              <article className="admin-empty-state">
+                <h2>{page.emptySubtasksTitle}</h2>
+                <p>{page.emptySubtasksLead}</p>
+              </article>
+            )}
+          </div>
+        </section>
+      </div>
+    </AdminShell>
   );
 }

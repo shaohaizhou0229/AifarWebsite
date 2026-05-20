@@ -6,6 +6,7 @@ import "@milkdown/crepe/theme/frame.css";
 import "../globals.css";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SiteAnalyticsTracker } from "@/components/SiteAnalyticsTracker";
 import { getLocaleMessages } from "@/i18n/messages";
 import { getDirection, isLocale, locales } from "@/i18n/routing";
 
@@ -25,6 +26,7 @@ export default async function LocaleLayout({ children, params }) {
       <body>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <SiteHeader locale={locale} messages={messages} />
+          <SiteAnalyticsTracker />
           {children}
           <SiteFooter locale={locale} messages={messages} />
         </NextIntlClientProvider>

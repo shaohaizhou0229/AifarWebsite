@@ -1,7 +1,5 @@
 import { redirect } from "next/navigation";
-import { AdminNav } from "@/components/AdminNav";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { PageHero } from "@/components/PageHero";
+import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
 import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import { localizedPath } from "@/i18n/routing";
@@ -11,35 +9,29 @@ export async function AdminPlaceholderPage({ locale, page, nav, sectionKey, perm
     await requireAdminPermission(getProfile, permission);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
-      return (
-        <main>
-          <PageHero eyebrow={page.eyebrow} title={page.deniedTitle} lead={page.deniedLead} />
-        </main>
-      );
+      return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
     }
     redirect(localizedPath(locale, "/login/"));
   }
 
   return (
-    <main>
-      <PageHero eyebrow={page.eyebrow} title={page.title} lead={page.lead} />
-      <section className="section alt">
-        <div className="section-inner">
-          <Breadcrumbs
-            locale={locale}
-            items={[
-              { label: nav.home, href: "/admin/" },
-              { label: page.breadcrumb || page.title }
-            ]}
-          />
-          <AdminNav locale={locale} labels={nav} current={sectionKey} />
-          <article className="card admin-empty-state">
-            <span className="pill">{page.status}</span>
-            <h2>{page.emptyTitle}</h2>
-            <p>{page.emptyLead}</p>
-          </article>
-        </div>
-      </section>
-    </main>
+    <AdminShell
+      locale={locale}
+      labels={{ nav }}
+      current={sectionKey}
+      eyebrow={page.eyebrow}
+      title={page.title}
+      lead={page.lead}
+      breadcrumbs={[
+        { label: nav.home, href: "/admin/" },
+        { label: page.breadcrumb || page.title }
+      ]}
+    >
+      <article className="admin-panel admin-empty-state">
+        <span className="admin-status admin-status-neutral">{page.status}</span>
+        <h2>{page.emptyTitle}</h2>
+        <p>{page.emptyLead}</p>
+      </article>
+    </AdminShell>
   );
 }

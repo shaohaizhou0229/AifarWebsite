@@ -1,9 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
+import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
 import { AdminDownloadForm } from "@/components/AdminDownloadForm";
-import { AdminNav } from "@/components/AdminNav";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { PageHero } from "@/components/PageHero";
 import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { formatFileSize, getAdminDownloadPlatform } from "@/lib/downloads";
 import { getProfile } from "@/lib/profiles";
@@ -40,11 +38,7 @@ export default async function AdminDownloadDetailPage({ params }) {
     await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.downloads);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
-      return (
-        <main>
-          <PageHero eyebrow={page.eyebrow} title={page.deniedTitle} lead={page.deniedLead} />
-        </main>
-      );
+      return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
     }
     redirect(localizedPath(locale, "/login/"));
   }
@@ -55,33 +49,33 @@ export default async function AdminDownloadDetailPage({ params }) {
   const release = platform.release;
 
   return (
-    <main>
-      <PageHero eyebrow={page.eyebrow} title={platform.label} lead={page.lead} />
-      <section className="section alt">
-        <div className="section-inner detail-layout">
-          <Breadcrumbs
-            locale={locale}
-            items={[
-              { label: adminHome.nav.home, href: "/admin/" },
-              { label: adminHome.nav.downloads, href: "/admin/downloads/" },
-              { label: platform.label }
-            ]}
-          />
-          <AdminNav locale={locale} labels={adminHome.nav} current="downloads" />
-          <article className="card detail-card">
-            <h3>{page.current}</h3>
-            <p>{release.version || page.noVersion}</p>
-            <p className="muted-line">{page.status}: {release.isPublished ? page.published : page.draft}</p>
-            <p className="muted-line">{messages.forms.downloads.uploadStatus}: {getUploadStatusLabel(messages.forms.downloads, release.uploadStatus)}</p>
-            <p className="muted-line">{page.file}: {release.storagePath || release.externalUrl || page.noFile}</p>
-            {release.originalFilename ? <p className="muted-line">{page.originalFile}: {release.originalFilename}</p> : null}
-            {release.fileSize ? <p className="muted-line">{page.fileSize}: {formatFileSize(release.fileSize)}</p> : null}
-            {release.checksumSha256 ? <code className="checksum-line">SHA-256: {release.checksumSha256}</code> : null}
-            {release.publishedAt ? <p className="muted-line">{page.publishedAt}: {formatDate(release.publishedAt, locale)}</p> : null}
-          </article>
-          <AdminDownloadForm platform={platform} labels={messages.forms.downloads} />
-        </div>
-      </section>
-    </main>
+    <AdminShell
+      locale={locale}
+      labels={adminHome}
+      current="downloads"
+      eyebrow={page.eyebrow}
+      title={platform.label}
+      lead={page.lead}
+      breadcrumbs={[
+        { label: adminHome.nav.home, href: "/admin/" },
+        { label: adminHome.nav.downloads, href: "/admin/downloads/" },
+        { label: platform.label }
+      ]}
+    >
+      <div className="admin-detail-layout">
+        <article className="admin-panel detail-card">
+          <h3>{page.current}</h3>
+          <p>{release.version || page.noVersion}</p>
+          <p className="muted-line">{page.status}: {release.isPublished ? page.published : page.draft}</p>
+          <p className="muted-line">{messages.forms.downloads.uploadStatus}: {getUploadStatusLabel(messages.forms.downloads, release.uploadStatus)}</p>
+          <p className="muted-line">{page.file}: {release.storagePath || release.externalUrl || page.noFile}</p>
+          {release.originalFilename ? <p className="muted-line">{page.originalFile}: {release.originalFilename}</p> : null}
+          {release.fileSize ? <p className="muted-line">{page.fileSize}: {formatFileSize(release.fileSize)}</p> : null}
+          {release.checksumSha256 ? <code className="checksum-line">SHA-256: {release.checksumSha256}</code> : null}
+          {release.publishedAt ? <p className="muted-line">{page.publishedAt}: {formatDate(release.publishedAt, locale)}</p> : null}
+        </article>
+        <AdminDownloadForm platform={platform} labels={messages.forms.downloads} />
+      </div>
+    </AdminShell>
   );
 }

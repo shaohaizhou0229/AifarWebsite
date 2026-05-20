@@ -1,8 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { AdminNav } from "@/components/AdminNav";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { PageHero } from "@/components/PageHero";
+import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
 import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
@@ -39,11 +37,7 @@ export default async function AdminContactPage({ params, searchParams }) {
     await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.contact);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
-      return (
-        <main>
-          <PageHero eyebrow={page.eyebrow} title={page.deniedTitle} lead={page.deniedLead} />
-        </main>
-      );
+      return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
     }
     redirect(localizedPath(locale, "/login/"));
   }
@@ -53,42 +47,43 @@ export default async function AdminContactPage({ params, searchParams }) {
   const tickets = await listAdminTickets(status);
 
   return (
-    <main>
-      <PageHero eyebrow={page.eyebrow} title={page.title} lead={page.lead} />
-      <section className="section alt">
-        <div className="section-inner">
-          <Breadcrumbs
-            locale={locale}
-            items={[
-              { label: adminHome.nav.home, href: "/admin/" },
-              { label: page.breadcrumb }
-            ]}
-          />
-          <AdminNav locale={locale} labels={adminHome.nav} current="contact" />
-          <div className="status-actions">
-            <a className="button secondary" href={localizedPath(locale, "/admin/contact/")}>{page.all}</a>
-            <a className="button secondary" href={`${localizedPath(locale, "/admin/contact/")}?status=new`}>{page.new}</a>
-            <a className="button secondary" href={`${localizedPath(locale, "/admin/contact/")}?status=in_progress`}>{page.inProgress}</a>
-            <a className="button secondary" href={`${localizedPath(locale, "/admin/contact/")}?status=closed`}>{page.closed}</a>
-          </div>
-          <div className="release-list">
-            {tickets.length ? tickets.map((ticket) => (
-              <a className="release" key={ticket.id} href={localizedPath(locale, `/admin/tickets/${ticket.id}/`)}>
-                <div>
-                  <h3>{ticket.subject || getRequestTypeLabel(messages.forms, ticket.requestType)}</h3>
-                  <p>{formatDate(ticket.createdAt, locale)} - {ticket.name} - {ticket.workEmail}</p>
-                </div>
-                <span className="pill">{getTicketStatusLabel(messages.forms.admin, ticket.status)}</span>
-              </a>
-            )) : (
-              <article className="card admin-empty-state">
-                <h2>{page.emptyTitle}</h2>
-                <p>{page.emptyLead}</p>
-              </article>
-            )}
-          </div>
+    <AdminShell
+      locale={locale}
+      labels={adminHome}
+      current="contact"
+      eyebrow={page.eyebrow}
+      title={page.title}
+      lead={page.lead}
+      breadcrumbs={[
+        { label: adminHome.nav.home, href: "/admin/" },
+        { label: page.breadcrumb }
+      ]}
+      actions={(
+        <div className="admin-segmented">
+          <a href={localizedPath(locale, "/admin/contact/")}>{page.all}</a>
+          <a href={`${localizedPath(locale, "/admin/contact/")}?status=new`}>{page.new}</a>
+          <a href={`${localizedPath(locale, "/admin/contact/")}?status=in_progress`}>{page.inProgress}</a>
+          <a href={`${localizedPath(locale, "/admin/contact/")}?status=closed`}>{page.closed}</a>
         </div>
-      </section>
-    </main>
+      )}
+    >
+      <div className="admin-table-list">
+        {tickets.length ? tickets.map((ticket) => (
+          <a className="admin-table-row" key={ticket.id} href={localizedPath(locale, `/admin/tickets/${ticket.id}/`)}>
+            <div>
+              <h3>{ticket.subject || getRequestTypeLabel(messages.forms, ticket.requestType)}</h3>
+              <p>{ticket.name} - {ticket.workEmail}</p>
+            </div>
+            <time>{formatDate(ticket.createdAt, locale)}</time>
+            <span className="admin-status admin-status-neutral">{getTicketStatusLabel(messages.forms.admin, ticket.status)}</span>
+          </a>
+        )) : (
+          <article className="admin-panel admin-empty-state">
+            <h2>{page.emptyTitle}</h2>
+            <p>{page.emptyLead}</p>
+          </article>
+        )}
+      </div>
+    </AdminShell>
   );
 }

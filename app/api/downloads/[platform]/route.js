@@ -1,12 +1,33 @@
 import { NextResponse } from "next/server";
 import { createPublicSupabaseClient, getCurrentUser } from "@/lib/auth";
 import { DOWNLOAD_BUCKET, clientReleaseFileExists, getPublishedRelease, sanitizePlatform } from "@/lib/downloads";
+import { getReferrerHost, getUserAgentFamily, recordSiteAnalyticsEvent } from "@/lib/site-analytics";
 import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET(_request, { params }) {
+function getLocaleFromReferrer(request) {
+  try {
+    const url = new URL(request.headers.get("referer") || "");
+    const [, locale] = url.pathname.split("/");
+    return locale;
+  } catch {
+    return "";
+  }
+}
+
+async function recordDownloadClick(request, platformKey) {
+  await recordSiteAnalyticsEvent({
+    path: `/downloads/${platformKey}/`,
+    locale: getLocaleFromReferrer(request),
+    eventType: "download_click",
+    referrerHost: getReferrerHost(request.headers.get("referer") || ""),
+    userAgentFamily: getUserAgentFamily(request.headers.get("user-agent") || "")
+  });
+}
+
+export async function GET(request, { params }) {
   const { platform } = await params;
   const platformKey = sanitizePlatform(platform);
 
@@ -21,6 +42,7 @@ export async function GET(_request, { params }) {
   }
 
   if (result.release.externalUrl) {
+    await recordDownloadClick(request, platformKey);
     const user = await getCurrentUser();
     await recordUserFootprint({
       userId: user?.id,
@@ -54,6 +76,7 @@ export async function GET(_request, { params }) {
   }
 
   const user = await getCurrentUser();
+  await recordDownloadClick(request, platformKey);
   await recordUserFootprint({
     userId: user?.id,
     actorUserId: user?.id,

@@ -1,9 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
-import { AdminNav } from "@/components/AdminNav";
+import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
 import { AdminUserForm } from "@/components/AdminUserForm";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { PageHero } from "@/components/PageHero";
 import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getAdminUser, getProfile } from "@/lib/profiles";
@@ -46,11 +44,7 @@ export default async function AdminUserDetailPage({ params }) {
     await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.users);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
-      return (
-        <main>
-          <PageHero eyebrow={page.eyebrow} title={page.deniedTitle} lead={page.deniedLead} />
-        </main>
-      );
+      return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
     }
     redirect(localizedPath(locale, "/login/"));
   }
@@ -64,48 +58,48 @@ export default async function AdminUserDetailPage({ params }) {
   ]);
 
   return (
-    <main>
-      <PageHero eyebrow={page.eyebrow} title={user.displayName || user.email} lead={`${page.role}: ${page.form.roles[user.role] || user.role} - ${page.form.accountStatus}: ${page.form.statuses[user.accountStatus] || user.accountStatus} - ${page.createdAt} ${formatDate(user.createdAt, locale)}`} />
-      <section className="section alt">
-        <div className="section-inner detail-layout">
-          <Breadcrumbs
-            locale={locale}
-            items={[
-              { label: adminHome.nav.home, href: "/admin/" },
-              { label: adminHome.nav.users, href: "/admin/users/" },
-              { label: page.breadcrumb }
-            ]}
-          />
-          <AdminNav locale={locale} labels={adminHome.nav} current="users" />
-          <article className="card detail-card">
-            <h2>{page.profileTitle}</h2>
-            <AdminUserForm user={user} labels={page.form} />
-          </article>
-          <div className="reply-list">
-            <h2>{page.ticketsTitle}</h2>
-            {tickets.length ? tickets.map((ticket) => (
-              <a className="release" key={ticket.id} href={localizedPath(locale, `/admin/tickets/${ticket.id}/`)}>
-                <div>
-                  <h3>{ticket.subject || getRequestTypeLabel(messages.forms, ticket.requestType)}</h3>
-                  <p>{formatDate(ticket.createdAt, locale)} - {ticket.workEmail}</p>
-                </div>
-                <span className="pill">{getTicketStatusLabel(messages.forms.admin, ticket.status)}</span>
-              </a>
-            )) : <p className="muted-line">{page.noTickets}</p>}
-          </div>
-          <div className="reply-list">
-            <h2>{page.footprintsTitle}</h2>
-            {footprints.length ? footprints.map((footprint) => (
-              <article className="card detail-card" key={footprint.id}>
-                <span className="pill">{footprintLabel(page, footprint.eventType)}</span>
-                <h3>{footprint.summary}</h3>
-                <p className="muted-line">{formatDate(footprint.createdAt, locale)}</p>
-                {footprint.actorEmail ? <p className="muted-line">{page.actor}: {footprint.actorName || footprint.actorEmail}</p> : null}
-              </article>
-            )) : <p className="muted-line">{page.noFootprints}</p>}
-          </div>
+    <AdminShell
+      locale={locale}
+      labels={adminHome}
+      current="users"
+      eyebrow={page.eyebrow}
+      title={user.displayName || user.email}
+      lead={`${page.role}: ${page.form.roles[user.role] || user.role} - ${page.form.accountStatus}: ${page.form.statuses[user.accountStatus] || user.accountStatus} - ${page.createdAt} ${formatDate(user.createdAt, locale)}`}
+      breadcrumbs={[
+        { label: adminHome.nav.home, href: "/admin/" },
+        { label: adminHome.nav.users, href: "/admin/users/" },
+        { label: page.breadcrumb }
+      ]}
+    >
+      <div className="admin-detail-layout">
+        <article className="admin-panel detail-card">
+          <h2>{page.profileTitle}</h2>
+          <AdminUserForm user={user} labels={page.form} />
+        </article>
+        <div className="reply-list admin-panel">
+          <h2>{page.ticketsTitle}</h2>
+          {tickets.length ? tickets.map((ticket) => (
+            <a className="release" key={ticket.id} href={localizedPath(locale, `/admin/tickets/${ticket.id}/`)}>
+              <div>
+                <h3>{ticket.subject || getRequestTypeLabel(messages.forms, ticket.requestType)}</h3>
+                <p>{formatDate(ticket.createdAt, locale)} - {ticket.workEmail}</p>
+              </div>
+              <span className="admin-status admin-status-neutral">{getTicketStatusLabel(messages.forms.admin, ticket.status)}</span>
+            </a>
+          )) : <p className="muted-line">{page.noTickets}</p>}
         </div>
-      </section>
-    </main>
+        <div className="reply-list">
+          <h2>{page.footprintsTitle}</h2>
+          {footprints.length ? footprints.map((footprint) => (
+            <article className="admin-panel detail-card" key={footprint.id}>
+              <span className="admin-status admin-status-neutral">{footprintLabel(page, footprint.eventType)}</span>
+              <h3>{footprint.summary}</h3>
+              <p className="muted-line">{formatDate(footprint.createdAt, locale)}</p>
+              {footprint.actorEmail ? <p className="muted-line">{page.actor}: {footprint.actorName || footprint.actorEmail}</p> : null}
+            </article>
+          )) : <p className="muted-line">{page.noFootprints}</p>}
+        </div>
+      </div>
+    </AdminShell>
   );
 }

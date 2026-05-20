@@ -22,9 +22,9 @@ const FALLBACK_LABELS = {
   collaboration: "Collaboration"
 };
 
-export function AdminNav({ locale, labels = {}, current = "home" }) {
+export function AdminNav({ locale, labels = {}, current = "home", variant = "inline" }) {
   return (
-    <div className="admin-nav" aria-label={labels.label || "Admin sections"}>
+    <div className={`admin-nav admin-nav-${variant}`} aria-label={labels.label || "Admin sections"}>
       {ADMIN_ITEMS.map(([key, href]) => (
         <a
           key={key}

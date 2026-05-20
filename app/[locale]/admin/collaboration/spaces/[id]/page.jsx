@@ -1,12 +1,10 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
-import { AdminNav } from "@/components/AdminNav";
+import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
 import {
   CollaborationMemberForm,
   CollaborationTaskForm
 } from "@/components/AdminCollaborationForms";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { PageHero } from "@/components/PageHero";
 import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getCollaborationSpace } from "@/lib/collaboration";
@@ -48,11 +46,7 @@ export default async function AdminCollaborationSpacePage({ params }) {
     user = context.user;
   } catch (error) {
     if (error instanceof AdminRequiredError) {
-      return (
-        <main>
-          <PageHero eyebrow={page.eyebrow} title={page.deniedTitle} lead={page.deniedLead} />
-        </main>
-      );
+      return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
     }
     redirect(localizedPath(locale, "/login/"));
   }
@@ -65,20 +59,21 @@ export default async function AdminCollaborationSpacePage({ params }) {
   const isLeader = space.leaderUserId === user.id;
 
   return (
-    <main>
-      <PageHero eyebrow={page.eyebrow} title={space.name} lead={space.description || page.noDescription} />
-      <section className="section alt">
-        <div className="section-inner detail-layout">
-          <Breadcrumbs
-            locale={locale}
-            items={[
-              { label: adminHome.nav.home, href: "/admin/" },
-              { label: listPage.breadcrumb, href: "/admin/collaboration/" },
-              { label: space.name }
-            ]}
-          />
-          <AdminNav locale={locale} labels={adminHome.nav} current="collaboration" />
-          <article className="card detail-card">
+    <AdminShell
+      locale={locale}
+      labels={adminHome}
+      current="collaboration"
+      eyebrow={page.eyebrow}
+      title={space.name}
+      lead={space.description || page.noDescription}
+      breadcrumbs={[
+        { label: adminHome.nav.home, href: "/admin/" },
+        { label: listPage.breadcrumb, href: "/admin/collaboration/" },
+        { label: space.name }
+      ]}
+    >
+      <div className="admin-detail-layout">
+          <article className="admin-panel detail-card">
             <h2>{page.membersTitle}</h2>
             <div className="permission-matrix">
               <div className="permission-row header">
@@ -112,16 +107,16 @@ export default async function AdminCollaborationSpacePage({ params }) {
               />
             ) : null}
           </article>
-          <article className="card detail-card">
+          <article className="admin-panel detail-card">
             <h2>{page.createTaskTitle}</h2>
             <CollaborationTaskForm spaceId={space.id} labels={page.taskForm} locale={locale} />
           </article>
           <div className="release-list">
             {space.tasks.length ? space.tasks.map((task) => (
-              <article className="card detail-card collaboration-task" key={task.id}>
+              <article className="admin-panel detail-card collaboration-task" key={task.id}>
                 <div className="task-heading">
                   <div>
-                    <span className="pill">{page.taskTypes[task.taskType] || task.taskType}</span>
+                    <span className="admin-status admin-status-neutral">{page.taskTypes[task.taskType] || task.taskType}</span>
                     <h2>{task.title}</h2>
                     <p>{task.description || page.noDescription}</p>
                     <p className="muted-line">{page.dueAt}: {formatDate(task.dueAt, locale) || page.notProvided}</p>
@@ -145,7 +140,7 @@ export default async function AdminCollaborationSpacePage({ params }) {
                       href={localizedPath(locale, `/admin/collaboration/subtasks/${subtask.id}/`)}
                     >
                       <div>
-                        <span className="pill">{page.statuses[subtask.status] || subtask.status}</span>
+                        <span className="admin-status admin-status-neutral">{page.statuses[subtask.status] || subtask.status}</span>
                         <h3>{subtask.title}</h3>
                         <p>{subtask.description || page.noDescription}</p>
                         <p className="muted-line">
@@ -163,14 +158,13 @@ export default async function AdminCollaborationSpacePage({ params }) {
                 </a>
               </article>
             )) : (
-              <article className="card admin-empty-state">
+              <article className="admin-panel admin-empty-state">
                 <h2>{page.emptyTasksTitle}</h2>
                 <p>{page.emptyTasksLead}</p>
               </article>
             )}
           </div>
-        </div>
-      </section>
-    </main>
+      </div>
+    </AdminShell>
   );
 }

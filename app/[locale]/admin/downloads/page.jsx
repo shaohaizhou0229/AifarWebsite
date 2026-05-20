@@ -1,8 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { AdminNav } from "@/components/AdminNav";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { PageHero } from "@/components/PageHero";
+import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
 import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { listAdminDownloadPlatforms } from "@/lib/downloads";
 import { getProfile } from "@/lib/profiles";
@@ -38,11 +36,7 @@ export default async function AdminDownloadsPage({ params }) {
     await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.downloads);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
-      return (
-        <main>
-          <PageHero eyebrow={page.eyebrow} title={page.deniedTitle} lead={page.deniedLead} />
-        </main>
-      );
+      return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
     }
     redirect(localizedPath(locale, "/login/"));
   }
@@ -50,31 +44,30 @@ export default async function AdminDownloadsPage({ params }) {
   const platforms = await listAdminDownloadPlatforms();
 
   return (
-    <main>
-      <PageHero eyebrow={page.eyebrow} title={page.title} lead={page.lead} />
-      <section className="section alt">
-        <div className="section-inner">
-          <Breadcrumbs
-            locale={locale}
-            items={[
-              { label: adminNav.home, href: "/admin/" },
-              { label: page.breadcrumb }
-            ]}
-          />
-          <AdminNav locale={locale} labels={adminNav} current="downloads" />
-          <div className="release-list">
-            {platforms.map((platform) => (
-              <a className="release" key={platform.key} href={localizedPath(locale, `/admin/downloads/${platform.key}/`)}>
-                <div>
-                  <h3>{platform.label}</h3>
-                  <p>{platform.release.version || page.noVersion}</p>
-                </div>
-                <span className="pill">{formatStatus(platform.release, page)}</span>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-    </main>
+    <AdminShell
+      locale={locale}
+      labels={adminHome}
+      current="downloads"
+      eyebrow={page.eyebrow}
+      title={page.title}
+      lead={page.lead}
+      breadcrumbs={[
+        { label: adminNav.home, href: "/admin/" },
+        { label: page.breadcrumb }
+      ]}
+    >
+      <div className="admin-table-list">
+        {platforms.map((platform) => (
+          <a className="admin-table-row" key={platform.key} href={localizedPath(locale, `/admin/downloads/${platform.key}/`)}>
+            <div>
+              <h3>{platform.label}</h3>
+              <p>{platform.release.version || page.noVersion}</p>
+            </div>
+            <span>{platform.release.buildNumber || "-"}</span>
+            <span className="admin-status admin-status-neutral">{formatStatus(platform.release, page)}</span>
+          </a>
+        ))}
+      </div>
+    </AdminShell>
   );
 }

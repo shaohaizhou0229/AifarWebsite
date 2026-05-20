@@ -1,8 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
-import { AdminNav } from "@/components/AdminNav";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { PageHero } from "@/components/PageHero";
+import { AdminAccessDenied, AdminShell } from "@/components/AdminShell";
 import { AdminRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
@@ -48,11 +46,7 @@ export default async function AdminSupportPage({ params, searchParams }) {
     await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.support);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
-      return (
-        <main>
-          <PageHero eyebrow={page.eyebrow} title={page.deniedTitle} lead={page.deniedLead} />
-        </main>
-      );
+      return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
     }
     redirect(localizedPath(locale, "/login/"));
   }
@@ -81,96 +75,94 @@ export default async function AdminSupportPage({ params, searchParams }) {
   ];
 
   return (
-    <main>
-      <PageHero eyebrow={page.eyebrow} title={page.title} lead={page.lead} />
-      <section className="section alt">
-        <div className="section-inner">
-          <Breadcrumbs
-            locale={locale}
-            items={[
-              { label: adminHome.nav.home, href: "/admin/" },
-              { label: page.breadcrumb }
-            ]}
-          />
-          <AdminNav locale={locale} labels={adminHome.nav} current="support" />
-          <div className="ticket-stat-grid">
-            {statCards.map(([label, value]) => (
-              <article className="ticket-stat" key={label}>
-                <span>{label}</span>
-                <strong>{value}</strong>
-              </article>
+    <AdminShell
+      locale={locale}
+      labels={adminHome}
+      current="support"
+      eyebrow={page.eyebrow}
+      title={page.title}
+      lead={page.lead}
+      breadcrumbs={[
+        { label: adminHome.nav.home, href: "/admin/" },
+        { label: page.breadcrumb }
+      ]}
+    >
+      <div className="ticket-stat-grid">
+        {statCards.map(([label, value]) => (
+          <article className="ticket-stat admin-panel" key={label}>
+            <span>{label}</span>
+            <strong>{value}</strong>
+          </article>
+        ))}
+      </div>
+      <form className="ticket-filter-bar admin-panel" action={localizedPath(locale, "/admin/support/")}>
+        <div className="field">
+          <label htmlFor="status">{page.filters.status}</label>
+          <select id="status" name="status" defaultValue={filters.status}>
+            <option value="">{page.filters.allStatuses}</option>
+            {STATUS_OPTIONS.map((option) => (
+              <option key={option} value={option}>{getTicketStatusLabel(adminLabels, option)}</option>
             ))}
-          </div>
-          <form className="ticket-filter-bar" action={localizedPath(locale, "/admin/support/")}>
-            <div className="field">
-              <label htmlFor="status">{page.filters.status}</label>
-              <select id="status" name="status" defaultValue={filters.status}>
-                <option value="">{page.filters.allStatuses}</option>
-                {STATUS_OPTIONS.map((option) => (
-                  <option key={option} value={option}>{getTicketStatusLabel(adminLabels, option)}</option>
-                ))}
-              </select>
-            </div>
-            <div className="field">
-              <label htmlFor="priority">{page.filters.priority}</label>
-              <select id="priority" name="priority" defaultValue={filters.priority}>
-                <option value="">{page.filters.allPriorities}</option>
-                {PRIORITY_OPTIONS.map((option) => (
-                  <option key={option} value={option}>{getTicketPriorityLabel(adminLabels, option)}</option>
-                ))}
-              </select>
-            </div>
-            <div className="field">
-              <label htmlFor="category">{page.filters.category}</label>
-              <select id="category" name="category" defaultValue={filters.category}>
-                <option value="">{page.filters.allCategories}</option>
-                {CATEGORY_OPTIONS.map((option) => (
-                  <option key={option} value={option}>{getTicketCategoryLabel(adminLabels, option)}</option>
-                ))}
-              </select>
-            </div>
-            <div className="field">
-              <label htmlFor="assignee">{page.filters.assignee}</label>
-              <select id="assignee" name="assignee" defaultValue={filters.assignee}>
-                <option value="">{page.filters.allAssignees}</option>
-                <option value="unassigned">{adminLabels.unassigned}</option>
-                {profiles.map((profile) => (
-                  <option key={profile.id} value={profile.id}>{profile.displayName || profile.email}</option>
-                ))}
-              </select>
-            </div>
-            <div className="field ticket-search-field">
-              <label htmlFor="q">{page.filters.keyword}</label>
-              <input id="q" name="q" defaultValue={filters.q} placeholder={page.filters.keywordPlaceholder} />
-            </div>
-            <button className="button primary" type="submit">{page.filters.apply}</button>
-            <a className="button secondary" href={localizedPath(locale, "/admin/support/")}>{page.filters.reset}</a>
-          </form>
-          <div className="ticket-table">
-            {tickets.length ? tickets.map((ticket) => (
-              <a className="ticket-row" key={ticket.id} href={localizedPath(locale, `/admin/tickets/${ticket.id}/`)}>
-                <div className="ticket-main">
-                  <h3>{ticket.subject || getRequestTypeLabel(messages.forms, ticket.requestType)}</h3>
-                  <p>{ticket.name} - {ticket.workEmail}</p>
-                  <span>{ticket.organization || page.notProvided}</span>
-                </div>
-                <div className="ticket-meta">
-                  <span className="pill">{getTicketStatusLabel(adminLabels, ticket.status)}</span>
-                  <span>{getTicketPriorityLabel(adminLabels, ticket.priority)}</span>
-                  <span>{getTicketCategoryLabel(adminLabels, ticket.category || "other")}</span>
-                  <span>{ticket.assigneeName || ticket.assigneeEmail || adminLabels.unassigned}</span>
-                  <span>{formatDate(ticket.updatedAt || ticket.createdAt, locale)}</span>
-                </div>
-              </a>
-            )) : (
-              <article className="card admin-empty-state">
-                <h2>{page.emptyTitle}</h2>
-                <p>{page.emptyLead}</p>
-              </article>
-            )}
-          </div>
+          </select>
         </div>
-      </section>
-    </main>
+        <div className="field">
+          <label htmlFor="priority">{page.filters.priority}</label>
+          <select id="priority" name="priority" defaultValue={filters.priority}>
+            <option value="">{page.filters.allPriorities}</option>
+            {PRIORITY_OPTIONS.map((option) => (
+              <option key={option} value={option}>{getTicketPriorityLabel(adminLabels, option)}</option>
+            ))}
+          </select>
+        </div>
+        <div className="field">
+          <label htmlFor="category">{page.filters.category}</label>
+          <select id="category" name="category" defaultValue={filters.category}>
+            <option value="">{page.filters.allCategories}</option>
+            {CATEGORY_OPTIONS.map((option) => (
+              <option key={option} value={option}>{getTicketCategoryLabel(adminLabels, option)}</option>
+            ))}
+          </select>
+        </div>
+        <div className="field">
+          <label htmlFor="assignee">{page.filters.assignee}</label>
+          <select id="assignee" name="assignee" defaultValue={filters.assignee}>
+            <option value="">{page.filters.allAssignees}</option>
+            <option value="unassigned">{adminLabels.unassigned}</option>
+            {profiles.map((profile) => (
+              <option key={profile.id} value={profile.id}>{profile.displayName || profile.email}</option>
+            ))}
+          </select>
+        </div>
+        <div className="field ticket-search-field">
+          <label htmlFor="q">{page.filters.keyword}</label>
+          <input id="q" name="q" defaultValue={filters.q} placeholder={page.filters.keywordPlaceholder} />
+        </div>
+        <button className="button primary compact" type="submit">{page.filters.apply}</button>
+        <a className="button secondary compact" href={localizedPath(locale, "/admin/support/")}>{page.filters.reset}</a>
+      </form>
+      <div className="ticket-table">
+        {tickets.length ? tickets.map((ticket) => (
+          <a className="ticket-row" key={ticket.id} href={localizedPath(locale, `/admin/tickets/${ticket.id}/`)}>
+            <div className="ticket-main">
+              <h3>{ticket.subject || getRequestTypeLabel(messages.forms, ticket.requestType)}</h3>
+              <p>{ticket.name} - {ticket.workEmail}</p>
+              <span>{ticket.organization || page.notProvided}</span>
+            </div>
+            <div className="ticket-meta">
+              <span className="admin-status admin-status-neutral">{getTicketStatusLabel(adminLabels, ticket.status)}</span>
+              <span>{getTicketPriorityLabel(adminLabels, ticket.priority)}</span>
+              <span>{getTicketCategoryLabel(adminLabels, ticket.category || "other")}</span>
+              <span>{ticket.assigneeName || ticket.assigneeEmail || adminLabels.unassigned}</span>
+              <span>{formatDate(ticket.updatedAt || ticket.createdAt, locale)}</span>
+            </div>
+          </a>
+        )) : (
+          <article className="admin-panel admin-empty-state">
+            <h2>{page.emptyTitle}</h2>
+            <p>{page.emptyLead}</p>
+          </article>
+        )}
+      </div>
+    </AdminShell>
   );
 }

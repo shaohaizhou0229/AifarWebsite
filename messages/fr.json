@@ -763,8 +763,8 @@
       "eyebrow": "Présentation Aifar",
       "deniedTitle": "Présentation Aifar",
       "deniedLead": "Présentation Aifar",
-      "title": "Présentation Aifar",
-      "lead": "Informations structurées sur les capacités et services Aifar.",
+      "title": "Vue de gestion.",
+      "lead": "Operations du site, travaux en attente et activite des modules en un coup d oeil.",
       "active": "Présentation Aifar",
       "planned": "Présentation Aifar",
       "nav": {
@@ -828,7 +828,110 @@
           "description": "Create spaces, assign tasks, track deadlines, and manage recurring work.",
           "status": "active"
         }
-      ]
+      ],
+      "shell": {
+        "brand": "Aifar",
+        "projectLabel": "Projet",
+        "projectName": "Aifar Website",
+        "workspace": "Console admin",
+        "notifications": "Notifications",
+        "account": "Compte",
+        "language": "Langue",
+        "breadcrumbs": "Fil d Ariane",
+        "auth": {
+          "signOut": "Se deconnecter",
+          "signingOut": "Deconnexion..."
+        }
+      },
+      "ranges": {
+        "today": "Aujourd hui",
+        "sevenDays": "7 jours",
+        "thirtyDays": "30 jours"
+      },
+      "metrics": {
+        "todayViews": "Visites du jour",
+        "totalViews": "Visites totales",
+        "downloadClicks": "Telechargements",
+        "newContacts": "Nouveaux contacts",
+        "openTickets": "Tickets ouverts",
+        "newUsers": "Nouveaux utilisateurs",
+        "draftContent": "Contenus brouillons",
+        "collaborationTodo": "Taches collaboration"
+      },
+      "traffic": {
+        "title": "Trafic du site",
+        "meta": "Visites anonymes du site public et clics de telechargement.",
+        "empty": "Aucune donnee de trafic pour le moment.",
+        "topPages": "Pages principales",
+        "languages": "Langues",
+        "downloads": "Telechargements"
+      },
+      "pending": {
+        "title": "Travail en attente",
+        "meta": "Elements inter-modules qui demandent une action admin.",
+        "empty": "Aucun travail en attente.",
+        "items": {
+          "newContacts": "Verifier les nouveaux contacts",
+          "unassignedTickets": "Assigner les tickets support",
+          "draftContent": "Verifier les brouillons",
+          "downloadGaps": "Publier ou configurer les telechargements",
+          "overdueSubtasks": "Verifier les sous-taches en retard"
+        }
+      },
+      "activity": {
+        "title": "Activite recente",
+        "meta": "Changements recents du site, support, utilisateurs, documents, telechargements et collaboration.",
+        "empty": "Aucune activite enregistree."
+      },
+      "health": {
+        "title": "Sante des modules",
+        "meta": "Preparation operationnelle par module.",
+        "notAvailable": "Non disponible",
+        "open": "Ouvrir",
+        "statuses": {
+          "ready": "Pret",
+          "needsReview": "A verifier",
+          "active": "Actif"
+        },
+        "modules": {
+          "product": {
+            "label": "Produit",
+            "summary": "Contenu du site et brouillons"
+          },
+          "downloads": {
+            "label": "Telechargements",
+            "summary": "Versions client et fichiers"
+          },
+          "users": {
+            "label": "Utilisateurs",
+            "summary": "Comptes, roles et invitations"
+          },
+          "docs": {
+            "label": "Docs",
+            "summary": "Documents publies et brouillons"
+          },
+          "support": {
+            "label": "Support",
+            "summary": "File des tickets support"
+          },
+          "contact": {
+            "label": "Contact",
+            "summary": "Demandes du formulaire"
+          },
+          "collaboration": {
+            "label": "Collaboration",
+            "summary": "Espaces, taches et sous-taches"
+          }
+        }
+      },
+      "quickActions": {
+        "inviteUser": "Inviter un utilisateur",
+        "newDocument": "Nouveau document",
+        "reviewTickets": "Voir les tickets",
+        "reviewContacts": "Voir les contacts",
+        "publishDownloads": "Publier telechargements",
+        "createSpace": "Creer un espace"
+      }
     },
     "adminProduct": {
       "seo": {

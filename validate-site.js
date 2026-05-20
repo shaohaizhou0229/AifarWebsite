@@ -146,7 +146,7 @@ for (const page of pages) {
     }
   }
 
-  if (!source.includes("<h1") && !source.includes("PageHero") && !source.includes("SitePageSections") && !source.includes("AdminPlaceholderPage")) {
+  if (!source.includes("<h1") && !source.includes("PageHero") && !source.includes("SitePageSections") && !source.includes("AdminShell") && !source.includes("AdminPlaceholderPage")) {
     console.error(`${page}: missing page heading`);
     failures += 1;
   }
@@ -169,8 +169,16 @@ for (const file of [
   "components/ProfileForm.jsx",
   "components/SignOutButton.jsx",
   "components/AdminTicketActions.jsx",
+  "components/AdminShell.jsx",
+  "components/AdminTopBar.jsx",
+  "components/AdminMetricCard.jsx",
+  "components/AdminDataPanel.jsx",
+  "components/AdminStatusPill.jsx",
+  "components/AdminActivityFeed.jsx",
+  "components/AdminHealthList.jsx",
   "components/AdminDownloadForm.jsx",
   "components/AdminDocumentForm.jsx",
+  "components/SiteAnalyticsTracker.jsx",
   "components/MarkdownContent.jsx",
   "components/AdminUserForm.jsx",
   "components/AdminCollaborationForms.jsx",
@@ -187,7 +195,11 @@ for (const file of [
   "messages/ar.json",
   "tools/normalize-i18n-messages.cjs",
   "middleware.js",
-  "next.config.js"
+  "next.config.js",
+  "lib/admin-dashboard.js",
+  "lib/site-analytics.js",
+  "app/api/analytics/track/route.js",
+  "supabase/migrations/20260520090000_add_site_analytics_events.sql"
 ]) {
   requireFile(file);
 }
