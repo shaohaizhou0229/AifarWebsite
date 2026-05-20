@@ -36,10 +36,38 @@ export function AdminUsersClient({ locale, page, initialQuery = "", initialStatu
         if (q) params.set("q", q);
         if (status) params.set("status", status);
         params.set("limit", "20");
+        params.set("metrics", "deferred");
         const response = await fetch(`/api/admin/users/?${params.toString()}`);
         const result = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(result.error || errorLabel);
-        if (!cancelled) setUsers(result.users || []);
+        const nextUsers = result.users || [];
+        if (!cancelled) {
+          setUsers(nextUsers);
+          setLoading(false);
+        }
+
+        const metricIds = nextUsers.filter((user) => user.recordType !== "invitation").map((user) => user.id).filter(Boolean);
+        if (metricIds.length) {
+          try {
+            const metricParams = new URLSearchParams();
+            metricParams.set("ids", metricIds.join(","));
+            const metricResponse = await fetch(`/api/admin/users/metrics/?${metricParams.toString()}`);
+            const metricResult = await metricResponse.json().catch(() => ({}));
+            if (metricResponse.ok && !cancelled) {
+              const metricById = new Map((metricResult.metrics || []).map((item) => [item.id, item]));
+              setUsers((currentUsers) => currentUsers.map((user) => {
+                const metrics = metricById.get(user.id);
+                return metrics ? {
+                  ...user,
+                  ticketCount: metrics.ticketCount,
+                  lastFootprintAt: metrics.lastFootprintAt
+                } : user;
+              }));
+            }
+          } catch {
+            // Metrics are secondary; the user list should remain usable if this follow-up request fails.
+          }
+        }
       } catch (loadError) {
         if (!cancelled) setError(loadError.message || errorLabel);
       } finally {

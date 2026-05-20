@@ -25,7 +25,8 @@ export async function GET(request) {
     await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.users);
     const url = new URL(request.url);
     const users = await listAdminUsers(url.searchParams.get("q") || "", url.searchParams.get("status") || "all", {
-      limit: url.searchParams.get("limit") || 20
+      limit: url.searchParams.get("limit") || 20,
+      includeMetrics: url.searchParams.get("metrics") !== "deferred"
     });
     return adminJson({ users });
   } catch (error) {
