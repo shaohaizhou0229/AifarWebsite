@@ -5,6 +5,7 @@ import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { createCollaborationSpace, listCollaborationSpaces, listMyCollaborationSubtasks } from "@/lib/collaboration";
 import { getProfile } from "@/lib/profiles";
 import { recordUserFootprint } from "@/lib/user-footprints";
+import { createServerTiming } from "@/lib/server-timing";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,13 +25,14 @@ function permissionError(error) {
 }
 
 export async function GET() {
+  const timing = createServerTiming();
   try {
-    const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.collaboration);
+    const { user } = await timing.measure("auth", () => requireAdminPermission(getProfile, ADMIN_PERMISSIONS.collaboration));
     const [spaces, subtasks] = await Promise.all([
-      listCollaborationSpaces(user.id),
-      listMyCollaborationSubtasks(user.id)
+      timing.measure("spaces", () => listCollaborationSpaces(user.id)),
+      timing.measure("subtasks", () => listMyCollaborationSubtasks(user.id))
     ]);
-    return adminJson({ spaces, subtasks });
+    return adminJson({ spaces, subtasks }, { headers: timing.headers() });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: "Unable to load collaboration spaces." }, { status: 500 });
   }

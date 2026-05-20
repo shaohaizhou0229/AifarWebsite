@@ -3,6 +3,7 @@ import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@
 import { adminJson } from "@/lib/admin-response";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getAdminUserMetrics, getProfile } from "@/lib/profiles";
+import { createServerTiming } from "@/lib/server-timing";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,12 +19,13 @@ function permissionError(error) {
 }
 
 export async function GET(request) {
+  const timing = createServerTiming();
   try {
-    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.users);
+    await timing.measure("auth", () => requireAdminPermission(getProfile, ADMIN_PERMISSIONS.users));
     const searchParams = new URL(request.url).searchParams;
     const ids = String(searchParams.get("ids") || "").split(",").map((id) => id.trim()).filter(Boolean);
-    const metrics = await getAdminUserMetrics(ids);
-    return adminJson({ metrics });
+    const metrics = await timing.measure("metrics", () => getAdminUserMetrics(ids));
+    return adminJson({ metrics }, { headers: timing.headers() });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: "Unable to load user metrics." }, { status: 500 });
   }

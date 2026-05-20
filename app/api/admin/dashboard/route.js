@@ -3,6 +3,7 @@ import { AdminRequiredError, AuthRequiredError, requireAdmin } from "@/lib/auth"
 import { adminJson } from "@/lib/admin-response";
 import { getAdminDashboardOverview } from "@/lib/admin-dashboard";
 import { getProfile } from "@/lib/profiles";
+import { createServerTiming } from "@/lib/server-timing";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,13 +19,14 @@ function permissionError(error) {
 }
 
 export async function GET(request) {
+  const timing = createServerTiming();
   try {
-    const context = await requireAdmin(getProfile);
+    const context = await timing.measure("auth", () => requireAdmin(getProfile));
     const searchParams = new URL(request.url).searchParams;
     const range = Number(searchParams.get("range") || 7);
-    const dashboard = await getAdminDashboardOverview({ userId: context.user.id, analyticsDays: range });
+    const dashboard = await timing.measure("data", () => getAdminDashboardOverview({ userId: context.user.id, analyticsDays: range }));
 
-    return adminJson({ dashboard });
+    return adminJson({ dashboard }, { headers: timing.headers() });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: "Unable to load dashboard." }, { status: 500 });
   }

@@ -7,6 +7,7 @@ import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprint
 import { EMAIL_EVENTS, enqueueAndTrySend, getSiteUrl } from "@/lib/email";
 import { buildInvitationEmail } from "@/lib/email/templates";
 import { createNotificationsForPermission, NOTIFICATION_EVENTS } from "@/lib/notifications";
+import { createServerTiming } from "@/lib/server-timing";
 
 export const runtime = "nodejs";
 
@@ -21,14 +22,15 @@ function permissionError(error) {
 }
 
 export async function GET(request) {
+  const timing = createServerTiming();
   try {
-    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.users);
+    await timing.measure("auth", () => requireAdminPermission(getProfile, ADMIN_PERMISSIONS.users));
     const url = new URL(request.url);
-    const users = await listAdminUsers(url.searchParams.get("q") || "", url.searchParams.get("status") || "all", {
+    const users = await timing.measure("users", () => listAdminUsers(url.searchParams.get("q") || "", url.searchParams.get("status") || "all", {
       limit: url.searchParams.get("limit") || 20,
       includeMetrics: url.searchParams.get("metrics") !== "deferred"
-    });
-    return adminJson({ users });
+    }));
+    return adminJson({ users }, { headers: timing.headers() });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: "Unable to load users." }, { status: 500 });
   }

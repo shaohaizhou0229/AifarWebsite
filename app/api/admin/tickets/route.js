@@ -4,6 +4,7 @@ import { adminJson } from "@/lib/admin-response";
 import { getProfile, listAdminProfiles } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getAdminTicketStats, listAdminTickets } from "@/lib/tickets";
+import { createServerTiming } from "@/lib/server-timing";
 
 export const runtime = "nodejs";
 
@@ -18,8 +19,9 @@ function permissionError(error) {
 }
 
 export async function GET(request) {
+  const timing = createServerTiming();
   try {
-    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.support);
+    await timing.measure("auth", () => requireAdminPermission(getProfile, ADMIN_PERMISSIONS.support));
     const searchParams = new URL(request.url).searchParams;
     const filters = {
       status: searchParams.get("status") || "",
@@ -30,11 +32,11 @@ export async function GET(request) {
       limit: searchParams.get("limit") || 20
     };
     const [tickets, stats, profiles] = await Promise.all([
-      listAdminTickets(filters),
-      getAdminTicketStats(),
-      listAdminProfiles()
+      timing.measure("tickets", () => listAdminTickets(filters)),
+      timing.measure("stats", () => getAdminTicketStats()),
+      timing.measure("profiles", () => listAdminProfiles())
     ]);
-    return adminJson({ tickets, stats, profiles });
+    return adminJson({ tickets, stats, profiles }, { headers: timing.headers() });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: "Unable to load tickets." }, { status: 500 });
   }

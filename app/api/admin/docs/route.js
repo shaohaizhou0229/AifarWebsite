@@ -10,6 +10,7 @@ import {
   saveDocumentVersion,
   uploadMarkdownToStorage
 } from "@/lib/documents";
+import { createServerTiming } from "@/lib/server-timing";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -39,11 +40,12 @@ function normalizeInput(body) {
 }
 
 export async function GET(request) {
+  const timing = createServerTiming();
   try {
-    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.docs);
+    await timing.measure("auth", () => requireAdminPermission(getProfile, ADMIN_PERMISSIONS.docs));
     const searchParams = new URL(request.url).searchParams;
-    const documents = await listAdminDocuments({ limit: searchParams.get("limit") || 20 });
-    return adminJson({ documents });
+    const documents = await timing.measure("documents", () => listAdminDocuments({ limit: searchParams.get("limit") || 20 }));
+    return adminJson({ documents }, { headers: timing.headers() });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: error.message || "Could not list documents." }, { status: 400 });
   }
