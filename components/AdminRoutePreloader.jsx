@@ -52,6 +52,14 @@ export function AdminRoutePreloader({ locale }) {
   const localePrefix = `/${locale}/admin`;
   const primaryRoutes = useMemo(() => PRIMARY_ADMIN_PATHS.map((path) => localizedPath(locale, path)), [locale]);
 
+  const warmDashboard = useCallback((rangeDays = 7) => {
+    loadAdminDashboard(locale, rangeDays).catch(() => {
+      window.setTimeout(() => {
+        loadAdminDashboard(locale, rangeDays, { force: true }).catch(() => {});
+      }, 1200);
+    });
+  }, [locale]);
+
   const prefetch = useCallback((href) => {
     if (!href || typeof window === "undefined") return;
 
@@ -73,7 +81,7 @@ export function AdminRoutePreloader({ locale }) {
 
     prefetched.current.add(key);
     if (isAdminHomePath(url.pathname, locale)) {
-      loadAdminDashboard(locale, Number(url.searchParams.get("range") || 7)).catch(() => {});
+      warmDashboard(Number(url.searchParams.get("range") || 7));
     }
 
     try {
@@ -85,7 +93,7 @@ export function AdminRoutePreloader({ locale }) {
     } catch {
       prefetched.current.delete(key);
     }
-  }, [locale, localePrefix, pathname, router]);
+  }, [locale, localePrefix, pathname, router, warmDashboard]);
 
   useEffect(() => {
     const timers = [];
@@ -96,7 +104,7 @@ export function AdminRoutePreloader({ locale }) {
       });
       if (!isAdminHomePath(pathname, locale)) {
         const dashboardTimer = window.setTimeout(() => {
-          loadAdminDashboard(locale, 7).catch(() => {});
+          warmDashboard(7);
         }, primaryRoutes.length * 140 + 180);
         timers.push(dashboardTimer);
       }

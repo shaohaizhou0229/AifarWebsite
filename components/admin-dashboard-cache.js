@@ -54,7 +54,7 @@ export async function loadAdminDashboard(locale, rangeDays, { force = false } = 
     return inFlight.get(cacheKey);
   }
 
-  const request = fetch(`/api/admin/dashboard/?range=${safeRange}`, { cache: "no-store" })
+  const request = fetch(`/api/admin/dashboard/?range=${safeRange}`, { cache: "no-store", credentials: "same-origin" })
     .then(async (response) => {
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || "Unable to load dashboard.");
