@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AdminAsyncState } from "@/components/AdminAsyncState";
 import { AdminInvitationActions } from "@/components/AdminInvitationActions";
@@ -17,15 +17,21 @@ function permissionSummary(user, page) {
   return names.length ? names.join(", ") : page.notProvided;
 }
 
-export function AdminUsersClient({ locale, page, initialQuery = "", initialStatus = "all", loadingLabel, errorLabel }) {
+export function AdminUsersClient({ locale, page, initialQuery = "", initialStatus = "all", initialUsers = null, loadingLabel, errorLabel }) {
   const router = useRouter();
+  const skipInitialFetch = useRef(Boolean(initialUsers));
   const [q, setQ] = useState(initialQuery);
   const [status, setStatus] = useState(initialStatus);
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState(initialUsers || []);
+  const [loading, setLoading] = useState(!initialUsers);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (skipInitialFetch.current) {
+      skipInitialFetch.current = false;
+      return undefined;
+    }
+
     let cancelled = false;
 
     async function loadUsers() {

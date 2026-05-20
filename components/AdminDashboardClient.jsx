@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   Download,
@@ -85,12 +85,18 @@ function localizeHealthItems(dashboard, page) {
   }));
 }
 
-export function AdminDashboardClient({ locale, page, rangeDays, loadingLabel, errorLabel }) {
-  const [dashboard, setDashboard] = useState(null);
-  const [loading, setLoading] = useState(true);
+export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard = null, loadingLabel, errorLabel }) {
+  const skipInitialFetch = useRef(Boolean(initialDashboard));
+  const [dashboard, setDashboard] = useState(initialDashboard);
+  const [loading, setLoading] = useState(!initialDashboard);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (skipInitialFetch.current) {
+      skipInitialFetch.current = false;
+      return undefined;
+    }
+
     let cancelled = false;
 
     async function loadDashboard() {

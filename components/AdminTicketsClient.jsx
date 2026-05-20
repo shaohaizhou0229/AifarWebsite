@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AdminAsyncState } from "@/components/AdminAsyncState";
 import { getRequestTypeLabel, getTicketCategoryLabel, getTicketPriorityLabel, getTicketStatusLabel } from "@/i18n/labels";
@@ -27,12 +27,18 @@ function buildQuery(filters = {}) {
   return params.toString();
 }
 
-export function AdminContactTicketsClient({ locale, page, messages, initialStatus = "", loadingLabel, errorLabel }) {
-  const [tickets, setTickets] = useState([]);
-  const [loading, setLoading] = useState(true);
+export function AdminContactTicketsClient({ locale, page, messages, initialStatus = "", initialTickets = null, loadingLabel, errorLabel }) {
+  const skipInitialFetch = useRef(Boolean(initialTickets));
+  const [tickets, setTickets] = useState(initialTickets || []);
+  const [loading, setLoading] = useState(!initialTickets);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (skipInitialFetch.current) {
+      skipInitialFetch.current = false;
+      return undefined;
+    }
+
     let cancelled = false;
 
     async function loadTickets() {
@@ -82,14 +88,15 @@ export function AdminContactTicketsClient({ locale, page, messages, initialStatu
   );
 }
 
-export function AdminSupportClient({ locale, page, messages, initialFilters, loadingLabel, errorLabel }) {
+export function AdminSupportClient({ locale, page, messages, initialFilters, initialData = null, loadingLabel, errorLabel }) {
   const router = useRouter();
   const adminLabels = messages.forms.admin;
+  const skipInitialFetch = useRef(Boolean(initialData));
   const [filters, setFilters] = useState(initialFilters);
-  const [tickets, setTickets] = useState([]);
-  const [stats, setStats] = useState({ pending: 0, inProgress: 0, today: 0, closed: 0 });
-  const [profiles, setProfiles] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [tickets, setTickets] = useState(initialData?.tickets || []);
+  const [stats, setStats] = useState(initialData?.stats || { pending: 0, inProgress: 0, today: 0, closed: 0 });
+  const [profiles, setProfiles] = useState(initialData?.profiles || []);
+  const [loading, setLoading] = useState(!initialData);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -97,6 +104,11 @@ export function AdminSupportClient({ locale, page, messages, initialFilters, loa
   }, [initialFilters]);
 
   useEffect(() => {
+    if (skipInitialFetch.current) {
+      skipInitialFetch.current = false;
+      return undefined;
+    }
+
     let cancelled = false;
 
     async function loadTickets() {

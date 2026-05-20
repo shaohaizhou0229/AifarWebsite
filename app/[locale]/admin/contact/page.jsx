@@ -6,7 +6,7 @@ import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { AdminRequiredError } from "@/lib/auth";
 import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { TICKET_STATUSES } from "@/lib/tickets";
+import { TICKET_STATUSES, listAdminTickets } from "@/lib/tickets";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -41,6 +41,7 @@ export default async function AdminContactPage({ params, searchParams }) {
 
   const query = await searchParams;
   const status = typeof query?.status === "string" && TICKET_STATUSES.has(query.status) ? query.status : "";
+  const initialTickets = await listAdminTickets({ status, limit: 20 });
 
   return (
     <>
@@ -63,7 +64,7 @@ export default async function AdminContactPage({ params, searchParams }) {
         </div>
       )}
     />
-      <AdminContactTicketsClient locale={locale} page={page} messages={messages} initialStatus={status} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
+      <AdminContactTicketsClient key={status || "all"} locale={locale} page={page} messages={messages} initialStatus={status} initialTickets={initialTickets} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
     </>
   );
 }

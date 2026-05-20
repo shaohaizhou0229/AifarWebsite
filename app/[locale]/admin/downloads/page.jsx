@@ -5,6 +5,7 @@ import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { AdminRequiredError } from "@/lib/auth";
 import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
+import { listAdminDownloadPlatforms } from "@/lib/downloads";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -38,6 +39,8 @@ export default async function AdminDownloadsPage({ params }) {
     redirect(localizedPath(locale, "/login/"));
   }
 
+  const initialPlatforms = await listAdminDownloadPlatforms();
+
   return (
     <>
       <AdminPageHeader
@@ -51,7 +54,7 @@ export default async function AdminDownloadsPage({ params }) {
         { label: page.breadcrumb }
       ]}
     />
-      <AdminDownloadsClient locale={locale} page={page} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
+      <AdminDownloadsClient locale={locale} page={page} initialPlatforms={initialPlatforms} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
     </>
   );
 }

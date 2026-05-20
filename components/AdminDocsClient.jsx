@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AdminAsyncState } from "@/components/AdminAsyncState";
 import { localizedPath } from "@/i18n/routing";
 
@@ -13,12 +13,18 @@ function categoryLabel(page, categoryKey, fallback) {
   return page.categories?.[categoryKey]?.label || fallback || categoryKey;
 }
 
-export function AdminDocsClient({ locale, page, loadingLabel, errorLabel }) {
-  const [documents, setDocuments] = useState([]);
-  const [loading, setLoading] = useState(true);
+export function AdminDocsClient({ locale, page, initialDocuments = null, loadingLabel, errorLabel }) {
+  const skipInitialFetch = useRef(Boolean(initialDocuments));
+  const [documents, setDocuments] = useState(initialDocuments || []);
+  const [loading, setLoading] = useState(!initialDocuments);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (skipInitialFetch.current) {
+      skipInitialFetch.current = false;
+      return undefined;
+    }
+
     let cancelled = false;
 
     async function loadDocuments() {

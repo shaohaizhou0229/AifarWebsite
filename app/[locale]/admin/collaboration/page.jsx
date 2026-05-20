@@ -6,6 +6,7 @@ import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { AdminRequiredError } from "@/lib/auth";
 import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
+import { listCollaborationSpaces, listMyCollaborationSubtasks } from "@/lib/collaboration";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -23,6 +24,7 @@ export async function generateMetadata({ params }) {
 export default async function AdminCollaborationPage({ params }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  let context;
   const [page, adminHome, messages] = await Promise.all([
     getPageMessages(locale, "adminCollaboration"),
     getPageMessages(locale, "adminHome"),
@@ -30,13 +32,18 @@ export default async function AdminCollaborationPage({ params }) {
   ]);
 
   try {
-    await requireAdminPermissionCached(ADMIN_PERMISSIONS.collaboration);
+    context = await requireAdminPermissionCached(ADMIN_PERMISSIONS.collaboration);
   } catch (error) {
     if (error instanceof AdminRequiredError) {
       return <AdminAccessDenied title={page.deniedTitle} lead={page.deniedLead} />;
     }
     redirect(localizedPath(locale, "/login/"));
   }
+
+  const [initialSpaces, initialSubtasks] = await Promise.all([
+    listCollaborationSpaces(context.user.id),
+    listMyCollaborationSubtasks(context.user.id)
+  ]);
 
   return (
     <>
@@ -56,7 +63,7 @@ export default async function AdminCollaborationPage({ params }) {
         <p>{page.createSpace.lead}</p>
         <CollaborationSpaceForm labels={page.createSpace.form} />
       </article>
-      <AdminCollaborationClient locale={locale} page={page} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
+      <AdminCollaborationClient locale={locale} page={page} initialSpaces={initialSpaces} initialSubtasks={initialSubtasks} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
     </>
   );
 }

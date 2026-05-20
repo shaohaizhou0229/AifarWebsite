@@ -6,6 +6,7 @@ import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { AdminRequiredError } from "@/lib/auth";
 import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
+import { listAdminDocuments } from "@/lib/documents";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -38,6 +39,8 @@ export default async function AdminDocsPage({ params }) {
     redirect(localizedPath(locale, "/login/"));
   }
 
+  const initialDocuments = await listAdminDocuments({ limit: 20 });
+
   return (
     <>
       <AdminPageHeader
@@ -52,7 +55,7 @@ export default async function AdminDocsPage({ params }) {
       ]}
       actions={<Link className="button primary compact" href={localizedPath(locale, "/admin/docs/new/")} prefetch={false}>{page.newDocument}</Link>}
     />
-      <AdminDocsClient locale={locale} page={page} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
+      <AdminDocsClient locale={locale} page={page} initialDocuments={initialDocuments} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
     </>
   );
 }

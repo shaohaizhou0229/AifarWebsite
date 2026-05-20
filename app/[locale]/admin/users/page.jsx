@@ -6,6 +6,7 @@ import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { AdminRequiredError } from "@/lib/auth";
 import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
+import { listAdminUsers } from "@/lib/profiles";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -41,6 +42,7 @@ export default async function AdminUsersPage({ params, searchParams }) {
   const query = await searchParams;
   const q = typeof query?.q === "string" ? query.q.trim() : "";
   const status = typeof query?.status === "string" ? query.status : "all";
+  const initialUsers = await listAdminUsers(q, status, { limit: 20 });
 
   return (
     <>
@@ -60,7 +62,7 @@ export default async function AdminUsersPage({ params, searchParams }) {
         <p>{page.invite.lead}</p>
         <AdminInviteUserForm labels={page.invite.form} />
       </article>
-      <AdminUsersClient locale={locale} page={page} initialQuery={q} initialStatus={status} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
+      <AdminUsersClient key={`${q}:${status}`} locale={locale} page={page} initialQuery={q} initialStatus={status} initialUsers={initialUsers} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
     </>
   );
 }

@@ -5,7 +5,8 @@ import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { AdminRequiredError } from "@/lib/auth";
 import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { TICKET_CATEGORIES, TICKET_PRIORITIES, TICKET_STATUSES } from "@/lib/tickets";
+import { listAdminProfiles } from "@/lib/profiles";
+import { TICKET_CATEGORIES, TICKET_PRIORITIES, TICKET_STATUSES, getAdminTicketStats, listAdminTickets } from "@/lib/tickets";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -51,6 +52,12 @@ export default async function AdminSupportPage({ params, searchParams }) {
     assignee: typeof query?.assignee === "string" ? query.assignee : "",
     q: typeof query?.q === "string" ? query.q.trim() : ""
   };
+  const [tickets, stats, profiles] = await Promise.all([
+    listAdminTickets({ ...filters, limit: 20 }),
+    getAdminTicketStats(),
+    listAdminProfiles()
+  ]);
+  const initialData = { tickets, stats, profiles };
 
   return (
     <>
@@ -65,7 +72,7 @@ export default async function AdminSupportPage({ params, searchParams }) {
         { label: page.breadcrumb }
       ]}
     />
-      <AdminSupportClient locale={locale} page={page} messages={messages} initialFilters={filters} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
+      <AdminSupportClient key={JSON.stringify(filters)} locale={locale} page={page} messages={messages} initialFilters={filters} initialData={initialData} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
     </>
   );
 }

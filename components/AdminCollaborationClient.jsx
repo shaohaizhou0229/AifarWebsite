@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AdminAsyncState } from "@/components/AdminAsyncState";
 import { localizedPath } from "@/i18n/routing";
@@ -9,10 +9,22 @@ function formatDate(value, locale) {
   return value ? new Date(value).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" }) : "";
 }
 
-export function AdminCollaborationClient({ locale, page, loadingLabel, errorLabel }) {
-  const [state, setState] = useState({ status: "loading", spaces: [], subtasks: [], error: "" });
+export function AdminCollaborationClient({ locale, page, initialSpaces = null, initialSubtasks = null, loadingLabel, errorLabel }) {
+  const hasInitialData = Array.isArray(initialSpaces) && Array.isArray(initialSubtasks);
+  const skipInitialFetch = useRef(hasInitialData);
+  const [state, setState] = useState({
+    status: hasInitialData ? "ready" : "loading",
+    spaces: initialSpaces || [],
+    subtasks: initialSubtasks || [],
+    error: ""
+  });
 
   useEffect(() => {
+    if (skipInitialFetch.current) {
+      skipInitialFetch.current = false;
+      return undefined;
+    }
+
     let active = true;
 
     async function loadCollaboration() {

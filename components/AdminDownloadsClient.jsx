@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AdminAsyncState } from "@/components/AdminAsyncState";
 import { localizedPath } from "@/i18n/routing";
 
@@ -9,12 +9,18 @@ function formatStatus(release, page) {
   return release.isPublished ? page.published : page.draft;
 }
 
-export function AdminDownloadsClient({ locale, page, loadingLabel, errorLabel }) {
-  const [platforms, setPlatforms] = useState([]);
-  const [loading, setLoading] = useState(true);
+export function AdminDownloadsClient({ locale, page, initialPlatforms = null, loadingLabel, errorLabel }) {
+  const skipInitialFetch = useRef(Boolean(initialPlatforms));
+  const [platforms, setPlatforms] = useState(initialPlatforms || []);
+  const [loading, setLoading] = useState(!initialPlatforms);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (skipInitialFetch.current) {
+      skipInitialFetch.current = false;
+      return undefined;
+    }
+
     let cancelled = false;
 
     async function loadPlatforms() {

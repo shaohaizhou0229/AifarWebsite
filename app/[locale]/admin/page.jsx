@@ -1,6 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
 import { AdminDashboardClient } from "@/components/AdminDashboardClient";
 import { AdminPageHeader } from "@/components/AdminShell";
+import { getAdminShellContext } from "@/lib/admin-context";
+import { getAdminDashboardOverview } from "@/lib/admin-dashboard";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { buildMetadata } from "@/i18n/seo";
 
@@ -23,6 +25,8 @@ export default async function AdminHomePage({ params, searchParams }) {
   ]);
   const query = await searchParams;
   const rangeDays = [1, 7, 30].includes(Number(query?.range)) ? Number(query.range) : 7;
+  const context = await getAdminShellContext();
+  const initialDashboard = await getAdminDashboardOverview({ userId: context.user.id, analyticsDays: rangeDays });
 
   return (
     <>
@@ -33,7 +37,7 @@ export default async function AdminHomePage({ params, searchParams }) {
       title={page.title}
       lead={page.lead}
     />
-      <AdminDashboardClient locale={locale} page={page} rangeDays={rangeDays} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
+      <AdminDashboardClient key={rangeDays} locale={locale} page={page} rangeDays={rangeDays} initialDashboard={initialDashboard} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
     </>
   );
 }
