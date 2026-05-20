@@ -4,25 +4,34 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { ActiveNavLink } from "@/components/ActiveNavLink";
 import { SignOutButton } from "@/components/SignOutButton";
+import { clearSiteSessionCache, createSiteSession, readSiteSessionCache, writeSiteSessionCache } from "@/components/site-session-cache";
 import { localizedPath } from "@/i18n/routing";
 
 function isProfileActive(profile) {
   return !profile || !profile.accountStatus || profile.accountStatus === "active";
 }
 
-function countUnread(notifications = []) {
-  return notifications.filter((notification) => !notification.readAt).length;
+function isAccountPath(pathname, locale) {
+  return pathname === `/${locale}/account/` || pathname?.startsWith(`/${locale}/account/`);
 }
 
 export function SiteSessionNav({ locale, nav, authLabels }) {
   const pathname = usePathname();
   const isAdminPath = pathname === `/${locale}/admin/` || pathname?.startsWith(`/${locale}/admin/`);
-  const [session, setSession] = useState({ user: null, profile: null, unreadCount: 0 });
+  const [session, setSession] = useState(() => (
+    isAccountPath(pathname, locale) ? { user: { id: "account-page" }, profile: null, unreadCount: 0 } : { user: null, profile: null, unreadCount: 0 }
+  ));
 
   useEffect(() => {
     if (isAdminPath) return undefined;
 
     const controller = new AbortController();
+    const cachedSession = readSiteSessionCache();
+    if (cachedSession) {
+      setSession(cachedSession);
+    } else if (isAccountPath(pathname, locale)) {
+      setSession((current) => current.user ? current : { user: { id: "account-page" }, profile: null, unreadCount: 0 });
+    }
 
     async function loadSession() {
       try {
@@ -35,28 +44,19 @@ export function SiteSessionNav({ locale, nav, authLabels }) {
 
         const result = await response.json();
         const active = result.user && isProfileActive(result.profile);
-        let unreadCount = 0;
-
-        if (active) {
-          const notificationsResponse = await fetch("/api/notifications/?limit=100", {
-            cache: "no-store",
-            credentials: "same-origin",
-            signal: controller.signal
-          }).catch(() => null);
-          if (notificationsResponse?.ok) {
-            const notificationsResult = await notificationsResponse.json();
-            unreadCount = countUnread(notificationsResult.notifications || []);
-          }
-        }
+        const nextSession = active ? createSiteSession(result) : null;
 
         if (controller.signal.aborted) return;
-        setSession({
-          user: active ? result.user : null,
-          profile: active ? result.profile : null,
-          unreadCount
-        });
+        if (nextSession) {
+          writeSiteSessionCache(nextSession);
+          setSession(nextSession);
+        } else {
+          clearSiteSessionCache();
+          setSession({ user: null, profile: null, unreadCount: 0 });
+        }
       } catch (error) {
         if (error?.name !== "AbortError") {
+          clearSiteSessionCache();
           setSession({ user: null, profile: null, unreadCount: 0 });
         }
       }
@@ -64,7 +64,7 @@ export function SiteSessionNav({ locale, nav, authLabels }) {
 
     loadSession();
     return () => controller.abort();
-  }, [isAdminPath]);
+  }, [isAdminPath, locale, pathname]);
 
   if (isAdminPath) return null;
 

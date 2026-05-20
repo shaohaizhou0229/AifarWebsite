@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createSiteSession, writeSiteSessionCache } from "@/components/site-session-cache";
 
 export function AuthForm({ mode, labels, accountPath, loginPath, registerPath, initialError = "", initialEmail = "", authRedirectPath = "" }) {
   const isRegister = mode === "register";
@@ -44,6 +45,8 @@ export function AuthForm({ mode, labels, accountPath, loginPath, registerPath, i
         return;
       }
 
+      const nextSession = createSiteSession(result);
+      if (nextSession) writeSiteSessionCache(nextSession);
       window.location.assign(accountPath);
     } catch (error) {
       setStatus({ type: "error", message: error.message });
