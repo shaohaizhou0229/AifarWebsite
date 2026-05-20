@@ -1,6 +1,6 @@
 import { locales, localizedPath, normalizePathname } from "./routing";
 
-export const siteUrl = "https://www.aifar.com";
+export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://aifarapp.com";
 
 export const publicPathnames = [
   "/",
