@@ -14,9 +14,15 @@ Then open `http://localhost:3000`.
 ## Validate
 
 ```powershell
+npm run test
 npm run validate
 npm run build
 ```
+
+`npm run test` is a lightweight pre-release safety net for locale key shape,
+admin permission checks, notification preferences, collaboration task rules, and
+profile input normalization. It uses Node's built-in test runner and does not
+need a database connection.
 
 ## Environment
 

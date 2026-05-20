@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { AuthRequiredError, clearAuthCookies, requireUser } from "@/lib/auth";
+import coreRules from "@/lib/core-rules.cjs";
 import { ensureProfile, isProfileActive, selfDeleteProfile, updateProfile } from "@/lib/profiles";
 import { updateNotificationPreferences } from "@/lib/notifications";
 import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
@@ -7,7 +8,7 @@ import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprint
 export const runtime = "nodejs";
 
 function clean(value) {
-  return typeof value === "string" ? value.trim() : "";
+  return coreRules.clean(value);
 }
 
 function authError(error) {
@@ -38,13 +39,7 @@ export async function PATCH(request) {
       return NextResponse.json({ error: "This account is not active." }, { status: 403 });
     }
     const payload = await request.json().catch(() => ({}));
-    const profile = await updateProfile(user, {
-      displayName: clean(payload.displayName),
-      organization: clean(payload.organization),
-      jobTitle: clean(payload.jobTitle),
-      countryRegion: clean(payload.countryRegion),
-      phone: clean(payload.phone)
-    });
+    const profile = await updateProfile(user, coreRules.normalizeProfileInput(payload));
     const notificationPreferences = await updateNotificationPreferences(user.id, payload.notificationPreferences || {});
     await recordUserFootprint({
       userId: user.id,
