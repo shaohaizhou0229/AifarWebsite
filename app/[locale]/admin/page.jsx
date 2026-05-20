@@ -44,10 +44,12 @@ function TrafficChart({ trend = [], labels }) {
     const y = 100 - (point.views / max) * 86 - 7;
     return `${x},${y}`;
   }).join(" ");
+  const areaPoints = points ? `0,100 ${points} 100,100` : "";
 
   return (
     <div className="admin-traffic-chart" aria-label={labels.title}>
       <svg viewBox="0 0 100 100" role="img" preserveAspectRatio="none">
+        {areaPoints ? <polygon points={areaPoints} /> : null}
         <polyline points={points} />
       </svg>
       <div className="admin-traffic-bars">
@@ -62,19 +64,21 @@ function TrafficChart({ trend = [], labels }) {
   );
 }
 
-function TrafficTable({ items = [], emptyText, labels }) {
+function TrafficTable({ items = [], emptyText, labels, nameLabel, total = 0 }) {
   if (!items.length) return <p className="admin-empty-copy">{emptyText}</p>;
 
   return (
     <div className="admin-traffic-table">
       <div>
-        <span>{labels.page || "Page"}</span>
+        <span>{nameLabel || labels.page || "Page"}</span>
         <span>{labels.views || "Views"}</span>
+        <span>{labels.share || "Share"}</span>
       </div>
       {items.map((item) => (
         <div key={item.path || item.locale}>
           <span>{item.path || item.locale}</span>
           <strong>{item.count}</strong>
+          <strong>{total ? `${Math.round((item.count / total) * 100)}%` : "-"}</strong>
         </div>
       ))}
     </div>
@@ -107,12 +111,12 @@ export default async function AdminHomePage({ params, searchParams }) {
 
   const dashboard = await getAdminDashboardOverview({ userId: user.id, analyticsDays: rangeDays });
   const metricCards = [
-    ["todayViews", dashboard.metrics.todayViews, "good", UserRound],
-    ["downloadClicks", dashboard.metrics.downloadClicks, "good", Download],
-    ["newContacts", dashboard.metrics.newContacts, dashboard.metrics.newContacts ? "attention" : "neutral", Mail],
-    ["openTickets", dashboard.metrics.openTickets, dashboard.metrics.openTickets ? "attention" : "neutral", LifeBuoy],
-    ["newUsers", dashboard.metrics.newUsers, "neutral", Users],
-    ["draftContent", dashboard.metrics.draftContent, dashboard.metrics.draftContent ? "attention" : "neutral", FileText]
+    ["todayViews", dashboard.metrics.todayViews, `${dashboard.metrics.totalViews} ${page.metrics.details.totalInRange}`, "good", "positive", UserRound],
+    ["downloadClicks", dashboard.metrics.downloadClicks, page.metrics.details.daysWindow.replace("{days}", rangeDays), "good", "positive", Download],
+    ["newContacts", dashboard.metrics.newContacts, dashboard.metrics.newContacts ? page.metrics.details.needsReview : page.metrics.details.clear, dashboard.metrics.newContacts ? "attention" : "neutral", dashboard.metrics.newContacts ? "warning" : "positive", Mail],
+    ["openTickets", dashboard.metrics.openTickets, dashboard.metrics.openTickets ? page.metrics.details.needsReview : page.metrics.details.clear, dashboard.metrics.openTickets ? "attention" : "neutral", dashboard.metrics.openTickets ? "warning" : "positive", LifeBuoy],
+    ["newUsers", dashboard.metrics.newUsers, page.metrics.details.today, "neutral", "neutral", Users],
+    ["draftContent", dashboard.metrics.draftContent, dashboard.metrics.draftContent ? page.metrics.details.needsReview : page.metrics.details.clear, dashboard.metrics.draftContent ? "attention" : "neutral", dashboard.metrics.draftContent ? "warning" : "positive", FileText]
   ];
 
   const healthItems = dashboard.moduleHealth.map((item) => ({
@@ -148,13 +152,23 @@ export default async function AdminHomePage({ params, searchParams }) {
       </div>
 
       <section className="admin-metric-grid">
-        {metricCards.map(([key, value, tone, Icon]) => (
-          <AdminMetricCard key={key} label={page.metrics[key]} value={value} tone={tone} icon={Icon} />
+        {metricCards.map(([key, value, meta, tone, metaTone, Icon]) => (
+          <AdminMetricCard key={key} label={page.metrics[key]} value={value} meta={meta} metaTone={metaTone} tone={tone} icon={Icon} />
         ))}
       </section>
 
       <section className="admin-dashboard-grid">
-        <AdminDataPanel title={page.traffic.title} meta={page.traffic.meta} className="admin-traffic-panel">
+        <AdminDataPanel
+          title={page.traffic.title}
+          meta={page.traffic.meta}
+          action={(
+            <div className="admin-panel-tabs" aria-label={page.traffic.tabsLabel}>
+              <span className="active">{page.traffic.tabs.visitors}</span>
+              <span>{page.traffic.tabs.downloads}</span>
+            </div>
+          )}
+          className="admin-traffic-panel"
+        >
           {dashboard.analytics.hasData ? (
             <>
               <div className="admin-traffic-summary">
@@ -175,6 +189,8 @@ export default async function AdminHomePage({ params, searchParams }) {
                     items={dashboard.analytics.topPages}
                     emptyText={page.traffic.empty}
                     labels={page.traffic}
+                    nameLabel={page.traffic.page}
+                    total={dashboard.metrics.totalViews}
                   />
                 </div>
                 <div>
@@ -183,16 +199,23 @@ export default async function AdminHomePage({ params, searchParams }) {
                     items={dashboard.analytics.languages}
                     emptyText={page.traffic.empty}
                     labels={page.traffic}
+                    nameLabel={page.traffic.language}
+                    total={dashboard.metrics.totalViews}
                   />
                 </div>
               </div>
+              <a className="admin-panel-footer-link" href={rangeHref(locale, 30)}>{page.traffic.viewFull} <ArrowRight aria-hidden="true" size={14} strokeWidth={1.8} /></a>
             </>
           ) : (
             <p className="admin-empty-copy">{page.traffic.empty}</p>
           )}
         </AdminDataPanel>
 
-        <AdminDataPanel title={page.pending.title} meta={page.pending.meta}>
+        <AdminDataPanel
+          title={page.pending.title}
+          meta={page.pending.meta}
+          action={<a className="admin-panel-action" href={localizedPath(locale, "/admin/support/")}>{page.pending.viewAll}</a>}
+        >
           <div className="admin-pending-list">
             {dashboard.pendingWork.map((item) => (
               <a href={localizedPath(locale, item.href)} key={item.key}>
@@ -201,18 +224,27 @@ export default async function AdminHomePage({ params, searchParams }) {
                   <strong>{page.pending.items[item.key]}</strong>
                   <span>{item.count}</span>
                 </div>
-                <AdminStatusPill tone={item.tone}>{item.count ? page.health.statuses.needsReview : page.health.statuses.ready}</AdminStatusPill>
+                <AdminStatusPill tone={item.tone}>{page.pending.statuses[item.count ? item.statusKey : "clear"]}</AdminStatusPill>
                 <ArrowRight aria-hidden="true" size={15} strokeWidth={1.8} />
               </a>
             ))}
           </div>
+          <a className="admin-panel-footer-link" href={localizedPath(locale, "/admin/collaboration/")}>{page.pending.myTasks} <ArrowRight aria-hidden="true" size={14} strokeWidth={1.8} /></a>
         </AdminDataPanel>
 
-        <AdminDataPanel title={page.activity.title} meta={page.activity.meta}>
+        <AdminDataPanel
+          title={page.activity.title}
+          meta={page.activity.meta}
+          action={<a className="admin-panel-action" href={localizedPath(locale, "/admin/users/")}>{page.activity.viewAll}</a>}
+        >
           <AdminActivityFeed items={dashboard.activity} emptyText={page.activity.empty} labels={page.activity} locale={locale} />
         </AdminDataPanel>
 
-        <AdminDataPanel title={page.health.title} meta={page.health.meta}>
+        <AdminDataPanel
+          title={page.health.title}
+          meta={page.health.meta}
+          action={<a className="admin-panel-action" href={localizedPath(locale, "/admin/")}>{page.health.viewAll}</a>}
+        >
           <AdminHealthList items={healthItems} labels={page.health} locale={locale} />
         </AdminDataPanel>
       </section>

@@ -869,7 +869,14 @@
         "openTickets": "Open tickets",
         "newUsers": "New users",
         "draftContent": "Draft content",
-        "collaborationTodo": "Collaboration tasks"
+        "collaborationTodo": "Collaboration tasks",
+        "details": {
+          "totalInRange": "total in range",
+          "daysWindow": "{days} day window",
+          "needsReview": "needs review",
+          "clear": "clear",
+          "today": "created today"
+        }
       },
       "traffic": {
         "title": "Website traffic",
@@ -879,7 +886,15 @@
         "languages": "Languages",
         "downloads": "Downloads",
         "page": "Page",
-        "views": "Views"
+        "views": "Views",
+        "language": "Language",
+        "share": "Share",
+        "viewFull": "View 30-day traffic",
+        "tabsLabel": "Traffic series",
+        "tabs": {
+          "visitors": "Visitors",
+          "downloads": "Downloads"
+        }
       },
       "pending": {
         "title": "Pending work",
@@ -891,6 +906,15 @@
           "draftContent": "Review draft content",
           "downloadGaps": "Publish or configure downloads",
           "overdueSubtasks": "Check overdue collaboration tasks"
+        },
+        "viewAll": "View queue",
+        "myTasks": "Go to collaboration tasks",
+        "statuses": {
+          "new": "New",
+          "urgent": "Urgent",
+          "pending": "Pending",
+          "overdue": "Overdue",
+          "clear": "Clear"
         }
       },
       "activity": {
@@ -917,6 +941,14 @@
           "documentDraft": "Document draft updated.",
           "downloadUpdated": "Client release updated.",
           "collaborationUpdated": "Collaboration space updated."
+        },
+        "viewAll": "View users",
+        "metaLabels": {
+          "publishedDocument": "Published document",
+          "draftDocument": "Draft document",
+          "publishedRelease": "Published release",
+          "draftRelease": "Draft release",
+          "openSubtasks": "{count} open subtasks"
         }
       },
       "health": {
@@ -963,7 +995,8 @@
         "status": "Status",
         "keyData": "Key data",
         "lastUpdated": "Last updated",
-        "action": "Action"
+        "action": "Action",
+        "viewAll": "View all modules"
       },
       "quickActions": {
         "inviteUser": "Invite user",

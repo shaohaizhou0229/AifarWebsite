@@ -869,7 +869,14 @@
         "openTickets": "Tickets ouverts",
         "newUsers": "Nouveaux utilisateurs",
         "draftContent": "Contenus brouillons",
-        "collaborationTodo": "Taches collaboration"
+        "collaborationTodo": "Taches collaboration",
+        "details": {
+          "totalInRange": "au total sur la periode",
+          "daysWindow": "{days} jours de donnees",
+          "needsReview": "a traiter",
+          "clear": "rien a traiter",
+          "today": "crees aujourd hui"
+        }
       },
       "traffic": {
         "title": "Trafic du site",
@@ -879,7 +886,15 @@
         "languages": "Langues",
         "downloads": "Telechargements",
         "page": "Page",
-        "views": "Vues"
+        "views": "Vues",
+        "language": "Langue",
+        "share": "Part",
+        "viewFull": "Voir le trafic sur 30 jours",
+        "tabsLabel": "Series de trafic",
+        "tabs": {
+          "visitors": "Visites",
+          "downloads": "Telechargements"
+        }
       },
       "pending": {
         "title": "Travail en attente",
@@ -891,6 +906,15 @@
           "draftContent": "Verifier les brouillons",
           "downloadGaps": "Publier ou configurer les telechargements",
           "overdueSubtasks": "Verifier les sous-taches en retard"
+        },
+        "viewAll": "Voir la file",
+        "myTasks": "Aller aux taches de collaboration",
+        "statuses": {
+          "new": "Nouveau",
+          "urgent": "Urgent",
+          "pending": "En attente",
+          "overdue": "En retard",
+          "clear": "Normal"
         }
       },
       "activity": {
@@ -917,6 +941,14 @@
           "documentDraft": "Brouillon de document mis ? jour.",
           "downloadUpdated": "Version client mise ? jour.",
           "collaborationUpdated": "Espace de collaboration mis ? jour."
+        },
+        "viewAll": "Voir les utilisateurs",
+        "metaLabels": {
+          "publishedDocument": "Document publie",
+          "draftDocument": "Brouillon de document",
+          "publishedRelease": "Version publiee",
+          "draftRelease": "Version brouillon",
+          "openSubtasks": "{count} sous-taches ouvertes"
         }
       },
       "health": {
@@ -963,7 +995,8 @@
         "status": "Statut",
         "keyData": "Donn?e cl?",
         "lastUpdated": "Derni?re mise ? jour",
-        "action": "Action"
+        "action": "Action",
+        "viewAll": "Voir tous les modules"
       },
       "quickActions": {
         "inviteUser": "Inviter un utilisateur",

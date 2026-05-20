@@ -3631,7 +3631,7 @@ body:has(.admin-shell)::before {
   border: 1px solid var(--admin-border);
   border-radius: 7px;
   box-shadow: none;
-  gap: 10px;
+  gap: 9px;
   padding: 16px;
 }
 
@@ -3660,6 +3660,32 @@ body:has(.admin-shell)::before {
   letter-spacing: 0;
 }
 
+.admin-metric-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.admin-metric-meta::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+  content: "";
+}
+
+.admin-metric-meta-positive {
+  color: #059669 !important;
+}
+
+.admin-metric-meta-warning {
+  color: #d97706 !important;
+}
+
+.admin-metric-meta-neutral {
+  color: var(--admin-muted) !important;
+}
+
 .admin-dashboard-grid {
   grid-template-columns: minmax(0, 1fr) minmax(360px, 0.92fr);
   gap: 16px;
@@ -3673,6 +3699,7 @@ body:has(.admin-shell)::before {
 }
 
 .admin-panel-header {
+  align-items: center;
   margin-bottom: 16px;
 }
 
@@ -3686,6 +3713,39 @@ body:has(.admin-shell)::before {
 .admin-panel p {
   color: var(--admin-muted);
   font-size: 13px;
+}
+
+.admin-panel-action {
+  color: var(--admin-blue);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.admin-panel-tabs {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.admin-panel-tabs span {
+  min-height: 30px;
+  border-right: 1px solid var(--admin-border);
+  color: var(--admin-muted);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 10px;
+}
+
+.admin-panel-tabs span:last-child {
+  border-right: 0;
+}
+
+.admin-panel-tabs .active {
+  background: #f8fbff;
+  color: var(--admin-blue);
 }
 
 .admin-traffic-panel {
@@ -3726,6 +3786,10 @@ body:has(.admin-shell)::before {
     #fff;
 }
 
+.admin-traffic-chart polygon {
+  fill: rgba(37, 99, 235, 0.07);
+}
+
 .admin-traffic-chart polyline {
   stroke: var(--admin-blue);
   stroke-width: 2;
@@ -3760,7 +3824,7 @@ body:has(.admin-shell)::before {
 
 .admin-traffic-table div {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 88px;
+  grid-template-columns: minmax(0, 1fr) 78px 64px;
   border-bottom: 1px solid var(--admin-border);
 }
 
@@ -3785,6 +3849,17 @@ body:has(.admin-shell)::before {
   text-align: right;
 }
 
+.admin-panel-footer-link {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  margin-top: 12px;
+  color: var(--admin-blue);
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
 .admin-pending-list a {
   grid-template-columns: auto minmax(0, 1fr) auto auto;
   min-height: 42px;
@@ -3804,6 +3879,12 @@ body:has(.admin-shell)::before {
 .admin-pending-list span {
   color: var(--admin-ink);
   font-weight: 500;
+}
+
+.admin-pending-list a:hover,
+.admin-health-row:hover,
+.admin-activity-item:hover {
+  background: #fafafa;
 }
 
 .admin-check-box {

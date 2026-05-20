@@ -1,4 +1,4 @@
-export function AdminMetricCard({ label, value, meta, tone = "neutral", icon: Icon }) {
+export function AdminMetricCard({ label, value, meta, metaTone = "neutral", tone = "neutral", icon: Icon }) {
   return (
     <article className={`admin-metric-card admin-metric-${tone}`}>
       <div className="admin-metric-card-label">
@@ -6,7 +6,7 @@ export function AdminMetricCard({ label, value, meta, tone = "neutral", icon: Ic
         <span>{label}</span>
       </div>
       <strong>{value}</strong>
-      {meta ? <small>{meta}</small> : null}
+      {meta ? <small className={`admin-metric-meta admin-metric-meta-${metaTone}`}>{meta}</small> : null}
     </article>
   );
 }

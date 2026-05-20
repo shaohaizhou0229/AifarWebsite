@@ -763,8 +763,8 @@
       "eyebrow": "معلومات Aifar",
       "deniedTitle": "معلومات Aifar",
       "deniedLead": "معلومات Aifar",
-      "title": "???? ???? ??? ???????",
-      "lead": "???? ?????? ?????? ?????? ??????? ????? ??????? ?? ???? ?????.",
+      "title": "نظرة عامة على الإدارة",
+      "lead": "عمليات الموقع والعمل المعلّق ونشاط الوحدات في لمحة واحدة.",
       "active": "معلومات Aifar",
       "planned": "معلومات Aifar",
       "nav": {
@@ -842,34 +842,41 @@
           "signOut": "تسجيل الخروج",
           "signingOut": "جار تسجيل الخروج..."
         },
-        "search": "???",
+        "search": "بحث",
         "searchShortcut": "Ctrl K",
-        "collapse": "??",
-        "userFallback": "?????",
+        "collapse": "طي",
+        "userFallback": "مدير",
         "userEmailFallback": "admin@aifar.com",
         "actions": {
-          "newAction": "????? ????",
-          "inviteUser": "???? ??????",
-          "newDocument": "????? ????",
-          "manageDownloads": "????? ?????????"
+          "newAction": "إجراء جديد",
+          "inviteUser": "دعوة مستخدم",
+          "newDocument": "مستند جديد",
+          "manageDownloads": "إدارة التنزيلات"
         }
       },
       "ranges": {
         "today": "اليوم",
         "sevenDays": "7 أيام",
         "thirtyDays": "30 يوما",
-        "label": "???? ????????",
-        "refresh": "?????"
+        "label": "نطاق الزيارات",
+        "refresh": "تحديث"
       },
       "metrics": {
-        "todayViews": "???? ?????",
+        "todayViews": "زوار اليوم",
         "totalViews": "إجمالي الزيارات",
-        "downloadClicks": "????? ???????",
+        "downloadClicks": "التنزيلات",
         "newContacts": "طلبات تواصل جديدة",
         "openTickets": "تذاكر مفتوحة",
         "newUsers": "مستخدمون جدد",
         "draftContent": "محتوى مسودة",
-        "collaborationTodo": "مهام التعاون"
+        "collaborationTodo": "مهام التعاون",
+        "details": {
+          "totalInRange": "إجمالي ضمن النطاق",
+          "daysWindow": "نافذة {days} يوم",
+          "needsReview": "يحتاج إلى مراجعة",
+          "clear": "لا توجد مهام",
+          "today": "أُنشئ اليوم"
+        }
       },
       "traffic": {
         "title": "حركة الموقع",
@@ -878,8 +885,16 @@
         "topPages": "أهم الصفحات",
         "languages": "اللغات",
         "downloads": "التنزيلات",
-        "page": "??????",
-        "views": "?????????"
+        "page": "الصفحة",
+        "views": "الزيارات",
+        "language": "اللغة",
+        "share": "الحصة",
+        "viewFull": "عرض زيارات 30 يوما",
+        "tabsLabel": "سلسلة حركة الزيارات",
+        "tabs": {
+          "visitors": "الزيارات",
+          "downloads": "التنزيلات"
+        }
       },
       "pending": {
         "title": "العمل المعلق",
@@ -891,6 +906,15 @@
           "draftContent": "مراجعة محتوى المسودة",
           "downloadGaps": "نشر أو إعداد التنزيلات",
           "overdueSubtasks": "فحص مهام التعاون المتأخرة"
+        },
+        "viewAll": "عرض القائمة",
+        "myTasks": "الانتقال إلى مهام التعاون",
+        "statuses": {
+          "new": "جديد",
+          "urgent": "عاجل",
+          "pending": "قيد الانتظار",
+          "overdue": "متأخر",
+          "clear": "طبيعي"
         }
       },
       "activity": {
@@ -898,25 +922,33 @@
         "meta": "تغييرات حديثة في الموقع والدعم والمستخدمين والوثائق والتنزيلات والتعاون.",
         "empty": "لا يوجد نشاط مسجل.",
         "events": {
-          "auth.registered": "?? ????? ?????? ????.",
-          "auth.logged_in": "???? ???????? ??????.",
-          "auth.oauth_logged_in": "???? ???????? ?????? ??? Google.",
-          "auth.account_deleted": "?? ??? ???? ??????.",
-          "profile.updated": "?? ????? ??? ????????.",
-          "admin.user_updated": "???? ??????? ????????.",
-          "admin.user_deleted": "??? ??????? ????????.",
-          "admin.test_account_reset": "???? ??????? ??? ???? ??????.",
-          "admin.user_invited": "??? ??????? ????????.",
-          "admin.invitation_canceled": "???? ??????? ????.",
-          "contact.submitted": "?? ?????? ??? ????? ????.",
-          "ticket.replied": "???? ?? ??? ????? ?????.",
-          "ticket.status_updated": "?????? ???? ????? ?????.",
-          "download.started": "??? ????? ????.",
-          "ticketUpdated": "?? ????? ????? ???.",
-          "documentPublished": "?? ??? ?????.",
-          "documentDraft": "?? ????? ????? ?????.",
-          "downloadUpdated": "?? ????? ????? ??????.",
-          "collaborationUpdated": "?? ????? ????? ?????."
+          "auth.registered": "تم تسجيل مستخدم جديد.",
+          "auth.logged_in": "سجّل المستخدم دخوله.",
+          "auth.oauth_logged_in": "سجّل المستخدم دخوله عبر Google.",
+          "auth.account_deleted": "تم حذف حساب المستخدم.",
+          "profile.updated": "تم تحديث ملف المستخدم.",
+          "admin.user_updated": "حدّث المدير مستخدما.",
+          "admin.user_deleted": "حذف المدير مستخدما.",
+          "admin.test_account_reset": "أعاد المدير ضبط حساب اختبار.",
+          "admin.user_invited": "دعا المدير مستخدما.",
+          "admin.invitation_canceled": "ألغى المدير دعوة.",
+          "contact.submitted": "تم إرسال طلب تواصل جديد.",
+          "ticket.replied": "تلقت تذكرة الدعم ردا.",
+          "ticket.status_updated": "تغيرت حالة تذكرة الدعم.",
+          "download.started": "بدأ تنزيل العميل.",
+          "ticketUpdated": "تم تحديث تذكرة دعم.",
+          "documentPublished": "تم نشر مستند.",
+          "documentDraft": "تم تحديث مسودة مستند.",
+          "downloadUpdated": "تم تحديث إصدار العميل.",
+          "collaborationUpdated": "تم تحديث مساحة تعاون."
+        },
+        "viewAll": "عرض المستخدمين",
+        "metaLabels": {
+          "publishedDocument": "مستند منشور",
+          "draftDocument": "مسودة مستند",
+          "publishedRelease": "إصدار منشور",
+          "draftRelease": "إصدار مسودة",
+          "openSubtasks": "{count} مهام فرعية مفتوحة"
         }
       },
       "health": {
@@ -959,11 +991,12 @@
             "summary": "المساحات والمهام والمهام الفرعية"
           }
         },
-        "module": "??????",
-        "status": "??????",
-        "keyData": "???????? ????????",
-        "lastUpdated": "??? ?????",
-        "action": "?????"
+        "module": "الوحدة",
+        "status": "الحالة",
+        "keyData": "البيانات الرئيسية",
+        "lastUpdated": "آخر تحديث",
+        "action": "الإجراء",
+        "viewAll": "عرض كل الوحدات"
       },
       "quickActions": {
         "inviteUser": "دعوة مستخدم",
@@ -972,7 +1005,7 @@
         "reviewContacts": "مراجعة الطلبات",
         "publishDownloads": "نشر التنزيلات",
         "createSpace": "إنشاء مساحة",
-        "manageDownloads": "????? ?????????"
+        "manageDownloads": "إدارة التنزيلات"
       }
     },
     "adminProduct": {
