@@ -763,8 +763,8 @@
       "eyebrow": "Présentation Aifar",
       "deniedTitle": "Présentation Aifar",
       "deniedLead": "Présentation Aifar",
-      "title": "Vue de gestion.",
-      "lead": "Operations du site, travaux en attente et activite des modules en un coup d oeil.",
+      "title": "Vue d'ensemble de gestion",
+      "lead": "Suivez les op?rations du site, les t?ches en attente et l'activit? des modules.",
       "active": "Présentation Aifar",
       "planned": "Présentation Aifar",
       "nav": {
@@ -841,17 +841,30 @@
         "auth": {
           "signOut": "Se deconnecter",
           "signingOut": "Deconnexion..."
+        },
+        "search": "Rechercher",
+        "searchShortcut": "Ctrl K",
+        "collapse": "R?duire",
+        "userFallback": "Admin",
+        "userEmailFallback": "admin@aifar.com",
+        "actions": {
+          "newAction": "Nouvelle action",
+          "inviteUser": "Inviter un utilisateur",
+          "newDocument": "Nouveau document",
+          "manageDownloads": "G?rer les t?l?chargements"
         }
       },
       "ranges": {
         "today": "Aujourd hui",
         "sevenDays": "7 jours",
-        "thirtyDays": "30 jours"
+        "thirtyDays": "30 jours",
+        "label": "P?riode du trafic",
+        "refresh": "Actualiser"
       },
       "metrics": {
-        "todayViews": "Visites du jour",
+        "todayViews": "Visiteurs aujourd'hui",
         "totalViews": "Visites totales",
-        "downloadClicks": "Telechargements",
+        "downloadClicks": "T?l?chargements",
         "newContacts": "Nouveaux contacts",
         "openTickets": "Tickets ouverts",
         "newUsers": "Nouveaux utilisateurs",
@@ -864,7 +877,9 @@
         "empty": "Aucune donnee de trafic pour le moment.",
         "topPages": "Pages principales",
         "languages": "Langues",
-        "downloads": "Telechargements"
+        "downloads": "Telechargements",
+        "page": "Page",
+        "views": "Vues"
       },
       "pending": {
         "title": "Travail en attente",
@@ -881,7 +896,28 @@
       "activity": {
         "title": "Activite recente",
         "meta": "Changements recents du site, support, utilisateurs, documents, telechargements et collaboration.",
-        "empty": "Aucune activite enregistree."
+        "empty": "Aucune activite enregistree.",
+        "events": {
+          "auth.registered": "Nouvel utilisateur inscrit.",
+          "auth.logged_in": "Utilisateur connect?.",
+          "auth.oauth_logged_in": "Utilisateur connect? avec Google.",
+          "auth.account_deleted": "Compte utilisateur supprim?.",
+          "profile.updated": "Profil utilisateur mis ? jour.",
+          "admin.user_updated": "Utilisateur mis ? jour par un administrateur.",
+          "admin.user_deleted": "Utilisateur supprim? par un administrateur.",
+          "admin.test_account_reset": "Compte de test r?initialis?.",
+          "admin.user_invited": "Utilisateur invit? par un administrateur.",
+          "admin.invitation_canceled": "Invitation annul?e par un administrateur.",
+          "contact.submitted": "Nouvelle demande de contact re?ue.",
+          "ticket.replied": "Nouvelle r?ponse sur un ticket support.",
+          "ticket.status_updated": "Statut du ticket support modifi?.",
+          "download.started": "T?l?chargement client d?marr?.",
+          "ticketUpdated": "Ticket support mis ? jour.",
+          "documentPublished": "Document publi?.",
+          "documentDraft": "Brouillon de document mis ? jour.",
+          "downloadUpdated": "Version client mise ? jour.",
+          "collaborationUpdated": "Espace de collaboration mis ? jour."
+        }
       },
       "health": {
         "title": "Sante des modules",
@@ -922,7 +958,12 @@
             "label": "Collaboration",
             "summary": "Espaces, taches et sous-taches"
           }
-        }
+        },
+        "module": "Module",
+        "status": "Statut",
+        "keyData": "Donn?e cl?",
+        "lastUpdated": "Derni?re mise ? jour",
+        "action": "Action"
       },
       "quickActions": {
         "inviteUser": "Inviter un utilisateur",
@@ -930,7 +971,8 @@
         "reviewTickets": "Voir les tickets",
         "reviewContacts": "Voir les contacts",
         "publishDownloads": "Publier telechargements",
-        "createSpace": "Creer un espace"
+        "createSpace": "Creer un espace",
+        "manageDownloads": "G?rer les t?l?chargements"
       }
     },
     "adminProduct": {

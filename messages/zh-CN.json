@@ -763,8 +763,8 @@
       "eyebrow": "管理后台",
       "deniedTitle": "需要管理员权限。",
       "deniedLead": "你的账户无权管理 Aifar 网站运营。",
-      "title": "管理总览。",
-      "lead": "集中查看网站运营、待处理事项和各模块最新活动。",
+      "title": "管理总览",
+      "lead": "集中查看网站运营、待处理工作和模块最新动态。",
       "active": "可用",
       "planned": "规划中",
       "nav": {
@@ -841,15 +841,28 @@
         "auth": {
           "signOut": "退出登录",
           "signingOut": "正在退出..."
+        },
+        "search": "搜索",
+        "searchShortcut": "Ctrl K",
+        "collapse": "收起",
+        "userFallback": "管理员",
+        "userEmailFallback": "admin@aifar.com",
+        "actions": {
+          "newAction": "新建操作",
+          "inviteUser": "邀请用户",
+          "newDocument": "新建文档",
+          "manageDownloads": "管理下载"
         }
       },
       "ranges": {
         "today": "今天",
         "sevenDays": "7 天",
-        "thirtyDays": "30 天"
+        "thirtyDays": "30 天",
+        "label": "统计周期",
+        "refresh": "刷新"
       },
       "metrics": {
-        "todayViews": "今日访问",
+        "todayViews": "今日访客",
         "totalViews": "总访问量",
         "downloadClicks": "下载点击",
         "newContacts": "新联系请求",
@@ -864,7 +877,9 @@
         "empty": "暂无访问数据。新的公开页面访问会显示在这里。",
         "topPages": "热门页面",
         "languages": "语言分布",
-        "downloads": "下载"
+        "downloads": "下载",
+        "page": "页面",
+        "views": "访问量"
       },
       "pending": {
         "title": "待处理事项",
@@ -881,7 +896,28 @@
       "activity": {
         "title": "最新活动",
         "meta": "最近的网站、支持、用户、文档、下载和协作变更。",
-        "empty": "暂无活动记录。"
+        "empty": "暂无活动记录。",
+        "events": {
+          "auth.registered": "新用户完成注册。",
+          "auth.logged_in": "用户已登录。",
+          "auth.oauth_logged_in": "用户通过 Google 登录。",
+          "auth.account_deleted": "用户账户已删除。",
+          "profile.updated": "用户资料已更新。",
+          "admin.user_updated": "管理员更新了用户资料。",
+          "admin.user_deleted": "管理员删除了用户。",
+          "admin.test_account_reset": "管理员重置了测试账号。",
+          "admin.user_invited": "管理员发出用户邀请。",
+          "admin.invitation_canceled": "管理员取消了用户邀请。",
+          "contact.submitted": "收到新的联系请求。",
+          "ticket.replied": "支持工单收到回复。",
+          "ticket.status_updated": "支持工单状态已变更。",
+          "download.started": "客户端下载安装已开始。",
+          "ticketUpdated": "支持工单已更新。",
+          "documentPublished": "文档已发布。",
+          "documentDraft": "文档草稿已更新。",
+          "downloadUpdated": "客户端版本已更新。",
+          "collaborationUpdated": "协作空间已更新。"
+        }
       },
       "health": {
         "title": "模块健康状态",
@@ -922,7 +958,12 @@
             "label": "协作",
             "summary": "空间、任务与子任务"
           }
-        }
+        },
+        "module": "模块",
+        "status": "状态",
+        "keyData": "关键数据",
+        "lastUpdated": "最后更新",
+        "action": "操作"
       },
       "quickActions": {
         "inviteUser": "邀请用户",
@@ -930,7 +971,8 @@
         "reviewTickets": "查看工单",
         "reviewContacts": "查看联系请求",
         "publishDownloads": "发布下载",
-        "createSpace": "创建协作空间"
+        "createSpace": "创建协作空间",
+        "manageDownloads": "管理下载"
       }
     },
     "adminProduct": {

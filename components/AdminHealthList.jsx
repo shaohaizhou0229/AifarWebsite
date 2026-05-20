@@ -15,15 +15,22 @@ function resolveHref(locale, href) {
 
 export function AdminHealthList({ items = [], labels = {}, locale }) {
   return (
-    <div className="admin-health-list">
+    <div className="admin-health-table">
+      <div className="admin-health-head">
+        <span>{labels.module || "Module"}</span>
+        <span>{labels.status || "Status"}</span>
+        <span>{labels.keyData || "Key data"}</span>
+        <span>{labels.lastUpdated || "Last updated"}</span>
+        <span>{labels.action || "Action"}</span>
+      </div>
       {items.map((item) => (
         <a className="admin-health-row" href={resolveHref(locale, item.href)} key={item.key}>
           <div>
             <strong>{item.label}</strong>
             <p>{item.summary}</p>
           </div>
-          <span>{item.count}</span>
           <AdminStatusPill tone={item.tone}>{item.status}</AdminStatusPill>
+          <span>{item.count}</span>
           <time>{formatDate(item.updatedAt, locale) || labels.notAvailable}</time>
           <small>{labels.open || "Open"}</small>
         </a>

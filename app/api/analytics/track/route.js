@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
-import {
-  getReferrerHost,
-  getUserAgentFamily,
-  recordSiteAnalyticsEvent
-} from "@/lib/site-analytics";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request) {
   try {
+    const {
+      getReferrerHost,
+      getUserAgentFamily,
+      recordSiteAnalyticsEvent
+    } = await import("@/lib/site-analytics");
     const body = await request.json();
     await recordSiteAnalyticsEvent({
       path: body.path,

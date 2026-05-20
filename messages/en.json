@@ -763,7 +763,7 @@
       "eyebrow": "Admin",
       "deniedTitle": "Administrator access required.",
       "deniedLead": "Your account does not have permission to manage Aifar website operations.",
-      "title": "Management overview.",
+      "title": "Management overview",
       "lead": "Website operations, pending work, and module activity at a glance.",
       "active": "Ready",
       "planned": "Planned",
@@ -841,15 +841,28 @@
         "auth": {
           "signOut": "Sign out",
           "signingOut": "Signing out..."
+        },
+        "search": "Search",
+        "searchShortcut": "Ctrl K",
+        "collapse": "Collapse",
+        "userFallback": "Admin",
+        "userEmailFallback": "admin@aifar.com",
+        "actions": {
+          "newAction": "New action",
+          "inviteUser": "Invite user",
+          "newDocument": "New document",
+          "manageDownloads": "Manage downloads"
         }
       },
       "ranges": {
         "today": "Today",
         "sevenDays": "7 days",
-        "thirtyDays": "30 days"
+        "thirtyDays": "30 days",
+        "label": "Traffic range",
+        "refresh": "Refresh"
       },
       "metrics": {
-        "todayViews": "Visits today",
+        "todayViews": "Visitors today",
         "totalViews": "Total visits",
         "downloadClicks": "Downloads",
         "newContacts": "New contacts",
@@ -864,7 +877,9 @@
         "empty": "No traffic data yet. New public page visits will appear here.",
         "topPages": "Top pages",
         "languages": "Languages",
-        "downloads": "Downloads"
+        "downloads": "Downloads",
+        "page": "Page",
+        "views": "Views"
       },
       "pending": {
         "title": "Pending work",
@@ -881,7 +896,28 @@
       "activity": {
         "title": "Latest activity",
         "meta": "Recent website, support, user, document, download, and collaboration changes.",
-        "empty": "No activity has been recorded yet."
+        "empty": "No activity has been recorded yet.",
+        "events": {
+          "auth.registered": "New user registered.",
+          "auth.logged_in": "User signed in.",
+          "auth.oauth_logged_in": "User signed in with Google.",
+          "auth.account_deleted": "User account was deleted.",
+          "profile.updated": "User profile was updated.",
+          "admin.user_updated": "Administrator updated a user.",
+          "admin.user_deleted": "Administrator deleted a user.",
+          "admin.test_account_reset": "Administrator reset a test account.",
+          "admin.user_invited": "Administrator invited a user.",
+          "admin.invitation_canceled": "Administrator canceled an invitation.",
+          "contact.submitted": "New contact request submitted.",
+          "ticket.replied": "Support ticket received a reply.",
+          "ticket.status_updated": "Support ticket status changed.",
+          "download.started": "Client download started.",
+          "ticketUpdated": "Support ticket updated.",
+          "documentPublished": "Document published.",
+          "documentDraft": "Document draft updated.",
+          "downloadUpdated": "Client release updated.",
+          "collaborationUpdated": "Collaboration space updated."
+        }
       },
       "health": {
         "title": "Module health",
@@ -922,7 +958,12 @@
             "label": "Collaboration",
             "summary": "Spaces, tasks, and subtasks"
           }
-        }
+        },
+        "module": "Module",
+        "status": "Status",
+        "keyData": "Key data",
+        "lastUpdated": "Last updated",
+        "action": "Action"
       },
       "quickActions": {
         "inviteUser": "Invite user",
@@ -930,7 +971,8 @@
         "reviewTickets": "Review tickets",
         "reviewContacts": "Review contacts",
         "publishDownloads": "Publish downloads",
-        "createSpace": "Create space"
+        "createSpace": "Create space",
+        "manageDownloads": "Manage downloads"
       }
     },
     "adminProduct": {

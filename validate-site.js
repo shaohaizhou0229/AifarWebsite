@@ -171,6 +171,7 @@ for (const file of [
   "components/AdminTicketActions.jsx",
   "components/AdminShell.jsx",
   "components/AdminTopBar.jsx",
+  "components/AdminLanguageMenu.jsx",
   "components/AdminMetricCard.jsx",
   "components/AdminDataPanel.jsx",
   "components/AdminStatusPill.jsx",
