@@ -214,8 +214,8 @@ export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard
                               <strong>{dashboard.metrics.totalViews}</strong>
                             </div>
                             <div>
-                              <span>{page.traffic.downloads}</span>
-                              <strong>{dashboard.metrics.downloadClicks}</strong>
+                              <span>{page.traffic.visitedPages}</span>
+                              <strong>{dashboard.analytics.visitedPages || 0}</strong>
                             </div>
                           </>
                         )}
@@ -254,7 +254,7 @@ export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard
               </div>
 
               <div className="admin-dashboard-column admin-dashboard-column-side">
-                <AdminDataPanel title={page.pending.title} meta={page.pending.meta} action={<Link className="admin-panel-action" href={localizedPath(locale, "/admin/support/")} prefetch={false}>{page.pending.viewAll}</Link>}>
+                <AdminDataPanel title={page.pending.title} meta={page.pending.meta}>
                   <div className="admin-pending-list">
                     {dashboard.pendingWork.map((item) => {
                       const Icon = PENDING_ICONS[item.key] || ClipboardList;
@@ -273,7 +273,6 @@ export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard
                       );
                     })}
                   </div>
-                  <Link className="admin-panel-footer-link" href={localizedPath(locale, "/admin/collaboration/")} prefetch={false}>{page.pending.myTasks} <ArrowRight aria-hidden="true" size={14} strokeWidth={1.8} /></Link>
                 </AdminDataPanel>
 
                 <AdminDataPanel title={page.health.title} meta={page.health.meta} action={<Link className="admin-panel-action" href={localizedPath(locale, "/admin/")} prefetch={false}>{page.health.viewAll}</Link>}>

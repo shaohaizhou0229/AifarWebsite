@@ -1,6 +1,6 @@
 "use client";
 
-const CACHE_PREFIX = "aifar-admin-dashboard-v2";
+const CACHE_PREFIX = "aifar-admin-dashboard-v3";
 const DEFAULT_MAX_AGE_MS = 120 * 1000;
 const inFlight = new Map();
 

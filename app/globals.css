@@ -3803,7 +3803,7 @@ body:has(.admin-shell)::before {
   top: calc(100% + 6px);
   left: 0;
   display: grid;
-  width: 100%;
+  width: min(280px, calc(100vw - 32px));
   border: 1px solid var(--admin-border);
   border-radius: 8px;
   background: #fff;
@@ -3821,12 +3821,26 @@ body:has(.admin-shell)::before {
   padding: 8px;
 }
 
+.admin-project-popover a > span {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.admin-project-popover strong,
+.admin-project-popover small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .admin-project-popover a.active {
   background: #f6f8fb;
 }
 
 .admin-project-popover p {
   margin: 6px 8px 4px;
+  overflow-wrap: anywhere;
 }
 
 .admin-project-mark {
@@ -5340,7 +5354,7 @@ body:has(.admin-shell)::before {
 .admin-shell.admin-sidebar-collapsed .admin-project-popover {
   top: 0;
   left: calc(100% + 8px);
-  width: 220px;
+  width: 260px;
 }
 
 .admin-shell.admin-sidebar-collapsed .admin-command-overlay {
@@ -5437,6 +5451,13 @@ body:has(.admin-shell)::before {
 
   .admin-shell.admin-sidebar-collapsed .admin-sidebar-user details {
     display: block;
+  }
+
+  .admin-project-popover,
+  .admin-shell.admin-sidebar-collapsed .admin-project-popover {
+    top: calc(100% + 6px);
+    left: 0;
+    width: 100%;
   }
 
   .admin-command-overlay,
