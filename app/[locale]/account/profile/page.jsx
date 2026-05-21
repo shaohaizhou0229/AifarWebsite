@@ -40,7 +40,11 @@ export default async function AccountProfilePage({ params }) {
       <PageHero eyebrow={page.eyebrow} title={page.title} lead={page.lead} />
       <section className="section alt">
         <div className="section-inner">
-          <ProfileForm profile={{ ...profile, notificationPreferences }} labels={messages.forms} />
+          <ProfileForm
+            profile={{ ...profile, notificationPreferences }}
+            labels={messages.forms}
+            profilePath={localizedPath(locale, "/account/profile/")}
+          />
           <AccountDeletionForm labels={page.deleteAccount} redirectPath={localizedPath(locale, "/login/")} />
         </div>
       </section>

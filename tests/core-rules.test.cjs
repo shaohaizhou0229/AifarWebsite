@@ -4,13 +4,16 @@ const {
   ADMIN_PERMISSIONS,
   canCreateCollaborationSpace,
   hasAdminPermission,
+  normalizeAccountEmailInput,
   normalizeAdminPermissions,
   normalizeNotificationPreferences,
+  normalizePasswordInput,
   normalizeProfileInput,
   normalizeRepeatFrequency,
   normalizeTaskStatus,
   normalizeTaskType,
-  nullableDate
+  nullableDate,
+  summarizeAuthIdentities
 } = require("../lib/core-rules.cjs");
 
 test("admin permissions only allow explicit active permission values", () => {
@@ -76,4 +79,59 @@ test("profile input normalization trims user-editable fields and drops non-strin
       phone: ""
     }
   );
+});
+
+test("account email changes require a valid normalized email", () => {
+  assert.deepEqual(normalizeAccountEmailInput({ email: "  Martin@Example.COM " }), {
+    email: "martin@example.com"
+  });
+  assert.throws(() => normalizeAccountEmailInput({ email: "" }), /Email is required/);
+  assert.throws(() => normalizeAccountEmailInput({ email: "not-an-email" }), /Invalid email/);
+});
+
+test("password updates require matching secure new passwords", () => {
+  assert.deepEqual(
+    normalizePasswordInput({
+      currentPassword: " old-password ",
+      newPassword: "new-password",
+      confirmPassword: "new-password"
+    }),
+    {
+      currentPassword: "old-password",
+      newPassword: "new-password"
+    }
+  );
+
+  assert.deepEqual(
+    normalizePasswordInput({
+      newPassword: "new-password",
+      confirmPassword: "new-password"
+    }, { requireCurrentPassword: false }),
+    {
+      currentPassword: "",
+      newPassword: "new-password"
+    }
+  );
+
+  assert.throws(() => normalizePasswordInput({ newPassword: "new-password", confirmPassword: "new-password" }), /Current password is required/);
+  assert.throws(() => normalizePasswordInput({ currentPassword: "old", newPassword: "short", confirmPassword: "short" }), /at least 8/);
+  assert.throws(() => normalizePasswordInput({ currentPassword: "old", newPassword: "new-password", confirmPassword: "different" }), /does not match/);
+});
+
+test("google unlinking is only allowed when email sign-in remains available", () => {
+  assert.deepEqual(
+    summarizeAuthIdentities([
+      { provider: "email" },
+      { provider: "google" }
+    ]),
+    {
+      providers: ["email", "google"],
+      hasEmailIdentity: true,
+      hasGoogleIdentity: true,
+      canUnlinkGoogle: true
+    }
+  );
+
+  assert.equal(summarizeAuthIdentities([{ provider: "google" }]).canUnlinkGoogle, false);
+  assert.equal(summarizeAuthIdentities([{ provider: "email" }]).canUnlinkGoogle, false);
 });
