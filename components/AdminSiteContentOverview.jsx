@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Clock, FileText, Pencil, Plus, Send, Sparkles } from "lucide-react";
+import { Clock, FileText, Pencil, Plus, Send } from "lucide-react";
 import { localizedPath } from "@/i18n/routing";
 import { formatDate } from "@/components/admin-site-content/form-utils";
 
@@ -73,9 +73,7 @@ export function AdminSiteContentOverview({
     <section className="site-content-center">
       <div className="site-content-center-hero">
         <div>
-          <p className="eyebrow">{labels.contentCenterEyebrow || labels.sections}</p>
           <h2>{labels.contentCenterTitle}</h2>
-          <p>{labels.contentCenterLead}</p>
         </div>
         <div className="site-content-center-actions">
           <label>
@@ -97,8 +95,8 @@ export function AdminSiteContentOverview({
             <Plus size={16} aria-hidden="true" />
             {labels.newHomeDesign}
           </Link>
-          <Link className="button primary" href={pageHref(locale, "/admin/product/designer/", { page: "product", contentLocale, mode: "new" })}>
-            <Sparkles size={16} aria-hidden="true" />
+          <Link className="button secondary" href={pageHref(locale, "/admin/product/designer/", { page: "product", contentLocale, mode: "new" })}>
+            <Plus size={16} aria-hidden="true" />
             {labels.newProductDesign}
           </Link>
         </div>

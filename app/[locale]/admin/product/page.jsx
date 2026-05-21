@@ -67,9 +67,7 @@ export default async function AdminProductPage({ params, searchParams }) {
       <AdminPageHeader
       locale={locale}
       shell={adminHome.shell}
-      eyebrow={page.eyebrow}
       title={page.title}
-      lead={page.lead}
       breadcrumbs={[
         { label: adminHome.nav.home, href: "/admin/" },
         { label: page.breadcrumb || page.title }

@@ -2167,6 +2167,8 @@ h3 {
 
 .site-content-center-hero {
   grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 74px;
+  padding: 12px 14px;
 }
 
 .site-content-center-hero h2,
@@ -2193,10 +2195,12 @@ h3 {
 }
 
 .site-content-center-actions label {
+  align-items: center;
   color: var(--muted);
-  display: grid;
-  gap: 5px;
+  display: inline-flex;
+  gap: 8px;
   font-size: 0.8rem;
+  white-space: nowrap;
 }
 
 .site-content-center-actions select {
