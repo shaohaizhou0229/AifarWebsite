@@ -5018,19 +5018,20 @@ body:has(.admin-shell)::before {
   inset: 0;
   display: grid;
   align-items: start;
-  justify-items: center;
-  background: rgba(15, 23, 42, 0.24);
-  padding-top: 12vh;
+  justify-items: start;
+  background: rgba(255, 255, 255, 0.16);
+  padding: 48px 0 0 2px;
 }
 
 .admin-command-panel {
   display: grid;
-  width: min(520px, calc(100vw - 32px));
+  width: min(388px, calc(100vw - 32px));
+  max-height: min(520px, calc(100vh - 72px));
   overflow: hidden;
   border: 1px solid var(--admin-border);
-  border-radius: 10px;
+  border-radius: 12px;
   background: #fff;
-  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.16), 0 3px 10px rgba(15, 23, 42, 0.08);
 }
 
 .admin-command-search {
@@ -5342,6 +5343,15 @@ body:has(.admin-shell)::before {
   width: 220px;
 }
 
+.admin-shell.admin-sidebar-collapsed .admin-command-overlay {
+  padding-top: 116px;
+  padding-left: 82px;
+}
+
+.admin-shell.admin-sidebar-collapsed .admin-command-panel {
+  width: min(360px, calc(100vw - 98px));
+}
+
 @media (max-width: 1240px) {
   .admin-metric-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -5427,6 +5437,18 @@ body:has(.admin-shell)::before {
 
   .admin-shell.admin-sidebar-collapsed .admin-sidebar-user details {
     display: block;
+  }
+
+  .admin-command-overlay,
+  .admin-shell.admin-sidebar-collapsed .admin-command-overlay {
+    justify-items: center;
+    background: rgba(15, 23, 42, 0.24);
+    padding: 12vh 16px 0;
+  }
+
+  .admin-command-panel,
+  .admin-shell.admin-sidebar-collapsed .admin-command-panel {
+    width: min(520px, calc(100vw - 32px));
   }
 
   .admin-content {
