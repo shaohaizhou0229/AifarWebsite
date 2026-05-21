@@ -14,6 +14,15 @@ export function AdminSidebarCollapse({ collapseLabel = "Collapse", expandLabel =
   }, []);
 
   useEffect(() => {
+    function onRequestedCollapse(event) {
+      setCollapsed(Boolean(event.detail?.collapsed));
+    }
+
+    window.addEventListener("aifar-admin-sidebar:set-collapsed", onRequestedCollapse);
+    return () => window.removeEventListener("aifar-admin-sidebar:set-collapsed", onRequestedCollapse);
+  }, []);
+
+  useEffect(() => {
     if (collapsed === null) return;
 
     const shell = buttonRef.current?.closest(".admin-shell");

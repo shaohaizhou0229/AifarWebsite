@@ -61,8 +61,16 @@ export function AdminSiteContentForm({
   useEffect(() => {
     const shell = document.querySelector(".admin-shell");
     shell?.classList.add("admin-designer-focus");
+    const requestSidebarCollapse = () => {
+      window.dispatchEvent(new CustomEvent("aifar-admin-sidebar:set-collapsed", { detail: { collapsed: true } }));
+    };
+    requestSidebarCollapse();
+    const animationFrame = window.requestAnimationFrame(requestSidebarCollapse);
 
-    return () => shell?.classList.remove("admin-designer-focus");
+    return () => {
+      window.cancelAnimationFrame(animationFrame);
+      shell?.classList.remove("admin-designer-focus");
+    };
   }, []);
 
   useEffect(() => {

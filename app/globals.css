@@ -2356,6 +2356,49 @@ h3 {
   box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
 }
 
+.site-designer-topbar {
+  gap: 10px;
+  padding: 10px 12px;
+}
+
+.site-designer-topbar .cms-toolbar {
+  gap: 10px;
+}
+
+.site-designer-topbar .field {
+  gap: 4px;
+}
+
+.site-designer-topbar .field label,
+.site-designer-topbar .eyebrow {
+  font-size: 0.72rem;
+}
+
+.site-designer-topbar .field select {
+  min-height: 34px;
+  padding: 7px 10px;
+}
+
+.site-designer-topbar .cms-status-panel {
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+.site-designer-topbar .cms-status-panel h3 {
+  font-size: 1rem;
+  margin: 2px 0;
+}
+
+.site-designer-topbar .cms-status-panel .muted-line {
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.site-designer-topbar .button {
+  min-height: 36px;
+  padding: 8px 12px;
+}
+
 .site-designer-return {
   display: grid;
   gap: 6px;
@@ -4794,7 +4837,8 @@ body:has(.admin-shell)::before {
 .admin-content:has(.site-content-designer-form) {
   width: 100%;
   max-width: none;
-  padding: 16px 16px 28px;
+  gap: 8px;
+  padding: 12px 16px 28px;
 }
 
 .admin-content:has(.site-content-designer-form) .admin-page-header,
@@ -4802,6 +4846,18 @@ body:has(.admin-shell)::before {
 .admin-content:has(.site-content-designer-form) .admin-detail-layout-wide {
   width: 100%;
   max-width: none;
+}
+
+.admin-content:has(.site-content-designer-form) .admin-breadcrumbs {
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+}
+
+.admin-content:has(.site-content-designer-form) .admin-breadcrumbs span:last-child {
+  color: var(--admin-ink);
+  font-size: 18px;
+  font-weight: 750;
 }
 
 .admin-breadcrumbs,
@@ -5882,35 +5938,29 @@ body:has(.admin-shell)::before {
   opacity: 0.65;
 }
 
-.admin-shell.admin-sidebar-collapsed,
-.admin-shell.admin-designer-focus {
+.admin-shell.admin-sidebar-collapsed {
   grid-template-columns: 72px minmax(0, 1fr);
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-sidebar,
-.admin-shell.admin-designer-focus .admin-sidebar {
+.admin-shell.admin-sidebar-collapsed .admin-sidebar {
   padding: 16px 10px;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-sidebar-brand,
-.admin-shell.admin-designer-focus .admin-sidebar-brand {
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-brand {
   justify-content: center;
   padding: 2px 0 24px;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-logo-full,
-.admin-shell.admin-designer-focus .admin-logo-full {
+.admin-shell.admin-sidebar-collapsed .admin-logo-full {
   display: none;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-logo-mark,
-.admin-shell.admin-designer-focus .admin-logo-mark {
+.admin-shell.admin-sidebar-collapsed .admin-logo-mark {
   display: block;
   width: 34px;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-sidebar-project,
-.admin-shell.admin-designer-focus .admin-sidebar-project {
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-project {
   grid-template-columns: 1fr;
   justify-items: center;
   padding: 0;
@@ -5925,74 +5975,55 @@ body:has(.admin-shell)::before {
 .admin-shell.admin-sidebar-collapsed .admin-nav-sidebar a span,
 .admin-shell.admin-sidebar-collapsed .admin-sidebar-collapse span,
 .admin-shell.admin-sidebar-collapsed .admin-sidebar-user > div,
-.admin-shell.admin-sidebar-collapsed .admin-sidebar-user details,
-.admin-shell.admin-designer-focus .admin-project-copy,
-.admin-shell.admin-designer-focus .admin-sidebar-project > svg:last-child,
-.admin-shell.admin-designer-focus .admin-sidebar-search span,
-.admin-shell.admin-designer-focus .admin-sidebar-search input,
-.admin-shell.admin-designer-focus .admin-sidebar-search kbd,
-.admin-shell.admin-designer-focus .admin-nav-group-label,
-.admin-shell.admin-designer-focus .admin-nav-sidebar a span,
-.admin-shell.admin-designer-focus .admin-sidebar-collapse span,
-.admin-shell.admin-designer-focus .admin-sidebar-user > div,
-.admin-shell.admin-designer-focus .admin-sidebar-user details {
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-user details {
   display: none;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-sidebar-search,
-.admin-shell.admin-designer-focus .admin-sidebar-search {
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-search {
   grid-template-columns: 1fr;
   justify-items: center;
   padding: 0;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-nav-sidebar,
-.admin-shell.admin-designer-focus .admin-nav-sidebar {
+.admin-shell.admin-sidebar-collapsed .admin-nav-sidebar {
   gap: 10px;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-nav-group,
-.admin-shell.admin-designer-focus .admin-nav-group {
+.admin-shell.admin-sidebar-collapsed .admin-nav-group {
   gap: 4px;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-nav-sidebar a,
-.admin-shell.admin-designer-focus .admin-nav-sidebar a {
+.admin-shell.admin-sidebar-collapsed .admin-nav-sidebar a {
   grid-template-columns: 1fr;
   justify-items: center;
   gap: 0;
   padding: 0;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-sidebar-collapse,
-.admin-shell.admin-designer-focus .admin-sidebar-collapse {
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-collapse {
   justify-content: center;
   padding: 0;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-sidebar-user,
-.admin-shell.admin-designer-focus .admin-sidebar-user {
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-user {
   grid-template-columns: 1fr;
   justify-items: center;
   margin-inline: -10px;
   padding-inline: 10px;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-project-popover,
-.admin-shell.admin-designer-focus .admin-project-popover {
+.admin-shell.admin-sidebar-collapsed .admin-project-popover {
   top: 0;
   left: calc(100% + 8px);
   width: 260px;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-command-overlay,
-.admin-shell.admin-designer-focus .admin-command-overlay {
+.admin-shell.admin-sidebar-collapsed .admin-command-overlay {
   padding-top: 116px;
   padding-left: 82px;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-command-panel,
-.admin-shell.admin-designer-focus .admin-command-panel {
+.admin-shell.admin-sidebar-collapsed .admin-command-panel {
   max-height: min(520px, calc(100vh - 140px));
   width: min(360px, calc(100vw - 98px));
 }

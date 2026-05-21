@@ -43,14 +43,16 @@ export function AdminPageHeader({ locale, shell = {}, eyebrow, title, lead, brea
           ))}
         </nav>
       ) : null}
-      <header className="admin-page-header">
-        <div>
-          {eyebrow ? <span className="admin-eyebrow">{eyebrow}</span> : null}
-          {title ? <h1>{title}</h1> : null}
-          {lead ? <p>{lead}</p> : null}
-        </div>
-        {actions ? <div className="admin-page-actions">{actions}</div> : null}
-      </header>
+      {title || lead || eyebrow || actions ? (
+        <header className="admin-page-header">
+          <div>
+            {eyebrow ? <span className="admin-eyebrow">{eyebrow}</span> : null}
+            {title ? <h1>{title}</h1> : null}
+            {lead ? <p>{lead}</p> : null}
+          </div>
+          {actions ? <div className="admin-page-actions">{actions}</div> : null}
+        </header>
+      ) : null}
     </>
   );
 }

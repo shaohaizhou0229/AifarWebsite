@@ -68,11 +68,10 @@ export default async function AdminProductDesignerPage({ params, searchParams })
       <AdminPageHeader
         locale={locale}
         shell={adminHome.shell}
-        title={labels.designerTitle || page.title}
         breadcrumbs={[
           { label: adminHome.nav.home, href: "/admin/" },
           { label: page.breadcrumb || page.title, href: "/admin/product/" },
-          { label: labels.designerBreadcrumb || labels.inspector }
+          { label: labels.designerTitle || labels.designerBreadcrumb || labels.inspector }
         ]}
       />
       <div className="admin-detail-layout admin-detail-layout-wide">
