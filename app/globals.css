@@ -2150,8 +2150,11 @@ h3 {
 }
 
 .site-content-designer-form {
-  border-radius: 10px;
-  padding: 16px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
 }
 
 .site-content-center-hero,
@@ -2345,7 +2348,8 @@ h3 {
 }
 
 .site-designer-topbar {
-  grid-template-columns: minmax(190px, 0.68fr) minmax(260px, 0.85fr) minmax(280px, 1fr) auto;
+  grid-template-columns: minmax(190px, 0.7fr) minmax(300px, 1fr) minmax(280px, 0.9fr) max-content;
+  min-width: 0;
   position: sticky;
   top: 56px;
   z-index: 4;
@@ -2361,7 +2365,8 @@ h3 {
   align-items: start;
   display: grid;
   gap: 14px;
-  grid-template-columns: minmax(250px, 0.64fr) minmax(680px, 1.65fr) minmax(300px, 0.76fr);
+  grid-template-columns: minmax(230px, 270px) minmax(0, 1fr) minmax(300px, 340px);
+  min-width: 0;
 }
 
 .site-designer-library,
@@ -2376,6 +2381,13 @@ h3 {
 .site-designer-canvas-panel {
   position: sticky;
   top: 142px;
+}
+
+.site-designer-library,
+.site-designer-inspector {
+  max-height: calc(100vh - 158px);
+  overflow: auto;
+  padding-right: 2px;
 }
 
 .site-designer-canvas-panel {
@@ -4780,7 +4792,15 @@ body:has(.admin-shell)::before {
 }
 
 .admin-content:has(.site-content-designer-form) {
-  width: calc(100% - 32px);
+  width: 100%;
+  max-width: none;
+  padding: 16px 16px 28px;
+}
+
+.admin-content:has(.site-content-designer-form) .admin-page-header,
+.admin-content:has(.site-content-designer-form) .admin-detail-layout,
+.admin-content:has(.site-content-designer-form) .admin-detail-layout-wide {
+  width: 100%;
   max-width: none;
 }
 
@@ -5862,29 +5882,35 @@ body:has(.admin-shell)::before {
   opacity: 0.65;
 }
 
-.admin-shell.admin-sidebar-collapsed {
+.admin-shell.admin-sidebar-collapsed,
+.admin-shell.admin-designer-focus {
   grid-template-columns: 72px minmax(0, 1fr);
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-sidebar {
+.admin-shell.admin-sidebar-collapsed .admin-sidebar,
+.admin-shell.admin-designer-focus .admin-sidebar {
   padding: 16px 10px;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-sidebar-brand {
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-brand,
+.admin-shell.admin-designer-focus .admin-sidebar-brand {
   justify-content: center;
   padding: 2px 0 24px;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-logo-full {
+.admin-shell.admin-sidebar-collapsed .admin-logo-full,
+.admin-shell.admin-designer-focus .admin-logo-full {
   display: none;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-logo-mark {
+.admin-shell.admin-sidebar-collapsed .admin-logo-mark,
+.admin-shell.admin-designer-focus .admin-logo-mark {
   display: block;
   width: 34px;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-sidebar-project {
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-project,
+.admin-shell.admin-designer-focus .admin-sidebar-project {
   grid-template-columns: 1fr;
   justify-items: center;
   padding: 0;
@@ -5899,55 +5925,74 @@ body:has(.admin-shell)::before {
 .admin-shell.admin-sidebar-collapsed .admin-nav-sidebar a span,
 .admin-shell.admin-sidebar-collapsed .admin-sidebar-collapse span,
 .admin-shell.admin-sidebar-collapsed .admin-sidebar-user > div,
-.admin-shell.admin-sidebar-collapsed .admin-sidebar-user details {
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-user details,
+.admin-shell.admin-designer-focus .admin-project-copy,
+.admin-shell.admin-designer-focus .admin-sidebar-project > svg:last-child,
+.admin-shell.admin-designer-focus .admin-sidebar-search span,
+.admin-shell.admin-designer-focus .admin-sidebar-search input,
+.admin-shell.admin-designer-focus .admin-sidebar-search kbd,
+.admin-shell.admin-designer-focus .admin-nav-group-label,
+.admin-shell.admin-designer-focus .admin-nav-sidebar a span,
+.admin-shell.admin-designer-focus .admin-sidebar-collapse span,
+.admin-shell.admin-designer-focus .admin-sidebar-user > div,
+.admin-shell.admin-designer-focus .admin-sidebar-user details {
   display: none;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-sidebar-search {
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-search,
+.admin-shell.admin-designer-focus .admin-sidebar-search {
   grid-template-columns: 1fr;
   justify-items: center;
   padding: 0;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-nav-sidebar {
+.admin-shell.admin-sidebar-collapsed .admin-nav-sidebar,
+.admin-shell.admin-designer-focus .admin-nav-sidebar {
   gap: 10px;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-nav-group {
+.admin-shell.admin-sidebar-collapsed .admin-nav-group,
+.admin-shell.admin-designer-focus .admin-nav-group {
   gap: 4px;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-nav-sidebar a {
+.admin-shell.admin-sidebar-collapsed .admin-nav-sidebar a,
+.admin-shell.admin-designer-focus .admin-nav-sidebar a {
   grid-template-columns: 1fr;
   justify-items: center;
   gap: 0;
   padding: 0;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-sidebar-collapse {
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-collapse,
+.admin-shell.admin-designer-focus .admin-sidebar-collapse {
   justify-content: center;
   padding: 0;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-sidebar-user {
+.admin-shell.admin-sidebar-collapsed .admin-sidebar-user,
+.admin-shell.admin-designer-focus .admin-sidebar-user {
   grid-template-columns: 1fr;
   justify-items: center;
   margin-inline: -10px;
   padding-inline: 10px;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-project-popover {
+.admin-shell.admin-sidebar-collapsed .admin-project-popover,
+.admin-shell.admin-designer-focus .admin-project-popover {
   top: 0;
   left: calc(100% + 8px);
   width: 260px;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-command-overlay {
+.admin-shell.admin-sidebar-collapsed .admin-command-overlay,
+.admin-shell.admin-designer-focus .admin-command-overlay {
   padding-top: 116px;
   padding-left: 82px;
 }
 
-.admin-shell.admin-sidebar-collapsed .admin-command-panel {
+.admin-shell.admin-sidebar-collapsed .admin-command-panel,
+.admin-shell.admin-designer-focus .admin-command-panel {
   max-height: min(520px, calc(100vh - 140px));
   width: min(360px, calc(100vw - 98px));
 }

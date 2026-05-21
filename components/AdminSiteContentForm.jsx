@@ -59,6 +59,13 @@ export function AdminSiteContentForm({
   const selectedSection = sections.find((section) => section.id === selectedSectionId) || sections[0] || null;
 
   useEffect(() => {
+    const shell = document.querySelector(".admin-shell");
+    shell?.classList.add("admin-designer-focus");
+
+    return () => shell?.classList.remove("admin-designer-focus");
+  }, []);
+
+  useEffect(() => {
     setSnapshots(initialSnapshots);
     setTemplates(initialTemplates);
   }, [initialSnapshots, initialTemplates]);
