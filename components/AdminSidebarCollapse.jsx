@@ -10,7 +10,8 @@ export function AdminSidebarCollapse({ collapseLabel = "Collapse", expandLabel =
   const buttonRef = useRef(null);
 
   useEffect(() => {
-    setCollapsed(window.localStorage.getItem(STORAGE_KEY) === "true");
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    setCollapsed(stored === null ? true : stored === "true");
   }, []);
 
   useEffect(() => {

@@ -82,6 +82,9 @@ export function AdminQuickJump({ locale, labels = {}, navLabels = {} }) {
               <Search aria-hidden="true" size={16} strokeWidth={1.8} />
               <input
                 ref={inputRef}
+                aria-label={labels.searchPlaceholder || labels.search || "Quick jump"}
+                name="adminQuickJump"
+                autoComplete="off"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder={labels.searchPlaceholder || labels.search || "Quick jump"}

@@ -39,20 +39,16 @@ export function AdminPageHeader({ locale, shell = {}, eyebrow, title, lead, brea
         <h1 className="sr-only" data-admin-page-title={topbarTitle}>{topbarTitle}</h1>
       ) : null}
       {breadcrumbs.length ? (
-        <nav className="admin-breadcrumbs" aria-label={shell.breadcrumbs || "Breadcrumbs"}>
+        <nav className="sr-only" data-admin-page-breadcrumbs aria-label={shell.breadcrumbs || "Breadcrumbs"}>
           {breadcrumbs.map((item, index) => (
             <span key={`${item.label}-${index}`}>
-              {item.href ? <Link href={localizedPath(locale, item.href)} prefetch={false}>{item.label}</Link> : item.label}
+              {item.href ? <Link data-admin-breadcrumb-item href={localizedPath(locale, item.href)} prefetch={false}>{item.label}</Link> : <span data-admin-breadcrumb-item>{item.label}</span>}
             </span>
           ))}
         </nav>
       ) : null}
-      {lead || eyebrow || actions ? (
-        <header className="admin-page-header">
-          <div>
-            {eyebrow ? <span className="admin-eyebrow">{eyebrow}</span> : null}
-            {lead ? <p>{lead}</p> : null}
-          </div>
+      {actions ? (
+        <header className="admin-page-header" aria-label={shell.pageActions || "Page actions"}>
           {actions ? <div className="admin-page-actions">{actions}</div> : null}
         </header>
       ) : null}

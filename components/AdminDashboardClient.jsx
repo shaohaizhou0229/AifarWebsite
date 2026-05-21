@@ -146,11 +146,11 @@ export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard
 
   const metricCards = dashboard ? [
     ["todayViews", dashboard.metrics.todayViews, `${dashboard.metrics.totalViews} ${page.metrics.details.totalInRange}`, "good", "positive", UserRound],
-    ["downloadClicks", dashboard.metrics.downloadClicks, page.metrics.details.daysWindow.replace("{days}", rangeDays), "good", "positive", Download],
     ["newContacts", dashboard.metrics.newContacts, dashboard.metrics.newContacts ? page.metrics.details.needsReview : page.metrics.details.clear, dashboard.metrics.newContacts ? "attention" : "neutral", dashboard.metrics.newContacts ? "warning" : "positive", Mail],
     ["openTickets", dashboard.metrics.openTickets, dashboard.metrics.openTickets ? page.metrics.details.needsReview : page.metrics.details.clear, dashboard.metrics.openTickets ? "attention" : "neutral", dashboard.metrics.openTickets ? "warning" : "positive", LifeBuoy],
     ["newUsers", dashboard.metrics.newUsers, page.metrics.details.today, "neutral", "neutral", Users],
-    ["draftContent", dashboard.metrics.draftContent, dashboard.metrics.draftContent ? page.metrics.details.needsReview : page.metrics.details.clear, dashboard.metrics.draftContent ? "attention" : "neutral", dashboard.metrics.draftContent ? "warning" : "positive", FileText]
+    ["draftContent", dashboard.metrics.draftContent, dashboard.metrics.draftContent ? page.metrics.details.needsReview : page.metrics.details.clear, dashboard.metrics.draftContent ? "attention" : "neutral", dashboard.metrics.draftContent ? "warning" : "positive", FileText],
+    ["collaborationTodo", dashboard.metrics.collaborationTodo, dashboard.metrics.collaborationTodo ? page.metrics.details.needsReview : page.metrics.details.clear, dashboard.metrics.collaborationTodo ? "attention" : "neutral", dashboard.metrics.collaborationTodo ? "warning" : "positive", ClipboardList]
   ] : [];
   const downloadSources = dashboard ? [
     { name: page.traffic.clientDownloads, count: dashboard.analytics.downloads?.client || 0 },
@@ -160,17 +160,6 @@ export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard
 
   return (
     <>
-      <div className="admin-dashboard-toolbar">
-        <nav className="admin-range-tabs" aria-label={page.ranges.label}>
-          <Link className={rangeDays === 1 ? "active" : ""} href={rangeHref(locale, 1)} prefetch={false}>{page.ranges.today}</Link>
-          <Link className={rangeDays === 7 ? "active" : ""} href={rangeHref(locale, 7)} prefetch={false}>{page.ranges.sevenDays}</Link>
-          <Link className={rangeDays === 30 ? "active" : ""} href={rangeHref(locale, 30)} prefetch={false}>{page.ranges.thirtyDays}</Link>
-        </nav>
-        <Link className="admin-icon-button" href={rangeHref(locale, rangeDays)} prefetch={false} aria-label={page.ranges.refresh}>
-          <RefreshCw aria-hidden="true" size={16} strokeWidth={1.8} />
-        </Link>
-      </div>
-
       <AdminAsyncState loading={loading} error={error} loadingLabel={loadingLabel} errorLabel={errorLabel}>
         {dashboard ? (
           <>
@@ -186,9 +175,19 @@ export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard
                   title={page.traffic.title}
                   meta={page.traffic.meta}
                   action={(
-                    <div className="admin-panel-tabs" aria-label={page.traffic.tabsLabel}>
-                      <button type="button" className={trafficMode === "visitors" ? "active" : ""} onClick={() => setTrafficMode("visitors")}>{page.traffic.tabs.visitors}</button>
-                      <button type="button" className={trafficMode === "downloads" ? "active" : ""} onClick={() => setTrafficMode("downloads")}>{page.traffic.tabs.downloads}</button>
+                    <div className="admin-traffic-controls">
+                      <nav className="admin-range-tabs" aria-label={page.ranges.label}>
+                        <Link className={rangeDays === 1 ? "active" : ""} href={rangeHref(locale, 1)} prefetch={false}>{page.ranges.today}</Link>
+                        <Link className={rangeDays === 7 ? "active" : ""} href={rangeHref(locale, 7)} prefetch={false}>{page.ranges.sevenDays}</Link>
+                        <Link className={rangeDays === 30 ? "active" : ""} href={rangeHref(locale, 30)} prefetch={false}>{page.ranges.thirtyDays}</Link>
+                      </nav>
+                      <Link className="admin-icon-button" href={rangeHref(locale, rangeDays)} prefetch={false} aria-label={page.ranges.refresh}>
+                        <RefreshCw aria-hidden="true" size={16} strokeWidth={1.8} />
+                      </Link>
+                      <div className="admin-panel-tabs" aria-label={page.traffic.tabsLabel}>
+                        <button type="button" className={trafficMode === "visitors" ? "active" : ""} onClick={() => setTrafficMode("visitors")}>{page.traffic.tabs.visitors}</button>
+                        <button type="button" className={trafficMode === "downloads" ? "active" : ""} onClick={() => setTrafficMode("downloads")}>{page.traffic.tabs.downloads}</button>
+                      </div>
                     </div>
                   )}
                   className="admin-traffic-panel"
@@ -216,6 +215,7 @@ export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard
                             <div>
                               <span>{page.traffic.visitedPages}</span>
                               <strong>{dashboard.analytics.visitedPages || 0}</strong>
+                              {page.traffic.visitedPagesHelp ? <small>{page.traffic.visitedPagesHelp}</small> : null}
                             </div>
                           </>
                         )}

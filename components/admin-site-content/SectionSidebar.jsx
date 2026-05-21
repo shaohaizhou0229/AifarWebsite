@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Archive, Image, Layers, LayoutTemplate, Save, Sparkles, Type, X } from "lucide-react";
 import { SITE_SECTION_LABELS, SITE_SECTION_TYPES } from "@/lib/site-page-builder";
 import { SectionMiniPreview, TemplateMiniPreview } from "./SectionPreview";
@@ -19,7 +19,19 @@ export function SectionSidebar({
   getTemplatePreviewContent
 }) {
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
+  const templateDialogRef = useRef(null);
   const canSaveTemplate = Boolean(templateDraft.name?.trim()) && !templateSaving;
+
+  useEffect(() => {
+    if (!isTemplateDialogOpen) return undefined;
+
+    function closeOnEscape(event) {
+      if (event.key === "Escape") setIsTemplateDialogOpen(false);
+    }
+
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [isTemplateDialogOpen]);
 
   async function saveTemplateFromDialog() {
     if (!canSaveTemplate) return;
@@ -52,10 +64,10 @@ export function SectionSidebar({
               </button>
               {!template.isSystem ? (
                 <>
-                <button className="icon-button" type="button" onClick={() => onUpdateTemplate(template)} title={labels.updateTemplate}>
+                <button className="icon-button" type="button" onClick={() => onUpdateTemplate(template)} title={labels.updateTemplate} aria-label={labels.updateTemplate}>
                   <Save size={15} aria-hidden="true" />
                 </button>
-                <button className="icon-button danger" type="button" onClick={() => onArchiveTemplate(template)} title={labels.archiveTemplate}>
+                <button className="icon-button danger" type="button" onClick={() => onArchiveTemplate(template)} title={labels.archiveTemplate} aria-label={labels.archiveTemplate}>
                   <Archive size={15} aria-hidden="true" />
                 </button>
                 </>
@@ -70,25 +82,31 @@ export function SectionSidebar({
       </button>
 
       {isTemplateDialogOpen ? (
-        <div className="template-save-dialog" role="dialog" aria-modal="true" aria-label={labels.saveAsTemplate}>
-          <div className="template-save-dialog-panel">
+        <div className="template-save-dialog" role="dialog" aria-modal="true" aria-label={labels.saveAsTemplate} onPointerDown={() => setIsTemplateDialogOpen(false)}>
+          <div className="template-save-dialog-panel" ref={templateDialogRef} onPointerDown={(event) => event.stopPropagation()}>
             <header className="template-save-dialog-head">
               <div>
                 <p className="eyebrow">{labels.templates}</p>
                 <strong>{labels.saveAsTemplate}</strong>
               </div>
-              <button className="icon-button" type="button" onClick={() => setIsTemplateDialogOpen(false)} title={labels.closePreview}>
+              <button className="icon-button" type="button" onClick={() => setIsTemplateDialogOpen(false)} title={labels.closePreview} aria-label={labels.closePreview}>
                 <X size={16} aria-hidden="true" />
               </button>
             </header>
             <div className="template-save-box">
               <input
+                aria-label={labels.templateName}
+                name="templateName"
+                autoComplete="off"
                 value={templateDraft.name}
                 placeholder={labels.templateName}
                 onChange={(event) => onTemplateDraftChange({ ...templateDraft, name: event.target.value })}
                 autoFocus
               />
               <textarea
+                aria-label={labels.templateDescription}
+                name="templateDescription"
+                autoComplete="off"
                 value={templateDraft.description}
                 placeholder={labels.templateDescription}
                 onChange={(event) => onTemplateDraftChange({ ...templateDraft, description: event.target.value })}

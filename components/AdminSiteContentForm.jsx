@@ -74,6 +74,17 @@ export function AdminSiteContentForm({
   }, []);
 
   useEffect(() => {
+    if (!previewOpen) return undefined;
+
+    function closeOnEscape(event) {
+      if (event.key === "Escape") setPreviewOpen(false);
+    }
+
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [previewOpen]);
+
+  useEffect(() => {
     setSnapshots(initialSnapshots);
     setTemplates(initialTemplates);
   }, [initialSnapshots, initialTemplates]);
@@ -564,8 +575,8 @@ export function AdminSiteContentForm({
       </section>
 
       {previewOpen ? (
-        <div className="site-preview-modal" role="dialog" aria-modal="true" aria-label={labels.fullPreview}>
-          <div className="site-preview-modal-panel">
+        <div className="site-preview-modal" role="dialog" aria-modal="true" aria-label={labels.fullPreview} onPointerDown={() => setPreviewOpen(false)}>
+          <div className="site-preview-modal-panel" onPointerDown={(event) => event.stopPropagation()}>
             <header className="site-preview-modal-head">
               <div>
                 <p className="eyebrow">{labels.fullPreview}</p>
