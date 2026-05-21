@@ -4777,24 +4777,36 @@ body:has(.admin-shell)::before {
 }
 
 .admin-topbar {
-  display: grid;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   min-height: 56px;
-  grid-template-columns: 1fr auto 1fr;
   border-bottom: 1px solid var(--admin-border);
   background: rgba(255, 255, 255, 0.9);
-  padding: 0 20px;
+  padding: 0 20px 0 max(20px, calc((100% - 1200px) / 2));
 }
 
 .admin-topbar-title {
-  justify-self: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--admin-ink);
+  padding-right: 18px;
 }
 
 .admin-topbar-title strong {
-  font-size: 15px;
-  font-weight: 600;
+  display: block;
+  overflow: hidden;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .admin-topbar-actions {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
   justify-content: flex-end;
   gap: 10px;
 }
@@ -4919,11 +4931,7 @@ body:has(.admin-shell)::before {
 }
 
 .admin-page-header h1 {
-  font-family: inherit;
-  font-size: 26px;
-  font-weight: 650;
-  letter-spacing: 0;
-  line-height: 1.15;
+  display: none;
 }
 
 .admin-page-header p {

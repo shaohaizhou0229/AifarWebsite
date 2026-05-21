@@ -30,6 +30,10 @@ export default async function AdminNotificationsPage({ params }) {
         shell={shellPage.shell}
         title={page.title}
         lead={page.lead}
+        breadcrumbs={[
+          { label: shellPage.nav.home, href: "/admin/" },
+          { label: shellPage.shell.adminNotifications || page.title }
+        ]}
       />
       <AdminNotificationsClient
         locale={locale}

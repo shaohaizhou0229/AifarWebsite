@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Bell, ChevronDown, Home, Plus } from "lucide-react";
 import { AdminAutoCloseDetails } from "@/components/AdminAutoCloseDetails";
 import { AdminLanguageMenu } from "@/components/AdminLanguageMenu";
+import { AdminTopBarTitle } from "@/components/AdminTopBarTitle";
 import { localizedPath } from "@/i18n/routing";
 
 export function AdminTopBar({ locale, labels = {}, title = "" }) {
@@ -9,10 +10,7 @@ export function AdminTopBar({ locale, labels = {}, title = "" }) {
 
   return (
     <div className="admin-topbar">
-      <div className="admin-topbar-side" aria-hidden="true" />
-      <div className="admin-topbar-title">
-        <strong>{title}</strong>
-      </div>
+      <AdminTopBarTitle fallbackTitle={title} />
       <div className="admin-topbar-actions">
         <Link className="admin-icon-button" href={localizedPath(locale, "/admin/notifications/")} prefetch={false} aria-label={labels.adminNotifications || labels.notifications || "Notifications"}>
           <Bell aria-hidden="true" size={17} strokeWidth={1.8} />

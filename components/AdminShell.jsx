@@ -31,9 +31,13 @@ export function getAdminShellInitials(user, profile) {
 
 export function AdminPageHeader({ locale, shell = {}, eyebrow, title, lead, breadcrumbs = [], actions = null }) {
   if (!title && !lead && !eyebrow && !breadcrumbs.length && !actions) return null;
+  const topbarTitle = title || breadcrumbs[breadcrumbs.length - 1]?.label || "";
 
   return (
     <>
+      {topbarTitle ? (
+        <h1 className="sr-only" data-admin-page-title={topbarTitle}>{topbarTitle}</h1>
+      ) : null}
       {breadcrumbs.length ? (
         <nav className="admin-breadcrumbs" aria-label={shell.breadcrumbs || "Breadcrumbs"}>
           {breadcrumbs.map((item, index) => (
@@ -43,11 +47,10 @@ export function AdminPageHeader({ locale, shell = {}, eyebrow, title, lead, brea
           ))}
         </nav>
       ) : null}
-      {title || lead || eyebrow || actions ? (
+      {lead || eyebrow || actions ? (
         <header className="admin-page-header">
           <div>
             {eyebrow ? <span className="admin-eyebrow">{eyebrow}</span> : null}
-            {title ? <h1>{title}</h1> : null}
             {lead ? <p>{lead}</p> : null}
           </div>
           {actions ? <div className="admin-page-actions">{actions}</div> : null}
