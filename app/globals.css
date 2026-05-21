@@ -5034,13 +5034,13 @@ body:has(.admin-shell)::before {
   align-items: start;
   justify-items: start;
   background: rgba(255, 255, 255, 0.16);
-  padding: 48px 0 0 2px;
+  padding: 118px 0 0 16px;
 }
 
 .admin-command-panel {
   display: grid;
   width: min(388px, calc(100vw - 32px));
-  max-height: min(520px, calc(100vh - 72px));
+  max-height: min(520px, calc(100vh - 142px));
   overflow: hidden;
   border: 1px solid var(--admin-border);
   border-radius: 12px;
@@ -5363,6 +5363,7 @@ body:has(.admin-shell)::before {
 }
 
 .admin-shell.admin-sidebar-collapsed .admin-command-panel {
+  max-height: min(520px, calc(100vh - 140px));
   width: min(360px, calc(100vw - 98px));
 }
 
