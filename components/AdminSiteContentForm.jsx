@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Eye, Monitor, Smartphone, Sparkles } from "lucide-react";
 import { SITE_LAYOUT_VERSION, createBlankSection, createSitePageTemplate } from "@/lib/site-page-builder";
@@ -46,6 +46,10 @@ export function AdminSiteContentForm({
   const [previewMode, setPreviewMode] = useState("desktop");
   const [previewOpen, setPreviewOpen] = useState(false);
   const [hoveredSectionId, setHoveredSectionId] = useState("");
+  const canvasPreviewRef = useRef(null);
+  const modalPreviewRef = useRef(null);
+  const [canvasPreviewScale, setCanvasPreviewScale] = useState(1);
+  const [modalPreviewScale, setModalPreviewScale] = useState(1);
 
   const currentPage = useMemo(
     () => pageOptions.find((option) => option.key === pageKey) || pageOptions[0],
@@ -58,6 +62,35 @@ export function AdminSiteContentForm({
     setSnapshots(initialSnapshots);
     setTemplates(initialTemplates);
   }, [initialSnapshots, initialTemplates]);
+
+  useEffect(() => {
+    const targetWidth = previewMode === "mobile" ? 390 : 1120;
+    const minScale = previewMode === "mobile" ? 0.78 : 0.54;
+    const observers = [];
+
+    function bindScaleObserver(node, setter) {
+      if (!node) return;
+
+      function updateScale() {
+        const availableWidth = Math.max(node.clientWidth - 24, 1);
+        setter(Math.min(1, Math.max(minScale, availableWidth / targetWidth)));
+      }
+
+      updateScale();
+      const observer = new ResizeObserver(updateScale);
+      observer.observe(node);
+      observers.push(observer);
+    }
+
+    bindScaleObserver(canvasPreviewRef.current, setCanvasPreviewScale);
+    if (previewOpen) {
+      bindScaleObserver(modalPreviewRef.current, setModalPreviewScale);
+    } else {
+      setModalPreviewScale(1);
+    }
+
+    return () => observers.forEach((observer) => observer.disconnect());
+  }, [previewMode, previewOpen]);
 
   function updateServerState(data) {
     if (Array.isArray(data.snapshots)) setSnapshots(data.snapshots);
@@ -450,18 +483,20 @@ export function AdminSiteContentForm({
                 </button>
               </div>
             </div>
-            <div className={`cms-live-preview site-designer-canvas ${previewMode}`}>
+            <div className={`cms-live-preview site-designer-canvas ${previewMode}`} ref={canvasPreviewRef}>
               {sections.length ? (
-                <SitePageSections
-                  page={ensureLayout(content)}
-                  locale={locale}
-                  editorMode
-                  labels={labels}
-                  selectedSectionId={selectedSectionId}
-                  hoveredSectionId={hoveredSectionId}
-                  onSelectSection={setSelectedSectionId}
-                  onHoverSection={setHoveredSectionId}
-                />
+                <div className="cms-live-preview-page" style={{ "--cms-preview-scale": canvasPreviewScale }}>
+                  <SitePageSections
+                    page={ensureLayout(content)}
+                    locale={locale}
+                    editorMode
+                    labels={labels}
+                    selectedSectionId={selectedSectionId}
+                    hoveredSectionId={hoveredSectionId}
+                    onSelectSection={setSelectedSectionId}
+                    onHoverSection={setHoveredSectionId}
+                  />
+                </div>
               ) : (
                 <div className="site-designer-empty-canvas">
                   <Sparkles size={28} aria-hidden="true" />
@@ -533,17 +568,19 @@ export function AdminSiteContentForm({
                 </button>
               </div>
             </header>
-            <div className={`cms-live-preview site-preview-modal-canvas ${previewMode}`}>
-              <SitePageSections
-                page={ensureLayout(content)}
-                locale={locale}
-                editorMode
-                labels={labels}
-                selectedSectionId={selectedSectionId}
-                hoveredSectionId={hoveredSectionId}
-                onSelectSection={setSelectedSectionId}
-                onHoverSection={setHoveredSectionId}
-              />
+            <div className={`cms-live-preview site-preview-modal-canvas ${previewMode}`} ref={modalPreviewRef}>
+              <div className="cms-live-preview-page" style={{ "--cms-preview-scale": modalPreviewScale }}>
+                <SitePageSections
+                  page={ensureLayout(content)}
+                  locale={locale}
+                  editorMode
+                  labels={labels}
+                  selectedSectionId={selectedSectionId}
+                  hoveredSectionId={hoveredSectionId}
+                  onSelectSection={setSelectedSectionId}
+                  onHoverSection={setHoveredSectionId}
+                />
+              </div>
             </div>
           </div>
         </div>

@@ -2149,6 +2149,11 @@ h3 {
   gap: 16px;
 }
 
+.site-content-designer-form {
+  border-radius: 10px;
+  padding: 16px;
+}
+
 .site-content-center-hero,
 .site-designer-topbar {
   align-items: center;
@@ -2336,10 +2341,11 @@ h3 {
 }
 
 .site-designer-topbar {
-  grid-template-columns: minmax(190px, 0.8fr) minmax(260px, 1fr) minmax(300px, 1fr) auto;
+  grid-template-columns: minmax(190px, 0.68fr) minmax(260px, 0.85fr) minmax(280px, 1fr) auto;
   position: sticky;
-  top: 0;
-  z-index: 25;
+  top: 56px;
+  z-index: 4;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
 }
 
 .site-designer-return {
@@ -2351,7 +2357,7 @@ h3 {
   align-items: start;
   display: grid;
   gap: 14px;
-  grid-template-columns: minmax(260px, 0.74fr) minmax(520px, 1.4fr) minmax(300px, 0.82fr);
+  grid-template-columns: minmax(250px, 0.64fr) minmax(680px, 1.65fr) minmax(300px, 0.76fr);
 }
 
 .site-designer-library,
@@ -2365,7 +2371,7 @@ h3 {
 .site-designer-inspector,
 .site-designer-canvas-panel {
   position: sticky;
-  top: 88px;
+  top: 142px;
 }
 
 .site-designer-canvas-panel {
@@ -2377,8 +2383,8 @@ h3 {
 }
 
 .site-designer-canvas {
-  height: calc(100vh - 230px);
-  min-height: 560px;
+  height: calc(100vh - 246px);
+  min-height: 600px;
 }
 
 .site-designer-empty-canvas {
@@ -2469,7 +2475,7 @@ h3 {
 }
 
 .site-preview-modal-canvas.mobile {
-  max-width: 420px;
+  max-width: 430px;
 }
 
 .cms-toolbar,
@@ -2816,11 +2822,26 @@ h3 {
   background: white;
   height: min(76vh, 860px);
   overflow: auto;
+  padding: 12px;
 }
 
 .cms-live-preview.mobile {
   margin: 0 auto;
-  max-width: 390px;
+  max-width: 430px;
+}
+
+.cms-live-preview-page {
+  width: 1120px;
+  min-height: 100%;
+  margin: 0 auto;
+  background: white;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+  transform-origin: top center;
+  zoom: var(--cms-preview-scale, 1);
+}
+
+.cms-live-preview.mobile .cms-live-preview-page {
+  width: 390px;
 }
 
 .cms-live-preview .hero,
@@ -4752,6 +4773,11 @@ body:has(.admin-shell)::before {
   margin: 0 auto;
   gap: 16px;
   padding: 24px 0 34px;
+}
+
+.admin-content:has(.site-content-designer-form) {
+  width: calc(100% - 32px);
+  max-width: none;
 }
 
 .admin-breadcrumbs,
