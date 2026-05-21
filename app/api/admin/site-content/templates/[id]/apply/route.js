@@ -39,7 +39,9 @@ export async function POST(request, { params }) {
     }
 
     const fallback = await getPageMessages(locale, pageKey);
-    const entry = await applySitePageTemplateToDraft(id, pageKey, locale, user, fallback);
+    const entry = await applySitePageTemplateToDraft(id, pageKey, locale, user, fallback, {
+      includeSeo: typeof body.includeSeo === "boolean" ? body.includeSeo : undefined
+    });
     if (!entry) {
       return NextResponse.json({ error: "Template not found." }, { status: 404 });
     }

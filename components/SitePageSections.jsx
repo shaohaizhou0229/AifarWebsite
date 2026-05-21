@@ -435,27 +435,69 @@ function CtaSection({ section, locale }) {
   );
 }
 
-export function SitePageSections({ page, locale }) {
+export function SitePageSections({
+  page,
+  locale,
+  editorMode = false,
+  labels = {},
+  selectedSectionId = "",
+  hoveredSectionId = "",
+  onSelectSection,
+  onHoverSection
+}) {
   const sections = Array.isArray(page?.sections) ? page.sections : [];
+
+  function renderSection(section) {
+    if (section.type === "hero") return <HeroSection section={section} locale={locale} key={section.id} />;
+    if (section.type === "trust_bar") return <TrustBarSection section={section} key={section.id} />;
+    if (section.type === "card_grid" || section.type === "capability_matrix") return <CardGridSection section={section} locale={locale} key={section.id} />;
+    if (section.type === "feature_list") return <FeatureListSection section={section} key={section.id} />;
+    if (section.type === "media_feature") return <MediaFeatureSection section={section} key={section.id} />;
+    if (section.type === "scenario_split") return <ScenarioSplitSection section={section} key={section.id} />;
+    if (section.type === "workflow_steps") return <WorkflowStepsSection section={section} key={section.id} />;
+    if (section.type === "module_showcase") return <ModuleShowcaseSection section={section} key={section.id} />;
+    if (section.type === "security_assurance") return <SecurityAssuranceSection section={section} key={section.id} />;
+    if (section.type === "download_panel") return <DownloadPanelSection section={section} locale={locale} key={section.id} />;
+    if (section.type === "faq_band") return <FaqBandSection section={section} key={section.id} />;
+    if (section.type === "support_entry") return <SupportEntrySection section={section} locale={locale} key={section.id} />;
+    if (section.type === "updates_list") return <UpdatesSection section={section} locale={locale} key={section.id} />;
+    if (section.type === "cta_band") return <CtaSection section={section} locale={locale} key={section.id} />;
+    return null;
+  }
 
   return (
     <>
-      {sections.map((section) => {
-        if (section.type === "hero") return <HeroSection section={section} locale={locale} key={section.id} />;
-        if (section.type === "trust_bar") return <TrustBarSection section={section} key={section.id} />;
-        if (section.type === "card_grid" || section.type === "capability_matrix") return <CardGridSection section={section} locale={locale} key={section.id} />;
-        if (section.type === "feature_list") return <FeatureListSection section={section} key={section.id} />;
-        if (section.type === "media_feature") return <MediaFeatureSection section={section} key={section.id} />;
-        if (section.type === "scenario_split") return <ScenarioSplitSection section={section} key={section.id} />;
-        if (section.type === "workflow_steps") return <WorkflowStepsSection section={section} key={section.id} />;
-        if (section.type === "module_showcase") return <ModuleShowcaseSection section={section} key={section.id} />;
-        if (section.type === "security_assurance") return <SecurityAssuranceSection section={section} key={section.id} />;
-        if (section.type === "download_panel") return <DownloadPanelSection section={section} locale={locale} key={section.id} />;
-        if (section.type === "faq_band") return <FaqBandSection section={section} key={section.id} />;
-        if (section.type === "support_entry") return <SupportEntrySection section={section} locale={locale} key={section.id} />;
-        if (section.type === "updates_list") return <UpdatesSection section={section} locale={locale} key={section.id} />;
-        if (section.type === "cta_band") return <CtaSection section={section} locale={locale} key={section.id} />;
-        return null;
+      {sections.map((section, index) => {
+        const renderedSection = renderSection(section);
+        if (!renderedSection) return null;
+        if (!editorMode) return renderedSection;
+        const sectionId = section.id || `${section.type}-${index}`;
+        const isActive = sectionId === selectedSectionId;
+        const isHovered = sectionId === hoveredSectionId;
+        const label = labels.sectionTypes?.[section.type] || section.type;
+        return (
+          <div
+            className={`cms-canvas-section${isActive ? " selected" : ""}${isHovered ? " hovered" : ""}`}
+            key={sectionId}
+            role="button"
+            tabIndex={0}
+            onClick={(event) => {
+              event.preventDefault();
+              onSelectSection?.(sectionId);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                onSelectSection?.(sectionId);
+              }
+            }}
+            onMouseEnter={() => onHoverSection?.(sectionId)}
+            onMouseLeave={() => onHoverSection?.("")}
+          >
+            <span className="cms-canvas-section-label">{label}</span>
+            {renderedSection}
+          </div>
+        );
       })}
     </>
   );

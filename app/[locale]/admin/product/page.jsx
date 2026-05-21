@@ -2,11 +2,11 @@ import { setRequestLocale } from "next-intl/server";
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
-import { AdminSiteContentForm } from "@/components/AdminSiteContentForm";
+import { AdminSiteContentOverview } from "@/components/AdminSiteContentOverview";
 import { AdminRequiredError } from "@/lib/auth";
 import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { getAdminSitePageContent, listSiteContentSnapshots, listSitePageTemplates } from "@/lib/site-content";
+import { getAdminSitePageContent, listSiteContentSnapshotsForPages } from "@/lib/site-content";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localeLabels, locales, localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -42,15 +42,25 @@ export default async function AdminProductPage({ params, searchParams }) {
     redirect(localizedPath(locale, "/login/"));
   }
 
-  const initialPageKey = query?.page === "product" ? "product" : "home";
-  const initialLocale = locales.includes(query?.contentLocale) ? query.contentLocale : locale;
-  const fallback = await getPageMessages(initialLocale, initialPageKey);
-  const [contentState, snapshots, templates] = await Promise.all([
-    getAdminSitePageContent(initialPageKey, initialLocale, fallback),
-    listSiteContentSnapshots(initialPageKey, initialLocale),
-    listSitePageTemplates(initialPageKey, initialLocale)
-  ]);
+  const contentLocale = locales.includes(query?.contentLocale) ? query.contentLocale : locale;
   const labels = messages.forms.siteContent;
+  const pageOptions = [
+    { key: "home", label: labels.homePage, publicPath: "/" },
+    { key: "product", label: labels.productPage, publicPath: "/product/" }
+  ];
+  const contentStates = await Promise.all(
+    pageOptions.map(async (option) => {
+      const fallback = await getPageMessages(contentLocale, option.key);
+      const state = await getAdminSitePageContent(option.key, contentLocale, fallback);
+      return {
+        ...option,
+        content: state.content,
+        entry: state.entry
+      };
+    })
+  );
+  const history = await listSiteContentSnapshotsForPages(pageOptions.map((option) => option.key), contentLocale, 12);
+  const pageLabelByKey = Object.fromEntries(pageOptions.map((option) => [option.key, option.label]));
 
   return (
     <>
@@ -66,18 +76,15 @@ export default async function AdminProductPage({ params, searchParams }) {
       ]}
     />
       <div className="admin-detail-layout">
-        <AdminSiteContentForm
+        <AdminSiteContentOverview
           labels={labels}
-          initialPageKey={initialPageKey}
-          initialLocale={initialLocale}
-          initialContent={contentState.content}
-          initialEntry={contentState.entry}
-          initialSnapshots={snapshots}
-          initialTemplates={templates}
-          pageOptions={[
-            { key: "home", label: labels.homePage },
-            { key: "product", label: labels.productPage }
-          ]}
+          locale={locale}
+          contentLocale={contentLocale}
+          pages={contentStates}
+          history={history.map((item) => ({
+            ...item,
+            pageLabel: pageLabelByKey[item.pageKey] || item.pageKey
+          }))}
           localeOptions={locales.map((key) => ({ key, label: localeLabels[key] || key }))}
         />
       </div>
