@@ -2642,11 +2642,55 @@ h3 {
   gap: 4px;
 }
 
+.template-save-trigger {
+  width: 100%;
+}
+
+.template-save-trigger svg {
+  flex: 0 0 auto;
+}
+
+.template-save-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  background: rgba(15, 23, 42, 0.34);
+  padding: 18px;
+}
+
+.template-save-dialog-panel {
+  display: grid;
+  gap: 14px;
+  width: min(420px, calc(100vw - 36px));
+  border: 1px solid rgba(183, 200, 213, 0.82);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.22);
+  padding: 16px;
+}
+
+.template-save-dialog-head,
+.template-save-dialog-actions {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.template-save-dialog-head strong {
+  display: block;
+  margin-top: 2px;
+}
+
+.template-save-dialog-actions {
+  justify-content: flex-end;
+}
+
 .template-save-box {
   display: grid;
   gap: 8px;
-  border-top: 1px solid var(--line);
-  padding-top: 12px;
 }
 
 .template-save-box input,

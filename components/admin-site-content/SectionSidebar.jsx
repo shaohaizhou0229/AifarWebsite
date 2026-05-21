@@ -1,4 +1,7 @@
-import { Archive, Image, Layers, LayoutTemplate, Save, Sparkles, Type } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { Archive, Image, Layers, LayoutTemplate, Save, Sparkles, Type, X } from "lucide-react";
 import { SITE_SECTION_LABELS, SITE_SECTION_TYPES } from "@/lib/site-page-builder";
 import { SectionMiniPreview, TemplateMiniPreview } from "./SectionPreview";
 
@@ -15,6 +18,15 @@ export function SectionSidebar({
   onAddSection,
   getTemplatePreviewContent
 }) {
+  const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
+  const canSaveTemplate = Boolean(templateDraft.name?.trim()) && !templateSaving;
+
+  async function saveTemplateFromDialog() {
+    if (!canSaveTemplate) return;
+    const saved = await onCreateTemplate();
+    if (saved !== false) setIsTemplateDialogOpen(false);
+  }
+
   return (
     <aside className="builder-panel">
       <div className="builder-panel-head">
@@ -52,29 +64,56 @@ export function SectionSidebar({
           </div>
         ))}
       </div>
-      <div className="template-save-box">
-        <input
-          value={templateDraft.name}
-          placeholder={labels.templateName}
-          onChange={(event) => onTemplateDraftChange({ ...templateDraft, name: event.target.value })}
-        />
-        <textarea
-          value={templateDraft.description}
-          placeholder={labels.templateDescription}
-          onChange={(event) => onTemplateDraftChange({ ...templateDraft, description: event.target.value })}
-        />
-        <label className="checkbox-line">
-          <input
-            type="checkbox"
-            checked={templateDraft.includeSeo}
-            onChange={(event) => onTemplateDraftChange({ ...templateDraft, includeSeo: event.target.checked })}
-          />
-          <span>{labels.includeSeo}</span>
-        </label>
-        <button className="button primary compact" type="button" onClick={onCreateTemplate} disabled={templateSaving}>
-          {templateSaving ? labels.saving : labels.saveAsTemplate}
-        </button>
-      </div>
+      <button className="button primary compact template-save-trigger" type="button" onClick={() => setIsTemplateDialogOpen(true)}>
+        <Save size={15} aria-hidden="true" />
+        {labels.saveAsTemplate}
+      </button>
+
+      {isTemplateDialogOpen ? (
+        <div className="template-save-dialog" role="dialog" aria-modal="true" aria-label={labels.saveAsTemplate}>
+          <div className="template-save-dialog-panel">
+            <header className="template-save-dialog-head">
+              <div>
+                <p className="eyebrow">{labels.templates}</p>
+                <strong>{labels.saveAsTemplate}</strong>
+              </div>
+              <button className="icon-button" type="button" onClick={() => setIsTemplateDialogOpen(false)} title={labels.closePreview}>
+                <X size={16} aria-hidden="true" />
+              </button>
+            </header>
+            <div className="template-save-box">
+              <input
+                value={templateDraft.name}
+                placeholder={labels.templateName}
+                onChange={(event) => onTemplateDraftChange({ ...templateDraft, name: event.target.value })}
+                autoFocus
+              />
+              <textarea
+                value={templateDraft.description}
+                placeholder={labels.templateDescription}
+                onChange={(event) => onTemplateDraftChange({ ...templateDraft, description: event.target.value })}
+              />
+              <label className="checkbox-line">
+                <input
+                  type="checkbox"
+                  checked={templateDraft.includeSeo}
+                  onChange={(event) => onTemplateDraftChange({ ...templateDraft, includeSeo: event.target.checked })}
+                />
+                <span>{labels.includeSeo}</span>
+              </label>
+            </div>
+            <div className="template-save-dialog-actions">
+              <button className="button secondary compact" type="button" onClick={() => setIsTemplateDialogOpen(false)}>
+                {labels.closePreview}
+              </button>
+              <button className="button primary compact" type="button" onClick={saveTemplateFromDialog} disabled={!canSaveTemplate}>
+                {templateSaving ? labels.saving : labels.saveAsTemplate}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <div className="builder-panel-head">
         <p className="eyebrow">{labels.addSection}</p>
         <Sparkles size={16} aria-hidden="true" />

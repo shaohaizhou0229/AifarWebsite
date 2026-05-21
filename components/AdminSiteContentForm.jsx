@@ -319,8 +319,10 @@ export function AdminSiteContentForm({
       setTemplates((current) => [...current, data.template]);
       setTemplateDraft({ name: "", description: "", includeSeo: false });
       setMessage(labels.templateSaved);
+      return true;
     } catch (templateError) {
       setError(templateError.message || labels.templateSaveFailed);
+      return false;
     } finally {
       setTemplateSaving(false);
     }
