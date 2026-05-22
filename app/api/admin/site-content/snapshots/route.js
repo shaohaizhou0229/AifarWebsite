@@ -2,7 +2,12 @@ import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { listSiteContentSnapshots, sanitizeSiteLocale, sanitizeSitePageKey } from "@/lib/site-content";
+import {
+  createSiteContentSnapshot,
+  listSiteContentSnapshots,
+  sanitizeSiteLocale,
+  sanitizeSitePageKey
+} from "@/lib/site-content";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -32,5 +37,32 @@ export async function GET(request) {
     return NextResponse.json({ snapshots });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: error.message || "Could not list snapshots." }, { status: 400 });
+  }
+}
+
+export async function POST(request) {
+  try {
+    const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.product);
+    const body = await request.json().catch(() => ({}));
+    const pageKey = sanitizeSitePageKey(body.pageKey);
+    const locale = sanitizeSiteLocale(body.locale);
+
+    if (!pageKey || !locale) {
+      return NextResponse.json({ error: "Unknown page or locale." }, { status: 400 });
+    }
+
+    const content = body.content && typeof body.content === "object" && !Array.isArray(body.content) ? body.content : {};
+    const snapshot = await createSiteContentSnapshot({
+      pageKey,
+      locale,
+      content,
+      snapshotType: "manual",
+      adminUser: user,
+      summary: String(body.summary || "").trim() || "Manual snapshot"
+    });
+    const snapshots = await listSiteContentSnapshots(pageKey, locale);
+    return NextResponse.json({ snapshot, snapshots }, { status: 201 });
+  } catch (error) {
+    return permissionError(error) || NextResponse.json({ error: error.message || "Could not create snapshot." }, { status: 400 });
   }
 }

@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { getAdminSitePageContent, listSiteContentSnapshots, restoreSiteContentSnapshot } from "@/lib/site-content";
-import { getPageMessages } from "@/i18n/messages";
+import { archiveSiteContentSnapshot, listSiteContentSnapshots } from "@/lib/site-content";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,22 +17,18 @@ function permissionError(error) {
   return null;
 }
 
-export async function POST(_request, { params }) {
+export async function DELETE(_request, { params }) {
   const { id } = await params;
 
   try {
     const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.product);
-    const entry = await restoreSiteContentSnapshot(id, user);
-    if (!entry) {
+    const snapshot = await archiveSiteContentSnapshot(id, user);
+    if (!snapshot) {
       return NextResponse.json({ error: "Snapshot not found." }, { status: 404 });
     }
-    const fallback = await getPageMessages(entry.locale, entry.pageKey);
-    const [result, snapshots] = await Promise.all([
-      getAdminSitePageContent(entry.pageKey, entry.locale, fallback),
-      listSiteContentSnapshots(entry.pageKey, entry.locale)
-    ]);
-    return NextResponse.json({ ...result, entry, snapshots });
+    const snapshots = await listSiteContentSnapshots(snapshot.pageKey, snapshot.locale);
+    return NextResponse.json({ snapshot, snapshots });
   } catch (error) {
-    return permissionError(error) || NextResponse.json({ error: error.message || "Could not restore snapshot." }, { status: 400 });
+    return permissionError(error) || NextResponse.json({ error: error.message || "Could not delete snapshot." }, { status: 400 });
   }
 }

@@ -7,7 +7,7 @@ import { AdminRequiredError } from "@/lib/auth";
 import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { SITE_LAYOUT_VERSION } from "@/lib/site-page-builder";
-import { getAdminSitePageContent, listSiteContentSnapshots, listSitePageTemplates } from "@/lib/site-content";
+import { getAdminSitePageContent, listSiteContentSnapshots } from "@/lib/site-content";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localeLabels, locales, localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -55,10 +55,9 @@ export default async function AdminProductDesignerPage({ params, searchParams })
   const initialLocale = locales.includes(query?.contentLocale) ? query.contentLocale : locale;
   const mode = query?.mode === "new" ? "new" : "edit";
   const fallback = await getPageMessages(initialLocale, initialPageKey);
-  const [contentState, snapshots, templates] = await Promise.all([
+  const [contentState, snapshots] = await Promise.all([
     getAdminSitePageContent(initialPageKey, initialLocale, fallback),
-    listSiteContentSnapshots(initialPageKey, initialLocale),
-    listSitePageTemplates(initialPageKey, initialLocale)
+    listSiteContentSnapshots(initialPageKey, initialLocale)
   ]);
   const labels = messages.forms.siteContent;
   const initialContent = mode === "new" ? createBlankDesign(contentState.content) : contentState.content;
@@ -82,7 +81,6 @@ export default async function AdminProductDesignerPage({ params, searchParams })
           initialContent={initialContent}
           initialEntry={contentState.entry}
           initialSnapshots={snapshots}
-          initialTemplates={templates}
           pageOptions={[
             { key: "home", label: labels.homePage },
             { key: "product", label: labels.productPage }

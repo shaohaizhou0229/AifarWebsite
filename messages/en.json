@@ -295,7 +295,7 @@
       "openPreview": "Preview",
       "fullPreview": "Large preview",
       "closePreview": "Close preview",
-      "startBlankHint": "Add blocks from the left panel or apply a template to start quickly.",
+      "startBlankHint": "Choose blocks from the left website structure; the canvas updates as the real page.",
       "applyStructure": "Structure only",
       "applyWithSeo": "Structure + SEO",
       "hoverPreview": "Layout guide",
@@ -303,6 +303,25 @@
       "layoutIcon": "Icon",
       "layoutImage": "Image",
       "templates": "Templates",
+      "webStructure": "Website structure",
+      "blockLibrary": "Block library",
+      "chooseBlock": "Choose a block",
+      "insertBlock": "Insert",
+      "insertBelow": "Insert below",
+      "duplicateSection": "Duplicate block",
+      "canvasTools": "Canvas block tools",
+      "pageSettings": "Page settings",
+      "snapshotList": "History snapshots",
+      "snapshotName": "Snapshot name",
+      "createSnapshot": "Create snapshot",
+      "snapshotCreated": "Snapshot created.",
+      "snapshotCreateFailed": "Unable to create snapshot.",
+      "previewSnapshot": "Preview snapshot",
+      "deleteSnapshot": "Delete snapshot",
+      "snapshotDeleted": "Snapshot deleted.",
+      "snapshotDeleteFailed": "Unable to delete snapshot.",
+      "confirmDeleteSnapshot": "Delete this snapshot from the history list?",
+      "confirmRemoveSection": "Delete this block?",
       "addSection": "Add block",
       "sections": "Page blocks",
       "pageBlueprint": "Page blueprint",
@@ -362,6 +381,28 @@
         "cta_band": "Close with conversion actions.",
         "support_entry": "Route visitors to support, docs, and inquiries."
       },
+      "sectionCategories": {
+        "hero": "Hero",
+        "navigation": "Navigation / entry",
+        "trust": "Trust data",
+        "modules": "Feature modules",
+        "media": "Media feature",
+        "scenarios": "Scenarios",
+        "workflow": "Workflow steps",
+        "security": "Security",
+        "downloads": "Download guide",
+        "faq": "FAQ",
+        "cta": "Call to action"
+      },
+      "settingTabs": {
+        "content": "Content",
+        "style": "Style",
+        "layout": "Layout",
+        "advanced": "Advanced"
+      },
+      "noStyleSettings": "This block has no style settings yet.",
+      "noLayoutSettings": "This block has no layout settings yet.",
+      "noAdvancedSettings": "This block has no advanced settings yet.",
       "variants": {
         "split": "Split hero",
         "simple": "Simple hero",
@@ -454,7 +495,8 @@
         "draft_saved": "Draft saved",
         "published": "Published",
         "restored": "Restored",
-        "template_applied": "Page plan applied"
+        "template_applied": "Page plan applied",
+        "manual": "Manual snapshot"
       }
     },
     "documents": {

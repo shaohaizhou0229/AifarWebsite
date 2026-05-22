@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowDown, ArrowUp, Copy, Plus, Trash2 } from "lucide-react";
 import { Card } from "@/components/Card";
 import { Release } from "@/components/Rows";
 import { localizedPath } from "@/i18n/routing";
@@ -443,7 +444,13 @@ export function SitePageSections({
   selectedSectionId = "",
   hoveredSectionId = "",
   onSelectSection,
-  onHoverSection
+  onHoverSection,
+  onMoveSection,
+  onDuplicateSection,
+  onRemoveSection,
+  onInsertAfterSection,
+  onDragStartSection,
+  onDropSection
 }) {
   const sections = Array.isArray(page?.sections) ? page.sections : [];
 
@@ -481,10 +488,14 @@ export function SitePageSections({
             key={sectionId}
             role="button"
             tabIndex={0}
+            draggable
             onClick={(event) => {
               event.preventDefault();
               onSelectSection?.(sectionId);
             }}
+            onDragStart={() => onDragStartSection?.(index)}
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={() => onDropSection?.(index)}
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
@@ -495,6 +506,25 @@ export function SitePageSections({
             onMouseLeave={() => onHoverSection?.("")}
           >
             <span className="cms-canvas-section-label">{label}</span>
+            {isActive ? (
+              <div className="cms-canvas-toolbar" aria-label={labels.canvasTools}>
+                <button type="button" disabled={index === 0} onClick={(event) => { event.stopPropagation(); onMoveSection?.(index, index - 1); }} title={labels.moveUp} aria-label={labels.moveUp}>
+                  <ArrowUp size={14} aria-hidden="true" />
+                </button>
+                <button type="button" disabled={index === sections.length - 1} onClick={(event) => { event.stopPropagation(); onMoveSection?.(index, index + 1); }} title={labels.moveDown} aria-label={labels.moveDown}>
+                  <ArrowDown size={14} aria-hidden="true" />
+                </button>
+                <button type="button" onClick={(event) => { event.stopPropagation(); onDuplicateSection?.(sectionId); }} title={labels.duplicateSection} aria-label={labels.duplicateSection}>
+                  <Copy size={14} aria-hidden="true" />
+                </button>
+                <button type="button" onClick={(event) => { event.stopPropagation(); onInsertAfterSection?.(sectionId, section.type); }} title={labels.insertBelow} aria-label={labels.insertBelow}>
+                  <Plus size={14} aria-hidden="true" />
+                </button>
+                <button type="button" className="danger" onClick={(event) => { event.stopPropagation(); onRemoveSection?.(sectionId); }} title={labels.removeSection} aria-label={labels.removeSection}>
+                  <Trash2 size={14} aria-hidden="true" />
+                </button>
+              </div>
+            ) : null}
             {renderedSection}
           </div>
         );
