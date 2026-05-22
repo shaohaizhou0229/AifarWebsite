@@ -5,11 +5,10 @@ import { Clock3, Eye, Monitor, RotateCcw, Settings, Smartphone, Sparkles, Trash2
 import { SITE_LAYOUT_VERSION, createBlankSection } from "@/lib/site-page-builder";
 import { SitePageSections } from "@/components/SitePageSections";
 import { CmsToolbar } from "@/components/admin-site-content/CmsToolbar";
-import { ContentStatusPanel } from "@/components/admin-site-content/ContentStatusPanel";
 import { SectionEditor } from "@/components/admin-site-content/SectionEditor";
 import { SectionSidebar } from "@/components/admin-site-content/SectionSidebar";
 import { SeoEditor } from "@/components/admin-site-content/SeoEditor";
-import { EMPTY_ENTRY, cloneContent, ensureLayout, formatDate, moveItem, updateSectionAt, updateSeo } from "@/components/admin-site-content/form-utils";
+import { cloneContent, ensureLayout, formatDate, moveItem, updateSectionAt, updateSeo } from "@/components/admin-site-content/form-utils";
 
 function SnapshotMenu({
   labels,
@@ -101,16 +100,13 @@ export function AdminSiteContentForm({
   initialPageKey,
   initialLocale,
   initialContent,
-  initialEntry,
   initialSnapshots = [],
   pageOptions,
-  localeOptions,
-  mode = "edit"
+  localeOptions
 }) {
   const [pageKey, setPageKey] = useState(initialPageKey);
   const [locale, setLocale] = useState(initialLocale);
   const [content, setContent] = useState(() => ensureLayout(initialContent));
-  const [entry, setEntry] = useState(initialEntry || EMPTY_ENTRY);
   const [selectedSectionId, setSelectedSectionId] = useState(() => initialContent?.sections?.[0]?.id || "");
   const [dragIndex, setDragIndex] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -174,6 +170,15 @@ export function AdminSiteContentForm({
   }, [initialSnapshots]);
 
   useEffect(() => {
+    if (!message && !error) return undefined;
+    const timer = window.setTimeout(() => {
+      setMessage("");
+      setError("");
+    }, 3600);
+    return () => window.clearTimeout(timer);
+  }, [message, error]);
+
+  useEffect(() => {
     const targetWidth = previewMode === "mobile" ? 390 : 1120;
     const minScale = previewMode === "mobile" ? 0.78 : 0.54;
     const observers = [];
@@ -222,7 +227,6 @@ export function AdminSiteContentForm({
       setPageKey(nextPageKey);
       setLocale(nextLocale);
       setContent(nextContent);
-      setEntry(data.entry || EMPTY_ENTRY);
       setSelectedSectionId(nextContent.sections[0]?.id || "");
       updateServerState(data);
     } catch (loadError) {
@@ -251,7 +255,6 @@ export function AdminSiteContentForm({
 
       const savedContent = ensureLayout(data.content);
       setContent(savedContent);
-      setEntry(data.entry || EMPTY_ENTRY);
       setSelectedSectionId((current) => current || savedContent.sections[0]?.id || "");
       updateServerState(data);
       if (showMessage) setMessage(labels.saved);
@@ -289,7 +292,6 @@ export function AdminSiteContentForm({
 
       const nextContent = ensureLayout(data.content);
       setContent(nextContent);
-      setEntry(data.entry || EMPTY_ENTRY);
       updateServerState(data);
       setMessage(labels.previewPublished || labels.published);
     } catch (publishError) {
@@ -443,7 +445,6 @@ export function AdminSiteContentForm({
       if (!response.ok) throw new Error(data.error || labels.restoreFailed);
       const nextContent = ensureLayout(data.content);
       setContent(nextContent);
-      setEntry(data.entry || EMPTY_ENTRY);
       setSelectedSectionId(nextContent.sections[0]?.id || "");
       updateServerState(data);
       setMessage(labels.restored);
@@ -473,10 +474,6 @@ export function AdminSiteContentForm({
     <form className="admin-actions site-content-designer-form" onSubmit={saveDraft}>
       <section className="site-designer-shell">
         <header className="site-designer-topbar">
-          <div className="site-designer-return">
-            <p className="eyebrow">{mode === "new" ? labels.modeNew : labels.modeEdit}</p>
-            <strong>{currentPage.label}</strong>
-          </div>
           <CmsToolbar
             labels={labels}
             pageKey={pageKey}
@@ -486,27 +483,6 @@ export function AdminSiteContentForm({
             disabled={loading || saving || publishing}
             onLoadContent={loadContent}
           />
-          <ContentStatusPanel
-            labels={labels}
-            currentPage={currentPage}
-            entry={entry}
-            locale={locale}
-            saving={saving}
-            publishing={publishing}
-            disabled={publishing || saving || loading}
-            onPublish={publishDraft}
-            showAction={false}
-          />
-          <div className="preview-mode-toggle" aria-label={labels.previewMode}>
-            <button type="button" className={previewMode === "desktop" ? "active" : ""} onClick={() => setPreviewMode("desktop")} title={labels.desktopPreview}>
-              <Monitor size={15} aria-hidden="true" />
-              <span>{labels.desktopPreview}</span>
-            </button>
-            <button type="button" className={previewMode === "mobile" ? "active" : ""} onClick={() => setPreviewMode("mobile")} title={labels.mobilePreview}>
-              <Smartphone size={15} aria-hidden="true" />
-              <span>{labels.mobilePreview}</span>
-            </button>
-          </div>
           <div className="site-designer-actions">
             <SnapshotMenu
               labels={labels}
@@ -526,10 +502,10 @@ export function AdminSiteContentForm({
               <Eye size={16} aria-hidden="true" />
               {labels.openPreview}
             </button>
-            <button className="button primary" type="submit" disabled={saving || publishing || loading}>
+            <button className="button site-designer-save-button" type="submit" disabled={saving || publishing || loading}>
               {saving ? labels.saving : labels.save}
             </button>
-            <button className="button secondary" type="button" onClick={publishDraft} disabled={publishing || saving || loading}>
+            <button className="button site-designer-publish-button" type="button" onClick={publishDraft} disabled={publishing || saving || loading}>
               {publishing ? labels.publishing : labels.publishCurrentPreview || labels.publish}
             </button>
           </div>
@@ -545,6 +521,16 @@ export function AdminSiteContentForm({
               <div>
                 <p className="eyebrow">{labels.canvas}</p>
                 <strong>{currentPage.label}</strong>
+              </div>
+              <div className="preview-mode-toggle" aria-label={labels.previewMode}>
+                <button type="button" className={previewMode === "desktop" ? "active" : ""} onClick={() => setPreviewMode("desktop")} title={labels.desktopPreview}>
+                  <Monitor size={15} aria-hidden="true" />
+                  <span>{labels.desktopPreview}</span>
+                </button>
+                <button type="button" className={previewMode === "mobile" ? "active" : ""} onClick={() => setPreviewMode("mobile")} title={labels.mobilePreview}>
+                  <Smartphone size={15} aria-hidden="true" />
+                  <span>{labels.mobilePreview}</span>
+                </button>
               </div>
             </div>
             <div className={`cms-live-preview site-designer-canvas ${previewMode}`} ref={canvasPreviewRef}>
@@ -655,8 +641,12 @@ export function AdminSiteContentForm({
         </div>
       ) : null}
 
-      {message ? <p className="form-message success">{message}</p> : null}
-      {error ? <p className="form-message error">{error}</p> : null}
+      {message || error ? (
+        <div className="site-designer-toast-stack" role="status" aria-live="polite">
+          {message ? <p className="form-message success">{message}</p> : null}
+          {error ? <p className="form-message error">{error}</p> : null}
+        </div>
+      ) : null}
     </form>
   );
 }

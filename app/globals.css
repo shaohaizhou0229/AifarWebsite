@@ -1707,6 +1707,24 @@ h3 {
   color: var(--amber);
 }
 
+.site-designer-toast-stack {
+  position: fixed;
+  top: 84px;
+  right: 24px;
+  z-index: 110;
+  display: grid;
+  gap: 8px;
+  width: min(360px, calc(100vw - 32px));
+  pointer-events: none;
+}
+
+.site-designer-toast-stack .form-message {
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.18);
+  padding: 12px 14px;
+}
+
 .account-settings-shell {
   display: grid;
   max-width: 920px;
@@ -2348,11 +2366,11 @@ h3 {
 }
 
 .site-designer-topbar {
-  grid-template-columns: minmax(120px, 0.52fr) minmax(260px, 0.7fr) minmax(250px, 0.78fr) auto max-content;
+  grid-template-columns: minmax(320px, 520px) minmax(0, 1fr);
   min-width: 0;
   position: sticky;
   top: 56px;
-  z-index: 4;
+  z-index: 12;
   box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
 }
 
@@ -2379,29 +2397,32 @@ h3 {
   padding: 7px 10px;
 }
 
-.site-designer-topbar .cms-status-panel {
-  gap: 8px;
-  padding: 10px 12px;
-}
-
-.site-designer-topbar .cms-status-panel h3 {
-  font-size: 1rem;
-  margin: 2px 0;
-}
-
-.site-designer-topbar .cms-status-panel .muted-line {
-  font-size: 0.78rem;
-  line-height: 1.35;
-}
-
 .site-designer-topbar .button {
   min-height: 36px;
   padding: 8px 12px;
 }
 
-.site-designer-return {
-  display: grid;
-  gap: 6px;
+.site-designer-save-button {
+  border-color: rgba(183, 200, 213, 0.98);
+  background: #f3f6f8;
+  color: #111827;
+  box-shadow: none;
+}
+
+.site-designer-save-button:hover {
+  border-color: rgba(148, 163, 184, 0.92);
+  background: #e9eef3;
+}
+
+.site-designer-publish-button {
+  border-color: #111827;
+  background: #111827;
+  color: #fff;
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.18);
+}
+
+.site-designer-publish-button:hover {
+  background: #030712;
 }
 
 .site-designer-grid {
@@ -2424,6 +2445,18 @@ h3 {
 .site-designer-canvas-panel {
   position: sticky;
   top: 142px;
+}
+
+.site-designer-library {
+  z-index: 20;
+}
+
+.site-designer-canvas-panel {
+  z-index: 1;
+}
+
+.site-designer-inspector {
+  z-index: 2;
 }
 
 .site-designer-library,
@@ -3041,6 +3074,7 @@ h3 {
   border-radius: 8px;
   display: inline-flex;
   overflow: hidden;
+  flex: 0 0 auto;
 }
 
 .preview-mode-toggle button {
@@ -3049,6 +3083,9 @@ h3 {
   background: white;
   color: var(--muted);
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font: inherit;
   font-size: 0.82rem;
   padding: 8px 10px;
@@ -3133,6 +3170,8 @@ h3 {
 
 .section-structure-panel {
   position: relative;
+  z-index: 30;
+  overflow: visible;
 }
 
 .site-structure-list {
@@ -3166,7 +3205,7 @@ h3 {
   position: absolute;
   top: 0;
   left: calc(100% + 12px);
-  z-index: 20;
+  z-index: 80;
   display: grid;
   gap: 12px;
   width: min(560px, calc(100vw - 320px));
