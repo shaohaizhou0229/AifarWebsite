@@ -32,7 +32,6 @@ export default async function AdminHomePage({ params, searchParams }) {
         title={page.title}
         lead={page.lead}
         breadcrumbs={[
-          { label: page.nav?.groups?.workspace || page.nav?.label || page.title },
           { label: page.title }
         ]}
       />

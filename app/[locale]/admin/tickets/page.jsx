@@ -29,8 +29,6 @@ export default async function AdminTicketsPage({ params, searchParams }) {
     getPageMessages(locale, "adminHome"),
     getLocaleMessages(locale)
   ]);
-  const adminNav = adminHome.nav;
-
   try {
     await requireAdminPermissionCached(ADMIN_PERMISSIONS.support);
   } catch (error) {
@@ -52,9 +50,7 @@ export default async function AdminTicketsPage({ params, searchParams }) {
       title={page.title}
       lead={page.lead}
       breadcrumbs={[
-        { label: adminNav.home, href: "/admin/" },
-        { label: adminNav.contact, href: "/admin/contact/" },
-        { label: page.breadcrumb }
+        { label: adminHome.nav.support }
       ]}
       actions={(
         <div className="admin-segmented">

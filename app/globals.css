@@ -4796,10 +4796,8 @@ body:has(.admin-shell)::before {
 }
 
 .admin-topbar-title {
-  display: grid;
   flex: 1 1 auto;
   min-width: 0;
-  gap: 3px;
   color: var(--admin-ink);
   padding-right: 18px;
 }
@@ -4809,24 +4807,19 @@ body:has(.admin-shell)::before {
   align-items: center;
   min-width: 0;
   color: var(--admin-muted);
-  gap: 7px;
-  font-size: 12px;
+  gap: 6px;
+  font-size: 13px;
   font-weight: 500;
-  line-height: 1.2;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .admin-topbar-breadcrumbs span {
   display: inline-flex;
   align-items: center;
+  max-width: min(30vw, 320px);
   min-width: 0;
-  gap: 7px;
-}
-
-.admin-topbar-breadcrumbs span + span::before {
-  width: 1px;
-  height: 11px;
-  background: var(--admin-border-strong);
-  content: "";
+  gap: 6px;
 }
 
 .admin-topbar-breadcrumbs a,
@@ -4841,12 +4834,36 @@ body:has(.admin-shell)::before {
   color: var(--admin-ink);
 }
 
-.admin-topbar-title strong {
-  display: block;
+.admin-topbar-breadcrumb-separator {
+  flex: 0 0 auto;
+  max-width: none;
+  color: var(--admin-subtle);
+  font-weight: 500;
+}
+
+.admin-topbar-breadcrumb-root {
+  flex: 0 1 auto;
+  max-width: min(24vw, 240px);
+  color: var(--admin-ink);
+}
+
+.admin-topbar-breadcrumb-root svg {
+  color: var(--admin-success);
+}
+
+.admin-topbar-breadcrumb-current {
+  min-height: 28px;
+  border: 1px solid var(--admin-border);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  color: var(--admin-ink);
+  font-weight: 650;
+  padding: 0 9px;
+}
+
+.admin-topbar-breadcrumb-current span {
   overflow: hidden;
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

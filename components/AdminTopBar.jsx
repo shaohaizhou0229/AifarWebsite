@@ -10,7 +10,7 @@ export function AdminTopBar({ locale, labels = {}, title = "" }) {
 
   return (
     <div className="admin-topbar">
-      <AdminTopBarTitle fallbackTitle={title} />
+      <AdminTopBarTitle fallbackTitle={title} projectName={labels.projectName || "Aifar Website"} rootHref={localizedPath(locale, "/admin/")} />
       <div className="admin-topbar-actions">
         <Link className="admin-icon-button" href={localizedPath(locale, "/admin/notifications/")} prefetch={false} aria-label={labels.adminNotifications || labels.notifications || "Notifications"}>
           <Bell aria-hidden="true" size={17} strokeWidth={1.8} />

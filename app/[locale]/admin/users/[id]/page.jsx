@@ -70,7 +70,7 @@ export default async function AdminUserDetailPage({ params }) {
       breadcrumbs={[
         { label: adminHome.nav.home, href: "/admin/" },
         { label: adminHome.nav.users, href: "/admin/users/" },
-        { label: page.breadcrumb }
+        { label: user.displayName || user.email }
       ]}
     />
       <div className="admin-detail-layout">

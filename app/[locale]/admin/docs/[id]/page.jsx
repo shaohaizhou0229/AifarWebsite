@@ -65,7 +65,7 @@ export default async function EditAdminDocumentPage({ params }) {
       breadcrumbs={[
         { label: adminHome.nav.home, href: "/admin/" },
         { label: adminHome.nav.docs, href: "/admin/docs/" },
-        { label: document.title }
+        { label: page.newBreadcrumb || page.newTitle }
       ]}
     />
       <div className="admin-detail-layout">

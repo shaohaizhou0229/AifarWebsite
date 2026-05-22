@@ -51,6 +51,7 @@ export default async function AdminDownloadDetailPage({ params }) {
   if (!platform) notFound();
 
   const release = platform.release;
+  const platformBreadcrumb = `${platform.label}${page.platformBreadcrumbSuffix || ""}`;
 
   return (
     <>
@@ -63,7 +64,7 @@ export default async function AdminDownloadDetailPage({ params }) {
       breadcrumbs={[
         { label: adminHome.nav.home, href: "/admin/" },
         { label: adminHome.nav.downloads, href: "/admin/downloads/" },
-        { label: platform.label }
+        { label: platformBreadcrumb }
       ]}
     />
       <div className="admin-detail-layout">

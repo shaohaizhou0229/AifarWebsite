@@ -71,7 +71,7 @@ export default async function AdminProductDesignerPage({ params, searchParams })
         breadcrumbs={[
           { label: adminHome.nav.home, href: "/admin/" },
           { label: page.breadcrumb || page.title, href: "/admin/product/" },
-          { label: labels.designerTitle || labels.designerBreadcrumb || labels.inspector }
+          { label: labels.designerBreadcrumb || labels.designerTitle || labels.inspector }
         ]}
       />
       <div className="admin-detail-layout admin-detail-layout-wide">
