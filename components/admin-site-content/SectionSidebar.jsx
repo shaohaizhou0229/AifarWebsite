@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Plus, X } from "lucide-react";
 import { SITE_SECTION_LABELS, createBlankSection } from "@/lib/site-page-builder";
 import { SitePageSections } from "@/components/SitePageSections";
@@ -47,14 +47,60 @@ function createPreviewSection(type, labels) {
 }
 
 export function SectionSidebar({ labels, locale, onAddSection }) {
-  const [activeGroupKey, setActiveGroupKey] = useState(STRUCTURE_GROUPS[0].key);
+  const [activeGroupKey, setActiveGroupKey] = useState("");
+  const closeTimerRef = useRef(null);
   const activeGroup = useMemo(
     () => activeGroupKey ? STRUCTURE_GROUPS.find((group) => group.key === activeGroupKey) : null,
     [activeGroupKey]
   );
 
+  useEffect(() => () => {
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+    }
+  }, []);
+
+  function clearCloseTimer() {
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }
+
+  function openGroup(groupKey) {
+    clearCloseTimer();
+    setActiveGroupKey(groupKey);
+  }
+
+  function closeLibrary() {
+    clearCloseTimer();
+    setActiveGroupKey("");
+  }
+
+  function scheduleCloseLibrary() {
+    clearCloseTimer();
+    closeTimerRef.current = window.setTimeout(() => {
+      setActiveGroupKey("");
+      closeTimerRef.current = null;
+    }, 160);
+  }
+
+  function insertSection(type) {
+    onAddSection(type);
+    closeLibrary();
+  }
+
   return (
-    <aside className="builder-panel section-structure-panel">
+    <aside
+      className="builder-panel section-structure-panel"
+      onMouseEnter={clearCloseTimer}
+      onMouseLeave={scheduleCloseLibrary}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+          closeLibrary();
+        }
+      }}
+    >
       <div className="builder-panel-head">
         <div>
           <p className="eyebrow">{labels.webStructure}</p>
@@ -67,7 +113,9 @@ export function SectionSidebar({ labels, locale, onAddSection }) {
             className={group.key === activeGroupKey ? "active" : ""}
             type="button"
             key={group.key}
-            onClick={() => setActiveGroupKey(group.key)}
+            onMouseEnter={() => openGroup(group.key)}
+            onFocus={() => openGroup(group.key)}
+            onClick={() => openGroup(group.key)}
           >
             {labels.sectionCategories?.[group.key] || group.key}
           </button>
@@ -75,39 +123,45 @@ export function SectionSidebar({ labels, locale, onAddSection }) {
       </nav>
 
       {activeGroup ? (
-      <div className="section-library-popover" role="region" aria-label={labels.blockLibrary}>
-        <header className="section-library-head">
-          <div>
-            <p className="eyebrow">{labels.sectionCategories?.[activeGroup.key] || activeGroup.key}</p>
-            <strong>{labels.chooseBlock}</strong>
-          </div>
-          <button className="icon-button" type="button" onClick={() => setActiveGroupKey("")} title={labels.closePreview} aria-label={labels.closePreview}>
-            <X size={15} aria-hidden="true" />
-          </button>
-        </header>
-        <div className="section-library-list">
-          {activeGroup.types.map((type) => {
-            const previewSection = createPreviewSection(type, labels);
-            return (
-              <article className="section-library-row" key={type}>
-                <div className="section-library-preview" aria-hidden="true">
-                  <div className="section-library-preview-page">
-                    <SitePageSections page={{ sections: [previewSection] }} locale={locale} />
+        <div
+          className="section-library-popover"
+          role="region"
+          aria-label={labels.blockLibrary}
+          onMouseEnter={clearCloseTimer}
+          onMouseLeave={scheduleCloseLibrary}
+        >
+          <header className="section-library-head">
+            <div>
+              <p className="eyebrow">{labels.sectionCategories?.[activeGroup.key] || activeGroup.key}</p>
+              <strong>{labels.chooseBlock}</strong>
+            </div>
+            <button className="icon-button" type="button" onClick={closeLibrary} title={labels.closePreview} aria-label={labels.closePreview}>
+              <X size={15} aria-hidden="true" />
+            </button>
+          </header>
+          <div className="section-library-list">
+            {activeGroup.types.map((type) => {
+              const previewSection = createPreviewSection(type, labels);
+              return (
+                <article className="section-library-row" key={type}>
+                  <div className="section-library-preview" aria-hidden="true">
+                    <div className="section-library-preview-page">
+                      <SitePageSections page={{ sections: [previewSection] }} locale={locale} />
+                    </div>
                   </div>
-                </div>
-                <div className="section-library-copy">
-                  <strong>{getSectionTitle(type, labels)}</strong>
-                  <p>{labels.sectionDescriptions?.[type] || labels.addSection}</p>
-                </div>
-                <button className="button primary compact" type="button" onClick={() => onAddSection(type)}>
-                  <Plus size={15} aria-hidden="true" />
-                  {labels.insertBlock}
-                </button>
-              </article>
-            );
-          })}
+                  <div className="section-library-copy">
+                    <strong>{getSectionTitle(type, labels)}</strong>
+                    <p>{labels.sectionDescriptions?.[type] || labels.addSection}</p>
+                  </div>
+                  <button className="button primary compact" type="button" onClick={() => insertSection(type)}>
+                    <Plus size={15} aria-hidden="true" />
+                    {labels.insertBlock}
+                  </button>
+                </article>
+              );
+            })}
+          </div>
         </div>
-      </div>
       ) : null}
     </aside>
   );

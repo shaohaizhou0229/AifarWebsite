@@ -533,6 +533,10 @@ export function AdminSiteContentForm({
                 </button>
               </div>
             </div>
+            <div className={`site-designer-canvas-feedback ${message || error ? "visible" : ""}`} role={message || error ? "status" : undefined} aria-live="polite">
+              {message ? <p className="form-message success">{message}</p> : null}
+              {error ? <p className="form-message error">{error}</p> : null}
+            </div>
             <div className={`cms-live-preview site-designer-canvas ${previewMode}`} ref={canvasPreviewRef}>
               {sections.length ? (
                 <div className="cms-live-preview-page" style={{ "--cms-preview-scale": canvasPreviewScale }}>
@@ -641,12 +645,6 @@ export function AdminSiteContentForm({
         </div>
       ) : null}
 
-      {message || error ? (
-        <div className="site-designer-toast-stack" role="status" aria-live="polite">
-          {message ? <p className="form-message success">{message}</p> : null}
-          {error ? <p className="form-message error">{error}</p> : null}
-        </div>
-      ) : null}
     </form>
   );
 }
