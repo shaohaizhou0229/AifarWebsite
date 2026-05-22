@@ -1708,12 +1708,14 @@ h3 {
 }
 
 .site-designer-canvas-feedback {
-  display: grid;
-  min-height: 40px;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
   align-items: center;
-  justify-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 0 8px 10px;
+  padding: 0 8px;
+  pointer-events: none;
 }
 
 .site-designer-canvas-feedback .form-message {
@@ -1722,7 +1724,10 @@ h3 {
   border-radius: 8px;
   background: #fff;
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
-  padding: 12px 14px;
+  padding: 8px 12px;
+  font-size: 0.86rem;
+  line-height: 1.25;
+  pointer-events: auto;
   text-align: center;
 }
 
@@ -2367,25 +2372,36 @@ h3 {
 }
 
 .site-designer-topbar {
-  grid-template-columns: minmax(320px, 520px) minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr);
   min-width: 0;
-  position: sticky;
-  top: 60px;
+  position: fixed;
+  top: var(--admin-designer-topbar-top);
+  left: calc(var(--admin-sidebar-current-width) + 16px);
+  right: 32px;
   z-index: calc(var(--admin-z-designer) + 30);
+  box-sizing: border-box;
+  min-height: var(--admin-designer-topbar-height);
   box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
 }
 
 .site-designer-topbar {
-  gap: 10px;
-  padding: 10px 12px;
+  gap: 8px;
+  padding: 8px 10px;
 }
 
 .site-designer-topbar .cms-toolbar {
-  gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
 }
 
 .site-designer-topbar .field {
-  gap: 4px;
+  display: grid;
+  grid-template-columns: auto minmax(150px, 190px);
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
 .site-designer-topbar .field label,
@@ -2394,13 +2410,20 @@ h3 {
 }
 
 .site-designer-topbar .field select {
-  min-height: 34px;
-  padding: 7px 10px;
+  min-height: 32px;
+  border-radius: 7px;
+  padding: 6px 10px;
 }
 
 .site-designer-topbar .button {
-  min-height: 36px;
-  padding: 8px 12px;
+  min-height: 34px;
+  padding: 7px 10px;
+  white-space: nowrap;
+}
+
+.site-designer-topbar .site-designer-actions {
+  flex-wrap: nowrap;
+  gap: 6px;
 }
 
 .site-designer-save-button {
@@ -2431,7 +2454,13 @@ h3 {
   display: grid;
   gap: 14px;
   grid-template-columns: minmax(230px, 270px) minmax(0, 1fr) minmax(300px, 340px);
+  height: calc(100vh - var(--admin-designer-topbar-top) - var(--admin-designer-topbar-height) - 32px);
   min-width: 0;
+  overflow: hidden;
+}
+
+.site-designer-shell:has(.site-designer-topbar) {
+  padding-top: calc(var(--admin-designer-topbar-height) + 16px);
 }
 
 .site-designer-library,
@@ -2444,8 +2473,8 @@ h3 {
 .site-designer-library,
 .site-designer-inspector,
 .site-designer-canvas-panel {
-  position: sticky;
-  top: 156px;
+  height: 100%;
+  min-height: 0;
 }
 
 .site-designer-library {
@@ -2462,7 +2491,6 @@ h3 {
 
 .site-designer-library,
 .site-designer-inspector {
-  max-height: calc(100vh - 172px);
   overflow: auto;
   padding-right: 2px;
 }
@@ -2472,11 +2500,15 @@ h3 {
 }
 
 .site-designer-library .builder-panel {
-  max-height: calc(100vh - 172px);
+  min-height: 100%;
 }
 
 .site-designer-canvas-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   min-width: 0;
+  min-height: 0;
+  overflow: hidden;
   border: 1px solid rgba(183, 200, 213, 0.78);
   border-radius: 8px;
   background: #f8fbfd;
@@ -2484,8 +2516,8 @@ h3 {
 }
 
 .site-designer-canvas {
-  height: calc(100vh - 246px);
-  min-height: 600px;
+  height: auto;
+  min-height: 0;
 }
 
 .site-designer-empty-canvas {
@@ -3060,10 +3092,14 @@ h3 {
 
 .cms-preview-toolbar {
   align-items: center;
-  display: flex;
-  gap: 12px;
-  justify-content: space-between;
-  padding: 4px 2px 12px;
+  display: grid;
+  grid-template-columns: minmax(150px, auto) minmax(160px, 1fr) auto;
+  gap: 10px;
+  padding: 4px 2px 10px;
+}
+
+.cms-preview-toolbar-title {
+  min-width: 0;
 }
 
 .cms-preview-toolbar strong {
@@ -3108,6 +3144,12 @@ h3 {
   height: min(76vh, 860px);
   overflow: auto;
   padding: 12px;
+}
+
+.cms-live-preview.site-designer-canvas {
+  align-self: stretch;
+  height: auto;
+  min-height: 0;
 }
 
 .cms-live-preview.mobile {
@@ -3173,6 +3215,14 @@ h3 {
   position: relative;
   z-index: calc(var(--admin-z-designer) + 10);
   overflow: visible;
+  background: #fbfcfd;
+  transition: border-radius 0.16s ease, box-shadow 0.16s ease;
+}
+
+.section-structure-panel:has(.section-library-popover) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
 }
 
 .site-structure-list {
@@ -3204,19 +3254,25 @@ h3 {
 
 .section-library-popover {
   position: absolute;
-  top: 0;
-  left: 100%;
+  top: -1px;
+  bottom: -1px;
+  left: calc(100% - 1px);
   z-index: calc(var(--admin-z-designer) + 20);
   display: grid;
-  gap: 12px;
-  width: min(560px, calc(100vw - 320px));
-  max-height: min(76vh, 760px);
-  overflow: auto;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0;
+  width: min(500px, calc(100vw - 330px));
+  overflow: hidden;
   border: 1px solid rgba(183, 200, 213, 0.86);
-  border-radius: 10px;
-  background: #fff;
-  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
-  padding: 14px;
+  border-left-color: rgba(183, 200, 213, 0.42);
+  border-radius: 0 10px 10px 0;
+  background: #f4f6f8;
+  box-shadow: 22px 18px 48px rgba(15, 23, 42, 0.12);
+  padding: 0;
+}
+
+.section-library-popover::before {
+  display: none;
 }
 
 .section-library-head {
@@ -3224,27 +3280,35 @@ h3 {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
+  border-bottom: 1px solid rgba(183, 200, 213, 0.66);
+  background: #f7f9fb;
+  padding: 14px 16px;
 }
 
 .section-library-list {
   display: grid;
+  align-content: start;
   gap: 10px;
+  min-height: 0;
+  overflow: auto;
+  padding: 10px;
 }
 
 .section-library-row {
   display: grid;
-  grid-template-columns: 152px minmax(0, 1fr) auto;
+  grid-template-columns: 132px minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
-  border: 1px solid rgba(183, 200, 213, 0.68);
+  border: 1px solid rgba(183, 200, 213, 0.62);
   border-radius: 8px;
-  background: #fbfcfd;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   padding: 10px;
 }
 
 .section-library-preview {
-  width: 152px;
-  height: 92px;
+  width: 132px;
+  height: 78px;
   overflow: hidden;
   border: 1px solid rgba(183, 200, 213, 0.62);
   border-radius: 7px;
@@ -3253,7 +3317,7 @@ h3 {
 
 .section-library-preview-page {
   width: 680px;
-  transform: scale(0.23);
+  transform: scale(0.21);
   transform-origin: top left;
 }
 
@@ -3283,9 +3347,21 @@ h3 {
 
 .section-library-copy p {
   color: var(--muted);
-  font-size: 0.8rem;
-  line-height: 1.45;
+  font-size: 0.78rem;
+  line-height: 1.42;
   margin: 3px 0 0;
+}
+
+.section-library-row .button.primary {
+  border-color: rgba(39, 108, 246, 0.58);
+  background: #fff;
+  color: var(--blue);
+  box-shadow: none;
+}
+
+.section-library-row .button.primary:hover {
+  border-color: rgba(39, 108, 246, 0.86);
+  background: rgba(39, 108, 246, 0.06);
 }
 
 .template-card {
@@ -4387,10 +4463,24 @@ a.subtask-row:hover {
     grid-template-columns: 1fr;
   }
 
+  .site-designer-topbar .cms-toolbar,
+  .site-designer-topbar .site-designer-actions {
+    flex-wrap: wrap;
+  }
+
+  .site-designer-topbar .field {
+    grid-template-columns: auto minmax(130px, 1fr);
+  }
+
+  .site-designer-grid {
+    height: auto;
+    overflow: visible;
+  }
+
   .site-designer-library,
   .site-designer-inspector,
   .site-designer-canvas-panel {
-    position: static;
+    height: auto;
   }
 
   .site-designer-canvas {
@@ -4716,6 +4806,12 @@ body:has(.admin-shell) {
   background: #fff;
 }
 
+html:has(.site-content-designer-form),
+body:has(.site-content-designer-form) {
+  height: 100%;
+  overflow: hidden;
+}
+
 body:has(.admin-shell)::before {
   display: none;
 }
@@ -4743,10 +4839,23 @@ body:has(.admin-shell)::before {
   --admin-z-dropdown: 130;
   --admin-z-command: 180;
   --admin-z-modal: 220;
+  --admin-topbar-height: 60px;
+  --admin-sidebar-current-width: 248px;
+  --admin-designer-topbar-top: 72px;
+  --admin-designer-topbar-height: 54px;
   grid-template-columns: 248px minmax(0, 1fr);
   background: var(--admin-bg);
   font-family: "Geist", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   letter-spacing: 0;
+}
+
+.admin-shell:has(.site-content-designer-form) {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
 }
 
 .admin-sidebar {
@@ -4756,6 +4865,14 @@ body:has(.admin-shell)::before {
   border-right: 1px solid var(--admin-border);
   background: #fbfbfc;
   padding: 14px 16px;
+}
+
+.admin-shell:has(.site-content-designer-form) .admin-sidebar {
+  position: relative;
+  top: auto;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .admin-sidebar-brand {
@@ -5135,6 +5252,20 @@ body:has(.admin-shell)::before {
   padding: 8px 20px 8px max(20px, calc((100% - 1200px) / 2));
 }
 
+.admin-shell:has(.site-content-designer-form) .admin-main {
+  display: grid;
+  grid-template-rows: var(--admin-topbar-height) minmax(0, 1fr);
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.admin-shell:has(.site-content-designer-form) .admin-topbar {
+  position: relative;
+  top: auto;
+  min-height: var(--admin-topbar-height);
+}
+
 .admin-topbar-title {
   flex: 1 1 auto;
   min-width: 0;
@@ -5312,7 +5443,10 @@ body:has(.admin-shell)::before {
   width: 100%;
   max-width: none;
   gap: 8px;
-  padding: 12px 16px 28px;
+  height: calc(100vh - var(--admin-topbar-height));
+  min-height: 0;
+  overflow: hidden;
+  padding: 12px 16px 16px;
 }
 
 .admin-content:has(.site-content-designer-form) .admin-page-header,
@@ -5320,6 +5454,14 @@ body:has(.admin-shell)::before {
 .admin-content:has(.site-content-designer-form) .admin-detail-layout-wide {
   width: 100%;
   max-width: none;
+  min-height: 0;
+}
+
+.admin-content:has(.site-content-designer-form) .admin-detail-layout,
+.admin-content:has(.site-content-designer-form) .admin-detail-layout-wide,
+.site-content-designer-form,
+.site-designer-shell {
+  height: 100%;
 }
 
 .admin-content:has(.site-content-designer-form) .admin-breadcrumbs {
@@ -6606,6 +6748,7 @@ body:has(.admin-shell)::before {
 }
 
 .admin-shell.admin-sidebar-collapsed {
+  --admin-sidebar-current-width: 72px;
   grid-template-columns: 72px minmax(0, 1fr);
 }
 

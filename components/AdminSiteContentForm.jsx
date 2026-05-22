@@ -518,9 +518,13 @@ export function AdminSiteContentForm({
 
           <main className="site-designer-canvas-panel">
             <div className="cms-preview-toolbar">
-              <div>
+              <div className="cms-preview-toolbar-title">
                 <p className="eyebrow">{labels.canvas}</p>
                 <strong>{currentPage.label}</strong>
+              </div>
+              <div className={`site-designer-canvas-feedback ${message || error ? "visible" : ""}`} role={message || error ? "status" : undefined} aria-live="polite">
+                {message ? <p className="form-message success">{message}</p> : null}
+                {error ? <p className="form-message error">{error}</p> : null}
               </div>
               <div className="preview-mode-toggle" aria-label={labels.previewMode}>
                 <button type="button" className={previewMode === "desktop" ? "active" : ""} onClick={() => setPreviewMode("desktop")} title={labels.desktopPreview}>
@@ -532,10 +536,6 @@ export function AdminSiteContentForm({
                   <span>{labels.mobilePreview}</span>
                 </button>
               </div>
-            </div>
-            <div className={`site-designer-canvas-feedback ${message || error ? "visible" : ""}`} role={message || error ? "status" : undefined} aria-live="polite">
-              {message ? <p className="form-message success">{message}</p> : null}
-              {error ? <p className="form-message error">{error}</p> : null}
             </div>
             <div className={`cms-live-preview site-designer-canvas ${previewMode}`} ref={canvasPreviewRef}>
               {sections.length ? (
@@ -569,10 +569,6 @@ export function AdminSiteContentForm({
 
           <aside className="site-designer-inspector">
             <section className="builder-panel">
-              <div className="builder-panel-head">
-                <p className="eyebrow">{labels.selectedBlock}</p>
-                <strong>{selectedSection ? labels.sectionTypes?.[selectedSection.type] : labels.noSectionSelected}</strong>
-              </div>
               <SectionEditor
                 section={selectedSection}
                 labels={labels}
