@@ -3,6 +3,7 @@ import { localizedPath } from "@/i18n/routing";
 import {
   Download,
   FileText,
+  Globe2,
   LifeBuoy,
   Mail,
   UserRound,
@@ -13,6 +14,7 @@ const ACTIVITY_ICONS = {
   ticket: LifeBuoy,
   document: FileText,
   download: Download,
+  product: Globe2,
   collaboration: Workflow,
   footprint: UserRound,
   contact: Mail

@@ -4,6 +4,7 @@ import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getAdminSitePageContent, listSiteContentSnapshots, listSitePageTemplates, publishSitePageDraft, sanitizeSiteLocale, sanitizeSitePageKey } from "@/lib/site-content";
+import { recordUserFootprint } from "@/lib/user-footprints";
 import { getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 
@@ -43,6 +44,14 @@ export async function POST(request) {
     }
 
     const entry = await publishSitePageDraft(pageKey, locale, user);
+    await recordUserFootprint({
+      userId: user.id,
+      actorUserId: user.id,
+      eventType: "site_content.published",
+      summary: "Administrator published website content.",
+      relatedType: "site_content",
+      metadata: { pageKey, locale }
+    });
     revalidatePublicSitePage(pageKey, locale);
     const fallback = await getPageMessages(locale, pageKey);
     const [result, snapshots, templates] = await Promise.all([

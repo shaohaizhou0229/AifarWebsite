@@ -22,7 +22,7 @@ export default async function AdminHomePage({ params, searchParams }) {
     getLocaleMessages(locale)
   ]);
   const query = await searchParams;
-  const rangeDays = [1, 7, 30].includes(Number(query?.range)) ? Number(query.range) : 7;
+  const rangeDays = Number(query?.range) === 1 ? 1 : 7;
 
   return (
     <>

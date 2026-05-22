@@ -1097,13 +1097,17 @@
         "refresh": "刷新"
       },
       "metrics": {
-        "todayViews": "今日访客",
+        "todayViews": "今日访客数",
         "totalViews": "总访问量",
         "downloadClicks": "总下载",
         "newContacts": "新联系请求",
         "openTickets": "未处理工单",
-        "newUsers": "新用户",
+        "newUsers": "今日新增新用户数",
         "draftContent": "草稿内容",
+        "pendingSiteContent": "官网内容待发布数",
+        "draftDocuments": "文档中心草稿数",
+        "draftClients": "客户端草稿数",
+        "contactRequests": "联系请求数",
         "collaborationTodo": "协作待办",
         "details": {
           "totalInRange": "周期内总访问",
@@ -1126,6 +1130,29 @@
         "views": "访问量",
         "language": "语言",
         "share": "占比",
+        "name": "名称",
+        "noShare": "-",
+        "visitsTrend": "访问趋势",
+        "pageCategoriesTitle": "前端页面分类",
+        "pageCategories": {
+          "home": "首页",
+          "product": "产品页",
+          "downloads": "下载页",
+          "docs": "文档中心",
+          "whatsNew": "更新公告",
+          "support": "支持页",
+          "contact": "联系我们",
+          "security": "安全说明",
+          "other": "其他公开页"
+        },
+        "languageNames": {
+          "zh-CN": "中文",
+          "en": "英文",
+          "fr": "法文",
+          "ar": "阿文",
+          "unknown": "未知"
+        },
+        "sharePrefix": "占比",
         "viewFull": "查看 30 天数据",
         "tabsLabel": "访问数据序列",
         "tabs": {
@@ -1139,10 +1166,40 @@
         "count": "数量",
         "downloadEmpty": "暂无下载活动。"
       },
+      "downloads": {
+        "title": "下载分析",
+        "meta": "按来源查看客户端下载和文档下载活动。",
+        "clientDownloads": "客户端下载",
+        "documentDownloads": "文档下载",
+        "downloadTrend": "下载趋势",
+        "clientBreakdown": "客户端下载",
+        "documentBreakdown": "文档下载",
+        "name": "来源",
+        "count": "数量",
+        "share": "占比",
+        "empty": "暂无下载活动。",
+        "clients": {
+          "windows": "Windows",
+          "ios": "iOS",
+          "android_phone": "Android Phone",
+          "android_pad": "Android Pad",
+          "mac": "Mac",
+          "other": "其他客户端"
+        },
+        "documentCategories": {
+          "operation_guides": "操作指南",
+          "technical_whitepapers": "技术白皮书",
+          "deployment_manuals": "部署手册",
+          "feature_lists": "功能清单",
+          "other": "其他文档"
+        }
+      },
       "pending": {
-        "title": "待处理事项",
-        "meta": "需要管理员处理的跨模块事项。",
-        "empty": "当前没有待处理事项。",
+        "title": "协作任务待办",
+        "meta": "当前分配给你的未完成协作子任务。",
+        "empty": "当前没有需要你处理的协作任务。",
+        "noContext": "协作任务",
+        "dueAt": "截止",
         "items": {
           "newContacts": "查看新的联系请求",
           "unassignedTickets": "分配支持工单",
@@ -1156,6 +1213,9 @@
           "new": "新建",
           "urgent": "紧急",
           "pending": "待处理",
+          "today": "今日",
+          "inProgress": "进行中",
+          "blocked": "受阻",
           "overdue": "逾期",
           "clear": "正常"
         },
@@ -1180,7 +1240,15 @@
           "ticket_replied": "支持工单收到回复。",
           "ticket_status_updated": "支持工单状态已变更。",
           "download_started": "客户端下载安装已开始。",
+          "download_published": "客户端版本已发布。",
+          "download_draft_saved": "客户端版本草稿已更新。",
+          "document_published": "文档已发布。",
+          "document_draft_saved": "文档草稿已上传。",
+          "site_content_published": "官网内容已发布。",
+          "site_content_draft_saved": "官网内容草稿已保存。",
           "ticketUpdated": "支持工单已更新。",
+          "siteContentPublished": "官网内容已发布。",
+          "siteContentDraft": "官网内容草稿已更新。",
           "documentPublished": "文档已发布。",
           "documentDraft": "文档草稿已更新。",
           "downloadUpdated": "客户端版本已更新。",
@@ -1188,6 +1256,8 @@
         },
         "viewAll": "查看全部活动",
         "metaLabels": {
+          "publishedSiteContent": "已发布官网内容",
+          "draftSiteContent": "官网内容草稿",
           "publishedDocument": "已发布文档",
           "draftDocument": "文档草稿",
           "publishedRelease": "已发布版本",

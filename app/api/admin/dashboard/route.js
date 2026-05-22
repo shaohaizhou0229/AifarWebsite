@@ -23,7 +23,7 @@ export async function GET(request) {
   try {
     const context = await timing.measure("auth", () => requireAdmin(getProfile));
     const searchParams = new URL(request.url).searchParams;
-    const range = Number(searchParams.get("range") || 7);
+    const range = Number(searchParams.get("range")) === 1 ? 1 : 7;
     const dashboard = await timing.measure("data", () => getAdminDashboardOverview({ userId: context.user.id, analyticsDays: range }));
 
     return adminJson({ dashboard }, { headers: timing.headers() });

@@ -10,6 +10,7 @@ import {
   sanitizeSitePageKey,
   saveSitePageDraft
 } from "@/lib/site-content";
+import { recordUserFootprint } from "@/lib/user-footprints";
 import { getPageMessages } from "@/i18n/messages";
 
 export const runtime = "nodejs";
@@ -64,6 +65,14 @@ export async function PATCH(request) {
     }
 
     const entry = await saveSitePageDraft(pageKey, locale, user, body.content);
+    await recordUserFootprint({
+      userId: user.id,
+      actorUserId: user.id,
+      eventType: "site_content.draft_saved",
+      summary: "Administrator saved a website content draft.",
+      relatedType: "site_content",
+      metadata: { pageKey, locale }
+    });
     const fallback = await getFallbackContent(pageKey, locale);
     const [result, snapshots, templates] = await Promise.all([
       getAdminSitePageContent(pageKey, locale, fallback),

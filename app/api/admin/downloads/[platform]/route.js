@@ -7,6 +7,7 @@ import { clientReleaseFileExists, getAdminDownloadPlatform, sanitizePlatform, up
 import { EMAIL_EVENTS, enqueueManyAndTrySend, getAdminNotificationEmails, getSiteUrl } from "@/lib/email";
 import { buildDownloadPublishedEmail } from "@/lib/email/templates";
 import { createNotificationsForPermission, NOTIFICATION_EVENTS } from "@/lib/notifications";
+import { recordUserFootprint } from "@/lib/user-footprints";
 import { localizedPath, locales } from "@/i18n/routing";
 
 export const runtime = "nodejs";
@@ -96,6 +97,14 @@ export async function PATCH(request, { params }) {
       releaseNotes: normalizeText(body.releaseNotes),
       externalUrl,
       isPublished
+    });
+    await recordUserFootprint({
+      userId: user.id,
+      actorUserId: user.id,
+      eventType: isPublished ? "download.published" : "download.draft_saved",
+      summary: isPublished ? "Administrator published a client release." : "Administrator updated a client release draft.",
+      relatedType: "client_release",
+      metadata: { platform: platformKey, version: release.version }
     });
     revalidatePublicDownloadsPages();
 

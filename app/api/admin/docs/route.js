@@ -10,6 +10,7 @@ import {
   saveDocumentVersion,
   uploadMarkdownToStorage
 } from "@/lib/documents";
+import { recordUserFootprint } from "@/lib/user-footprints";
 import { createServerTiming } from "@/lib/server-timing";
 
 export const runtime = "nodejs";
@@ -77,6 +78,15 @@ export async function POST(request) {
       input.originalFilename
     );
     const result = await saveDocumentVersion(user, input, uploadInfo);
+    await recordUserFootprint({
+      userId: user.id,
+      actorUserId: user.id,
+      eventType: input.isPublished ? "document.published" : "document.draft_saved",
+      summary: input.isPublished ? "Administrator published a document." : "Administrator uploaded a document draft.",
+      relatedType: "document",
+      relatedId: result.document?.id || null,
+      metadata: { title: result.document?.title, categoryKey: result.document?.categoryKey }
+    });
     return NextResponse.json(result);
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: error.message || "Could not save document." }, { status: 400 });

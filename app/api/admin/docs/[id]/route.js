@@ -10,6 +10,7 @@ import {
 } from "@/lib/documents";
 import { getProfile } from "@/lib/profiles";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
+import { recordUserFootprint } from "@/lib/user-footprints";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -71,6 +72,15 @@ export async function PATCH(request, { params }) {
       input.originalFilename
     );
     const result = await saveDocumentVersion(user, input, uploadInfo);
+    await recordUserFootprint({
+      userId: user.id,
+      actorUserId: user.id,
+      eventType: input.isPublished ? "document.published" : "document.draft_saved",
+      summary: input.isPublished ? "Administrator published a document." : "Administrator uploaded a document draft.",
+      relatedType: "document",
+      relatedId: result.document?.id || id,
+      metadata: { title: result.document?.title, categoryKey: result.document?.categoryKey }
+    });
     return NextResponse.json(result);
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: error.message || "Could not update document." }, { status: 400 });

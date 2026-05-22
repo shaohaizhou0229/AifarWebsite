@@ -1104,6 +1104,10 @@
         "openTickets": "تذاكر مفتوحة",
         "newUsers": "مستخدمون جدد",
         "draftContent": "محتوى مسودة",
+        "pendingSiteContent": "Website drafts",
+        "draftDocuments": "Doc drafts",
+        "draftClients": "Client drafts",
+        "contactRequests": "Contact requests",
         "collaborationTodo": "مهام التعاون",
         "details": {
           "totalInRange": "إجمالي ضمن النطاق",
@@ -1126,6 +1130,29 @@
         "views": "الزيارات",
         "language": "اللغة",
         "share": "الحصة",
+        "name": "Name",
+        "noShare": "-",
+        "visitsTrend": "Visit trend",
+        "pageCategoriesTitle": "Public page categories",
+        "pageCategories": {
+          "home": "Home",
+          "product": "Product",
+          "downloads": "Downloads",
+          "docs": "Docs",
+          "whatsNew": "What's new",
+          "support": "Support",
+          "contact": "Contact",
+          "security": "Security",
+          "other": "Other public pages"
+        },
+        "languageNames": {
+          "zh-CN": "Chinese",
+          "en": "English",
+          "fr": "French",
+          "ar": "Arabic",
+          "unknown": "Unknown"
+        },
+        "sharePrefix": "Share",
         "viewFull": "عرض بيانات 30 يوما",
         "tabsLabel": "سلسلة حركة الزيارات",
         "tabs": {
@@ -1139,10 +1166,40 @@
         "count": "العدد",
         "downloadEmpty": "لا يوجد نشاط تنزيل بعد."
       },
+      "downloads": {
+        "title": "Download analysis",
+        "meta": "Client and document download activity by source.",
+        "clientDownloads": "Client downloads",
+        "documentDownloads": "Document downloads",
+        "downloadTrend": "Download trend",
+        "clientBreakdown": "Client downloads",
+        "documentBreakdown": "Document downloads",
+        "name": "Source",
+        "count": "Count",
+        "share": "Share",
+        "empty": "No download activity yet.",
+        "clients": {
+          "windows": "Windows",
+          "ios": "iOS",
+          "android_phone": "Android Phone",
+          "android_pad": "Android Pad",
+          "mac": "Mac",
+          "other": "Other clients"
+        },
+        "documentCategories": {
+          "operation_guides": "Operation guides",
+          "technical_whitepapers": "Technical whitepapers",
+          "deployment_manuals": "Deployment manuals",
+          "feature_lists": "Feature lists",
+          "other": "Other documents"
+        }
+      },
       "pending": {
-        "title": "العمل المعلق",
-        "meta": "عناصر تحتاج إجراء من المدير.",
-        "empty": "لا يوجد عمل معلق حاليا.",
+        "title": "Collaboration task todos",
+        "meta": "Open collaboration subtasks assigned to you.",
+        "empty": "No collaboration tasks need your action right now.",
+        "noContext": "Collaboration task",
+        "dueAt": "Due",
         "items": {
           "newContacts": "مراجعة طلبات التواصل الجديدة",
           "unassignedTickets": "إسناد تذاكر الدعم",
@@ -1156,6 +1213,9 @@
           "new": "جديد",
           "urgent": "عاجل",
           "pending": "قيد الانتظار",
+          "today": "Today",
+          "inProgress": "In progress",
+          "blocked": "Blocked",
           "overdue": "متأخر",
           "clear": "طبيعي"
         },
@@ -1181,13 +1241,23 @@
           "ticket_status_updated": "تغيرت حالة تذكرة الدعم.",
           "download_started": "بدأ تنزيل العميل.",
           "ticketUpdated": "تم تحديث تذكرة دعم.",
+          "siteContentPublished": "Website content published.",
+          "siteContentDraft": "Website content draft updated.",
           "documentPublished": "تم نشر مستند.",
           "documentDraft": "تم تحديث مسودة مستند.",
           "downloadUpdated": "تم تحديث إصدار العميل.",
-          "collaborationUpdated": "تم تحديث مساحة تعاون."
+          "collaborationUpdated": "تم تحديث مساحة تعاون.",
+          "download_published": "Client release published.",
+          "download_draft_saved": "Client release draft updated.",
+          "document_published": "Document published.",
+          "document_draft_saved": "Document draft uploaded.",
+          "site_content_published": "Website content published.",
+          "site_content_draft_saved": "Website content draft saved."
         },
         "viewAll": "عرض كل النشاط",
         "metaLabels": {
+          "publishedSiteContent": "Published website content",
+          "draftSiteContent": "Website draft",
           "publishedDocument": "مستند منشور",
           "draftDocument": "مسودة مستند",
           "publishedRelease": "إصدار منشور",
