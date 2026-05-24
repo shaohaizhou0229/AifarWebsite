@@ -4806,6 +4806,14 @@ body:has(.admin-shell) {
   background: #fff;
 }
 
+@media (min-width: 1041px) {
+  html:has(.admin-shell),
+  body:has(.admin-shell) {
+    height: 100%;
+    overflow: hidden;
+  }
+}
+
 html:has(.site-content-designer-form),
 body:has(.site-content-designer-form) {
   height: 100%;
@@ -4847,6 +4855,32 @@ body:has(.admin-shell)::before {
   background: var(--admin-bg);
   font-family: "Geist", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   letter-spacing: 0;
+}
+
+@media (min-width: 1041px) {
+  .admin-shell {
+    height: 100vh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .admin-shell > .admin-sidebar {
+    position: relative;
+    top: auto;
+    height: 100vh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .admin-main {
+    display: grid;
+    min-width: 0;
+    height: 100vh;
+    min-height: 0;
+    grid-template-rows: var(--admin-topbar-height) minmax(0, 1fr);
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
 }
 
 .admin-shell:has(.site-content-designer-form) {
@@ -6845,8 +6879,64 @@ body:has(.admin-shell)::before {
 }
 
 @media (max-width: 1040px) {
+  html:has(.admin-shell),
+  body:has(.admin-shell) {
+    height: auto;
+    overflow-x: clip;
+    overflow-y: auto;
+  }
+
+  .admin-shell,
   .admin-shell.admin-sidebar-collapsed {
+    height: auto;
+    min-height: 100vh;
     grid-template-columns: 1fr;
+    overflow: visible;
+  }
+
+  .admin-main {
+    display: block;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .admin-sidebar {
+    position: static;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  html:has(.site-content-designer-form),
+  body:has(.site-content-designer-form) {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .admin-shell:has(.site-content-designer-form) {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .admin-shell:has(.site-content-designer-form) .admin-sidebar {
+    position: relative;
+    top: auto;
+    height: 100vh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .admin-shell:has(.site-content-designer-form) .admin-main {
+    display: grid;
+    height: 100vh;
+    min-height: 0;
+    grid-template-rows: var(--admin-topbar-height) minmax(0, 1fr);
+    overflow: hidden;
   }
 
   .admin-shell.admin-sidebar-collapsed .admin-sidebar {
