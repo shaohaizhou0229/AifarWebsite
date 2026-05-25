@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Clock3, Eye, Monitor, RotateCcw, Settings, Smartphone, Sparkles, Trash2, X } from "lucide-react";
 import { SITE_LAYOUT_VERSION, createBlankSection } from "@/lib/site-page-builder";
 import { SitePageSections } from "@/components/SitePageSections";
@@ -124,6 +124,7 @@ export function AdminSiteContentForm({
   const canvasPreviewRef = useRef(null);
   const modalPreviewRef = useRef(null);
   const snapshotPreviewRef = useRef(null);
+  const pendingScrollRestoreRef = useRef(null);
   const [canvasPreviewScale, setCanvasPreviewScale] = useState(1);
   const [modalPreviewScale, setModalPreviewScale] = useState(1);
   const [snapshotPreviewScale, setSnapshotPreviewScale] = useState(1);
@@ -205,6 +206,40 @@ export function AdminSiteContentForm({
 
     return () => observers.forEach((observer) => observer.disconnect());
   }, [previewMode, previewOpen, snapshotPreview]);
+
+  useLayoutEffect(() => {
+    if (!pendingScrollRestoreRef.current) return undefined;
+    const positions = pendingScrollRestoreRef.current;
+    pendingScrollRestoreRef.current = null;
+    const restore = () => {
+      for (const { node, top, left } of positions) {
+        if (!node) continue;
+        node.scrollTop = top;
+        node.scrollLeft = left;
+      }
+    };
+    restore();
+    const frame = window.requestAnimationFrame(restore);
+    return () => window.cancelAnimationFrame(frame);
+  });
+
+  function captureDesignerScrollPositions() {
+    const nodes = [
+      document.scrollingElement,
+      document.querySelector(".admin-main"),
+      document.querySelector(".site-designer-inspector"),
+      canvasPreviewRef.current
+    ].filter(Boolean);
+    return nodes.map((node) => ({
+      node,
+      top: node.scrollTop,
+      left: node.scrollLeft
+    }));
+  }
+
+  function queueDesignerScrollRestore() {
+    pendingScrollRestoreRef.current = captureDesignerScrollPositions();
+  }
 
   function updateServerState(data) {
     if (Array.isArray(data.snapshots)) setSnapshots(data.snapshots);
@@ -305,6 +340,7 @@ export function AdminSiteContentForm({
     const file = event.target.files?.[0];
     if (!file) return;
 
+    queueDesignerScrollRestore();
     setUploadingSectionId(sectionId);
     setMessage("");
     setError("");
@@ -325,6 +361,7 @@ export function AdminSiteContentForm({
         throw new Error(data.error || labels.uploadFailed);
       }
 
+      queueDesignerScrollRestore();
       patchSection(sectionId, (section) => ({
         ...section,
         content: {
