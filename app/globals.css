@@ -4912,7 +4912,11 @@ body:has(.admin-shell)::before {
   top: auto;
   height: 100vh;
   min-height: 0;
-  overflow: hidden;
+  overflow: visible;
+}
+
+.admin-shell:has(.site-content-designer-form) .admin-sidebar:has(.admin-sidebar-project-menu[open]) {
+  z-index: calc(var(--admin-z-command) - 1);
 }
 
 .admin-sidebar-brand {
@@ -4934,6 +4938,11 @@ body:has(.admin-shell)::before {
 
 .admin-sidebar-project-menu[open] {
   z-index: calc(var(--admin-z-sidebar) + 1);
+}
+
+.admin-shell:has(.site-content-designer-form) .admin-sidebar-project-menu[open],
+.admin-shell:has(.site-content-designer-form) .admin-sidebar-project-menu[open] .admin-project-popover {
+  z-index: calc(var(--admin-z-command) - 1);
 }
 
 .admin-sidebar-project-menu summary {
@@ -6938,7 +6947,7 @@ body:has(.admin-shell)::before {
     top: auto;
     height: 100vh;
     min-height: 0;
-    overflow: hidden;
+    overflow: visible;
   }
 
   .admin-shell:has(.site-content-designer-form) .admin-main {
