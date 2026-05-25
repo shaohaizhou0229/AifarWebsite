@@ -4875,7 +4875,7 @@ body:has(.admin-shell)::before {
     top: auto;
     height: 100vh;
     min-height: 0;
-    overflow: hidden;
+    overflow: visible;
   }
 
   .admin-main {
@@ -4930,6 +4930,10 @@ body:has(.admin-shell)::before {
 .admin-sidebar-project-menu {
   position: relative;
   margin: 0 0 16px;
+}
+
+.admin-sidebar-project-menu[open] {
+  z-index: calc(var(--admin-z-sidebar) + 1);
 }
 
 .admin-sidebar-project-menu summary {
