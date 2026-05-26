@@ -227,7 +227,11 @@ for (const file of [
   "lib/site-analytics.js",
   "app/api/analytics/track/route.js",
   "app/api/admin/assets/route.js",
+  "app/api/admin/assets/bulk/route.js",
   "app/api/admin/assets/upload/route.js",
+  "app/api/admin/assets/upload-session/route.js",
+  "app/api/admin/assets/upload-complete/route.js",
+  "app/api/admin/assets/upload-status/route.js",
   "app/api/admin/assets/generate/route.js",
   "app/api/admin/assets/folders/route.js",
   "app/api/admin/assets/tags/route.js",
@@ -235,6 +239,7 @@ for (const file of [
   "app/api/assets/images/[...path]/route.js",
   "supabase/migrations/20260526090000_create_project_assets.sql",
   "supabase/migrations/20260526113000_add_project_asset_catalogs.sql",
+  "supabase/migrations/20260526143000_add_project_asset_upload_sessions.sql",
   "supabase/migrations/20260520090000_add_site_analytics_events.sql"
 ]) {
   requireFile(file);
