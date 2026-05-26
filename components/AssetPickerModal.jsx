@@ -178,6 +178,39 @@ function AssetPagination({ labels, page, limit, total, onPageChange, onLimitChan
   );
 }
 
+function FolderBreadcrumb({ labels, directory, onSelect }) {
+  const parts = String(directory || "").split("/").filter(Boolean);
+
+  if (!parts.length) return null;
+
+  const crumbs = [
+    { label: t(labels, "allDirectories"), value: "" },
+    ...parts.map((part, index) => ({
+      label: part,
+      value: parts.slice(0, index + 1).join("/")
+    }))
+  ];
+
+  return (
+    <nav className="asset-folder-breadcrumb" aria-label={t(labels, "folderBreadcrumb")}>
+      <span>{t(labels, "folderBreadcrumb")}</span>
+      <ol>
+        {crumbs.map((crumb, index) => {
+          const last = index === crumbs.length - 1;
+          return (
+            <li key={`${crumb.value}-${index}`}>
+              {index > 0 ? <span aria-hidden="true">/</span> : null}
+              <button type="button" disabled={last} onClick={() => onSelect(crumb.value)}>
+                {crumb.label}
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+}
+
 function AssetGrid({ assets, folderItems, labels, locale, selectedAsset, selectedIds, loading, onOpenFolder, onSelect, onToggle }) {
   if (loading) {
     return (
@@ -282,11 +315,15 @@ function TagPicker({ labels, availableTags, selectedTags, onChange, onCreateTag 
     function placePopover() {
       const rect = buttonRef.current?.getBoundingClientRect();
       if (!rect) return;
-      const width = Math.min(Math.max(rect.width, 260), 360, window.innerWidth - 48);
+      const panelRect = buttonRef.current?.closest(".asset-picker-panel")?.getBoundingClientRect();
+      const width = Math.min(Math.max(rect.width, 220), 300, window.innerWidth - 48);
       const left = Math.min(Math.max(24, rect.left), window.innerWidth - width - 24);
-      const height = Math.min(360, window.innerHeight - 48);
-      const hasRoomBelow = window.innerHeight - rect.bottom > height + 18;
-      const top = hasRoomBelow ? rect.bottom + 8 : Math.max(24, rect.top - height - 8);
+      const maxTop = panelRect ? panelRect.top + 12 : 24;
+      const maxBottom = panelRect ? panelRect.bottom - 62 : window.innerHeight - 24;
+      const availableBelow = maxBottom - rect.bottom - 8;
+      const availableAbove = rect.top - maxTop - 8;
+      const height = Math.max(130, Math.min(210, Math.max(availableBelow, availableAbove), window.innerHeight - 48));
+      const top = availableBelow >= 130 ? rect.bottom + 8 : Math.max(maxTop, maxBottom - height);
       setPopoverStyle({ left, top, width, maxHeight: height });
     }
 
@@ -402,7 +439,7 @@ function TagPicker({ labels, availableTags, selectedTags, onChange, onCreateTag 
   );
 }
 
-function AssetInspector({ asset, labels, locale, saving, folders, tags, onCreateTag, onSave }) {
+function AssetInspector({ asset, labels, locale, saving, folders, tags, onCreateTag, onPreview, onSave }) {
   const [draft, setDraft] = useState(() => ({
     displayName: asset?.displayName || "",
     altText: asset?.altText || "",
@@ -433,9 +470,9 @@ function AssetInspector({ asset, labels, locale, saving, folders, tags, onCreate
   return (
     <aside className="asset-inspector">
       <div className="asset-inspector-summary">
-        <div className="asset-inspector-thumb">
+        <button className="asset-inspector-thumb" type="button" onClick={() => onPreview?.(asset)} title={t(labels, "previewOriginal")} aria-label={t(labels, "previewOriginal")}>
           <img src={asset.url} alt={asset.altText || asset.displayName || asset.originalFilename} loading="lazy" />
-        </div>
+        </button>
         <div className="asset-inspector-meta">
           <span>{labels.sourceLabels?.[asset.source] || asset.source}</span>
           <span>{formatBytes(asset.fileSize, labels)}</span>
@@ -473,6 +510,26 @@ function AssetInspector({ asset, labels, locale, saving, folders, tags, onCreate
         {saving ? t(labels, "saving") : t(labels, "saveMetadata")}
       </button>
     </aside>
+  );
+}
+
+function AssetOriginalPreview({ asset, labels, onClose }) {
+  if (!asset) return null;
+
+  return (
+    <div className="asset-original-preview" role="dialog" aria-modal="true" aria-label={t(labels, "originalPreview")} onPointerDown={onClose}>
+      <div className="asset-original-preview-panel" onPointerDown={(event) => event.stopPropagation()}>
+        <header>
+          <strong title={asset.displayName || asset.originalFilename}>{asset.displayName || asset.originalFilename}</strong>
+          <button className="icon-button" type="button" onClick={onClose} title={t(labels, "close")} aria-label={t(labels, "close")}>
+            <X size={18} aria-hidden="true" />
+          </button>
+        </header>
+        <div className="asset-original-preview-frame">
+          <img src={asset.url} alt={asset.altText || asset.displayName || asset.originalFilename} />
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -726,6 +783,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
   const [limit, setLimit] = useState(DEFAULT_ASSET_PAGE_LIMIT);
   const [totalAssets, setTotalAssets] = useState(0);
   const [selectedAsset, setSelectedAsset] = useState(null);
+  const [previewAsset, setPreviewAsset] = useState(null);
   const [selectedAssetIds, setSelectedAssetIds] = useState([]);
   const [bulkMode, setBulkMode] = useState("");
   const [bulkDraft, setBulkDraft] = useState({ directoryPath: "", tags: [], tagMode: "append", altText: "" });
@@ -1133,12 +1191,16 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
     if (confirmed) applyBulkAction("archive");
   }
 
-  function openFolder(directoryPath) {
+  function changeDirectory(directoryPath) {
     setPage(1);
     setDirectory(directoryPath);
     setSelectedAsset(null);
     setSelectedAssetIds([]);
     setBulkMode("");
+  }
+
+  function openFolder(directoryPath) {
+    changeDirectory(directoryPath);
   }
 
   async function generateAsset(input) {
@@ -1260,7 +1322,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
                       onTagSelect={setTagFilter}
                       onClearTag={() => setTagFilter("")}
                     />
-                    <select value={directory} onChange={(event) => setDirectory(event.target.value)} aria-label={t(labels, "directoryPath")}>
+                    <select value={directory} onChange={(event) => changeDirectory(event.target.value)} aria-label={t(labels, "directoryPath")}>
                       <option value="">{t(labels, "allDirectories")}</option>
                       {folders.map((item) => <option value={item} key={item}>{item}</option>)}
                     </select>
@@ -1276,6 +1338,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
                       <RefreshCw size={16} aria-hidden="true" />
                     </button>
                   </div>
+                  <FolderBreadcrumb labels={labels} directory={directory} onSelect={changeDirectory} />
                   {folderCreatorOpen ? (
                     <div className="asset-toolbar-create">
                       <input value={toolbarFolderName} placeholder={t(labels, "folderNamePlaceholder")} onChange={(event) => setToolbarFolderName(event.target.value)} />
@@ -1346,6 +1409,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
                 folders={folders}
                 tags={Array.from(new Set([...tags, ...(selectedAsset?.tags || [])].filter(Boolean)))}
                 onCreateTag={createTag}
+                onPreview={setPreviewAsset}
                 onSave={saveAssetMetadata}
               />
             </>
@@ -1372,6 +1436,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
             {t(labels, "choose")}
           </button>
         </footer>
+        <AssetOriginalPreview asset={previewAsset} labels={labels} onClose={() => setPreviewAsset(null)} />
       </div>
     </div>
   );
