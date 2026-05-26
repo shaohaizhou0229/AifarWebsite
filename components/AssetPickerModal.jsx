@@ -263,8 +263,15 @@ function AssetSearch({ labels, query, tags, selectedTag, onQueryChange, onTagSel
 
   return (
     <div className="asset-search-wrap">
-      <label className="asset-search">
+      <div className="asset-search">
         <Search size={15} aria-hidden="true" />
+        {selectedTag ? (
+          <button className="asset-active-filter" type="button" onClick={onClearTag}>
+            <Tag size={13} aria-hidden="true" />
+            <span>{selectedTag}</span>
+            <X size={12} aria-hidden="true" />
+          </button>
+        ) : null}
         <input
           value={query}
           placeholder={t(labels, "searchPlaceholder")}
@@ -272,14 +279,7 @@ function AssetSearch({ labels, query, tags, selectedTag, onQueryChange, onTagSel
           onChange={(event) => onQueryChange(event.target.value)}
           onFocus={() => setFocused(true)}
         />
-      </label>
-      {selectedTag ? (
-        <button className="asset-active-filter" type="button" onClick={onClearTag}>
-          <Tag size={13} aria-hidden="true" />
-          <span>{selectedTag}</span>
-          <X size={12} aria-hidden="true" />
-        </button>
-      ) : null}
+      </div>
       {focused && quickTags.length ? (
         <div className="asset-search-popover">
           <span>{t(labels, "quickTags")}</span>

@@ -4135,15 +4135,16 @@ h3 {
 }
 
 .asset-search {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  display: flex;
+  min-height: 42px;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   border: 1px solid #d8dee8;
   border-radius: 8px;
   background: #fff;
   color: #64748b;
-  padding: 0 12px;
+  padding: 4px 10px;
 }
 
 .asset-search-wrap {
@@ -4154,12 +4155,14 @@ h3 {
 }
 
 .asset-search input {
+  flex: 1 1 150px;
   border: 0;
-  padding-left: 0;
+  padding: 6px 0;
 }
 
 .asset-active-filter {
   display: inline-flex;
+  max-width: min(220px, 100%);
   width: fit-content;
   align-items: center;
   gap: 6px;
@@ -4171,7 +4174,14 @@ h3 {
   font: inherit;
   font-size: 0.78rem;
   font-weight: 800;
-  padding: 4px 8px;
+  padding: 6px 8px;
+}
+
+.asset-active-filter span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .asset-search-popover,
