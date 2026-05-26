@@ -3,20 +3,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Check,
+  Download,
   FileImage,
   FolderOpen,
   Image as ImageIcon,
   Loader2,
   Pencil,
+  Plus,
   RefreshCw,
   Search,
   Sparkles,
+  Tag,
   UploadCloud,
   X
 } from "lucide-react";
 import assetRules from "@/lib/project-assets-core.cjs";
 
-const TABS = ["upload", "project", "stock", "generate"];
+const TABS = ["upload", "project", "generate"];
 const IMAGE_SIZES = ["1024x1024", "1024x1536", "1536x1024"];
 const IMAGE_QUALITIES = ["auto", "low", "medium", "high"];
 const { validateAssetFileInput } = assetRules;
@@ -47,12 +50,6 @@ function formatDate(value, locale) {
 
 function getRelativePath(file) {
   return file.webkitRelativePath || file.name;
-}
-
-function getDirectory(relativePath = "") {
-  const normalized = String(relativePath || "").replace(/\\/g, "/");
-  if (!normalized.includes("/")) return "";
-  return normalized.split("/").slice(0, -1).join("/");
 }
 
 function escapeMarkdownAlt(value = "") {
@@ -131,30 +128,148 @@ function AssetGrid({ assets, labels, locale, selectedAsset, loading, onSelect })
   );
 }
 
-function AssetInspector({ asset, labels, locale, saving, onSave }) {
+function AssetSearch({ labels, query, tags, selectedTag, onQueryChange, onTagSelect, onClearTag }) {
+  const [focused, setFocused] = useState(false);
+  const quickTags = tags.slice(0, 12);
+
+  return (
+    <div className="asset-search-wrap">
+      <label className="asset-search">
+        <Search size={15} aria-hidden="true" />
+        <input
+          value={query}
+          placeholder={t(labels, "searchPlaceholder")}
+          onBlur={() => window.setTimeout(() => setFocused(false), 120)}
+          onChange={(event) => onQueryChange(event.target.value)}
+          onFocus={() => setFocused(true)}
+        />
+      </label>
+      {selectedTag ? (
+        <button className="asset-active-filter" type="button" onClick={onClearTag}>
+          <Tag size={13} aria-hidden="true" />
+          <span>{selectedTag}</span>
+          <X size={12} aria-hidden="true" />
+        </button>
+      ) : null}
+      {focused && quickTags.length ? (
+        <div className="asset-search-popover">
+          <span>{t(labels, "quickTags")}</span>
+          <div className="asset-chip-row">
+            {quickTags.map((tag) => (
+              <button className={selectedTag === tag ? "selected" : ""} key={tag} type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => onTagSelect(tag)}>
+                {tag}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function TagPicker({ labels, availableTags, selectedTags, onChange, onCreateTag }) {
+  const [open, setOpen] = useState(false);
+  const [newTag, setNewTag] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [error, setError] = useState("");
+
+  function toggleTag(tag) {
+    if (selectedTags.includes(tag)) {
+      onChange(selectedTags.filter((item) => item !== tag));
+      return;
+    }
+    onChange([...selectedTags, tag].slice(0, 12));
+  }
+
+  async function submitTag() {
+    const value = newTag.trim();
+    if (!value) return;
+    setCreating(true);
+    setError("");
+    try {
+      const created = await onCreateTag(value);
+      const tagName = created?.name || value;
+      if (!selectedTags.includes(tagName)) {
+        onChange([...selectedTags, tagName].slice(0, 12));
+      }
+      setNewTag("");
+    } catch (createError) {
+      setError(createError.message || t(labels, "tagFailed"));
+    } finally {
+      setCreating(false);
+    }
+  }
+
+  return (
+    <div className="asset-tag-picker">
+      <button className="asset-tag-control" type="button" onClick={() => setOpen((current) => !current)}>
+        {selectedTags.length ? (
+          selectedTags.map((tag) => <span className="asset-chip" key={tag}>{tag}</span>)
+        ) : (
+          <span className="asset-tag-placeholder">{t(labels, "noTags")}</span>
+        )}
+      </button>
+      {open ? (
+        <div className="asset-tag-popover">
+          <div className="asset-chip-row">
+            {availableTags.map((tag) => (
+              <button className={selectedTags.includes(tag) ? "selected" : ""} key={tag} type="button" onClick={() => toggleTag(tag)}>
+                {tag}
+              </button>
+            ))}
+          </div>
+          <div className="asset-inline-create">
+            <input value={newTag} placeholder={t(labels, "tagNamePlaceholder")} onChange={(event) => setNewTag(event.target.value)} />
+            <button className="button secondary compact" type="button" onClick={submitTag} disabled={creating || !newTag.trim()}>
+              <Plus size={13} aria-hidden="true" />
+              {creating ? t(labels, "saving") : t(labels, "createTag")}
+            </button>
+          </div>
+          {error ? <p className="form-message error">{error}</p> : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function AssetInspector({ asset, labels, locale, saving, folders, tags, onCreateFolder, onCreateTag, onSave }) {
   const [draft, setDraft] = useState(() => ({
     displayName: asset?.displayName || "",
     altText: asset?.altText || "",
     directoryPath: asset?.directoryPath || "",
-    tags: (asset?.tags || []).join(", ")
+    tags: asset?.tags || []
   }));
+  const [folderName, setFolderName] = useState("");
+  const [creatingFolder, setCreatingFolder] = useState(false);
+  const [folderError, setFolderError] = useState("");
 
   useEffect(() => {
     setDraft({
       displayName: asset?.displayName || "",
       altText: asset?.altText || "",
       directoryPath: asset?.directoryPath || "",
-      tags: (asset?.tags || []).join(", ")
+      tags: asset?.tags || []
     });
   }, [asset]);
 
   if (!asset) {
-    return (
-      <aside className="asset-inspector empty">
-        <ImageIcon size={28} aria-hidden="true" />
-        <p>{t(labels, "selectAssetHint")}</p>
-      </aside>
-    );
+    return null;
+  }
+
+  async function submitFolder() {
+    const value = folderName.trim();
+    if (!value) return;
+    setCreatingFolder(true);
+    setFolderError("");
+    try {
+      const folder = await onCreateFolder(value);
+      setDraft((current) => ({ ...current, directoryPath: folder?.directoryPath || value }));
+      setFolderName("");
+    } catch (error) {
+      setFolderError(error.message || t(labels, "folderFailed"));
+    } finally {
+      setCreatingFolder(false);
+    }
   }
 
   return (
@@ -178,11 +293,28 @@ function AssetInspector({ asset, labels, locale, saving, onSave }) {
       </label>
       <label className="asset-field">
         <span>{t(labels, "directoryPath")}</span>
-        <input value={draft.directoryPath} onChange={(event) => setDraft((current) => ({ ...current, directoryPath: event.target.value }))} />
+        <select value={draft.directoryPath} onChange={(event) => setDraft((current) => ({ ...current, directoryPath: event.target.value }))}>
+          <option value="">{t(labels, "uncategorized")}</option>
+          {folders.map((folder) => <option value={folder} key={folder}>{folder}</option>)}
+        </select>
       </label>
+      <div className="asset-inline-create">
+        <input value={folderName} placeholder={t(labels, "folderNamePlaceholder")} onChange={(event) => setFolderName(event.target.value)} />
+        <button className="button secondary compact" type="button" onClick={submitFolder} disabled={creatingFolder || !folderName.trim()}>
+          <Plus size={13} aria-hidden="true" />
+          {creatingFolder ? t(labels, "saving") : t(labels, "createFolder")}
+        </button>
+      </div>
+      {folderError ? <p className="form-message error">{folderError}</p> : null}
       <label className="asset-field">
         <span>{t(labels, "tags")}</span>
-        <input value={draft.tags} onChange={(event) => setDraft((current) => ({ ...current, tags: event.target.value }))} />
+        <TagPicker
+          labels={labels}
+          availableTags={tags}
+          selectedTags={draft.tags}
+          onChange={(nextTags) => setDraft((current) => ({ ...current, tags: nextTags }))}
+          onCreateTag={onCreateTag}
+        />
       </label>
       <button className="button secondary compact" type="button" onClick={() => onSave(asset, draft)} disabled={saving || !draft.displayName.trim()}>
         <Pencil size={14} aria-hidden="true" />
@@ -246,7 +378,7 @@ function UploadPanel({ labels, uploadBusy, uploadResults, dragActive, onBrowse, 
   );
 }
 
-function GeneratePanel({ labels, generating, generatedAsset, error, onGenerate, onSelectGenerated }) {
+function GeneratePanel({ labels, generating, generatedAsset, error, onDownloadGenerated, onGenerate, onSaveGenerated, onSelectGenerated }) {
   const [prompt, setPrompt] = useState("");
   const [size, setSize] = useState("1024x1024");
   const [quality, setQuality] = useState("auto");
@@ -287,10 +419,20 @@ function GeneratePanel({ labels, generating, generatedAsset, error, onGenerate, 
         ) : generatedAsset ? (
           <>
             <img src={generatedAsset.url} alt={generatedAsset.altText || generatedAsset.displayName} />
-            <button className="button secondary compact" type="button" onClick={() => onSelectGenerated(generatedAsset)}>
-              <Check size={14} aria-hidden="true" />
-              {t(labels, "useGenerated")}
-            </button>
+            <div className="asset-generated-actions">
+              <button className="button secondary compact" type="button" onClick={() => onSaveGenerated(generatedAsset)}>
+                <FolderOpen size={14} aria-hidden="true" />
+                {t(labels, "saveGeneratedToProject")}
+              </button>
+              <button className="button secondary compact" type="button" onClick={() => onDownloadGenerated(generatedAsset)}>
+                <Download size={14} aria-hidden="true" />
+                {t(labels, "downloadImage")}
+              </button>
+              <button className="button primary compact" type="button" onClick={() => onSelectGenerated(generatedAsset)}>
+                <Check size={14} aria-hidden="true" />
+                {t(labels, "useGenerated")}
+              </button>
+            </div>
           </>
         ) : (
           <div className="asset-empty-state dashed">
@@ -308,8 +450,13 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
   const [query, setQuery] = useState("");
   const [directory, setDirectory] = useState("");
   const [source, setSource] = useState("");
+  const [tagFilter, setTagFilter] = useState("");
+  const [folderCreatorOpen, setFolderCreatorOpen] = useState(false);
+  const [toolbarFolderName, setToolbarFolderName] = useState("");
+  const [creatingToolbarFolder, setCreatingToolbarFolder] = useState(false);
   const [assets, setAssets] = useState([]);
-  const [directories, setDirectories] = useState([]);
+  const [folders, setFolders] = useState([]);
+  const [tags, setTags] = useState([]);
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [loading, setLoading] = useState(false);
   const [assetError, setAssetError] = useState("");
@@ -341,7 +488,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
   }, [onClose, open]);
 
   const fetchAssets = useCallback(async () => {
-    if (!open || (tab !== "project" && tab !== "stock")) return;
+    if (!open || tab !== "project") return;
     setLoading(true);
     setAssetError("");
 
@@ -350,20 +497,21 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
       params.set("limit", "36");
       if (query.trim()) params.set("q", query.trim());
       if (directory) params.set("directory", directory);
-      const nextSource = tab === "stock" ? "system" : source;
-      if (nextSource) params.set("source", nextSource);
+      if (source) params.set("source", source);
+      if (tagFilter) params.set("tag", tagFilter);
 
       const response = await fetch(`/api/admin/assets/?${params.toString()}`);
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || t(labels, "loadFailed"));
       setAssets(data.assets || []);
-      setDirectories(data.directories || []);
+      setFolders(data.folders || data.directories || []);
+      setTags(data.tags || []);
     } catch (error) {
       setAssetError(error.message || t(labels, "loadFailed"));
     } finally {
       setLoading(false);
     }
-  }, [directory, labels, open, query, source, tab]);
+  }, [directory, labels, open, query, source, tab, tagFilter]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -461,10 +609,59 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
       if (!response.ok) throw new Error(data.error || t(labels, "saveFailed"));
       setSelectedAsset(data.asset);
       setAssets((current) => current.map((item) => item.id === data.asset.id ? data.asset : item));
+      setFolders((current) => Array.from(new Set([...current, data.asset.directoryPath].filter(Boolean))).sort());
+      setTags((current) => Array.from(new Set([...current, ...(data.asset.tags || [])].filter(Boolean))).sort((left, right) => left.localeCompare(right)));
     } catch (error) {
       setAssetError(error.message || t(labels, "saveFailed"));
     } finally {
       setSavingAsset(false);
+    }
+  }
+
+  async function createFolder(name) {
+    const response = await fetch("/api/admin/assets/folders/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || t(labels, "folderFailed"));
+    const folder = data.folder;
+    if (folder?.directoryPath) {
+      setFolders((current) => Array.from(new Set([...current, folder.directoryPath])).sort());
+    }
+    return folder;
+  }
+
+  async function createTag(name) {
+    const response = await fetch("/api/admin/assets/tags/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || t(labels, "tagFailed"));
+    const tag = data.tag;
+    if (tag?.name) {
+      setTags((current) => Array.from(new Set([...current, tag.name])).sort((left, right) => left.localeCompare(right)));
+    }
+    return tag;
+  }
+
+  async function createToolbarFolder() {
+    const value = toolbarFolderName.trim();
+    if (!value) return;
+    setCreatingToolbarFolder(true);
+    setAssetError("");
+    try {
+      const folder = await createFolder(value);
+      if (folder?.directoryPath) setDirectory(folder.directoryPath);
+      setToolbarFolderName("");
+      setFolderCreatorOpen(false);
+    } catch (error) {
+      setAssetError(error.message || t(labels, "folderFailed"));
+    } finally {
+      setCreatingToolbarFolder(false);
     }
   }
 
@@ -490,6 +687,29 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
     }
   }
 
+  function saveGeneratedToProject(asset) {
+    if (!asset) return;
+    setSelectedAsset(asset);
+    setSource("generated");
+    setDirectory(asset.directoryPath || "");
+    setTagFilter("");
+    setQuery("");
+    setTab("project");
+  }
+
+  function downloadAsset(asset) {
+    if (!asset?.url) {
+      setAssetError(t(labels, "downloadFailed"));
+      return;
+    }
+    const link = document.createElement("a");
+    link.href = asset.url;
+    link.download = asset.originalFilename || asset.displayName || "image";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }
+
   function chooseAsset(asset = selectedAsset) {
     if (!asset) return;
     onSelect?.({
@@ -503,7 +723,6 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
   const tabs = useMemo(() => [
     ["upload", t(labels, "uploadTab"), UploadCloud],
     ["project", t(labels, "projectTab"), FolderOpen],
-    ["stock", t(labels, "stockTab"), ImageIcon],
     ["generate", t(labels, "generateTab"), Sparkles]
   ], [labels]);
 
@@ -536,7 +755,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
 
         {assetError ? <p className="asset-picker-error form-message error">{assetError}</p> : null}
 
-        <div className="asset-picker-body">
+        <div className={`asset-picker-body ${tab === "project" && !selectedAsset ? "no-inspector" : ""}`}>
           {tab === "upload" ? (
             <UploadPanel
               labels={labels}
@@ -550,31 +769,59 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
             />
           ) : null}
 
-          {tab === "project" || tab === "stock" ? (
+          {tab === "project" ? (
             <>
               <section className="asset-browser">
-                <div className="asset-browser-toolbar">
-                  <label className="asset-search">
-                    <Search size={15} aria-hidden="true" />
-                    <input value={query} placeholder={t(labels, "searchPlaceholder")} onChange={(event) => setQuery(event.target.value)} />
-                  </label>
-                  <select value={directory} onChange={(event) => setDirectory(event.target.value)} aria-label={t(labels, "directoryPath")}>
-                    <option value="">{t(labels, "allDirectories")}</option>
-                    {directories.map((item) => <option value={item} key={item}>{item}</option>)}
-                  </select>
-                  {tab === "project" ? (
+                <div className="asset-browser-controls">
+                  <div className="asset-browser-toolbar">
+                    <AssetSearch
+                      labels={labels}
+                      query={query}
+                      tags={tags}
+                      selectedTag={tagFilter}
+                      onQueryChange={setQuery}
+                      onTagSelect={setTagFilter}
+                      onClearTag={() => setTagFilter("")}
+                    />
+                    <select value={directory} onChange={(event) => setDirectory(event.target.value)} aria-label={t(labels, "directoryPath")}>
+                      <option value="">{t(labels, "allDirectories")}</option>
+                      {folders.map((item) => <option value={item} key={item}>{item}</option>)}
+                    </select>
                     <select value={source} onChange={(event) => setSource(event.target.value)} aria-label={t(labels, "source")}>
                       <option value="">{t(labels, "allSources")}</option>
                       {["upload", "folder_upload", "generated"].map((item) => <option value={item} key={item}>{labels.sourceLabels?.[item] || item}</option>)}
                     </select>
+                    <button className="button secondary compact asset-new-folder" type="button" onClick={() => setFolderCreatorOpen((current) => !current)}>
+                      <Plus size={14} aria-hidden="true" />
+                      {t(labels, "newFolder")}
+                    </button>
+                    <button className="icon-button" type="button" onClick={fetchAssets} title={t(labels, "refresh")} aria-label={t(labels, "refresh")}>
+                      <RefreshCw size={16} aria-hidden="true" />
+                    </button>
+                  </div>
+                  {folderCreatorOpen ? (
+                    <div className="asset-toolbar-create">
+                      <input value={toolbarFolderName} placeholder={t(labels, "folderNamePlaceholder")} onChange={(event) => setToolbarFolderName(event.target.value)} />
+                      <button className="button primary compact" type="button" onClick={createToolbarFolder} disabled={creatingToolbarFolder || !toolbarFolderName.trim()}>
+                        <Plus size={14} aria-hidden="true" />
+                        {creatingToolbarFolder ? t(labels, "saving") : t(labels, "createFolder")}
+                      </button>
+                    </div>
                   ) : null}
-                  <button className="icon-button" type="button" onClick={fetchAssets} title={t(labels, "refresh")} aria-label={t(labels, "refresh")}>
-                    <RefreshCw size={16} aria-hidden="true" />
-                  </button>
                 </div>
                 <AssetGrid assets={assets} labels={labels} locale={locale} selectedAsset={selectedAsset} loading={loading} onSelect={setSelectedAsset} />
               </section>
-              <AssetInspector asset={selectedAsset} labels={labels} locale={locale} saving={savingAsset} onSave={saveAssetMetadata} />
+              <AssetInspector
+                asset={selectedAsset}
+                labels={labels}
+                locale={locale}
+                saving={savingAsset}
+                folders={folders}
+                tags={Array.from(new Set([...tags, ...(selectedAsset?.tags || [])].filter(Boolean)))}
+                onCreateFolder={createFolder}
+                onCreateTag={createTag}
+                onSave={saveAssetMetadata}
+              />
             </>
           ) : null}
 
@@ -585,6 +832,8 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
               generatedAsset={generatedAsset}
               error={generateError}
               onGenerate={generateAsset}
+              onDownloadGenerated={downloadAsset}
+              onSaveGenerated={saveGeneratedToProject}
               onSelectGenerated={(asset) => chooseAsset(asset)}
             />
           ) : null}
@@ -592,7 +841,6 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
 
         <footer className="asset-picker-footer">
           <button className="button secondary" type="button" onClick={() => onClose?.()}>{t(labels, "cancel")}</button>
-          <button className="button secondary" type="button" disabled={!selectedAsset}>{t(labels, "customize")}</button>
           <button className="button primary" type="button" onClick={() => chooseAsset()} disabled={!selectedAsset}>
             <Check size={15} aria-hidden="true" />
             {t(labels, "choose")}
