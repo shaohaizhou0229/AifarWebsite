@@ -3829,13 +3829,14 @@ h3 {
 }
 
 .asset-picker-panel {
+  position: relative;
   display: grid;
   width: min(1560px, calc(100vw - 48px));
   height: min(760px, calc(100vh - 40px));
   height: min(760px, calc(100dvh - 40px));
   max-height: calc(100vh - 40px);
   max-height: calc(100dvh - 40px);
-  grid-template-rows: auto auto auto minmax(0, 1fr) 52px;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
   overflow: hidden;
   border: 1px solid rgba(229, 231, 235, 0.94);
   border-radius: 8px;
@@ -4260,7 +4261,7 @@ h3 {
   gap: 14px;
   overflow: auto;
   padding-right: 4px;
-  padding-bottom: 2px;
+  padding-bottom: 68px;
 }
 
 .asset-pagination {
@@ -4677,22 +4678,24 @@ h3 {
 
 .asset-picker-footer {
   display: flex;
-  position: relative;
-  align-self: end;
+  position: absolute;
+  right: 24px;
+  bottom: 18px;
   z-index: 20;
-  min-height: 52px;
-  flex-shrink: 0;
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
-  border-top: 1px solid #e5e7eb;
-  background: #fff;
-  padding: 8px 24px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  pointer-events: none;
 }
 
 .asset-picker-footer .button {
   flex: 0 0 auto;
   white-space: nowrap;
+  pointer-events: auto;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.16);
 }
 
 .asset-upload-queue {
@@ -4917,7 +4920,7 @@ h3 {
 
 .asset-inspector {
   max-height: 100%;
-  padding-bottom: 18px;
+  padding-bottom: 76px;
 }
 
 .asset-inspector.empty {
