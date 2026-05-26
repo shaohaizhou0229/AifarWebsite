@@ -9,6 +9,7 @@ import {
   CheckSquare,
   Download,
   FileImage,
+  Folder,
   FolderOpen,
   Image as ImageIcon,
   Loader2,
@@ -120,7 +121,24 @@ function AssetCard({ asset, labels, locale, selected, checked, onSelect, onToggl
   );
 }
 
-function AssetGrid({ assets, labels, locale, selectedAsset, selectedIds, loading, onSelect, onToggle }) {
+function FolderCard({ folder, labels, locale, onOpen }) {
+  return (
+    <article className="asset-card asset-folder-card">
+      <button className="asset-card-main" type="button" onClick={() => onOpen(folder.directoryPath)}>
+        <span className="asset-card-thumb asset-folder-thumb">
+          {folder.coverUrl ? <img src={folder.coverUrl} alt={folder.displayName} loading="lazy" /> : <Folder size={54} aria-hidden="true" />}
+        </span>
+        <span className="asset-card-body">
+          <strong title={folder.directoryPath}>{folder.displayName || folder.directoryPath}</strong>
+          <small>{formatTemplate(t(labels, "folderAssetCount"), { count: folder.assetCount })}</small>
+          <small>{[folder.totalBytes ? formatBytes(folder.totalBytes, labels) : t(labels, "folderEmpty"), formatDate(folder.updatedAt, locale)].filter(Boolean).join(" / ")}</small>
+        </span>
+      </button>
+    </article>
+  );
+}
+
+function AssetGrid({ assets, folderItems, labels, locale, selectedAsset, selectedIds, loading, onOpenFolder, onSelect, onToggle }) {
   if (loading) {
     return (
       <div className="asset-empty-state">
@@ -130,7 +148,7 @@ function AssetGrid({ assets, labels, locale, selectedAsset, selectedIds, loading
     );
   }
 
-  if (!assets.length) {
+  if (!assets.length && !folderItems.length) {
     return (
       <div className="asset-empty-state">
         <FileImage size={28} aria-hidden="true" />
@@ -141,6 +159,15 @@ function AssetGrid({ assets, labels, locale, selectedAsset, selectedIds, loading
 
   return (
     <div className="asset-grid">
+      {folderItems.map((folder) => (
+        <FolderCard
+          folder={folder}
+          key={folder.directoryPath}
+          labels={labels}
+          locale={locale}
+          onOpen={onOpenFolder}
+        />
+      ))}
       {assets.map((asset) => (
         <AssetCard
           asset={asset}
@@ -203,6 +230,11 @@ function TagPicker({ labels, availableTags, selectedTags, onChange, onCreateTag 
   const [error, setError] = useState("");
   const [popoverStyle, setPopoverStyle] = useState({});
   const buttonRef = useRef(null);
+  const normalizedSelectedTags = selectedTags || [];
+  const commonTags = useMemo(() => {
+    const selectedSet = new Set(normalizedSelectedTags);
+    return Array.from(new Set([...normalizedSelectedTags, ...availableTags.filter((tag) => !selectedSet.has(tag)).slice(0, 6)])).filter(Boolean);
+  }, [availableTags, normalizedSelectedTags]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -210,9 +242,9 @@ function TagPicker({ labels, availableTags, selectedTags, onChange, onCreateTag 
     function placePopover() {
       const rect = buttonRef.current?.getBoundingClientRect();
       if (!rect) return;
-      const width = Math.min(420, window.innerWidth - 48);
+      const width = Math.min(Math.max(rect.width, 260), 360, window.innerWidth - 48);
       const left = Math.min(Math.max(24, rect.left), window.innerWidth - width - 24);
-      const height = Math.min(270, window.innerHeight - 48);
+      const height = Math.min(360, window.innerHeight - 48);
       const hasRoomBelow = window.innerHeight - rect.bottom > height + 18;
       const top = hasRoomBelow ? rect.bottom + 8 : Math.max(24, rect.top - height - 8);
       setPopoverStyle({ left, top, width, maxHeight: height });
@@ -228,11 +260,15 @@ function TagPicker({ labels, availableTags, selectedTags, onChange, onCreateTag 
   }, [open]);
 
   function toggleTag(tag) {
-    if (selectedTags.includes(tag)) {
-      onChange(selectedTags.filter((item) => item !== tag));
+    if (normalizedSelectedTags.includes(tag)) {
+      onChange(normalizedSelectedTags.filter((item) => item !== tag));
       return;
     }
-    onChange([...selectedTags, tag].slice(0, 12));
+    onChange([...normalizedSelectedTags, tag].slice(0, 12));
+  }
+
+  function removeTag(tag) {
+    onChange(normalizedSelectedTags.filter((item) => item !== tag));
   }
 
   async function submitTag() {
@@ -243,8 +279,8 @@ function TagPicker({ labels, availableTags, selectedTags, onChange, onCreateTag 
     try {
       const created = await onCreateTag(value);
       const tagName = created?.name || value;
-      if (!selectedTags.includes(tagName)) {
-        onChange([...selectedTags, tagName].slice(0, 12));
+      if (!normalizedSelectedTags.includes(tagName)) {
+        onChange([...normalizedSelectedTags, tagName].slice(0, 12));
       }
       setNewTag("");
     } catch (createError) {
@@ -254,16 +290,32 @@ function TagPicker({ labels, availableTags, selectedTags, onChange, onCreateTag 
     }
   }
 
+  function renderTagGroup(title, groupTags) {
+    return (
+      <section className="asset-tag-group">
+        <span>{title}</span>
+        {groupTags.length ? (
+          <div className="asset-chip-row">
+            {groupTags.map((tag) => {
+              const selected = normalizedSelectedTags.includes(tag);
+              return (
+                <button className={selected ? "selected" : ""} key={tag} type="button" onClick={() => toggleTag(tag)}>
+                  {tag}
+                  {selected ? <Check size={12} aria-hidden="true" /> : null}
+                </button>
+              );
+            })}
+          </div>
+        ) : <span className="asset-muted-label">{t(labels, "noSavedTags")}</span>}
+      </section>
+    );
+  }
+
   const popover = open ? (
     <div className="asset-tag-popover floating" style={popoverStyle} onPointerDown={(event) => event.stopPropagation()}>
-      <div className="asset-chip-row">
-        {availableTags.length ? availableTags.map((tag) => (
-          <button className={selectedTags.includes(tag) ? "selected" : ""} key={tag} type="button" onClick={() => toggleTag(tag)}>
-            {tag}
-          </button>
-        )) : <span className="asset-muted-label">{t(labels, "noSavedTags")}</span>}
-      </div>
-      <div className="asset-inline-create">
+      {renderTagGroup(t(labels, "commonTags"), commonTags)}
+      {renderTagGroup(t(labels, "allTags"), availableTags)}
+      <div className="asset-tag-create">
         <input value={newTag} placeholder={t(labels, "tagNamePlaceholder")} onChange={(event) => setNewTag(event.target.value)} />
         <button className="button secondary compact" type="button" onClick={submitTag} disabled={creating || !newTag.trim()}>
           <Plus size={13} aria-hidden="true" />
@@ -276,13 +328,35 @@ function TagPicker({ labels, availableTags, selectedTags, onChange, onCreateTag 
 
   return (
     <div className="asset-tag-picker">
-      <button ref={buttonRef} className="asset-tag-control" type="button" onClick={() => setOpen((current) => !current)}>
-        {selectedTags.length ? (
-          selectedTags.map((tag) => <span className="asset-chip" key={tag}>{tag}</span>)
+      <div
+        ref={buttonRef}
+        className={`asset-tag-control ${open ? "open" : ""}`}
+        role="button"
+        tabIndex={0}
+        onClick={() => setOpen((current) => !current)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            setOpen((current) => !current);
+          }
+        }}
+      >
+        {normalizedSelectedTags.length ? (
+          normalizedSelectedTags.map((tag) => (
+            <span className="asset-chip removable" key={tag}>
+              {tag}
+              <button type="button" onClick={(event) => {
+                event.stopPropagation();
+                removeTag(tag);
+              }} aria-label={`${t(labels, "removeTag")} ${tag}`}>
+                <X size={12} aria-hidden="true" />
+              </button>
+            </span>
+          ))
         ) : (
           <span className="asset-tag-placeholder">{t(labels, "noTags")}</span>
         )}
-      </button>
+      </div>
       {typeof document !== "undefined" && popover ? createPortal(popover, document.body) : null}
     </div>
   );
@@ -306,7 +380,14 @@ function AssetInspector({ asset, labels, locale, saving, folders, tags, onCreate
   }, [asset]);
 
   if (!asset) {
-    return null;
+    return (
+      <aside className="asset-inspector empty">
+        <div className="asset-empty-state">
+          <ImageIcon size={28} aria-hidden="true" />
+          <p>{t(labels, "selectAssetHint")}</p>
+        </div>
+      </aside>
+    );
   }
 
   return (
@@ -393,7 +474,17 @@ function UploadTaskRow({ labels, task, onCancel, onResume }) {
 
 function UploadPanel({ labels, uploadBusy, uploadTasks, dragActive, onBrowse, onBrowseFolder, onDropFiles, onDragState, onCancelTask, onResumeTask }) {
   return (
-    <div className="asset-upload-panel">
+    <aside className="asset-upload-panel">
+      <div className="asset-upload-panel-head">
+        <div>
+          <strong>{t(labels, "uploadQueue")}</strong>
+          <span>{formatTemplate(t(labels, "uploadQueueCount"), { count: uploadTasks.length })}</span>
+        </div>
+        <button className="button secondary compact" type="button" onClick={onBrowseFolder}>
+          <FolderOpen size={14} aria-hidden="true" />
+          {t(labels, "browseFolder")}
+        </button>
+      </div>
       <div
         className={`asset-dropzone ${dragActive ? "active" : ""}`}
         onDragEnter={(event) => {
@@ -414,7 +505,7 @@ function UploadPanel({ labels, uploadBusy, uploadTasks, dragActive, onBrowse, on
           onDropFiles(event.dataTransfer.files);
         }}
       >
-        <UploadCloud size={38} aria-hidden="true" />
+        <UploadCloud size={26} aria-hidden="true" />
         <strong>{uploadBusy ? t(labels, "uploading") : t(labels, "dropTitle")}</strong>
         <p>{t(labels, "formatHint")}</p>
         <div className="asset-dropzone-actions">
@@ -428,11 +519,7 @@ function UploadPanel({ labels, uploadBusy, uploadTasks, dragActive, onBrowse, on
           </button>
         </div>
       </div>
-      <aside className="asset-upload-queue">
-        <div className="asset-upload-queue-head">
-          <strong>{t(labels, "uploadQueue")}</strong>
-          <span>{formatTemplate(t(labels, "uploadQueueCount"), { count: uploadTasks.length })}</span>
-        </div>
+      <div className="asset-upload-queue">
         {uploadTasks.length ? (
           <div className="asset-upload-task-list">
             {uploadTasks.map((task) => (
@@ -445,8 +532,8 @@ function UploadPanel({ labels, uploadBusy, uploadTasks, dragActive, onBrowse, on
             <p>{t(labels, "uploadQueueEmpty")}</p>
           </div>
         )}
-      </aside>
-    </div>
+      </div>
+    </aside>
   );
 }
 
@@ -597,6 +684,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
   const [creatingToolbarFolder, setCreatingToolbarFolder] = useState(false);
   const [assets, setAssets] = useState([]);
   const [folders, setFolders] = useState([]);
+  const [folderItems, setFolderItems] = useState([]);
   const [tags, setTags] = useState([]);
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [selectedAssetIds, setSelectedAssetIds] = useState([]);
@@ -618,6 +706,13 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
 
   const selectedIds = useMemo(() => new Set(selectedAssetIds), [selectedAssetIds]);
   const uploadBusy = useMemo(() => uploadTasks.some((task) => ACTIVE_UPLOAD_STATUSES.has(task.status)), [uploadTasks]);
+  const isManagerTab = tab === "upload" || tab === "project";
+  const visibleFolderItems = useMemo(() => {
+    if (directory || source || tagFilter) return [];
+    const keyword = query.trim().toLowerCase();
+    if (!keyword) return folderItems;
+    return folderItems.filter((item) => `${item.displayName} ${item.directoryPath}`.toLowerCase().includes(keyword));
+  }, [directory, folderItems, query, source, tagFilter]);
 
   useEffect(() => {
     if (!folderInputRef.current) return;
@@ -637,7 +732,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
   }, [onClose, open]);
 
   const fetchAssets = useCallback(async () => {
-    if (!open || tab !== "project") return;
+    if (!open || tab === "generate") return;
     setLoading(true);
     setAssetError("");
 
@@ -656,6 +751,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
       }
       setAssets(data.assets || []);
       setFolders(data.folders || data.directories || []);
+      setFolderItems(data.folderItems || []);
       setTags(data.tags || []);
     } catch (error) {
       setAssetError(error.message || t(labels, "loadFailed"));
@@ -782,7 +878,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
         setSelectedAsset((current) => current || asset);
         setFolders((current) => Array.from(new Set([...current, asset.directoryPath].filter(Boolean))).sort());
         uploadRefs.current.delete(task.id);
-        if (tab === "project") fetchAssets();
+        if (tab !== "generate") fetchAssets();
       });
     } catch (error) {
       if (cancelledTaskIds.current.has(task.id)) {
@@ -888,6 +984,17 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
     const folder = data.folder;
     if (folder?.directoryPath) {
       setFolders((current) => Array.from(new Set([...current, folder.directoryPath])).sort());
+      setFolderItems((current) => {
+        if (current.some((item) => item.directoryPath === folder.directoryPath)) return current;
+        return [...current, {
+          assetCount: 0,
+          coverUrl: "",
+          directoryPath: folder.directoryPath,
+          displayName: folder.displayName || folder.directoryPath.split("/").pop() || folder.directoryPath,
+          totalBytes: 0,
+          updatedAt: new Date().toISOString()
+        }].sort((left, right) => left.directoryPath.localeCompare(right.directoryPath));
+      });
     }
     return folder;
   }
@@ -972,6 +1079,13 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
     if (!selectedAssetIds.length) return;
     const confirmed = window.confirm(formatTemplate(t(labels, "deleteConfirm"), { count: selectedAssetIds.length }));
     if (confirmed) applyBulkAction("archive");
+  }
+
+  function openFolder(directoryPath) {
+    setDirectory(directoryPath);
+    setSelectedAsset(null);
+    setSelectedAssetIds([]);
+    setBulkMode("");
   }
 
   async function generateAsset(input) {
@@ -1064,8 +1178,8 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
 
         {assetError ? <p className="asset-picker-error form-message error">{assetError}</p> : null}
 
-        <div className={`asset-picker-body ${tab === "project" && !selectedAsset ? "no-inspector" : ""}`}>
-          {tab === "upload" ? (
+        <div className={`asset-picker-body ${isManagerTab ? "asset-manager-body" : ""}`}>
+          {isManagerTab ? (
             <UploadPanel
               labels={labels}
               uploadBusy={uploadBusy}
@@ -1080,7 +1194,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
             />
           ) : null}
 
-          {tab === "project" ? (
+          {isManagerTab ? (
             <>
               <section className="asset-browser">
                 <div className="asset-browser-controls">
@@ -1145,11 +1259,13 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
                 </div>
                 <AssetGrid
                   assets={assets}
+                  folderItems={visibleFolderItems}
                   labels={labels}
                   locale={locale}
                   selectedAsset={selectedAsset}
                   selectedIds={selectedIds}
                   loading={loading}
+                  onOpenFolder={openFolder}
                   onSelect={setSelectedAsset}
                   onToggle={toggleAssetSelection}
                 />

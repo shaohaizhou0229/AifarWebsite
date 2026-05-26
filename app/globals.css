@@ -3906,33 +3906,69 @@ h3 {
   padding: 18px 28px;
 }
 
-.asset-picker-body.no-inspector {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.asset-picker-body:has(.asset-upload-panel),
 .asset-picker-body:has(.asset-generate-panel) {
   display: block;
 }
 
+.asset-picker-body.asset-manager-body {
+  grid-template-columns: minmax(240px, 300px) minmax(420px, 1fr) minmax(250px, 300px);
+  gap: 12px;
+  padding: 14px 20px;
+}
+
 .asset-upload-panel {
   display: grid;
+  min-height: 0;
   height: 100%;
-  grid-template-columns: minmax(320px, 1fr) minmax(280px, 420px);
-  gap: 22px;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  padding: 14px;
+}
+
+.asset-upload-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.asset-upload-panel-head > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.asset-upload-panel-head strong {
+  color: #111827;
+  font-size: 0.96rem;
+}
+
+.asset-upload-panel-head span {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.asset-upload-panel-head .button {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .asset-dropzone {
   display: grid;
-  min-height: 360px;
+  min-height: 142px;
   align-content: center;
   justify-items: center;
-  gap: 14px;
+  gap: 8px;
   border: 1px dashed #bfcbdb;
   border-radius: 8px;
   background: #fff;
   color: #52637a;
-  padding: 36px;
+  padding: 18px 14px;
   text-align: center;
 }
 
@@ -3943,13 +3979,14 @@ h3 {
 
 .asset-dropzone strong {
   color: #111827;
-  font-size: 1.24rem;
+  font-size: 1rem;
 }
 
 .asset-dropzone p {
   max-width: 520px;
   margin: 0;
   color: #64748b;
+  font-size: 0.78rem;
   font-weight: 650;
 }
 
@@ -4028,9 +4065,24 @@ h3 {
 }
 
 .asset-browser-toolbar {
-  display: grid;
-  grid-template-columns: minmax(260px, 1fr) minmax(150px, 220px) minmax(140px, 180px) auto auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
   gap: 10px;
+}
+
+.asset-browser-toolbar .asset-search-wrap {
+  flex: 1 1 300px;
+}
+
+.asset-browser-toolbar select {
+  flex: 0 1 170px;
+}
+
+.asset-browser-toolbar .asset-new-folder,
+.asset-browser-toolbar .icon-button {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .asset-browser-toolbar select,
@@ -4097,12 +4149,15 @@ h3 {
   z-index: 3;
   display: grid;
   gap: 10px;
-  min-width: min(420px, calc(100vw - 88px));
   border: 1px solid #d8dee8;
   border-radius: 8px;
   background: #fff;
   box-shadow: 0 16px 38px rgba(15, 23, 42, 0.14);
   padding: 12px;
+}
+
+.asset-search-popover {
+  min-width: min(420px, calc(100vw - 88px));
 }
 
 .asset-search-popover {
@@ -4130,7 +4185,7 @@ h3 {
 .asset-grid {
   display: grid;
   min-height: 0;
-  grid-template-columns: repeat(auto-fill, minmax(178px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(164px, 1fr));
   align-content: start;
   gap: 14px;
   overflow: auto;
@@ -4178,6 +4233,22 @@ h3 {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+.asset-folder-card .asset-card-main {
+  grid-template-rows: 136px minmax(0, 1fr);
+}
+
+.asset-folder-thumb {
+  background: linear-gradient(180deg, #fff8e7 0%, #fff 100%);
+  color: #f5a524;
+}
+
+.asset-folder-thumb img {
+  width: 78%;
+  height: 78%;
+  border-radius: 8px;
+  object-fit: cover;
 }
 
 .asset-card-body {
@@ -4296,6 +4367,11 @@ h3 {
   text-align: left;
 }
 
+.asset-tag-control.open {
+  border-color: rgba(22, 119, 255, 0.6);
+  box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.12);
+}
+
 .asset-tag-placeholder {
   color: #64748b;
   font-size: 0.9rem;
@@ -4318,6 +4394,28 @@ h3 {
   padding: 7px 9px;
 }
 
+.asset-chip.removable {
+  gap: 6px;
+  padding: 6px 7px 6px 9px;
+}
+
+.asset-chip.removable button {
+  display: inline-grid;
+  width: 17px;
+  height: 17px;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(71, 85, 105, 0.12);
+  color: #475569;
+  cursor: pointer;
+  padding: 0;
+}
+
+.asset-chip.removable button:hover {
+  background: rgba(71, 85, 105, 0.2);
+}
+
 .asset-chip-row {
   display: flex;
   flex-wrap: wrap;
@@ -4325,6 +4423,7 @@ h3 {
 }
 
 .asset-chip-row button {
+  gap: 5px;
   border: 1px solid #d8dee8;
   background: #fff;
   color: #475569;
@@ -4341,6 +4440,37 @@ h3 {
 .asset-tag-popover {
   right: 0;
   top: calc(100% + 6px);
+}
+
+.asset-tag-group {
+  display: grid;
+  gap: 8px;
+}
+
+.asset-tag-group > span:first-child {
+  color: #64748b;
+  font-size: 0.76rem;
+  font-weight: 850;
+}
+
+.asset-tag-create {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  border-top: 1px solid #eef1f5;
+  padding-top: 10px;
+}
+
+.asset-tag-create input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  background: #fff;
+  color: #111827;
+  font: inherit;
+  font-size: 0.88rem;
+  padding: 9px 10px;
 }
 
 .asset-empty-state {
@@ -4418,13 +4548,12 @@ h3 {
 .asset-upload-queue {
   display: grid;
   min-height: 0;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: 12px;
+  grid-template-rows: minmax(0, 1fr);
+  gap: 0;
   overflow: hidden;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: #fff;
-  padding: 14px;
+  border: 0;
+  background: transparent;
+  padding: 0;
 }
 
 .asset-upload-queue-head {
@@ -4456,7 +4585,7 @@ h3 {
 
 .asset-upload-task {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 10px;
   align-items: start;
   border: 1px solid #e5e7eb;
@@ -4557,8 +4686,9 @@ h3 {
 
 .asset-upload-task-actions {
   display: flex;
+  grid-column: 2;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 6px;
 }
 
@@ -4639,6 +4769,15 @@ h3 {
   max-height: 100%;
 }
 
+.asset-inspector.empty {
+  align-content: center;
+}
+
+.asset-inspector.empty .asset-empty-state {
+  min-height: 180px;
+  border-style: dashed;
+}
+
 .asset-inspector-summary {
   display: grid;
   gap: 10px;
@@ -4646,7 +4785,9 @@ h3 {
 
 .asset-inspector-thumb {
   display: grid;
-  height: 96px;
+  aspect-ratio: 16 / 9;
+  min-height: 84px;
+  max-height: 132px;
   place-items: center;
   overflow: hidden;
   border: 1px solid #eef1f5;
@@ -4665,6 +4806,7 @@ h3 {
   z-index: calc(var(--admin-z-modal, 220) + 60);
   overflow: auto;
   min-width: 0;
+  max-width: min(360px, calc(100vw - 48px));
   right: auto;
   top: auto;
 }
