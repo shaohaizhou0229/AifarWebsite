@@ -4405,12 +4405,368 @@ h3 {
 
 .asset-picker-footer {
   display: flex;
+  position: relative;
+  z-index: 6;
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
   border-top: 1px solid #e5e7eb;
   background: #fff;
   padding: 12px 28px;
+}
+
+.asset-upload-queue {
+  display: grid;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  padding: 14px;
+}
+
+.asset-upload-queue-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.asset-upload-queue-head strong {
+  color: #111827;
+  font-size: 0.96rem;
+}
+
+.asset-upload-queue-head span,
+.asset-muted-label {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.asset-upload-task-list {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  overflow: auto;
+  padding-right: 3px;
+}
+
+.asset-upload-task {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fbfcfe;
+  padding: 12px;
+}
+
+.asset-upload-task.completed {
+  border-color: rgba(21, 128, 61, 0.18);
+  background: #f5fbf7;
+}
+
+.asset-upload-task.failed,
+.asset-upload-task.rejected {
+  border-color: rgba(190, 18, 60, 0.18);
+  background: #fff7f8;
+}
+
+.asset-upload-task.cancelled,
+.asset-upload-task.paused {
+  border-color: rgba(100, 116, 139, 0.24);
+  background: #f8fafc;
+}
+
+.asset-upload-task-icon {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: #52637a;
+}
+
+.asset-upload-task.completed .asset-upload-task-icon {
+  background: #e8f7ee;
+  color: #15803d;
+}
+
+.asset-upload-task.failed .asset-upload-task-icon,
+.asset-upload-task.rejected .asset-upload-task-icon {
+  background: #fff1f2;
+  color: #be123c;
+}
+
+.asset-upload-task-main {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+}
+
+.asset-upload-task-head {
+  display: grid;
+  gap: 2px;
+}
+
+.asset-upload-task-head strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #111827;
+  font-size: 0.86rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.asset-upload-task-head small,
+.asset-upload-task-main p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
+.asset-upload-meter {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e8edf4;
+}
+
+.asset-upload-meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--admin-blue);
+  transition: width 180ms ease;
+}
+
+.asset-upload-task.completed .asset-upload-meter span {
+  background: #16a34a;
+}
+
+.asset-upload-task.failed .asset-upload-meter span,
+.asset-upload-task.rejected .asset-upload-meter span {
+  background: #be123c;
+}
+
+.asset-upload-task-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.asset-upload-empty {
+  display: grid;
+  min-height: 220px;
+  align-content: center;
+  justify-items: center;
+  gap: 8px;
+  border: 1px dashed #d8dee8;
+  border-radius: 8px;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.asset-upload-empty p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.84rem;
+  font-weight: 750;
+}
+
+.asset-card {
+  display: block;
+  cursor: default;
+}
+
+.asset-card.checked {
+  border-color: rgba(22, 119, 255, 0.42);
+  background: #fbfdff;
+}
+
+.asset-card-main {
+  display: grid;
+  min-width: 0;
+  grid-template-rows: 136px minmax(0, 1fr);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.asset-card-checkbox {
+  position: absolute;
+  z-index: 2;
+  top: 9px;
+  left: 9px;
+  display: inline-grid;
+  cursor: pointer;
+}
+
+.asset-card-checkbox input {
+  position: absolute;
+  opacity: 0;
+}
+
+.asset-card-checkbox span {
+  display: inline-grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border: 1px solid rgba(100, 116, 139, 0.32);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--admin-blue);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.asset-card-checkbox input:focus-visible + span {
+  border-color: var(--admin-blue);
+  box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.16);
+}
+
+.asset-inspector {
+  max-height: 100%;
+}
+
+.asset-inspector-summary {
+  display: grid;
+  gap: 10px;
+}
+
+.asset-inspector-thumb {
+  display: grid;
+  height: 96px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid #eef1f5;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.asset-inspector-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.asset-tag-popover.floating {
+  position: fixed;
+  z-index: calc(var(--admin-z-modal, 220) + 60);
+  overflow: auto;
+  min-width: 0;
+  right: auto;
+  top: auto;
+}
+
+.asset-bulk-bar,
+.asset-bulk-panel {
+  border: 1px solid rgba(100, 116, 139, 0.18);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.asset-bulk-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+}
+
+.asset-bulk-bar strong {
+  color: #111827;
+  font-size: 0.88rem;
+}
+
+.asset-bulk-bar > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.asset-bulk-bar button {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #d8dee8;
+  border-radius: 7px;
+  background: #fff;
+  color: #475569;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 0 10px;
+}
+
+.asset-bulk-bar button.active {
+  border-color: rgba(22, 119, 255, 0.42);
+  background: #eaf2ff;
+  color: #1d4ed8;
+}
+
+.asset-bulk-bar button.danger {
+  border-color: rgba(190, 18, 60, 0.2);
+  color: #be123c;
+}
+
+.asset-bulk-panel {
+  display: grid;
+  max-width: 620px;
+  gap: 12px;
+  padding: 12px;
+}
+
+.asset-bulk-panel-actions,
+.asset-segmented {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.asset-bulk-panel-actions {
+  justify-content: flex-end;
+}
+
+.asset-segmented {
+  width: fit-content;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 3px;
+}
+
+.asset-segmented button {
+  min-height: 32px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 0 10px;
+}
+
+.asset-segmented button.active {
+  background: #fff;
+  color: #111827;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
 }
 
 .spin {

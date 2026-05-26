@@ -1,19 +1,27 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import * as tus from "tus-js-client";
 import {
+  AlertCircle,
   Check,
+  CheckSquare,
   Download,
   FileImage,
   FolderOpen,
   Image as ImageIcon,
   Loader2,
+  MoveRight,
+  PauseCircle,
   Pencil,
+  Play,
   Plus,
   RefreshCw,
   Search,
   Sparkles,
   Tag,
+  Trash2,
   UploadCloud,
   X
 } from "lucide-react";
@@ -22,14 +30,23 @@ import assetRules from "@/lib/project-assets-core.cjs";
 const TABS = ["upload", "project", "generate"];
 const IMAGE_SIZES = ["1024x1024", "1024x1536", "1536x1024"];
 const IMAGE_QUALITIES = ["auto", "low", "medium", "high"];
+const ACTIVE_UPLOAD_STATUSES = new Set(["preparing", "uploading", "finalizing"]);
 const { validateAssetFileInput } = assetRules;
 
 function t(labels, key) {
   return labels?.[key] || key;
 }
 
+function formatTemplate(template = "", values = {}) {
+  return String(template).replace(/\{(\w+)\}/g, (_match, key) => values[key] ?? "");
+}
+
 function validationMessage(labels, code) {
   return labels?.validation?.[code] || labels?.uploadFailed || code;
+}
+
+function uploadStatusLabel(labels, status) {
+  return labels?.uploadStatuses?.[status] || status;
 }
 
 function formatBytes(bytes, labels) {
@@ -56,6 +73,10 @@ function escapeMarkdownAlt(value = "") {
   return String(value || "").replace(/\]/g, "\\]");
 }
 
+function taskIdFor(file, index) {
+  return `${getRelativePath(file)}-${file.size}-${file.lastModified || 0}-${index}-${Date.now()}`;
+}
+
 async function readImageDimensions(file) {
   return new Promise((resolve) => {
     if (!file?.type?.startsWith("image/")) {
@@ -77,23 +98,29 @@ async function readImageDimensions(file) {
   });
 }
 
-function AssetCard({ asset, labels, locale, selected, onSelect }) {
+function AssetCard({ asset, labels, locale, selected, checked, onSelect, onToggle }) {
   return (
-    <button className={`asset-card ${selected ? "selected" : ""}`} type="button" onClick={() => onSelect(asset)}>
-      <span className="asset-card-thumb">
-        {asset.url ? <img src={asset.url} alt={asset.altText || asset.displayName || asset.originalFilename} loading="lazy" /> : <ImageIcon size={30} aria-hidden="true" />}
-      </span>
-      <span className="asset-card-body">
-        <strong title={asset.displayName}>{asset.displayName || asset.originalFilename}</strong>
-        <small>{[asset.directoryPath, formatBytes(asset.fileSize, labels)].filter(Boolean).join(" / ")}</small>
-        <small>{labels.sourceLabels?.[asset.source] || asset.source} · {formatDate(asset.updatedAt, locale)}</small>
-      </span>
+    <article className={`asset-card ${selected ? "selected" : ""} ${checked ? "checked" : ""}`}>
+      <label className="asset-card-checkbox" title={t(labels, "selectForBatch")}>
+        <input checked={checked} type="checkbox" onChange={() => onToggle(asset.id)} />
+        <span aria-hidden="true">{checked ? <CheckSquare size={15} /> : null}</span>
+      </label>
+      <button className="asset-card-main" type="button" onClick={() => onSelect(asset)}>
+        <span className="asset-card-thumb">
+          {asset.url ? <img src={asset.url} alt={asset.altText || asset.displayName || asset.originalFilename} loading="lazy" /> : <ImageIcon size={30} aria-hidden="true" />}
+        </span>
+        <span className="asset-card-body">
+          <strong title={asset.displayName}>{asset.displayName || asset.originalFilename}</strong>
+          <small>{[asset.directoryPath, formatBytes(asset.fileSize, labels)].filter(Boolean).join(" / ")}</small>
+          <small>{[labels.sourceLabels?.[asset.source] || asset.source, formatDate(asset.updatedAt, locale)].filter(Boolean).join(" · ")}</small>
+        </span>
+      </button>
       {selected ? <span className="asset-card-check"><Check size={14} aria-hidden="true" /></span> : null}
-    </button>
+    </article>
   );
 }
 
-function AssetGrid({ assets, labels, locale, selectedAsset, loading, onSelect }) {
+function AssetGrid({ assets, labels, locale, selectedAsset, selectedIds, loading, onSelect, onToggle }) {
   if (loading) {
     return (
       <div className="asset-empty-state">
@@ -117,11 +144,13 @@ function AssetGrid({ assets, labels, locale, selectedAsset, loading, onSelect })
       {assets.map((asset) => (
         <AssetCard
           asset={asset}
+          checked={selectedIds.has(asset.id)}
           key={asset.id}
           labels={labels}
           locale={locale}
           selected={selectedAsset?.id === asset.id}
           onSelect={onSelect}
+          onToggle={onToggle}
         />
       ))}
     </div>
@@ -172,6 +201,31 @@ function TagPicker({ labels, availableTags, selectedTags, onChange, onCreateTag 
   const [newTag, setNewTag] = useState("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
+  const [popoverStyle, setPopoverStyle] = useState({});
+  const buttonRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    function placePopover() {
+      const rect = buttonRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const width = Math.min(420, window.innerWidth - 48);
+      const left = Math.min(Math.max(24, rect.left), window.innerWidth - width - 24);
+      const height = Math.min(270, window.innerHeight - 48);
+      const hasRoomBelow = window.innerHeight - rect.bottom > height + 18;
+      const top = hasRoomBelow ? rect.bottom + 8 : Math.max(24, rect.top - height - 8);
+      setPopoverStyle({ left, top, width, maxHeight: height });
+    }
+
+    placePopover();
+    window.addEventListener("resize", placePopover);
+    window.addEventListener("scroll", placePopover, true);
+    return () => {
+      window.removeEventListener("resize", placePopover);
+      window.removeEventListener("scroll", placePopover, true);
+    };
+  }, [open]);
 
   function toggleTag(tag) {
     if (selectedTags.includes(tag)) {
@@ -200,48 +254,47 @@ function TagPicker({ labels, availableTags, selectedTags, onChange, onCreateTag 
     }
   }
 
+  const popover = open ? (
+    <div className="asset-tag-popover floating" style={popoverStyle} onPointerDown={(event) => event.stopPropagation()}>
+      <div className="asset-chip-row">
+        {availableTags.length ? availableTags.map((tag) => (
+          <button className={selectedTags.includes(tag) ? "selected" : ""} key={tag} type="button" onClick={() => toggleTag(tag)}>
+            {tag}
+          </button>
+        )) : <span className="asset-muted-label">{t(labels, "noSavedTags")}</span>}
+      </div>
+      <div className="asset-inline-create">
+        <input value={newTag} placeholder={t(labels, "tagNamePlaceholder")} onChange={(event) => setNewTag(event.target.value)} />
+        <button className="button secondary compact" type="button" onClick={submitTag} disabled={creating || !newTag.trim()}>
+          <Plus size={13} aria-hidden="true" />
+          {creating ? t(labels, "saving") : t(labels, "createTag")}
+        </button>
+      </div>
+      {error ? <p className="form-message error">{error}</p> : null}
+    </div>
+  ) : null;
+
   return (
     <div className="asset-tag-picker">
-      <button className="asset-tag-control" type="button" onClick={() => setOpen((current) => !current)}>
+      <button ref={buttonRef} className="asset-tag-control" type="button" onClick={() => setOpen((current) => !current)}>
         {selectedTags.length ? (
           selectedTags.map((tag) => <span className="asset-chip" key={tag}>{tag}</span>)
         ) : (
           <span className="asset-tag-placeholder">{t(labels, "noTags")}</span>
         )}
       </button>
-      {open ? (
-        <div className="asset-tag-popover">
-          <div className="asset-chip-row">
-            {availableTags.map((tag) => (
-              <button className={selectedTags.includes(tag) ? "selected" : ""} key={tag} type="button" onClick={() => toggleTag(tag)}>
-                {tag}
-              </button>
-            ))}
-          </div>
-          <div className="asset-inline-create">
-            <input value={newTag} placeholder={t(labels, "tagNamePlaceholder")} onChange={(event) => setNewTag(event.target.value)} />
-            <button className="button secondary compact" type="button" onClick={submitTag} disabled={creating || !newTag.trim()}>
-              <Plus size={13} aria-hidden="true" />
-              {creating ? t(labels, "saving") : t(labels, "createTag")}
-            </button>
-          </div>
-          {error ? <p className="form-message error">{error}</p> : null}
-        </div>
-      ) : null}
+      {typeof document !== "undefined" && popover ? createPortal(popover, document.body) : null}
     </div>
   );
 }
 
-function AssetInspector({ asset, labels, locale, saving, folders, tags, onCreateFolder, onCreateTag, onSave }) {
+function AssetInspector({ asset, labels, locale, saving, folders, tags, onCreateTag, onSave }) {
   const [draft, setDraft] = useState(() => ({
     displayName: asset?.displayName || "",
     altText: asset?.altText || "",
     directoryPath: asset?.directoryPath || "",
     tags: asset?.tags || []
   }));
-  const [folderName, setFolderName] = useState("");
-  const [creatingFolder, setCreatingFolder] = useState(false);
-  const [folderError, setFolderError] = useState("");
 
   useEffect(() => {
     setDraft({
@@ -256,32 +309,18 @@ function AssetInspector({ asset, labels, locale, saving, folders, tags, onCreate
     return null;
   }
 
-  async function submitFolder() {
-    const value = folderName.trim();
-    if (!value) return;
-    setCreatingFolder(true);
-    setFolderError("");
-    try {
-      const folder = await onCreateFolder(value);
-      setDraft((current) => ({ ...current, directoryPath: folder?.directoryPath || value }));
-      setFolderName("");
-    } catch (error) {
-      setFolderError(error.message || t(labels, "folderFailed"));
-    } finally {
-      setCreatingFolder(false);
-    }
-  }
-
   return (
     <aside className="asset-inspector">
-      <div className="asset-inspector-preview">
-        <img src={asset.url} alt={asset.altText || asset.displayName || asset.originalFilename} loading="lazy" />
-      </div>
-      <div className="asset-inspector-meta">
-        <span>{labels.sourceLabels?.[asset.source] || asset.source}</span>
-        <span>{formatBytes(asset.fileSize, labels)}</span>
-        {asset.width && asset.height ? <span>{asset.width} x {asset.height}</span> : null}
-        <span>{formatDate(asset.updatedAt, locale)}</span>
+      <div className="asset-inspector-summary">
+        <div className="asset-inspector-thumb">
+          <img src={asset.url} alt={asset.altText || asset.displayName || asset.originalFilename} loading="lazy" />
+        </div>
+        <div className="asset-inspector-meta">
+          <span>{labels.sourceLabels?.[asset.source] || asset.source}</span>
+          <span>{formatBytes(asset.fileSize, labels)}</span>
+          {asset.width && asset.height ? <span>{asset.width} x {asset.height}</span> : null}
+          <span>{formatDate(asset.updatedAt, locale)}</span>
+        </div>
       </div>
       <label className="asset-field">
         <span>{t(labels, "displayName")}</span>
@@ -298,14 +337,6 @@ function AssetInspector({ asset, labels, locale, saving, folders, tags, onCreate
           {folders.map((folder) => <option value={folder} key={folder}>{folder}</option>)}
         </select>
       </label>
-      <div className="asset-inline-create">
-        <input value={folderName} placeholder={t(labels, "folderNamePlaceholder")} onChange={(event) => setFolderName(event.target.value)} />
-        <button className="button secondary compact" type="button" onClick={submitFolder} disabled={creatingFolder || !folderName.trim()}>
-          <Plus size={13} aria-hidden="true" />
-          {creatingFolder ? t(labels, "saving") : t(labels, "createFolder")}
-        </button>
-      </div>
-      {folderError ? <p className="form-message error">{folderError}</p> : null}
       <label className="asset-field">
         <span>{t(labels, "tags")}</span>
         <TagPicker
@@ -324,7 +355,43 @@ function AssetInspector({ asset, labels, locale, saving, folders, tags, onCreate
   );
 }
 
-function UploadPanel({ labels, uploadBusy, uploadResults, dragActive, onBrowse, onBrowseFolder, onDropFiles, onDragState }) {
+function UploadTaskRow({ labels, task, onCancel, onResume }) {
+  const isActive = ACTIVE_UPLOAD_STATUSES.has(task.status);
+  const canResume = task.status === "paused" || task.status === "cancelled" || task.status === "failed";
+  return (
+    <div className={`asset-upload-task ${task.status}`}>
+      <span className="asset-upload-task-icon">
+        {task.status === "completed" ? <Check size={15} /> : task.status === "failed" || task.status === "rejected" ? <AlertCircle size={15} /> : <UploadCloud size={15} />}
+      </span>
+      <div className="asset-upload-task-main">
+        <div className="asset-upload-task-head">
+          <strong title={task.relativePath}>{task.relativePath}</strong>
+          <small>{task.status === "rejected" ? validationMessage(labels, task.code) : uploadStatusLabel(labels, task.status)}</small>
+        </div>
+        <div className={`asset-upload-meter ${isActive ? "active" : ""}`} role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(task.progress || 0)}>
+          <span style={{ width: `${Math.max(0, Math.min(100, task.progress || 0))}%` }} />
+        </div>
+        <p>{task.error ? task.error : `${formatBytes(task.uploadedBytes || 0, labels)} / ${formatBytes(task.file?.size || task.fileSize || 0, labels)}`}</p>
+      </div>
+      <div className="asset-upload-task-actions">
+        {canResume ? (
+          <button className="button secondary compact" type="button" onClick={() => onResume(task.id)}>
+            <Play size={13} aria-hidden="true" />
+            {t(labels, "resumeUpload")}
+          </button>
+        ) : null}
+        {isActive ? (
+          <button className="button secondary compact" type="button" onClick={() => onCancel(task.id)}>
+            <PauseCircle size={13} aria-hidden="true" />
+            {t(labels, "cancelUpload")}
+          </button>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function UploadPanel({ labels, uploadBusy, uploadTasks, dragActive, onBrowse, onBrowseFolder, onDropFiles, onDragState, onCancelTask, onResumeTask }) {
   return (
     <div className="asset-upload-panel">
       <div
@@ -351,29 +418,103 @@ function UploadPanel({ labels, uploadBusy, uploadResults, dragActive, onBrowse, 
         <strong>{uploadBusy ? t(labels, "uploading") : t(labels, "dropTitle")}</strong>
         <p>{t(labels, "formatHint")}</p>
         <div className="asset-dropzone-actions">
-          <button className="button primary compact" type="button" onClick={onBrowse} disabled={uploadBusy}>
+          <button className="button primary compact" type="button" onClick={onBrowse}>
             <FileImage size={14} aria-hidden="true" />
             {t(labels, "browseImages")}
           </button>
-          <button className="button secondary compact" type="button" onClick={onBrowseFolder} disabled={uploadBusy}>
+          <button className="button secondary compact" type="button" onClick={onBrowseFolder}>
             <FolderOpen size={14} aria-hidden="true" />
             {t(labels, "browseFolder")}
           </button>
         </div>
       </div>
-      {uploadResults.length ? (
-        <div className="asset-upload-results">
-          {uploadResults.map((result, index) => (
-            <div className={`asset-upload-result ${result.ok ? "success" : "error"}`} key={`${result.filename || result.asset?.id || index}-${index}`}>
-              <span>{result.ok ? <Check size={14} aria-hidden="true" /> : <X size={14} aria-hidden="true" />}</span>
-              <div>
-                <strong>{result.asset?.displayName || result.filename}</strong>
-                <small>{result.ok ? t(labels, "uploaded") : validationMessage(labels, result.code)}</small>
-              </div>
-            </div>
-          ))}
+      <aside className="asset-upload-queue">
+        <div className="asset-upload-queue-head">
+          <strong>{t(labels, "uploadQueue")}</strong>
+          <span>{formatTemplate(t(labels, "uploadQueueCount"), { count: uploadTasks.length })}</span>
         </div>
+        {uploadTasks.length ? (
+          <div className="asset-upload-task-list">
+            {uploadTasks.map((task) => (
+              <UploadTaskRow labels={labels} key={task.id} task={task} onCancel={onCancelTask} onResume={onResumeTask} />
+            ))}
+          </div>
+        ) : (
+          <div className="asset-upload-empty">
+            <FileImage size={22} aria-hidden="true" />
+            <p>{t(labels, "uploadQueueEmpty")}</p>
+          </div>
+        )}
+      </aside>
+    </div>
+  );
+}
+
+function BulkActionPanel({ labels, mode, folders, tags, draft, busy, onDraftChange, onCreateTag, onApply, onCancel }) {
+  if (!mode) return null;
+  return (
+    <div className="asset-bulk-panel">
+      {mode === "move" ? (
+        <label className="asset-field">
+          <span>{t(labels, "targetFolder")}</span>
+          <select value={draft.directoryPath} onChange={(event) => onDraftChange({ directoryPath: event.target.value })}>
+            <option value="">{t(labels, "uncategorized")}</option>
+            {folders.map((folder) => <option value={folder} key={folder}>{folder}</option>)}
+          </select>
+        </label>
       ) : null}
+      {mode === "tags" ? (
+        <>
+          <div className="asset-segmented">
+            <button className={draft.tagMode === "append" ? "active" : ""} type="button" onClick={() => onDraftChange({ tagMode: "append" })}>{t(labels, "appendTags")}</button>
+            <button className={draft.tagMode === "replace" ? "active" : ""} type="button" onClick={() => onDraftChange({ tagMode: "replace" })}>{t(labels, "replaceTags")}</button>
+          </div>
+          <label className="asset-field">
+            <span>{t(labels, "tags")}</span>
+            <TagPicker labels={labels} availableTags={tags} selectedTags={draft.tags} onChange={(nextTags) => onDraftChange({ tags: nextTags })} onCreateTag={onCreateTag} />
+          </label>
+        </>
+      ) : null}
+      {mode === "altText" ? (
+        <label className="asset-field">
+          <span>{t(labels, "altText")}</span>
+          <input value={draft.altText} placeholder={t(labels, "bulkAltPlaceholder")} onChange={(event) => onDraftChange({ altText: event.target.value })} />
+        </label>
+      ) : null}
+      <div className="asset-bulk-panel-actions">
+        <button className="button secondary compact" type="button" onClick={onCancel}>{t(labels, "cancel")}</button>
+        <button className="button primary compact" type="button" onClick={onApply} disabled={busy || (mode === "tags" && !draft.tags.length)}>
+          {busy ? t(labels, "saving") : t(labels, "applyBulk")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function BulkActionBar({ labels, count, activeMode, onMode, onDelete, onClear }) {
+  if (!count) return null;
+  return (
+    <div className="asset-bulk-bar">
+      <strong>{formatTemplate(t(labels, "selectedCount"), { count })}</strong>
+      <div>
+        <button className={activeMode === "move" ? "active" : ""} type="button" onClick={() => onMode("move")}>
+          <MoveRight size={14} aria-hidden="true" />
+          {t(labels, "bulkMove")}
+        </button>
+        <button className={activeMode === "tags" ? "active" : ""} type="button" onClick={() => onMode("tags")}>
+          <Tag size={14} aria-hidden="true" />
+          {t(labels, "bulkTags")}
+        </button>
+        <button className={activeMode === "altText" ? "active" : ""} type="button" onClick={() => onMode("altText")}>
+          <Pencil size={14} aria-hidden="true" />
+          {t(labels, "bulkAltText")}
+        </button>
+        <button className="danger" type="button" onClick={onDelete}>
+          <Trash2 size={14} aria-hidden="true" />
+          {t(labels, "bulkDelete")}
+        </button>
+        <button type="button" onClick={onClear}>{t(labels, "clearSelection")}</button>
+      </div>
     </div>
   );
 }
@@ -458,10 +599,13 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
   const [folders, setFolders] = useState([]);
   const [tags, setTags] = useState([]);
   const [selectedAsset, setSelectedAsset] = useState(null);
+  const [selectedAssetIds, setSelectedAssetIds] = useState([]);
+  const [bulkMode, setBulkMode] = useState("");
+  const [bulkDraft, setBulkDraft] = useState({ directoryPath: "", tags: [], tagMode: "append", altText: "" });
+  const [bulkBusy, setBulkBusy] = useState(false);
   const [loading, setLoading] = useState(false);
   const [assetError, setAssetError] = useState("");
-  const [uploadBusy, setUploadBusy] = useState(false);
-  const [uploadResults, setUploadResults] = useState([]);
+  const [uploadTasks, setUploadTasks] = useState([]);
   const [dragActive, setDragActive] = useState(false);
   const [savingAsset, setSavingAsset] = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -469,6 +613,11 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
   const [generatedAsset, setGeneratedAsset] = useState(null);
   const fileInputRef = useRef(null);
   const folderInputRef = useRef(null);
+  const uploadRefs = useRef(new Map());
+  const cancelledTaskIds = useRef(new Set());
+
+  const selectedIds = useMemo(() => new Set(selectedAssetIds), [selectedAssetIds]);
+  const uploadBusy = useMemo(() => uploadTasks.some((task) => ACTIVE_UPLOAD_STATUSES.has(task.status)), [uploadTasks]);
 
   useEffect(() => {
     if (!folderInputRef.current) return;
@@ -519,76 +668,182 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
     return () => window.clearTimeout(timer);
   }, [fetchAssets, open]);
 
+  function updateTask(taskId, patch) {
+    setUploadTasks((current) => current.map((task) => task.id === taskId ? { ...task, ...(typeof patch === "function" ? patch(task) : patch) } : task));
+  }
+
+  async function setRemoteUploadStatus(task, status) {
+    if (!task?.session?.id) return null;
+    const response = await fetch("/api/admin/assets/upload-status/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId: task.session.id, status })
+    });
+    return response.json().catch(() => ({}));
+  }
+
+  async function startUploadTask(task) {
+    if (!task?.file || task.status === "completed" || task.status === "rejected") return;
+    cancelledTaskIds.current.delete(task.id);
+
+    const existingUpload = uploadRefs.current.get(task.id);
+    if (existingUpload && (task.status === "paused" || task.status === "cancelled")) {
+      updateTask(task.id, { status: "uploading", error: "" });
+      existingUpload.start();
+      return;
+    }
+
+    updateTask(task.id, { status: "preparing", error: "" });
+
+    try {
+      const sessionResponse = task.session ? null : await fetch("/api/admin/assets/upload-session/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          filename: task.file.name,
+          fileSize: task.file.size,
+          contentType: task.file.type || "application/octet-stream",
+          relativePath: task.relativePath
+        })
+      });
+      const sessionData = task.session ? { session: task.session, bucket: task.bucket, storagePath: task.storagePath, endpoint: task.endpoint, headers: task.headers, chunkSize: task.chunkSize } : await sessionResponse.json().catch(() => ({}));
+      if (sessionResponse && !sessionResponse.ok) {
+        throw new Error(validationMessage(labels, sessionData.code) || sessionData.error || t(labels, "uploadFailed"));
+      }
+
+      updateTask(task.id, {
+        bucket: sessionData.bucket,
+        chunkSize: sessionData.chunkSize,
+        endpoint: sessionData.endpoint,
+        headers: sessionData.headers,
+        session: sessionData.session,
+        status: "uploading",
+        storagePath: sessionData.storagePath
+      });
+
+      await new Promise((resolve, reject) => {
+        const upload = new tus.Upload(task.file, {
+          endpoint: sessionData.endpoint,
+          chunkSize: sessionData.chunkSize,
+          retryDelays: [0, 1000, 3000, 5000],
+          uploadDataDuringCreation: true,
+          removeFingerprintOnSuccess: true,
+          headers: sessionData.headers || {},
+          metadata: {
+            bucketName: sessionData.bucket,
+            objectName: sessionData.storagePath,
+            contentType: task.file.type || "application/octet-stream",
+            cacheControl: "3600"
+          },
+          onError(uploadError) {
+            reject(uploadError);
+          },
+          onProgress(bytesUploaded, bytesTotal) {
+            updateTask(task.id, {
+              progress: bytesTotal ? Math.round((bytesUploaded / bytesTotal) * 100) : 0,
+              status: "uploading",
+              uploadedBytes: bytesUploaded
+            });
+          },
+          async onSuccess() {
+            try {
+              updateTask(task.id, { status: "finalizing", progress: 100 });
+              const completeResponse = await fetch("/api/admin/assets/upload-complete/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  sessionId: sessionData.session.id,
+                  width: task.dimensions.width || 0,
+                  height: task.dimensions.height || 0
+                })
+              });
+              const completeData = await completeResponse.json().catch(() => ({}));
+              if (!completeResponse.ok) {
+                throw new Error(completeData.error || t(labels, "uploadFailed"));
+              }
+              resolve(completeData.asset);
+            } catch (completeError) {
+              reject(completeError);
+            }
+          }
+        });
+
+        uploadRefs.current.set(task.id, upload);
+        upload.findPreviousUploads().then((previousUploads) => {
+          if (previousUploads.length) {
+            upload.resumeFromPreviousUpload(previousUploads[0]);
+          }
+          upload.start();
+        }).catch(reject);
+      }).then((asset) => {
+        updateTask(task.id, { asset, status: "completed", progress: 100, uploadedBytes: task.file.size });
+        setSelectedAsset((current) => current || asset);
+        setFolders((current) => Array.from(new Set([...current, asset.directoryPath].filter(Boolean))).sort());
+        uploadRefs.current.delete(task.id);
+        if (tab === "project") fetchAssets();
+      });
+    } catch (error) {
+      if (cancelledTaskIds.current.has(task.id)) {
+        updateTask(task.id, { status: "cancelled" });
+      } else {
+        updateTask(task.id, { error: error.message || t(labels, "uploadFailed"), status: "failed" });
+      }
+    }
+  }
+
   async function uploadFiles(fileList) {
     const files = Array.from(fileList || []);
     if (!files.length) return;
 
-    setUploadBusy(true);
-    setUploadResults([]);
     setAssetError("");
+    const seenPaths = new Set();
+    const nextTasks = [];
 
-    try {
-      const seenPaths = new Set();
-      const rejected = [];
-      const accepted = [];
-
-      for (const file of files) {
-        const relativePath = getRelativePath(file);
-        const validation = validateAssetFileInput({ name: file.name, type: file.type, size: file.size });
-        const duplicateKey = relativePath.toLowerCase();
-        if (!validation.ok) {
-          rejected.push({ ok: false, filename: relativePath, code: validation.code });
-          continue;
-        }
-        if (seenPaths.has(duplicateKey)) {
-          rejected.push({ ok: false, filename: relativePath, code: "duplicate" });
-          continue;
-        }
-        seenPaths.add(duplicateKey);
-        accepted.push({ file, relativePath, dimensions: await readImageDimensions(file) });
+    for (const [index, file] of files.entries()) {
+      const relativePath = getRelativePath(file);
+      const validation = validateAssetFileInput({ name: file.name, type: file.type, size: file.size });
+      const duplicateKey = relativePath.toLowerCase();
+      if (!validation.ok) {
+        nextTasks.push({ id: taskIdFor(file, index), code: validation.code, file, progress: 0, relativePath, status: "rejected" });
+        continue;
       }
-
-      if (!accepted.length) {
-        setUploadResults(rejected);
-        return;
+      if (seenPaths.has(duplicateKey)) {
+        nextTasks.push({ id: taskIdFor(file, index), code: "duplicate", file, progress: 0, relativePath, status: "rejected" });
+        continue;
       }
-
-      const formData = new FormData();
-      for (const item of accepted) {
-        formData.append("files", item.file);
-        formData.append("relativePaths", item.relativePath);
-        formData.append("widths", String(item.dimensions.width || 0));
-        formData.append("heights", String(item.dimensions.height || 0));
-      }
-
-      const response = await fetch("/api/admin/assets/upload/", {
-        method: "POST",
-        body: formData
+      seenPaths.add(duplicateKey);
+      nextTasks.push({
+        id: taskIdFor(file, index),
+        dimensions: await readImageDimensions(file),
+        file,
+        progress: 0,
+        relativePath,
+        status: "queued",
+        uploadedBytes: 0
       });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || t(labels, "uploadFailed"));
-
-      const results = [
-        ...rejected,
-        ...(data.results || []).map((result, index) => ({
-          ...result,
-          filename: result.filename || accepted[index]?.relativePath || result.asset?.originalFilename || ""
-        }))
-      ];
-      setUploadResults(results);
-      const firstAsset = results.find((result) => result.ok)?.asset;
-      if (firstAsset) {
-        setSelectedAsset(firstAsset);
-        setTab("project");
-      }
-      await fetchAssets();
-    } catch (error) {
-      setAssetError(error.message || t(labels, "uploadFailed"));
-    } finally {
-      setUploadBusy(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      if (folderInputRef.current) folderInputRef.current.value = "";
     }
+
+    setUploadTasks((current) => [...nextTasks, ...current].slice(0, 80));
+    nextTasks.filter((task) => task.status === "queued").forEach((task) => startUploadTask(task));
+
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (folderInputRef.current) folderInputRef.current.value = "";
+  }
+
+  async function cancelUploadTask(taskId) {
+    const task = uploadTasks.find((item) => item.id === taskId);
+    const upload = uploadRefs.current.get(taskId);
+    cancelledTaskIds.current.add(taskId);
+    if (upload) {
+      await upload.abort().catch(() => {});
+    }
+    updateTask(taskId, { status: "cancelled" });
+    await setRemoteUploadStatus(task, "cancelled").catch(() => {});
+  }
+
+  function resumeUploadTask(taskId) {
+    const task = uploadTasks.find((item) => item.id === taskId);
+    if (task) startUploadTask(task);
   }
 
   async function saveAssetMetadata(asset, draft) {
@@ -663,6 +918,56 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
     } finally {
       setCreatingToolbarFolder(false);
     }
+  }
+
+  function toggleAssetSelection(assetId) {
+    setSelectedAssetIds((current) => current.includes(assetId) ? current.filter((id) => id !== assetId) : [...current, assetId]);
+  }
+
+  async function applyBulkAction(action = bulkMode) {
+    if (!selectedAssetIds.length) return;
+    setBulkBusy(true);
+    setAssetError("");
+    try {
+      const response = await fetch("/api/admin/assets/bulk/", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action,
+          assetIds: selectedAssetIds,
+          altText: bulkDraft.altText,
+          directoryPath: bulkDraft.directoryPath,
+          tagMode: bulkDraft.tagMode,
+          tags: bulkDraft.tags
+        })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || t(labels, "bulkFailed"));
+
+      if (action === "archive") {
+        setAssets((current) => current.filter((asset) => !selectedAssetIds.includes(asset.id)));
+        if (selectedAsset && selectedAssetIds.includes(selectedAsset.id)) setSelectedAsset(null);
+      } else {
+        const updated = new Map((data.assets || []).map((asset) => [asset.id, asset]));
+        setAssets((current) => current.map((asset) => updated.get(asset.id) || asset));
+        if (selectedAsset && updated.has(selectedAsset.id)) setSelectedAsset(updated.get(selectedAsset.id));
+        if (action === "move" && bulkDraft.directoryPath) setFolders((current) => Array.from(new Set([...current, bulkDraft.directoryPath])).sort());
+        if (action === "tags") setTags((current) => Array.from(new Set([...current, ...bulkDraft.tags])).sort((left, right) => left.localeCompare(right)));
+      }
+      setSelectedAssetIds([]);
+      setBulkMode("");
+      setBulkDraft({ directoryPath: "", tags: [], tagMode: "append", altText: "" });
+    } catch (error) {
+      setAssetError(error.message || t(labels, "bulkFailed"));
+    } finally {
+      setBulkBusy(false);
+    }
+  }
+
+  function confirmBulkDelete() {
+    if (!selectedAssetIds.length) return;
+    const confirmed = window.confirm(formatTemplate(t(labels, "deleteConfirm"), { count: selectedAssetIds.length }));
+    if (confirmed) applyBulkAction("archive");
   }
 
   async function generateAsset(input) {
@@ -760,12 +1065,14 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
             <UploadPanel
               labels={labels}
               uploadBusy={uploadBusy}
-              uploadResults={uploadResults}
+              uploadTasks={uploadTasks}
               dragActive={dragActive}
               onBrowse={() => fileInputRef.current?.click()}
               onBrowseFolder={() => folderInputRef.current?.click()}
               onDropFiles={uploadFiles}
               onDragState={setDragActive}
+              onCancelTask={cancelUploadTask}
+              onResumeTask={resumeUploadTask}
             />
           ) : null}
 
@@ -808,8 +1115,40 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
                       </button>
                     </div>
                   ) : null}
+                  <BulkActionBar
+                    labels={labels}
+                    count={selectedAssetIds.length}
+                    activeMode={bulkMode}
+                    onMode={(mode) => setBulkMode((current) => current === mode ? "" : mode)}
+                    onDelete={confirmBulkDelete}
+                    onClear={() => {
+                      setSelectedAssetIds([]);
+                      setBulkMode("");
+                    }}
+                  />
+                  <BulkActionPanel
+                    labels={labels}
+                    mode={bulkMode}
+                    folders={folders}
+                    tags={tags}
+                    draft={bulkDraft}
+                    busy={bulkBusy}
+                    onDraftChange={(patch) => setBulkDraft((current) => ({ ...current, ...patch }))}
+                    onCreateTag={createTag}
+                    onApply={() => applyBulkAction()}
+                    onCancel={() => setBulkMode("")}
+                  />
                 </div>
-                <AssetGrid assets={assets} labels={labels} locale={locale} selectedAsset={selectedAsset} loading={loading} onSelect={setSelectedAsset} />
+                <AssetGrid
+                  assets={assets}
+                  labels={labels}
+                  locale={locale}
+                  selectedAsset={selectedAsset}
+                  selectedIds={selectedIds}
+                  loading={loading}
+                  onSelect={setSelectedAsset}
+                  onToggle={toggleAssetSelection}
+                />
               </section>
               <AssetInspector
                 asset={selectedAsset}
@@ -818,7 +1157,6 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
                 saving={savingAsset}
                 folders={folders}
                 tags={Array.from(new Set([...tags, ...(selectedAsset?.tags || [])].filter(Boolean)))}
-                onCreateFolder={createFolder}
                 onCreateTag={createTag}
                 onSave={saveAssetMetadata}
               />
