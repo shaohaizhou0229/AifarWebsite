@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdmin } from "@/lib/auth";
-import { createProjectAssetTag } from "@/lib/project-assets";
+import { createProjectAssetTag, deleteProjectAssetTag } from "@/lib/project-assets";
 import { getProfile } from "@/lib/profiles";
 
 export const runtime = "nodejs";
@@ -23,5 +23,15 @@ export async function POST(request) {
     return NextResponse.json({ tag });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: error.message || "Could not create tag." }, { status: 400 });
+  }
+}
+
+export async function DELETE(request) {
+  try {
+    const user = await requireAdmin(getProfile);
+    const tag = await deleteProjectAssetTag(user, await request.json().catch(() => ({})));
+    return NextResponse.json({ tag });
+  } catch (error) {
+    return permissionError(error) || NextResponse.json({ error: error.message || "Could not delete tag." }, { status: 400 });
   }
 }

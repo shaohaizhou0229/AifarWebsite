@@ -296,13 +296,15 @@ function AssetSearch({ labels, query, tags, selectedTag, onQueryChange, onTagSel
   );
 }
 
-function TagPicker({ labels, availableTags, selectedTags, onChange, onCreateTag }) {
+function TagPicker({ labels, availableTags, selectedTags, onChange, onCreateTag, onDeleteTag }) {
   const [open, setOpen] = useState(false);
   const [newTag, setNewTag] = useState("");
   const [creating, setCreating] = useState(false);
+  const [deletingTag, setDeletingTag] = useState("");
   const [error, setError] = useState("");
   const [popoverStyle, setPopoverStyle] = useState({});
   const buttonRef = useRef(null);
+  const popoverRef = useRef(null);
   const normalizedSelectedTags = selectedTags || [];
   const commonTags = useMemo(() => {
     const selectedSet = new Set(normalizedSelectedTags);
@@ -323,7 +325,8 @@ function TagPicker({ labels, availableTags, selectedTags, onChange, onCreateTag 
       const availableBelow = maxBottom - rect.bottom - 8;
       const availableAbove = rect.top - maxTop - 8;
       const height = Math.max(130, Math.min(210, Math.max(availableBelow, availableAbove), window.innerHeight - 48));
-      const top = availableBelow >= 130 ? rect.bottom + 8 : Math.max(maxTop, maxBottom - height);
+      const openBelow = availableBelow >= 130 || availableBelow >= availableAbove;
+      const top = openBelow ? rect.bottom + 8 : Math.max(maxTop, rect.top - height - 8);
       setPopoverStyle({ left, top, width, maxHeight: height });
     }
 
@@ -333,6 +336,29 @@ function TagPicker({ labels, availableTags, selectedTags, onChange, onCreateTag 
     return () => {
       window.removeEventListener("resize", placePopover);
       window.removeEventListener("scroll", placePopover, true);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    function closeOnOutsidePointer(event) {
+      const target = event.target;
+      if (buttonRef.current?.contains(target) || popoverRef.current?.contains(target)) return;
+      setOpen(false);
+    }
+
+    function closeOnEscape(event) {
+      if (event.key !== "Escape") return;
+      event.stopPropagation();
+      setOpen(false);
+    }
+
+    document.addEventListener("pointerdown", closeOnOutsidePointer, true);
+    document.addEventListener("keydown", closeOnEscape, true);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsidePointer, true);
+      document.removeEventListener("keydown", closeOnEscape, true);
     };
   }, [open]);
 
@@ -367,19 +393,50 @@ function TagPicker({ labels, availableTags, selectedTags, onChange, onCreateTag 
     }
   }
 
+  async function deleteTag(tag) {
+    if (!onDeleteTag || deletingTag) return;
+    const confirmed = window.confirm(formatTemplate(t(labels, "deleteTagConfirm"), { tag }));
+    if (!confirmed) return;
+    setDeletingTag(tag);
+    setError("");
+    try {
+      await onDeleteTag(tag);
+      onChange(normalizedSelectedTags.filter((item) => item.toLowerCase() !== tag.toLowerCase()));
+    } catch (deleteError) {
+      setError(deleteError.message || t(labels, "tagDeleteFailed"));
+    } finally {
+      setDeletingTag("");
+    }
+  }
+
   function renderTagGroup(title, groupTags) {
     return (
       <section className="asset-tag-group">
         <span>{title}</span>
         {groupTags.length ? (
-          <div className="asset-chip-row">
+          <div className="asset-chip-row asset-tag-options">
             {groupTags.map((tag) => {
               const selected = normalizedSelectedTags.includes(tag);
+              const deleting = deletingTag.toLowerCase() === tag.toLowerCase();
               return (
-                <button className={selected ? "selected" : ""} key={tag} type="button" onClick={() => toggleTag(tag)}>
-                  {tag}
-                  {selected ? <Check size={12} aria-hidden="true" /> : null}
-                </button>
+                <span className={`asset-tag-option ${selected ? "selected" : ""}`} key={tag}>
+                  <button className="asset-tag-select" type="button" onClick={() => toggleTag(tag)}>
+                    {tag}
+                    {selected ? <Check size={12} aria-hidden="true" /> : null}
+                  </button>
+                  {onDeleteTag ? (
+                    <button
+                      className="asset-tag-delete"
+                      type="button"
+                      onClick={() => deleteTag(tag)}
+                      disabled={Boolean(deletingTag)}
+                      title={t(labels, "deleteTag")}
+                      aria-label={`${t(labels, "deleteTag")} ${tag}`}
+                    >
+                      {deleting ? <Loader2 size={12} aria-hidden="true" className="spin" /> : <Trash2 size={12} aria-hidden="true" />}
+                    </button>
+                  ) : null}
+                </span>
               );
             })}
           </div>
@@ -389,7 +446,10 @@ function TagPicker({ labels, availableTags, selectedTags, onChange, onCreateTag 
   }
 
   const popover = open ? (
-    <div className="asset-tag-popover floating" style={popoverStyle} onPointerDown={(event) => event.stopPropagation()}>
+    <div ref={popoverRef} className="asset-tag-popover floating" style={popoverStyle} onPointerDown={(event) => event.stopPropagation()}>
+      <button className="asset-tag-popover-close" type="button" onClick={() => setOpen(false)} title={t(labels, "close")} aria-label={t(labels, "close")}>
+        <X size={14} aria-hidden="true" />
+      </button>
       {renderTagGroup(t(labels, "commonTags"), commonTags)}
       {renderTagGroup(t(labels, "allTags"), availableTags)}
       <div className="asset-tag-create">
@@ -439,7 +499,7 @@ function TagPicker({ labels, availableTags, selectedTags, onChange, onCreateTag 
   );
 }
 
-function AssetInspector({ asset, labels, locale, saving, folders, tags, onCreateTag, onPreview, onSave }) {
+function AssetInspector({ asset, labels, locale, saving, folders, tags, onCreateTag, onDeleteTag, onPreview, onSave }) {
   const [draft, setDraft] = useState(() => ({
     displayName: asset?.displayName || "",
     altText: asset?.altText || "",
@@ -503,6 +563,7 @@ function AssetInspector({ asset, labels, locale, saving, folders, tags, onCreate
           selectedTags={draft.tags}
           onChange={(nextTags) => setDraft((current) => ({ ...current, tags: nextTags }))}
           onCreateTag={onCreateTag}
+          onDeleteTag={onDeleteTag}
         />
       </label>
       <button className="button secondary compact" type="button" onClick={() => onSave(asset, draft)} disabled={saving || !draft.displayName.trim()}>
@@ -630,7 +691,7 @@ function UploadPanel({ labels, uploadBusy, uploadTasks, dragActive, onBrowse, on
   );
 }
 
-function BulkActionPanel({ labels, mode, folders, tags, draft, busy, onDraftChange, onCreateTag, onApply, onCancel }) {
+function BulkActionPanel({ labels, mode, folders, tags, draft, busy, onDraftChange, onCreateTag, onDeleteTag, onApply, onCancel }) {
   if (!mode) return null;
   return (
     <div className="asset-bulk-panel">
@@ -651,7 +712,7 @@ function BulkActionPanel({ labels, mode, folders, tags, draft, busy, onDraftChan
           </div>
           <label className="asset-field">
             <span>{t(labels, "tags")}</span>
-            <TagPicker labels={labels} availableTags={tags} selectedTags={draft.tags} onChange={(nextTags) => onDraftChange({ tags: nextTags })} onCreateTag={onCreateTag} />
+            <TagPicker labels={labels} availableTags={tags} selectedTags={draft.tags} onChange={(nextTags) => onDraftChange({ tags: nextTags })} onCreateTag={onCreateTag} onDeleteTag={onDeleteTag} />
           </label>
         </>
       ) : null}
@@ -1123,6 +1184,33 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
     return tag;
   }
 
+  async function deleteTag(name) {
+    const response = await fetch("/api/admin/assets/tags/", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || t(labels, "tagDeleteFailed"));
+    const removedName = data.tag?.name || name;
+    const keepTag = (tag) => tag.toLowerCase() !== removedName.toLowerCase();
+    setTags((current) => current.filter(keepTag));
+    setAssets((current) => current.map((asset) => ({
+      ...asset,
+      tags: (asset.tags || []).filter(keepTag)
+    })));
+    setSelectedAsset((current) => current ? {
+      ...current,
+      tags: (current.tags || []).filter(keepTag)
+    } : current);
+    setBulkDraft((current) => ({
+      ...current,
+      tags: (current.tags || []).filter(keepTag)
+    }));
+    if (tagFilter.toLowerCase() === removedName.toLowerCase()) setTagFilter("");
+    return data.tag;
+  }
+
   async function createToolbarFolder() {
     const value = toolbarFolderName.trim();
     if (!value) return;
@@ -1368,6 +1456,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
                     busy={bulkBusy}
                     onDraftChange={(patch) => setBulkDraft((current) => ({ ...current, ...patch }))}
                     onCreateTag={createTag}
+                    onDeleteTag={deleteTag}
                     onApply={() => applyBulkAction()}
                     onCancel={() => setBulkMode("")}
                   />
@@ -1409,6 +1498,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
                 folders={folders}
                 tags={Array.from(new Set([...tags, ...(selectedAsset?.tags || [])].filter(Boolean)))}
                 onCreateTag={createTag}
+                onDeleteTag={deleteTag}
                 onPreview={setPreviewAsset}
                 onSave={saveAssetMetadata}
               />

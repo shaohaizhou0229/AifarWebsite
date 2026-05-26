@@ -4580,9 +4580,89 @@ h3 {
   color: #1d4ed8;
 }
 
+.asset-tag-options {
+  gap: 7px;
+}
+
+.asset-tag-option {
+  display: inline-flex;
+  min-height: 32px;
+  overflow: hidden;
+  align-items: stretch;
+  border: 1px solid #d8dee8;
+  border-radius: 999px;
+  background: #fff;
+}
+
+.asset-tag-option.selected {
+  border-color: rgba(22, 119, 255, 0.44);
+  background: #eaf2ff;
+  color: #1d4ed8;
+}
+
+.asset-tag-option .asset-tag-select,
+.asset-tag-option .asset-tag-delete {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.asset-tag-option .asset-tag-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 850;
+  padding: 8px 10px;
+}
+
+.asset-tag-option .asset-tag-delete {
+  display: inline-grid;
+  width: 30px;
+  place-items: center;
+  border-left: 1px solid rgba(100, 116, 139, 0.16);
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0;
+}
+
+.asset-tag-option .asset-tag-delete:hover {
+  background: #fff1f2;
+  color: #dc2626;
+}
+
+.asset-tag-option .asset-tag-delete:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
 .asset-tag-popover {
   right: 0;
   top: calc(100% + 6px);
+}
+
+.asset-tag-popover-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border: 1px solid rgba(100, 116, 139, 0.18);
+  border-radius: 7px;
+  background: #fff;
+  color: #475569;
+  cursor: pointer;
+  padding: 0;
+}
+
+.asset-tag-popover-close:hover {
+  border-color: rgba(22, 119, 255, 0.28);
+  color: #1d4ed8;
 }
 
 .asset-tag-group {
@@ -5023,6 +5103,8 @@ h3 {
   overflow: auto;
   min-width: 0;
   max-width: min(360px, calc(100vw - 48px));
+  overscroll-behavior: contain;
+  padding-top: 38px;
   right: auto;
   top: auto;
 }
