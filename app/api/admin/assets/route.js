@@ -24,6 +24,7 @@ export async function GET(request) {
       q: searchParams.get("q") || "",
       directoryPath: searchParams.get("directory") || "",
       source: searchParams.get("source") || "",
+      tag: searchParams.get("tag") || "",
       page: searchParams.get("page") || 1,
       limit: searchParams.get("limit") || 24
     });

@@ -4,6 +4,8 @@ const {
   MAX_PROJECT_ASSET_SIZE,
   normalizeAssetDirectory,
   normalizeAssetSearchParams,
+  normalizeAssetTagName,
+  normalizeAssetTags,
   normalizeAssetUpdateInput,
   splitRelativeAssetPath,
   validateAssetFileInput
@@ -35,10 +37,11 @@ test("folder uploads preserve safe relative directories", () => {
 });
 
 test("asset search and update input are normalized", () => {
-  assert.deepEqual(normalizeAssetSearchParams({ q: " hero ", directory: " home ", source: "generated", page: "2", limit: "100" }), {
+  assert.deepEqual(normalizeAssetSearchParams({ q: " hero ", directory: " home ", source: "generated", tag: " Cover ", page: "2", limit: "100" }), {
     q: "hero",
     directoryPath: "home",
     source: "generated",
+    tag: "Cover",
     page: 2,
     limit: 60,
     offset: 60
@@ -54,4 +57,10 @@ test("asset search and update input are normalized", () => {
     directoryPath: "home",
     tags: ["hero", "website"]
   });
+});
+
+test("asset folder and tag catalogs use safe reusable values", () => {
+  assert.equal(normalizeAssetDirectory(" ../Campaign\\Home// "), "Campaign/Home");
+  assert.equal(normalizeAssetTagName("  launch tag  "), "launch tag");
+  assert.deepEqual(normalizeAssetTags(["launch", "Launch", "", "site"]), ["launch", "site"]);
 });

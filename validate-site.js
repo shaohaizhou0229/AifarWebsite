@@ -229,9 +229,12 @@ for (const file of [
   "app/api/admin/assets/route.js",
   "app/api/admin/assets/upload/route.js",
   "app/api/admin/assets/generate/route.js",
+  "app/api/admin/assets/folders/route.js",
+  "app/api/admin/assets/tags/route.js",
   "app/api/admin/assets/[id]/route.js",
   "app/api/assets/images/[...path]/route.js",
   "supabase/migrations/20260526090000_create_project_assets.sql",
+  "supabase/migrations/20260526113000_add_project_asset_catalogs.sql",
   "supabase/migrations/20260520090000_add_site_analytics_events.sql"
 ]) {
   requireFile(file);
