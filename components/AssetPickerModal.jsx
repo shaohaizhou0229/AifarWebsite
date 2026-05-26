@@ -31,6 +31,8 @@ import assetRules from "@/lib/project-assets-core.cjs";
 const TABS = ["project", "generate"];
 const IMAGE_SIZES = ["1024x1024", "1024x1536", "1536x1024"];
 const IMAGE_QUALITIES = ["auto", "low", "medium", "high"];
+const ASSET_PAGE_LIMITS = [24, 48, 60];
+const DEFAULT_ASSET_PAGE_LIMIT = 24;
 const ACTIVE_UPLOAD_STATUSES = new Set(["preparing", "uploading", "finalizing"]);
 const { validateAssetFileInput } = assetRules;
 
@@ -124,9 +126,10 @@ function AssetCard({ asset, labels, locale, selected, checked, onSelect, onToggl
 function FolderCard({ folder, labels, locale, onOpen }) {
   return (
     <article className="asset-card asset-folder-card">
+      <span className="asset-folder-badge">{t(labels, "folderBadge")}</span>
       <button className="asset-card-main" type="button" onClick={() => onOpen(folder.directoryPath)}>
         <span className="asset-card-thumb asset-folder-thumb">
-          {folder.coverUrl ? <img src={folder.coverUrl} alt={folder.displayName} loading="lazy" /> : <Folder size={54} aria-hidden="true" />}
+          <Folder size={58} aria-hidden="true" />
         </span>
         <span className="asset-card-body">
           <strong title={folder.directoryPath}>{folder.displayName || folder.directoryPath}</strong>
@@ -135,6 +138,43 @@ function FolderCard({ folder, labels, locale, onOpen }) {
         </span>
       </button>
     </article>
+  );
+}
+
+function AssetPagination({ labels, page, limit, total, onPageChange, onLimitChange }) {
+  const totalPages = Math.max(1, Math.ceil(Number(total || 0) / limit));
+  const currentPage = Math.min(page, totalPages);
+  const startPage = Math.max(1, Math.min(currentPage - 2, totalPages - 4));
+  const endPage = Math.min(totalPages, startPage + 4);
+  const pages = Array.from({ length: endPage - startPage + 1 }, (_item, index) => startPage + index);
+
+  if (!total) return null;
+
+  return (
+    <div className="asset-pagination" aria-label={t(labels, "paginationLabel")}>
+      <span>{formatTemplate(t(labels, "paginationSummary"), { total })}</span>
+      <div className="asset-pagination-actions">
+        <button className="button secondary compact" type="button" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage <= 1}>
+          {t(labels, "previousPage")}
+        </button>
+        <div className="asset-pagination-pages">
+          {pages.map((item) => (
+            <button className={item === currentPage ? "active" : ""} key={item} type="button" onClick={() => onPageChange(item)} aria-current={item === currentPage ? "page" : undefined}>
+              {item}
+            </button>
+          ))}
+        </div>
+        <button className="button secondary compact" type="button" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage >= totalPages}>
+          {t(labels, "nextPage")}
+        </button>
+      </div>
+      <label className="asset-page-size">
+        <span>{t(labels, "itemsPerPage")}</span>
+        <select value={limit} onChange={(event) => onLimitChange(Number(event.target.value))}>
+          {ASSET_PAGE_LIMITS.map((item) => <option value={item} key={item}>{item}</option>)}
+        </select>
+      </label>
+    </div>
   );
 }
 
@@ -480,10 +520,6 @@ function UploadPanel({ labels, uploadBusy, uploadTasks, dragActive, onBrowse, on
           <strong>{t(labels, "uploadQueue")}</strong>
           <span>{formatTemplate(t(labels, "uploadQueueCount"), { count: uploadTasks.length })}</span>
         </div>
-        <button className="button secondary compact" type="button" onClick={onBrowseFolder}>
-          <FolderOpen size={14} aria-hidden="true" />
-          {t(labels, "browseFolder")}
-        </button>
       </div>
       <div
         className={`asset-dropzone ${dragActive ? "active" : ""}`}
@@ -686,6 +722,9 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
   const [folders, setFolders] = useState([]);
   const [folderItems, setFolderItems] = useState([]);
   const [tags, setTags] = useState([]);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(DEFAULT_ASSET_PAGE_LIMIT);
+  const [totalAssets, setTotalAssets] = useState(0);
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [selectedAssetIds, setSelectedAssetIds] = useState([]);
   const [bulkMode, setBulkMode] = useState("");
@@ -708,11 +747,11 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
   const uploadBusy = useMemo(() => uploadTasks.some((task) => ACTIVE_UPLOAD_STATUSES.has(task.status)), [uploadTasks]);
   const isManagerTab = tab === "project";
   const visibleFolderItems = useMemo(() => {
-    if (directory || source || tagFilter) return [];
+    if (page !== 1 || directory || source || tagFilter) return [];
     const keyword = query.trim().toLowerCase();
     if (!keyword) return folderItems;
     return folderItems.filter((item) => `${item.displayName} ${item.directoryPath}`.toLowerCase().includes(keyword));
-  }, [directory, folderItems, query, source, tagFilter]);
+  }, [directory, folderItems, page, query, source, tagFilter]);
 
   useEffect(() => {
     if (!folderInputRef.current) return;
@@ -731,6 +770,10 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
     return () => document.removeEventListener("keydown", closeOnEscape);
   }, [onClose, open]);
 
+  useEffect(() => {
+    setPage(1);
+  }, [directory, limit, query, source, tagFilter]);
+
   const fetchAssets = useCallback(async () => {
     if (!open || tab === "generate") return;
     setLoading(true);
@@ -738,7 +781,8 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
 
     try {
       const params = new URLSearchParams();
-      params.set("limit", "36");
+      params.set("page", String(page));
+      params.set("limit", String(limit));
       if (query.trim()) params.set("q", query.trim());
       if (directory) params.set("directory", directory);
       if (source) params.set("source", source);
@@ -749,6 +793,13 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
       if (!response.ok) {
         throw new Error(data.code === "assetManagerBusy" ? t(labels, "loadBusy") : data.error || t(labels, "loadFailed"));
       }
+      const nextTotal = Number(data.total || 0);
+      const nextTotalPages = Math.max(1, Math.ceil(nextTotal / limit));
+      setTotalAssets(nextTotal);
+      if (page > nextTotalPages) {
+        setPage(nextTotalPages);
+        return;
+      }
       setAssets(data.assets || []);
       setFolders(data.folders || data.directories || []);
       setFolderItems(data.folderItems || []);
@@ -758,7 +809,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
     } finally {
       setLoading(false);
     }
-  }, [directory, labels, open, query, source, tab, tagFilter]);
+  }, [directory, labels, limit, open, page, query, source, tab, tagFilter]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -1068,6 +1119,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
       setSelectedAssetIds([]);
       setBulkMode("");
       setBulkDraft({ directoryPath: "", tags: [], tagMode: "append", altText: "" });
+      await fetchAssets();
     } catch (error) {
       setAssetError(error.message || t(labels, "bulkFailed"));
     } finally {
@@ -1082,6 +1134,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
   }
 
   function openFolder(directoryPath) {
+    setPage(1);
     setDirectory(directoryPath);
     setSelectedAsset(null);
     setSelectedAssetIds([]);
@@ -1267,6 +1320,22 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
                   onOpenFolder={openFolder}
                   onSelect={setSelectedAsset}
                   onToggle={toggleAssetSelection}
+                />
+                <AssetPagination
+                  labels={labels}
+                  page={page}
+                  limit={limit}
+                  total={totalAssets}
+                  onPageChange={(nextPage) => {
+                    setPage(nextPage);
+                    setSelectedAssetIds([]);
+                    setBulkMode("");
+                  }}
+                  onLimitChange={(nextLimit) => {
+                    setLimit(nextLimit);
+                    setSelectedAssetIds([]);
+                    setBulkMode("");
+                  }}
                 />
               </section>
               <AssetInspector
