@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import assetRules from "@/lib/project-assets-core.cjs";
 
-const TABS = ["upload", "project", "generate"];
+const TABS = ["project", "generate"];
 const IMAGE_SIZES = ["1024x1024", "1024x1536", "1536x1024"];
 const IMAGE_QUALITIES = ["auto", "low", "medium", "high"];
 const ACTIVE_UPLOAD_STATUSES = new Set(["preparing", "uploading", "finalizing"]);
@@ -706,7 +706,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
 
   const selectedIds = useMemo(() => new Set(selectedAssetIds), [selectedAssetIds]);
   const uploadBusy = useMemo(() => uploadTasks.some((task) => ACTIVE_UPLOAD_STATUSES.has(task.status)), [uploadTasks]);
-  const isManagerTab = tab === "upload" || tab === "project";
+  const isManagerTab = tab === "project";
   const visibleFolderItems = useMemo(() => {
     if (directory || source || tagFilter) return [];
     const keyword = query.trim().toLowerCase();
@@ -1144,7 +1144,6 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
   }
 
   const tabs = useMemo(() => [
-    ["upload", t(labels, "uploadTab"), UploadCloud],
     ["project", t(labels, "projectTab"), FolderOpen],
     ["generate", t(labels, "generateTab"), Sparkles]
   ], [labels]);

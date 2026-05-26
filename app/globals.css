@@ -3825,13 +3825,13 @@ h3 {
   display: grid;
   place-items: center;
   background: rgba(17, 24, 39, 0.58);
-  padding: 32px;
+  padding: 24px;
 }
 
 .asset-picker-panel {
   display: grid;
-  width: min(1560px, calc(100vw - 64px));
-  height: min(760px, calc(100vh - 64px));
+  width: min(1560px, calc(100vw - 48px));
+  height: min(780px, calc(100vh - 48px));
   grid-template-rows: auto auto auto minmax(0, 1fr) auto;
   overflow: hidden;
   border: 1px solid rgba(229, 231, 235, 0.94);
@@ -3874,6 +3874,7 @@ h3 {
 
 .asset-picker-tabs button {
   display: inline-flex;
+  flex: 0 0 auto;
   min-height: 48px;
   align-items: center;
   gap: 8px;
@@ -4536,13 +4537,20 @@ h3 {
 .asset-picker-footer {
   display: flex;
   position: relative;
-  z-index: 6;
+  z-index: 20;
+  min-height: 62px;
+  flex-shrink: 0;
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
   border-top: 1px solid #e5e7eb;
   background: #fff;
   padding: 12px 28px;
+}
+
+.asset-picker-footer .button {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .asset-upload-queue {
@@ -4767,6 +4775,7 @@ h3 {
 
 .asset-inspector {
   max-height: 100%;
+  padding-bottom: 18px;
 }
 
 .asset-inspector.empty {
