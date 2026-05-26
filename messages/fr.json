@@ -511,6 +511,7 @@
       "insertImage": "Insérer une image",
       "loading": "Chargement des images...",
       "loadFailed": "Impossible de charger les fichiers projet.",
+      "loadBusy": "Les fichiers projet sont très sollicités. Veuillez actualiser dans un instant.",
       "noAssets": "Aucune image trouvée.",
       "selectAssetHint": "Sélectionnez une image pour voir l'aperçu et les détails.",
       "displayName": "Nom",

@@ -651,7 +651,9 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
 
       const response = await fetch(`/api/admin/assets/?${params.toString()}`);
       const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || t(labels, "loadFailed"));
+      if (!response.ok) {
+        throw new Error(data.code === "assetManagerBusy" ? t(labels, "loadBusy") : data.error || t(labels, "loadFailed"));
+      }
       setAssets(data.assets || []);
       setFolders(data.folders || data.directories || []);
       setTags(data.tags || []);
@@ -824,7 +826,9 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
     }
 
     setUploadTasks((current) => [...nextTasks, ...current].slice(0, 80));
-    nextTasks.filter((task) => task.status === "queued").forEach((task) => startUploadTask(task));
+    for (const task of nextTasks.filter((item) => item.status === "queued")) {
+      await startUploadTask(task);
+    }
 
     if (fileInputRef.current) fileInputRef.current.value = "";
     if (folderInputRef.current) folderInputRef.current.value = "";

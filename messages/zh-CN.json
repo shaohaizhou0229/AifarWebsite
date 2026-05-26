@@ -511,6 +511,7 @@
       "insertImage": "插入图片",
       "loading": "正在加载图片...",
       "loadFailed": "无法加载项目文件。",
+      "loadBusy": "项目文件加载繁忙，请稍后刷新。",
       "noAssets": "没有找到图片。",
       "selectAssetHint": "选择一张图片后查看预览和详情。",
       "displayName": "名称",

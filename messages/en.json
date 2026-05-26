@@ -511,6 +511,7 @@
       "insertImage": "Insert image",
       "loading": "Loading images...",
       "loadFailed": "Unable to load project files.",
+      "loadBusy": "Project files are busy. Please refresh again in a moment.",
       "noAssets": "No images found.",
       "selectAssetHint": "Select an image to preview details.",
       "displayName": "Name",

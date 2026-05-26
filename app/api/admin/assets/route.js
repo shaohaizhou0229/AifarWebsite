@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdmin } from "@/lib/auth";
+import { isDatabaseConnectionLimitError } from "@/lib/db";
 import { listProjectAssets } from "@/lib/project-assets";
 import { getProfile } from "@/lib/profiles";
 
@@ -30,6 +31,12 @@ export async function GET(request) {
     });
     return NextResponse.json(result);
   } catch (error) {
+    if (isDatabaseConnectionLimitError(error)) {
+      return NextResponse.json({
+        code: "assetManagerBusy",
+        error: "Asset manager is busy. Please refresh later."
+      }, { status: 503 });
+    }
     return permissionError(error) || NextResponse.json({ error: error.message || "Could not list assets." }, { status: 400 });
   }
 }
