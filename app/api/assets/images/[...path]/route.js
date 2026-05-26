@@ -5,15 +5,35 @@ import {
   getCurrentAccessToken,
   requireAdmin
 } from "@/lib/auth";
-import { getProfile } from "@/lib/profiles";
 import {
   PROJECT_ASSET_BUCKET,
   isPublicProjectAssetImage,
   normalizePublicAssetPath
 } from "@/lib/project-assets";
+import { getProfile } from "@/lib/profiles";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+async function createReadableStorageClient(storagePath) {
+  if (await isPublicProjectAssetImage(storagePath)) {
+    return {
+      supabase: createPublicSupabaseClient(),
+      cacheControl: "public, max-age=300, stale-while-revalidate=3600"
+    };
+  }
+
+  try {
+    await requireAdmin(getProfile);
+    const accessToken = await getCurrentAccessToken();
+    return {
+      supabase: createUserSupabaseClient(accessToken),
+      cacheControl: "private, max-age=60"
+    };
+  } catch {
+    return null;
+  }
+}
 
 export async function GET(_request, { params }) {
   const { path = [] } = await params;
@@ -23,21 +43,12 @@ export async function GET(_request, { params }) {
     return NextResponse.json({ error: "Image not found." }, { status: 404 });
   }
 
-  let supabase = null;
-  let cacheControl = "public, max-age=300, stale-while-revalidate=3600";
-  if (await isPublicProjectAssetImage(storagePath)) {
-    supabase = createPublicSupabaseClient();
-  } else {
-    try {
-      await requireAdmin(getProfile);
-      supabase = createUserSupabaseClient(await getCurrentAccessToken());
-      cacheControl = "private, max-age=60";
-    } catch {
-      return NextResponse.json({ error: "Image not found." }, { status: 404 });
-    }
+  const readable = await createReadableStorageClient(storagePath);
+  if (!readable) {
+    return NextResponse.json({ error: "Image not found." }, { status: 404 });
   }
 
-  const { data, error } = await supabase.storage.from(PROJECT_ASSET_BUCKET).download(storagePath);
+  const { data, error } = await readable.supabase.storage.from(PROJECT_ASSET_BUCKET).download(storagePath);
 
   if (error || !data) {
     return NextResponse.json({ error: error?.message || "Image not found." }, { status: 404 });
@@ -46,7 +57,7 @@ export async function GET(_request, { params }) {
   return new Response(data, {
     headers: {
       "Content-Type": data.type || "application/octet-stream",
-      "Cache-Control": cacheControl
+      "Cache-Control": readable.cacheControl
     }
   });
 }
