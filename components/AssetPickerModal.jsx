@@ -1357,13 +1357,17 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
     <div className="asset-picker-modal" role="dialog" aria-modal="true" aria-label={t(labels, "title")} onPointerDown={() => onClose?.()}>
       <div className="asset-picker-panel" onPointerDown={(event) => event.stopPropagation()}>
         <header className="asset-picker-head">
-          <div>
+          <div className="asset-picker-title">
             <h2>{t(labels, "title")}</h2>
             <p>{t(labels, "lead")}</p>
           </div>
-          <button className="icon-button" type="button" onClick={() => onClose?.()} title={t(labels, "close")} aria-label={t(labels, "close")}>
-            <X size={18} aria-hidden="true" />
-          </button>
+          <div className="asset-picker-head-actions">
+            <button className="button secondary" type="button" onClick={() => onClose?.()}>{t(labels, "cancel")}</button>
+            <button className="button primary" type="button" onClick={() => chooseAsset()} disabled={!selectedAsset}>
+              <Check size={15} aria-hidden="true" />
+              {t(labels, "choose")}
+            </button>
+          </div>
         </header>
 
         <nav className="asset-picker-tabs" aria-label={t(labels, "tabsLabel")}>
@@ -1519,13 +1523,6 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
           ) : null}
         </div>
 
-        <footer className="asset-picker-footer">
-          <button className="button secondary" type="button" onClick={() => onClose?.()}>{t(labels, "cancel")}</button>
-          <button className="button primary" type="button" onClick={() => chooseAsset()} disabled={!selectedAsset}>
-            <Check size={15} aria-hidden="true" />
-            {t(labels, "choose")}
-          </button>
-        </footer>
         <AssetOriginalPreview asset={previewAsset} labels={labels} onClose={() => setPreviewAsset(null)} />
       </div>
     </div>

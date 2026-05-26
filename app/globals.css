@@ -3854,6 +3854,10 @@ h3 {
   padding: 20px 32px 16px;
 }
 
+.asset-picker-title {
+  min-width: 0;
+}
+
 .asset-picker-head h2 {
   margin: 0;
   color: #111827;
@@ -3865,6 +3869,19 @@ h3 {
   margin: 4px 0 0;
   color: #64748b;
   font-size: 0.94rem;
+}
+
+.asset-picker-head-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 10px;
+  padding-top: 2px;
+}
+
+.asset-picker-head-actions .button {
+  min-height: 34px;
+  white-space: nowrap;
 }
 
 .asset-picker-tabs {
@@ -4261,7 +4278,7 @@ h3 {
   gap: 14px;
   overflow: auto;
   padding-right: 4px;
-  padding-bottom: 68px;
+  padding-bottom: 8px;
 }
 
 .asset-pagination {
@@ -4756,28 +4773,6 @@ h3 {
   gap: 10px;
 }
 
-.asset-picker-footer {
-  display: flex;
-  position: absolute;
-  right: 24px;
-  bottom: 18px;
-  z-index: 20;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-  border: 0;
-  background: transparent;
-  padding: 0;
-  pointer-events: none;
-}
-
-.asset-picker-footer .button {
-  flex: 0 0 auto;
-  white-space: nowrap;
-  pointer-events: auto;
-  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.16);
-}
-
 .asset-upload-queue {
   display: grid;
   min-height: 0;
@@ -5000,7 +4995,7 @@ h3 {
 
 .asset-inspector {
   max-height: 100%;
-  padding-bottom: 76px;
+  padding-bottom: 14px;
 }
 
 .asset-inspector.empty {
