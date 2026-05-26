@@ -76,7 +76,7 @@ export default async function EditAdminDocumentPage({ params }) {
           <p className="muted-line">{page.category}: {adminDocs.categories?.[document.categoryKey]?.label || document.categoryLabel}</p>
           {document.checksumSha256 ? <code className="checksum-line">SHA-256: {document.checksumSha256}</code> : null}
         </article>
-        <AdminDocumentForm document={document} categories={localizeCategories(categories, adminDocs)} labels={messages.forms.documents} locale={locale} />
+        <AdminDocumentForm document={document} categories={localizeCategories(categories, adminDocs)} labels={messages.forms.documents} assetLabels={messages.forms.assets} locale={locale} />
         <AdminVersionTimeline
           title={page.history}
           emptyText={page.noHistory}

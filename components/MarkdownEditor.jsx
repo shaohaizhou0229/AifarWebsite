@@ -1,10 +1,24 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ImagePlus } from "lucide-react";
+import { AssetPickerModal } from "@/components/AssetPickerModal";
 import { MarkdownContent } from "@/components/MarkdownContent";
 
-export function MarkdownEditor({ id, value, onChange, labels }) {
+function appendMarkdownImage(markdown, asset) {
+  const alt = String(asset.altText || asset.displayName || asset.filename || asset.originalFilename || "")
+    .replace(/\]/g, "\\]");
+  const imageMarkdown = asset.markdown || `![${alt}](${asset.url})`;
+  return `${String(markdown || "").trimEnd()}\n\n${imageMarkdown}\n`;
+}
+
+export function MarkdownEditor({ id, value, onChange, labels, assetLabels, locale }) {
   const [mode, setMode] = useState("visual");
+  const [assetPickerOpen, setAssetPickerOpen] = useState(false);
+
+  function insertAsset(asset) {
+    onChange(appendMarkdownImage(value, asset));
+  }
 
   return (
     <div className="markdown-editor-shell">
@@ -30,6 +44,10 @@ export function MarkdownEditor({ id, value, onChange, labels }) {
             </button>
           ))}
         </div>
+        <button className="button secondary compact" type="button" onClick={() => setAssetPickerOpen(true)}>
+          <ImagePlus size={15} aria-hidden="true" />
+          {assetLabels.insertImage}
+        </button>
       </div>
 
       {mode === "visual" ? (
@@ -53,6 +71,14 @@ export function MarkdownEditor({ id, value, onChange, labels }) {
           {value.trim() ? <MarkdownContent content={value} /> : <p className="muted-line">{labels.emptyPreview}</p>}
         </div>
       ) : null}
+      <AssetPickerModal
+        open={assetPickerOpen}
+        labels={assetLabels}
+        locale={locale}
+        initialTab="project"
+        onClose={() => setAssetPickerOpen(false)}
+        onSelect={insertAsset}
+      />
     </div>
   );
 }

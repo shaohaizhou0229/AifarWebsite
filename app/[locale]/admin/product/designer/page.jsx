@@ -76,6 +76,7 @@ export default async function AdminProductDesignerPage({ params, searchParams })
       <div className="admin-detail-layout admin-detail-layout-wide">
         <AdminSiteContentForm
           labels={labels}
+          assetLabels={messages.forms.assets}
           initialPageKey={initialPageKey}
           initialLocale={initialLocale}
           initialContent={initialContent}

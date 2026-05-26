@@ -4,7 +4,7 @@ function isSafeHref(href = "") {
 
 function renderInline(text) {
   const parts = [];
-  const pattern = /(`[^`]+`|\*\*[^*]+\*\*|~~[^~]+~~|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g;
+  const pattern = /(!\[[^\]]*]\([^)]+\)|`[^`]+`|\*\*[^*]+\*\*|~~[^~]+~~|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g;
   let lastIndex = 0;
   let match;
 
@@ -22,6 +22,12 @@ function renderInline(text) {
       parts.push(<s key={parts.length}>{token.slice(2, -2)}</s>);
     } else if (token.startsWith("*")) {
       parts.push(<em key={parts.length}>{token.slice(1, -1)}</em>);
+    } else if (token.startsWith("![")) {
+      const image = /^!\[([^\]]*)]\(([^)]+)\)$/.exec(token);
+      const src = image?.[2] || "";
+      parts.push(
+        <img className="markdown-inline-image" key={parts.length} src={isSafeHref(src) ? src : ""} alt={image?.[1] || ""} loading="lazy" />
+      );
     } else {
       const link = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(token);
       const href = link?.[2] || "#";
@@ -48,6 +54,7 @@ function normalizeHeadingText(value = "") {
     .replace(/\*\*([^*]+)\*\*/g, "$1")
     .replace(/~~([^~]+)~~/g, "$1")
     .replace(/\*([^*]+)\*/g, "$1")
+    .replace(/!\[([^\]]*)]\([^)]+\)/g, "$1")
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
     .trim();
 }

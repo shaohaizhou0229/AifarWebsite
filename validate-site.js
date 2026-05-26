@@ -202,6 +202,7 @@ for (const file of [
   "components/AdminNotificationsClient.jsx",
   "components/AdminDownloadForm.jsx",
   "components/AdminDocumentForm.jsx",
+  "components/AssetPickerModal.jsx",
   "components/SiteAnalyticsTracker.jsx",
   "components/MarkdownContent.jsx",
   "components/AdminUserForm.jsx",
@@ -221,8 +222,16 @@ for (const file of [
   "middleware.js",
   "next.config.js",
   "lib/admin-dashboard.js",
+  "lib/project-assets.js",
+  "lib/project-assets-core.cjs",
   "lib/site-analytics.js",
   "app/api/analytics/track/route.js",
+  "app/api/admin/assets/route.js",
+  "app/api/admin/assets/upload/route.js",
+  "app/api/admin/assets/generate/route.js",
+  "app/api/admin/assets/[id]/route.js",
+  "app/api/assets/images/[...path]/route.js",
+  "supabase/migrations/20260526090000_create_project_assets.sql",
   "supabase/migrations/20260520090000_add_site_analytics_events.sql"
 ]) {
   requireFile(file);

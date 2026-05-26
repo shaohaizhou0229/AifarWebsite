@@ -63,7 +63,7 @@ export default async function NewAdminDocumentPage({ params }) {
       ]}
     />
       <div className="admin-detail-layout">
-        <AdminDocumentForm categories={categories} labels={messages.forms.documents} locale={locale} />
+        <AdminDocumentForm categories={categories} labels={messages.forms.documents} assetLabels={messages.forms.assets} locale={locale} />
       </div>
     </>
   );

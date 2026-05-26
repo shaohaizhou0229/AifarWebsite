@@ -37,7 +37,7 @@ export async function POST(request) {
     }
 
     if (!isAllowedSiteImage(file)) {
-      return NextResponse.json({ error: "Please upload a jpg, png, or webp image up to 10 MB." }, { status: 400 });
+      return NextResponse.json({ error: "Please upload a JPG, PNG, WEBP, or SVG image up to 5 MB." }, { status: 400 });
     }
 
     const upload = await buildSiteImageUpload(file, pageKey, locale);

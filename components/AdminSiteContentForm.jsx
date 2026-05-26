@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Clock3, Eye, Monitor, RotateCcw, Settings, Smartphone, Sparkles, Trash2, X } from "lucide-react";
+import { AssetPickerModal } from "@/components/AssetPickerModal";
 import { SITE_LAYOUT_VERSION, createBlankSection } from "@/lib/site-page-builder";
 import { SitePageSections } from "@/components/SitePageSections";
 import { CmsToolbar } from "@/components/admin-site-content/CmsToolbar";
@@ -97,6 +98,7 @@ function SnapshotMenu({
 
 export function AdminSiteContentForm({
   labels,
+  assetLabels,
   initialPageKey,
   initialLocale,
   initialContent,
@@ -112,7 +114,6 @@ export function AdminSiteContentForm({
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
-  const [uploadingSectionId, setUploadingSectionId] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [snapshots, setSnapshots] = useState(initialSnapshots);
@@ -120,6 +121,7 @@ export function AdminSiteContentForm({
   const [previewOpen, setPreviewOpen] = useState(false);
   const [pageSettingsOpen, setPageSettingsOpen] = useState(false);
   const [snapshotPreview, setSnapshotPreview] = useState(null);
+  const [assetPickerTarget, setAssetPickerTarget] = useState(null);
   const [hoveredSectionId, setHoveredSectionId] = useState("");
   const canvasPreviewRef = useRef(null);
   const modalPreviewRef = useRef(null);
@@ -336,47 +338,26 @@ export function AdminSiteContentForm({
     }
   }
 
-  async function uploadImage(event, sectionId, pathKey, urlKey) {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  function openAssetPicker(sectionId, pathKey, urlKey) {
+    setAssetPickerTarget({ sectionId, pathKey, urlKey });
+  }
 
+  function selectAsset(asset) {
+    if (!assetPickerTarget || !asset?.storagePath) return;
     queueDesignerScrollRestore();
-    setUploadingSectionId(sectionId);
-    setMessage("");
-    setError("");
-
-    try {
-      const formData = new FormData();
-      formData.set("pageKey", pageKey);
-      formData.set("locale", locale);
-      formData.set("file", file);
-
-      const response = await fetch("/api/admin/site-content/image/", {
-        method: "POST",
-        body: formData
-      });
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(data.error || labels.uploadFailed);
+    patchSection(assetPickerTarget.sectionId, (section) => ({
+      ...section,
+      content: {
+        ...(section.content || {}),
+        [assetPickerTarget.pathKey]: asset.storagePath,
+        [assetPickerTarget.urlKey]: asset.url,
+        ...(assetPickerTarget.pathKey === "heroImagePath"
+          ? { heroAlt: section.content?.heroAlt || asset.altText || asset.filename || "" }
+          : { imageAlt: section.content?.imageAlt || asset.altText || asset.filename || "" })
       }
-
-      queueDesignerScrollRestore();
-      patchSection(sectionId, (section) => ({
-        ...section,
-        content: {
-          ...(section.content || {}),
-          [pathKey]: data.storagePath,
-          [urlKey]: data.url
-        }
-      }));
-      setMessage(labels.uploaded);
-    } catch (uploadError) {
-      setError(uploadError.message || labels.uploadFailed);
-    } finally {
-      setUploadingSectionId("");
-      event.target.value = "";
-    }
+    }));
+    setMessage(labels.assetSelected || labels.uploaded);
+    setAssetPickerTarget(null);
   }
 
   function patchSection(sectionId, updater) {
@@ -609,10 +590,9 @@ export function AdminSiteContentForm({
               <SectionEditor
                 section={selectedSection}
                 labels={labels}
-                uploadingSectionId={uploadingSectionId}
                 onPatchSection={patchSection}
                 onPatchSectionContent={patchSectionContent}
-                onUploadImage={uploadImage}
+                onOpenAssetPicker={openAssetPicker}
               />
             </section>
           </aside>
@@ -677,6 +657,15 @@ export function AdminSiteContentForm({
           </div>
         </div>
       ) : null}
+
+      <AssetPickerModal
+        open={Boolean(assetPickerTarget)}
+        labels={assetLabels}
+        locale={locale}
+        initialTab="project"
+        onClose={() => setAssetPickerTarget(null)}
+        onSelect={selectAsset}
+      />
 
     </form>
   );

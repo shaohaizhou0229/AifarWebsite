@@ -13,7 +13,7 @@ function slugify(value) {
     .replace(/-{2,}/g, "-");
 }
 
-export function AdminDocumentForm({ document, categories, labels, locale }) {
+export function AdminDocumentForm({ document, categories, labels, assetLabels, locale }) {
   const router = useRouter();
   const isEditing = Boolean(document?.id);
   const initial = useMemo(() => ({
@@ -251,7 +251,7 @@ export function AdminDocumentForm({ document, categories, labels, locale }) {
             </div>
           </div>
         ) : null}
-        <MarkdownEditor id="markdownContent" labels={labels} value={form.markdownContent} onChange={updateMarkdownContent} />
+        <MarkdownEditor id="markdownContent" labels={labels} assetLabels={assetLabels} locale={locale} value={form.markdownContent} onChange={updateMarkdownContent} />
       </div>
       <label className="checkbox-line">
         <input name="isPublished" type="checkbox" checked={form.isPublished} onChange={updateField} />
