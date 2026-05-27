@@ -92,7 +92,7 @@ function TextFields({ labels, contentValues, section, fields, onPatchSectionCont
   ));
 }
 
-function ContentTab({ section, labels, onPatchSection, onPatchSectionContent, onOpenAssetPicker }) {
+function ContentTab({ section, labels, defaultTargetSize, onPatchSection, onPatchSectionContent, onOpenAssetPicker }) {
   const contentValues = section.content || {};
   const commonText = [
     { key: "eyebrow", label: "eyebrow" },
@@ -108,7 +108,7 @@ function ContentTab({ section, labels, onPatchSection, onPatchSectionContent, on
         <Field label={labels.heroAlt}>
           <TextInput value={contentValues.heroAlt} onChange={(value) => onPatchSectionContent(section.id, "heroAlt", value)} />
         </Field>
-        <SectionImageUpload section={section} pathKey="heroImagePath" urlKey="heroImageUrl" label={labels.heroImage} labels={labels} onPatchSection={onPatchSection} onOpenAssetPicker={onOpenAssetPicker} />
+        <SectionImageUpload section={section} pathKey="heroImagePath" urlKey="heroImageUrl" label={labels.heroImage} labels={labels} defaultTargetSize={defaultTargetSize} onPatchSection={onPatchSection} onOpenAssetPicker={onOpenAssetPicker} />
       </>
     );
   }
@@ -142,7 +142,7 @@ function ContentTab({ section, labels, onPatchSection, onPatchSectionContent, on
         <Field label={labels.heroAlt}>
           <TextInput value={contentValues.imageAlt} onChange={(value) => onPatchSectionContent(section.id, "imageAlt", value)} />
         </Field>
-        <SectionImageUpload section={section} pathKey="imagePath" urlKey="imageUrl" label={labels.heroImage} labels={labels} onPatchSection={onPatchSection} onOpenAssetPicker={onOpenAssetPicker} />
+        <SectionImageUpload section={section} pathKey="imagePath" urlKey="imageUrl" label={labels.heroImage} labels={labels} defaultTargetSize={defaultTargetSize} onPatchSection={onPatchSection} onOpenAssetPicker={onOpenAssetPicker} />
         <RowEditor labels={labels} rows={contentValues.items} columns={2} placeholders={[labels.itemTitle, labels.description]} onChange={(rows) => onPatchSectionContent(section.id, "items", rows)} />
       </>
     );
@@ -300,7 +300,7 @@ function AdvancedTab({ section, labels, onPatchSection, onPatchSectionContent })
   );
 }
 
-export function SectionEditor({ section, labels, onPatchSection, onPatchSectionContent, onOpenAssetPicker }) {
+export function SectionEditor({ section, labels, defaultTargetSize = "1024x1024", onPatchSection, onPatchSectionContent, onOpenAssetPicker }) {
   const tabs = useMemo(() => [
     ["content", labels.settingTabs?.content || labels.inspector],
     ["style", labels.settingTabs?.style || labels.sectionTone],
@@ -332,7 +332,7 @@ export function SectionEditor({ section, labels, onPatchSection, onPatchSectionC
         ))}
       </div>
       {activeTab === "content" ? (
-          <ContentTab section={section} labels={labels} onPatchSection={onPatchSection} onPatchSectionContent={onPatchSectionContent} onOpenAssetPicker={onOpenAssetPicker} />
+          <ContentTab section={section} labels={labels} defaultTargetSize={defaultTargetSize} onPatchSection={onPatchSection} onPatchSectionContent={onPatchSectionContent} onOpenAssetPicker={onOpenAssetPicker} />
       ) : null}
       {activeTab === "style" ? <StyleTab section={section} labels={labels} onPatchSection={onPatchSection} /> : null}
       {activeTab === "layout" ? <LayoutTab section={section} labels={labels} onPatchSection={onPatchSection} /> : null}

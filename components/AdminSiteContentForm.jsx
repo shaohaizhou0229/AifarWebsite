@@ -11,30 +11,14 @@ import { SectionSidebar } from "@/components/admin-site-content/SectionSidebar";
 import { SeoEditor } from "@/components/admin-site-content/SeoEditor";
 import { cloneContent, ensureLayout, formatDate, moveItem, updateSectionAt, updateSeo } from "@/components/admin-site-content/form-utils";
 import promptContextRules from "@/lib/asset-prompt-context.cjs";
+import imageGenerationRules from "@/lib/image-generation-settings-core.cjs";
 import { localizedPath } from "@/i18n/routing";
 
-const IMAGE_GENERATION_SIZES = ["1024x1024", "1024x1536", "1536x1024"];
 const { buildSectionImagePromptContext } = promptContextRules;
-
-function normalizeGenerateSize(size, fallback = "1024x1024") {
-  return IMAGE_GENERATION_SIZES.includes(size) ? size : fallback;
-}
+const { normalizeImageSize, resolveImageTargetSize } = imageGenerationRules;
 
 function getSectionImageSpec(section, pathKey) {
   return section?.settings?.imageSpecs?.[pathKey] || {};
-}
-
-function getClosestGenerateSize(spec = {}, fallback = "1024x1024") {
-  const width = Number(spec.width || 0);
-  const height = Number(spec.height || 0);
-  if (!width || !height) return normalizeGenerateSize(spec.size, fallback);
-
-  const targetRatio = width / height;
-  return IMAGE_GENERATION_SIZES.reduce((best, size) => {
-    const [nextWidth, nextHeight] = size.split("x").map(Number);
-    const score = Math.abs((nextWidth / nextHeight) - targetRatio);
-    return score < best.score ? { size, score } : best;
-  }, { size: normalizeGenerateSize(fallback), score: Number.POSITIVE_INFINITY }).size;
 }
 
 function SnapshotMenu({
@@ -368,23 +352,27 @@ export function AdminSiteContentForm({
 
   function openAssetPicker(sectionId, pathKey, urlKey) {
     const targetSection = sections.find((section) => section.id === sectionId);
-    const defaultSize = normalizeGenerateSize(imageSettings.defaultSize || "1024x1024");
-    const imageSpec = getSectionImageSpec(targetSection, pathKey);
-    const hasSectionSpec = Boolean(Number(imageSpec.width || 0) && Number(imageSpec.height || 0));
-    const defaultGenerateSize = getClosestGenerateSize(imageSpec, defaultSize);
+    const defaultSize = normalizeImageSize(imageSettings.defaultSize || "1024x1024");
+    const targetSize = resolveImageTargetSize({
+      sectionType: targetSection?.type || "",
+      pathKey,
+      spec: getSectionImageSpec(targetSection, pathKey),
+      defaultSize
+    });
     const promptContext = buildSectionImagePromptContext({
       pageKey,
       locale,
       section: targetSection,
       pathKey,
-      size: defaultGenerateSize,
-      sizeSource: hasSectionSpec ? "sectionImageSpec" : "aiDefault"
+      size: targetSize.actualSize,
+      sizeSource: targetSize.sizeSource
     });
     setAssetPickerTarget({
       sectionId,
       pathKey,
       urlKey,
-      defaultGenerateSize,
+      targetSize,
+      defaultGenerateSize: targetSize.actualSize,
       promptContext,
       defaultPromptMode: promptContext.hasContext ? "section_context" : "manual"
     });
@@ -638,6 +626,7 @@ export function AdminSiteContentForm({
               <SectionEditor
                 section={selectedSection}
                 labels={labels}
+                defaultTargetSize={normalizeImageSize(imageSettings.defaultSize || "1024x1024")}
                 onPatchSection={patchSection}
                 onPatchSectionContent={patchSectionContent}
                 onOpenAssetPicker={openAssetPicker}
@@ -712,7 +701,8 @@ export function AdminSiteContentForm({
         locale={locale}
         initialTab="project"
         libraryHref={localizedPath(adminLocale || locale, "/admin/assets/")}
-        defaultGenerateSize={assetPickerTarget?.defaultGenerateSize || normalizeGenerateSize(imageSettings.defaultSize || "1024x1024")}
+        defaultGenerateSize={assetPickerTarget?.defaultGenerateSize || normalizeImageSize(imageSettings.defaultSize || "1024x1024")}
+        targetSize={assetPickerTarget?.targetSize}
         promptContext={assetPickerTarget?.promptContext}
         defaultPromptMode={assetPickerTarget?.defaultPromptMode || "manual"}
         onClose={() => setAssetPickerTarget(null)}

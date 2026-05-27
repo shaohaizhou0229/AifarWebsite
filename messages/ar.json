@@ -502,7 +502,18 @@
       "targetImageSize": "مواصفات الصورة",
       "targetWidth": "العرض",
       "targetHeight": "الارتفاع",
-      "imageSizeHint": "تستخدم لاقتراح حجم توليد الصورة لهذه الكتلة."
+      "imageSizeHint": "تستخدم كحجم مستهدف لاختيار الصورة وتوليدها بالذكاء الاصطناعي.",
+      "recommendedTargetSize": "الحجم المقترح",
+      "actualGenerationSize": "حجم التوليد الفعلي",
+      "incompleteTargetSize": "يجب إدخال العرض والارتفاع معا. سيتم استخدام الحجم المقترح حاليا.",
+      "useRecommendedSize": "استخدام الحجم المقترح",
+      "resetDefaultSize": "إعادة الضبط",
+      "targetSizeSourceLabels": {
+        "sectionImageSpec": "مخصص",
+        "sectionRecommendation": "اقتراح الكتلة",
+        "aiDefault": "افتراضي النظام",
+        "assetLibraryCustom": "مخصص من مكتبة الأصول"
+      }
     },
     "assets": {
       "title": "اختيار أو رفع الصور",
@@ -584,6 +595,7 @@
       "retryUpload": "إعادة المحاولة",
       "removeUploadTask": "إزالة من قائمة الانتظار",
       "done": "تم",
+      "targetImageSize": "حجم الصورة المستهدف",
       "prompt": "وصف الصورة",
       "promptPlaceholder": "صف الصورة التي تريد إنشاءها",
       "promptSource": "مصدر الوصف",
@@ -602,6 +614,7 @@
       "targetWidth": "العرض المطلوب",
       "targetHeight": "الارتفاع المطلوب",
       "actualGenerationSize": "ستستخدم الخدمة أقرب حجم مدعوم.",
+      "assetLibraryCustomSize": "الحجم المستهدف الافتراضي لخدمة الذكاء الاصطناعي",
       "saveFolder": "مجلد الحفظ",
       "generateAndSave": "إنشاء وحفظ",
       "generatedSaved": "تم حفظ الصورة المنشأة.",
@@ -609,6 +622,12 @@
       "openAiSettings": "فتح إعدادات خدمة الذكاء الاصطناعي",
       "targetSizeChip": "المطلوب: {size}",
       "serviceSizeChip": "الفعلي: {size}",
+      "targetSizeSourceLabels": {
+        "sectionImageSpec": "مخصص للكتلة الحالية",
+        "sectionRecommendation": "اقتراح الكتلة الحالية",
+        "aiDefault": "الحجم المستهدف الافتراضي لخدمة الذكاء الاصطناعي",
+        "assetLibraryCustom": "مخصص من مكتبة الأصول"
+      },
       "assetUploaded": "تم رفع الصورة إلى المكتبة.",
       "useGenerated": "استخدام الصورة المنشأة",
       "saveGeneratedToProject": "حفظ في ملفات المشروع",
@@ -2294,7 +2313,7 @@
       "enabled": "حالة الخدمة",
       "enabledYes": "مفعلة",
       "enabledNo": "متوقفة",
-      "defaultSize": "الحجم الافتراضي",
+      "defaultSize": "الحجم المستهدف الافتراضي",
       "defaultQuality": "الجودة الافتراضية",
       "defaultOutput": "الإخراج الافتراضي",
       "envManagedHint": "تدار هذه القيم عبر متغيرات بيئة الخادم. يختار المصممون الأحجام والجودة المسموح بها فقط.",
@@ -2315,7 +2334,9 @@
         "medium": "متوسطة",
         "high": "عالية"
       },
-      "availableSizes": "الأحجام المتاحة"
+      "availableSizes": "أحجام التوليد المدعومة",
+      "sizeMatchingRule": "قاعدة مطابقة الحجم",
+      "sizeMatchingRuleLead": "يدخل المحررون العرض والارتفاع المستهدفين. يستخدم النظام تلقائيا أقرب حجم توليد مدعوم ويحفظ القيمتين في بيانات الصورة."
     }
   }
 }

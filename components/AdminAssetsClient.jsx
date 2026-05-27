@@ -20,13 +20,14 @@ import {
   X
 } from "lucide-react";
 import { AdminAsyncState } from "@/components/AdminAsyncState";
+import imageGenerationRules from "@/lib/image-generation-settings-core.cjs";
 
 const DEFAULT_ASSET_LIMIT = 24;
 const ASSET_PAGE_SIZE_OPTIONS = [24, 48];
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024;
 const SOURCE_OPTIONS = ["upload", "folder_upload", "generated"];
-const SUPPORTED_GENERATION_SIZES = ["1024x1024", "1024x1536", "1536x1024"];
 const SUPPORTED_UPLOAD_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp", "svg"]);
+const { closestImageSizeForSpec, parseImageSize } = imageGenerationRules;
 
 function t(labels, key) {
   return labels?.[key] || key;
@@ -97,29 +98,10 @@ function normalizeRelativePath(value = "") {
     .join("/");
 }
 
-function parseSize(size = "1024x1024") {
-  const [width, height] = String(size || "").split("x").map(Number);
-  return { width: width || 1024, height: height || 1024 };
-}
-
 function clampNumber(value, min, max, fallback) {
   const number = Number(value);
   if (!Number.isFinite(number)) return fallback;
   return Math.min(Math.max(Math.trunc(number), min), max);
-}
-
-function closestGenerationSize(spec = {}, fallback = "1024x1024", supportedSizes = SUPPORTED_GENERATION_SIZES) {
-  const width = Number(spec.targetWidth || spec.width || 0);
-  const height = Number(spec.targetHeight || spec.height || 0);
-  const safeFallback = supportedSizes.includes(fallback) ? fallback : supportedSizes[0];
-  if (!width || !height) return supportedSizes.includes(spec.size) ? spec.size : safeFallback;
-
-  const targetRatio = width / height;
-  return supportedSizes.reduce((best, size) => {
-    const [nextWidth, nextHeight] = size.split("x").map(Number);
-    const nextScore = Math.abs((nextWidth / nextHeight) - targetRatio);
-    return nextScore < best.score ? { size, score: nextScore } : best;
-  }, { size: safeFallback, score: Number.POSITIVE_INFINITY }).size;
 }
 
 function getVisiblePages(currentPage, totalPages) {
@@ -526,8 +508,7 @@ function AdminAssetUploadModal({ open, labels, folders, onClose, onUploaded }) {
 
 function AdminAssetGenerateModal({ open, labels, locale, folders, imageSettings, defaultGenerateSize, onClose, onGenerated }) {
   const defaultSize = imageSettings?.defaultSize || defaultGenerateSize || "1024x1024";
-  const parsedDefault = parseSize(defaultSize);
-  const supportedSizes = imageSettings?.supportedSizes?.length ? imageSettings.supportedSizes : SUPPORTED_GENERATION_SIZES;
+  const parsedDefault = parseImageSize(defaultSize);
   const [prompt, setPrompt] = useState("");
   const [targetWidth, setTargetWidth] = useState(parsedDefault.width);
   const [targetHeight, setTargetHeight] = useState(parsedDefault.height);
@@ -540,7 +521,7 @@ function AdminAssetGenerateModal({ open, labels, locale, folders, imageSettings,
 
   useEffect(() => {
     if (!open) return;
-    const nextDefault = parseSize(defaultSize);
+    const nextDefault = parseImageSize(defaultSize);
     setTargetWidth(nextDefault.width);
     setTargetHeight(nextDefault.height);
     setQuality(imageSettings?.defaultQuality || "auto");
@@ -552,7 +533,7 @@ function AdminAssetGenerateModal({ open, labels, locale, folders, imageSettings,
   const configured = Boolean(imageSettings?.configured);
   const safeWidth = clampNumber(targetWidth, 128, 4096, parsedDefault.width);
   const safeHeight = clampNumber(targetHeight, 128, 4096, parsedDefault.height);
-  const actualSize = closestGenerationSize({ targetWidth: safeWidth, targetHeight: safeHeight }, defaultSize, supportedSizes);
+  const actualSize = closestImageSizeForSpec({ targetWidth: safeWidth, targetHeight: safeHeight }, defaultSize);
 
   async function submitGeneration() {
     if (!configured || !prompt.trim()) return;
@@ -568,6 +549,7 @@ function AdminAssetGenerateModal({ open, labels, locale, folders, imageSettings,
           targetWidth: safeWidth,
           targetHeight: safeHeight,
           size: actualSize,
+          sizeSource: "assetLibraryCustom",
           quality,
           directoryPath,
           tags: splitTags(tagText)
@@ -612,6 +594,10 @@ function AdminAssetGenerateModal({ open, labels, locale, folders, imageSettings,
               <span>{t(labels, "prompt")}</span>
               <textarea value={prompt} placeholder={t(labels, "promptPlaceholder")} onChange={(event) => setPrompt(event.target.value)} />
             </label>
+            <div className="admin-asset-size-source">
+              <span>{t(labels, "targetImageSize")}</span>
+              <strong>{labels.targetSizeSourceLabels?.assetLibraryCustom || t(labels, "assetLibraryCustomSize")}</strong>
+            </div>
             <div className="admin-asset-size-grid">
               <label className="asset-field">
                 <span>{t(labels, "targetWidth")}</span>

@@ -109,6 +109,10 @@ export function AdminAiSettingsClient({ labels, settings }) {
               {(settings.supportedSizes || []).map((size) => <span key={size}>{size}</span>)}
             </div>
           </div>
+          <div className="ai-size-rule-card">
+            <strong>{labels.sizeMatchingRule}</strong>
+            <p>{labels.sizeMatchingRuleLead}</p>
+          </div>
           <p className="muted-line">{labels.envManagedHint}</p>
         </article>
       </div>

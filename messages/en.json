@@ -502,7 +502,18 @@
       "targetImageSize": "Image size",
       "targetWidth": "Width",
       "targetHeight": "Height",
-      "imageSizeHint": "Used to suggest the AI generation size for this block."
+      "imageSizeHint": "Used as the target size for image selection and AI generation.",
+      "recommendedTargetSize": "Recommended",
+      "actualGenerationSize": "Actual AI generation size",
+      "incompleteTargetSize": "Width and height must both be filled. The recommended size is used for now.",
+      "useRecommendedSize": "Use recommended",
+      "resetDefaultSize": "Reset default",
+      "targetSizeSourceLabels": {
+        "sectionImageSpec": "Custom",
+        "sectionRecommendation": "Block recommendation",
+        "aiDefault": "System default",
+        "assetLibraryCustom": "Asset library custom"
+      }
     },
     "assets": {
       "title": "Choose or upload images",
@@ -584,6 +595,7 @@
       "retryUpload": "Retry upload",
       "removeUploadTask": "Remove from queue",
       "done": "Done",
+      "targetImageSize": "Target image size",
       "prompt": "Image description",
       "promptPlaceholder": "Describe the image you want to create",
       "promptSource": "Prompt source",
@@ -602,6 +614,7 @@
       "targetWidth": "Target width",
       "targetHeight": "Target height",
       "actualGenerationSize": "The service will use the closest supported size.",
+      "assetLibraryCustomSize": "AI service default target size",
       "saveFolder": "Save folder",
       "generateAndSave": "Generate and save",
       "generatedSaved": "Generated image saved.",
@@ -609,6 +622,12 @@
       "openAiSettings": "Open AI service settings",
       "targetSizeChip": "Target: {size}",
       "serviceSizeChip": "Actual: {size}",
+      "targetSizeSourceLabels": {
+        "sectionImageSpec": "Current block custom",
+        "sectionRecommendation": "Current block recommendation",
+        "aiDefault": "AI service default target size",
+        "assetLibraryCustom": "Asset library custom"
+      },
       "assetUploaded": "Image uploaded to the library.",
       "useGenerated": "Use generated image",
       "saveGeneratedToProject": "Save to project files",
@@ -2294,7 +2313,7 @@
       "enabled": "Service status",
       "enabledYes": "Enabled",
       "enabledNo": "Disabled",
-      "defaultSize": "Default size",
+      "defaultSize": "Default target size",
       "defaultQuality": "Default quality",
       "defaultOutput": "Default output",
       "envManagedHint": "These values are managed as server environment variables. Designers only choose allowed sizes and quality levels in the image picker.",
@@ -2315,7 +2334,9 @@
         "medium": "Medium",
         "high": "High"
       },
-      "availableSizes": "Available sizes"
+      "availableSizes": "Supported generation sizes",
+      "sizeMatchingRule": "Size matching rule",
+      "sizeMatchingRuleLead": "Editors enter a target width and height. The system automatically uses the closest supported generation size and saves both values in image metadata."
     }
   }
 }

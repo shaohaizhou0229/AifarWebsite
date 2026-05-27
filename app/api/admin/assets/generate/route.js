@@ -22,7 +22,8 @@ import {
   getImageGenerationSettings,
   normalizeImageOutputFormat,
   normalizeImageQuality,
-  normalizeImageSize
+  normalizeImageSize,
+  normalizeTargetDimension
 } from "@/lib/image-generation-settings";
 import { getProfile } from "@/lib/profiles";
 import { recordUserFootprint } from "@/lib/user-footprints";
@@ -44,14 +45,12 @@ function normalizePrompt(value) {
   return String(value || "").trim().slice(0, 1200);
 }
 
-function normalizeTargetDimension(value) {
-  const number = Number(value || 0);
-  if (!Number.isFinite(number) || number <= 0) return 0;
-  return Math.min(Math.max(Math.trunc(number), 128), 4096);
-}
-
 function normalizePromptMode(value) {
   return value === "section_context" ? "section_context" : "manual";
+}
+
+function normalizeSizeSource(value, fallback = "serviceDefault") {
+  return String(value || fallback || "serviceDefault").trim().slice(0, 40);
 }
 
 function normalizePromptContext(value) {
@@ -144,6 +143,7 @@ export async function POST(request) {
     const size = targetWidth && targetHeight
       ? closestImageSizeForSpec({ targetWidth, targetHeight, size: body.size }, defaultSize)
       : normalizeImageSize(body.size, defaultSize);
+    const sizeSource = normalizeSizeSource(body.sizeSource, targetWidth && targetHeight ? (promptContext?.sizeSource || "customTarget") : "serviceDefault");
     const quality = normalizeImageQuality(body.quality, normalizeImageQuality(process.env.OPENAI_IMAGE_DEFAULT_QUALITY, "auto"));
     const outputFormat = normalizeImageOutputFormat(body.outputFormat, normalizeImageOutputFormat(process.env.OPENAI_IMAGE_OUTPUT_FORMAT, "webp"));
     const directoryPath = normalizeAssetDirectory(body.directoryPath || "generated") || "generated";
@@ -197,7 +197,7 @@ export async function POST(request) {
         targetWidth,
         targetHeight,
         targetSize: targetWidth && targetHeight ? `${targetWidth}x${targetHeight}` : "",
-        sizeSource: targetWidth && targetHeight ? "assetLibraryCustom" : (promptContext?.sizeSource || "serviceDefault"),
+        sizeSource,
         size,
         quality,
         outputFormat,
@@ -218,6 +218,7 @@ export async function POST(request) {
         outputFormat,
         targetWidth,
         targetHeight,
+        sizeSource,
         promptMode,
         pageKey: promptContext?.pageKey || "",
         sectionId: promptContext?.sectionId || ""

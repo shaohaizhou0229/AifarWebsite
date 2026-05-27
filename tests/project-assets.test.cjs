@@ -19,7 +19,8 @@ const {
   closestImageSizeForSpec,
   normalizeImageOutputFormat,
   normalizeImageQuality,
-  normalizeImageSize
+  normalizeImageSize,
+  resolveImageTargetSize
 } = require("../lib/image-generation-settings-core.cjs");
 
 test("asset validation accepts the configured image formats up to 5 MB", () => {
@@ -40,6 +41,50 @@ test("image generation settings map custom targets to supported service sizes", 
   assert.equal(normalizeImageSize("2048x2048", "1024x1024"), "1024x1024");
   assert.equal(normalizeImageQuality("HIGH"), "high");
   assert.equal(normalizeImageOutputFormat("jpg", "webp"), "webp");
+});
+
+test("section image target sizes resolve recommendation, custom input, and fallback sources", () => {
+  const hero = resolveImageTargetSize({ sectionType: "hero", pathKey: "heroImagePath", defaultSize: "1024x1024" });
+  assert.equal(hero.targetSize, "1536x864");
+  assert.equal(hero.actualSize, "1536x1024");
+  assert.equal(hero.sizeSource, "sectionRecommendation");
+
+  const media = resolveImageTargetSize({ sectionType: "media_feature", pathKey: "imagePath", defaultSize: "1024x1024" });
+  assert.equal(media.targetSize, "1536x1024");
+  assert.equal(media.actualSize, "1536x1024");
+
+  const unknown = resolveImageTargetSize({ sectionType: "custom_block", pathKey: "imagePath", defaultSize: "1024x1024" });
+  assert.equal(unknown.targetSize, "1024x1024");
+  assert.equal(unknown.sizeSource, "sectionRecommendation");
+
+  const custom = resolveImageTargetSize({
+    sectionType: "hero",
+    pathKey: "heroImagePath",
+    spec: { width: 1440, height: 900 },
+    defaultSize: "1024x1024"
+  });
+  assert.equal(custom.targetSize, "1440x900");
+  assert.equal(custom.actualSize, "1536x1024");
+  assert.equal(custom.sizeSource, "sectionImageSpec");
+
+  const partial = resolveImageTargetSize({
+    sectionType: "hero",
+    pathKey: "heroImagePath",
+    spec: { width: 1440 },
+    defaultSize: "1024x1024"
+  });
+  assert.equal(partial.targetSize, "1536x864");
+  assert.equal(partial.hasPartialCustomSize, true);
+  assert.equal(partial.sizeSource, "sectionRecommendation");
+
+  const aiDefault = resolveImageTargetSize({
+    sectionType: "hero",
+    pathKey: "heroImagePath",
+    spec: { width: 1024, height: 1024, source: "aiDefault" },
+    defaultSize: "1024x1024"
+  });
+  assert.equal(aiDefault.targetSize, "1024x1024");
+  assert.equal(aiDefault.sizeSource, "aiDefault");
 });
 
 test("asset validation rejects oversized and unsupported files", () => {

@@ -31,14 +31,15 @@ import {
   ZoomOut
 } from "lucide-react";
 import assetRules from "@/lib/project-assets-core.cjs";
+import imageGenerationRules from "@/lib/image-generation-settings-core.cjs";
 
 const TABS = ["project", "generate"];
-const IMAGE_SIZES = ["1024x1024", "1024x1536", "1536x1024"];
 const IMAGE_QUALITIES = ["auto", "low", "medium", "high"];
 const ASSET_PAGE_LIMITS = [24, 48, 60];
 const DEFAULT_ASSET_PAGE_LIMIT = 24;
 const ACTIVE_UPLOAD_STATUSES = new Set(["preparing", "uploading", "finalizing"]);
 const { validateAssetFileInput } = assetRules;
+const { closestImageSizeForSpec, parseImageSize } = imageGenerationRules;
 
 function t(labels, key) {
   return labels?.[key] || key;
@@ -844,12 +845,14 @@ function BulkActionBar({ labels, count, activeMode, onMode, onDelete, onClear })
   );
 }
 
-function normalizePanelSize(size) {
-  return IMAGE_SIZES.includes(size) ? size : "1024x1024";
-}
-
 function normalizePromptMode(mode, hasContext) {
   return hasContext && mode === "section_context" ? "section_context" : "manual";
+}
+
+function clampGenerateDimension(value, fallback) {
+  const number = Number(value);
+  if (!Number.isFinite(number) || number <= 0) return fallback;
+  return Math.min(Math.max(Math.trunc(number), 128), 4096);
 }
 
 function GeneratePanel({
@@ -858,6 +861,7 @@ function GeneratePanel({
   generatedAsset,
   error,
   defaultSize = "1024x1024",
+  targetSize = null,
   promptContext,
   defaultPromptMode = "manual",
   onDownloadGenerated,
@@ -869,16 +873,23 @@ function GeneratePanel({
   const normalizedDefaultMode = normalizePromptMode(defaultPromptMode, hasPromptContext);
   const [promptMode, setPromptMode] = useState(normalizedDefaultMode);
   const [prompt, setPrompt] = useState("");
-  const normalizedDefaultSize = normalizePanelSize(defaultSize);
-  const [size, setSize] = useState(normalizedDefaultSize);
+  const fallbackTarget = parseImageSize(defaultSize);
+  const [targetWidth, setTargetWidth] = useState(targetSize?.targetWidth || fallbackTarget.width);
+  const [targetHeight, setTargetHeight] = useState(targetSize?.targetHeight || fallbackTarget.height);
   const [quality, setQuality] = useState("auto");
+  const safeTargetWidth = clampGenerateDimension(targetWidth, fallbackTarget.width);
+  const safeTargetHeight = clampGenerateDimension(targetHeight, fallbackTarget.height);
+  const actualSize = closestImageSizeForSpec({ targetWidth: safeTargetWidth, targetHeight: safeTargetHeight }, defaultSize);
+  const sizeSource = targetSize?.sizeSource || "aiDefault";
   const finalPrompt = promptMode === "section_context"
     ? [promptContext?.prompt, prompt.trim() ? `Additional style requirements: ${prompt.trim()}` : ""].filter(Boolean).join("\n\n")
     : prompt.trim();
 
   useEffect(() => {
-    setSize(normalizedDefaultSize);
-  }, [normalizedDefaultSize]);
+    const nextFallback = parseImageSize(defaultSize);
+    setTargetWidth(targetSize?.targetWidth || nextFallback.width);
+    setTargetHeight(targetSize?.targetHeight || nextFallback.height);
+  }, [defaultSize, targetSize?.targetWidth, targetSize?.targetHeight]);
 
   useEffect(() => {
     setPromptMode(normalizedDefaultMode);
@@ -915,13 +926,26 @@ function GeneratePanel({
             onChange={(event) => setPrompt(event.target.value)}
           />
         </label>
+        <div className="asset-target-size-card">
+          <div className="asset-target-size-head">
+            <strong>{t(labels, "targetImageSize")}</strong>
+            <span>{labels.targetSizeSourceLabels?.[sizeSource] || sizeSource}</span>
+          </div>
+          <div className="asset-generate-options">
+            <label className="asset-field">
+              <span>{t(labels, "targetWidth")}</span>
+              <input type="number" min="128" max="4096" inputMode="numeric" value={targetWidth} onChange={(event) => setTargetWidth(event.target.value)} />
+            </label>
+            <label className="asset-field">
+              <span>{t(labels, "targetHeight")}</span>
+              <input type="number" min="128" max="4096" inputMode="numeric" value={targetHeight} onChange={(event) => setTargetHeight(event.target.value)} />
+            </label>
+          </div>
+          <p>{formatTemplate(t(labels, "targetSizeChip"), { size: `${safeTargetWidth}x${safeTargetHeight}` })}</p>
+          <strong>{formatTemplate(t(labels, "serviceSizeChip"), { size: actualSize })}</strong>
+          <small>{t(labels, "actualGenerationSize")}</small>
+        </div>
         <div className="asset-generate-options">
-          <label className="asset-field">
-            <span>{t(labels, "size")}</span>
-            <select value={size} onChange={(event) => setSize(event.target.value)}>
-              {IMAGE_SIZES.map((option) => <option key={option} value={option}>{option}</option>)}
-            </select>
-          </label>
           <label className="asset-field">
             <span>{t(labels, "quality")}</span>
             <select value={quality} onChange={(event) => setQuality(event.target.value)}>
@@ -935,11 +959,14 @@ function GeneratePanel({
           type="button"
           onClick={() => onGenerate({
             prompt: finalPrompt,
-            size,
+            size: actualSize,
+            targetWidth: safeTargetWidth,
+            targetHeight: safeTargetHeight,
+            sizeSource,
             quality,
             promptMode,
             promptSupplement: prompt,
-            promptContext: promptMode === "section_context" ? promptContext?.metadata : null
+            promptContext: promptMode === "section_context" ? { ...(promptContext?.metadata || {}), size: actualSize, sizeSource } : null
           })}
           disabled={generating || !finalPrompt.trim()}
         >
@@ -992,6 +1019,7 @@ export function AssetPickerModal({
   initialTab = "project",
   libraryHref = "",
   defaultGenerateSize = "1024x1024",
+  targetSize = null,
   promptContext = null,
   defaultPromptMode = "manual"
 }) {
@@ -1691,6 +1719,7 @@ export function AssetPickerModal({
               generatedAsset={generatedAsset}
               error={generateError}
               defaultSize={defaultGenerateSize}
+              targetSize={targetSize}
               promptContext={promptContext}
               defaultPromptMode={defaultPromptMode}
               onGenerate={generateAsset}

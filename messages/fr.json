@@ -502,7 +502,18 @@
       "targetImageSize": "Taille image",
       "targetWidth": "Largeur",
       "targetHeight": "Hauteur",
-      "imageSizeHint": "Sert a suggerer la taille IA pour ce bloc."
+      "imageSizeHint": "Utilisee comme taille cible pour la selection d image et la generation IA.",
+      "recommendedTargetSize": "Recommandee",
+      "actualGenerationSize": "Taille reelle de generation IA",
+      "incompleteTargetSize": "Largeur et hauteur doivent etre renseignees ensemble. La taille recommandee est utilisee pour l instant.",
+      "useRecommendedSize": "Utiliser la taille recommandee",
+      "resetDefaultSize": "Reinitialiser",
+      "targetSizeSourceLabels": {
+        "sectionImageSpec": "Personnalisee",
+        "sectionRecommendation": "Recommandation du bloc",
+        "aiDefault": "Defaut systeme",
+        "assetLibraryCustom": "Personnalisee bibliotheque"
+      }
     },
     "assets": {
       "title": "Choisir ou importer des images",
@@ -584,6 +595,7 @@
       "retryUpload": "Réessayer",
       "removeUploadTask": "Retirer de la file",
       "done": "Terminé",
+      "targetImageSize": "Taille cible de l image",
       "prompt": "Description de l'image",
       "promptPlaceholder": "Décrivez l'image à créer",
       "promptSource": "Source du prompt",
@@ -602,6 +614,7 @@
       "targetWidth": "Largeur cible",
       "targetHeight": "Hauteur cible",
       "actualGenerationSize": "Le service utilisera la taille prise en charge la plus proche.",
+      "assetLibraryCustomSize": "Taille cible par defaut du service IA",
       "saveFolder": "Dossier d'enregistrement",
       "generateAndSave": "Générer et enregistrer",
       "generatedSaved": "Image générée enregistrée.",
@@ -609,6 +622,12 @@
       "openAiSettings": "Ouvrir les paramètres IA",
       "targetSizeChip": "Cible : {size}",
       "serviceSizeChip": "Réelle : {size}",
+      "targetSizeSourceLabels": {
+        "sectionImageSpec": "Bloc actuel personnalise",
+        "sectionRecommendation": "Recommandation du bloc actuel",
+        "aiDefault": "Taille cible par defaut du service IA",
+        "assetLibraryCustom": "Personnalisee bibliotheque"
+      },
       "assetUploaded": "Image importée dans la bibliothèque.",
       "useGenerated": "Utiliser l'image générée",
       "saveGeneratedToProject": "Enregistrer dans le projet",
@@ -2294,7 +2313,7 @@
       "enabled": "Statut",
       "enabledYes": "Active",
       "enabledNo": "Desactive",
-      "defaultSize": "Taille par defaut",
+      "defaultSize": "Taille cible par defaut",
       "defaultQuality": "Qualite par defaut",
       "defaultOutput": "Sortie par defaut",
       "envManagedHint": "Ces valeurs sont gerees par variables d environnement serveur.",
@@ -2315,7 +2334,9 @@
         "medium": "Moyenne",
         "high": "Haute"
       },
-      "availableSizes": "Tailles disponibles"
+      "availableSizes": "Tailles de generation prises en charge",
+      "sizeMatchingRule": "Regle de correspondance des tailles",
+      "sizeMatchingRuleLead": "Les editeurs saisissent une largeur et une hauteur cibles. Le systeme utilise automatiquement la taille de generation prise en charge la plus proche et conserve les deux valeurs dans les metadonnees de l image."
     }
   }
 }
