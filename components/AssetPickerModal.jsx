@@ -953,7 +953,6 @@ function GeneratePanel({
             </select>
           </label>
         </div>
-        <p className="muted-line">{formatTemplate(t(labels, "suggestedSize"), { size: normalizedDefaultSize })}</p>
         <button
           className="button primary"
           type="button"
