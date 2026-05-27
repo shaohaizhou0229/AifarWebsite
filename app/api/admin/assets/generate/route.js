@@ -39,6 +39,32 @@ function normalizePrompt(value) {
   return String(value || "").trim().slice(0, 1200);
 }
 
+function normalizePromptMode(value) {
+  return value === "section_context" ? "section_context" : "manual";
+}
+
+function normalizePromptContext(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const fields = Array.isArray(value.fields)
+    ? value.fields.slice(0, 12).map((field) => ({
+      label: String(field?.label || "").trim().slice(0, 80),
+      value: String(field?.value || "").trim().slice(0, 220)
+    })).filter((field) => field.label && field.value)
+    : [];
+
+  return {
+    pageKey: String(value.pageKey || "").trim().slice(0, 80),
+    locale: String(value.locale || "").trim().slice(0, 32),
+    sectionId: String(value.sectionId || "").trim().slice(0, 120),
+    sectionType: String(value.sectionType || "").trim().slice(0, 80),
+    sectionVariant: String(value.sectionVariant || "").trim().slice(0, 80),
+    pathKey: String(value.pathKey || "").trim().slice(0, 80),
+    size: String(value.size || "").trim().slice(0, 32),
+    sizeSource: String(value.sizeSource || "").trim().slice(0, 40),
+    fields
+  };
+}
+
 async function fetchGeneratedImage(url) {
   const response = await fetch(url);
   if (!response.ok) {
@@ -98,6 +124,9 @@ export async function POST(request) {
 
     const body = await request.json().catch(() => ({}));
     const prompt = normalizePrompt(body.prompt);
+    const promptMode = normalizePromptMode(body.promptMode);
+    const promptContext = normalizePromptContext(body.promptContext);
+    const promptSupplement = normalizePrompt(body.promptSupplement).slice(0, 600);
     const size = normalizeImageSize(body.size, normalizeImageSize(process.env.OPENAI_IMAGE_DEFAULT_SIZE, "1024x1024"));
     const quality = normalizeImageQuality(body.quality, normalizeImageQuality(process.env.OPENAI_IMAGE_DEFAULT_QUALITY, "auto"));
     const outputFormat = normalizeImageOutputFormat(body.outputFormat, normalizeImageOutputFormat(process.env.OPENAI_IMAGE_OUTPUT_FORMAT, "webp"));
@@ -138,6 +167,9 @@ export async function POST(request) {
       tags: ["generated"],
       metadata: {
         prompt,
+        promptMode,
+        promptSupplement,
+        promptContext,
         size,
         quality,
         outputFormat,
@@ -152,7 +184,14 @@ export async function POST(request) {
       summary: "Administrator generated a project asset.",
       relatedType: "project_asset",
       relatedId: asset.id,
-      metadata: { size, quality, outputFormat }
+      metadata: {
+        size,
+        quality,
+        outputFormat,
+        promptMode,
+        pageKey: promptContext?.pageKey || "",
+        sectionId: promptContext?.sectionId || ""
+      }
     });
 
     return NextResponse.json({ asset });

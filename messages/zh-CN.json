@@ -566,6 +566,13 @@
       "itemsPerPage": "每页",
       "prompt": "图片描述",
       "promptPlaceholder": "描述你想生成的图片",
+      "promptSource": "提示词来源",
+      "promptModeContext": "使用区块内容",
+      "promptModeManual": "自主描述",
+      "contextSummary": "区块上下文",
+      "contextSummaryEmpty": "暂无可用区块摘要。",
+      "promptSupplement": "风格补充",
+      "promptSupplementPlaceholder": "可选：补充视觉风格、氛围、构图或需要避免的内容",
       "size": "尺寸",
       "quality": "质量",
       "generateImage": "生成图片",
@@ -642,6 +649,18 @@
       "generationHistory": "AI 生成历史",
       "usageTitle": "使用位置",
       "usagePending": "已为官网内容引用统计预留入口，启用资产使用索引后会显示精确引用。",
+      "usageLoading": "正在检查使用位置...",
+      "usageNone": "当前未发现使用位置。",
+      "usageLoadFailed": "无法加载使用位置。",
+      "usageSourceLabels": {
+        "siteContent": "官网内容",
+        "document": "文档中心"
+      },
+      "usageStatusLabels": {
+        "draft": "草稿",
+        "published": "已发布",
+        "hero": "主视觉"
+      },
       "notProvided": "未提供"
     },
     "documents": {
@@ -2256,6 +2275,7 @@
       ],
       "envTitle": "必填配置",
       "envLead": "启用 AI 生图前，需要在本地和生产环境配置以下变量。",
+      "envStorageNote": "API Key 不通过后台保存，请在部署环境中维护。",
       "qualityLabels": {
         "auto": "自动",
         "low": "低",

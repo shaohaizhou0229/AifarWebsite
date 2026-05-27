@@ -764,22 +764,72 @@ function normalizePanelSize(size) {
   return IMAGE_SIZES.includes(size) ? size : "1024x1024";
 }
 
-function GeneratePanel({ labels, generating, generatedAsset, error, defaultSize = "1024x1024", onDownloadGenerated, onGenerate, onSaveGenerated, onSelectGenerated }) {
+function normalizePromptMode(mode, hasContext) {
+  return hasContext && mode === "section_context" ? "section_context" : "manual";
+}
+
+function GeneratePanel({
+  labels,
+  generating,
+  generatedAsset,
+  error,
+  defaultSize = "1024x1024",
+  promptContext,
+  defaultPromptMode = "manual",
+  onDownloadGenerated,
+  onGenerate,
+  onSaveGenerated,
+  onSelectGenerated
+}) {
+  const hasPromptContext = Boolean(promptContext?.hasContext && promptContext?.prompt);
+  const normalizedDefaultMode = normalizePromptMode(defaultPromptMode, hasPromptContext);
+  const [promptMode, setPromptMode] = useState(normalizedDefaultMode);
   const [prompt, setPrompt] = useState("");
   const normalizedDefaultSize = normalizePanelSize(defaultSize);
   const [size, setSize] = useState(normalizedDefaultSize);
   const [quality, setQuality] = useState("auto");
+  const finalPrompt = promptMode === "section_context"
+    ? [promptContext?.prompt, prompt.trim() ? `Additional style requirements: ${prompt.trim()}` : ""].filter(Boolean).join("\n\n")
+    : prompt.trim();
 
   useEffect(() => {
     setSize(normalizedDefaultSize);
   }, [normalizedDefaultSize]);
 
+  useEffect(() => {
+    setPromptMode(normalizedDefaultMode);
+    setPrompt("");
+  }, [normalizedDefaultMode, promptContext?.metadata?.sectionId, promptContext?.metadata?.pathKey]);
+
   return (
     <div className="asset-generate-panel">
       <section className="asset-generate-form">
+        {hasPromptContext ? (
+          <div className="asset-prompt-source">
+            <span>{t(labels, "promptSource")}</span>
+            <div>
+              <button className={promptMode === "section_context" ? "active" : ""} type="button" onClick={() => setPromptMode("section_context")}>
+                {t(labels, "promptModeContext")}
+              </button>
+              <button className={promptMode === "manual" ? "active" : ""} type="button" onClick={() => setPromptMode("manual")}>
+                {t(labels, "promptModeManual")}
+              </button>
+            </div>
+          </div>
+        ) : null}
+        {hasPromptContext && promptMode === "section_context" ? (
+          <article className="asset-context-card">
+            <strong>{t(labels, "contextSummary")}</strong>
+            <p>{promptContext.summary || t(labels, "contextSummaryEmpty")}</p>
+          </article>
+        ) : null}
         <label className="asset-field">
-          <span>{t(labels, "prompt")}</span>
-          <textarea value={prompt} placeholder={t(labels, "promptPlaceholder")} onChange={(event) => setPrompt(event.target.value)} />
+          <span>{promptMode === "section_context" ? t(labels, "promptSupplement") : t(labels, "prompt")}</span>
+          <textarea
+            value={prompt}
+            placeholder={promptMode === "section_context" ? t(labels, "promptSupplementPlaceholder") : t(labels, "promptPlaceholder")}
+            onChange={(event) => setPrompt(event.target.value)}
+          />
         </label>
         <div className="asset-generate-options">
           <label className="asset-field">
@@ -796,7 +846,19 @@ function GeneratePanel({ labels, generating, generatedAsset, error, defaultSize 
           </label>
         </div>
         <p className="muted-line">{formatTemplate(t(labels, "suggestedSize"), { size: normalizedDefaultSize })}</p>
-        <button className="button primary" type="button" onClick={() => onGenerate({ prompt, size, quality })} disabled={generating || !prompt.trim()}>
+        <button
+          className="button primary"
+          type="button"
+          onClick={() => onGenerate({
+            prompt: finalPrompt,
+            size,
+            quality,
+            promptMode,
+            promptSupplement: prompt,
+            promptContext: promptMode === "section_context" ? promptContext?.metadata : null
+          })}
+          disabled={generating || !finalPrompt.trim()}
+        >
           <Sparkles size={16} aria-hidden="true" />
           {generating ? t(labels, "generating") : t(labels, "generateImage")}
         </button>
@@ -837,7 +899,18 @@ function GeneratePanel({ labels, generating, generatedAsset, error, defaultSize 
   );
 }
 
-export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, onSelect, initialTab = "project", libraryHref = "", defaultGenerateSize = "1024x1024" }) {
+export function AssetPickerModal({
+  open,
+  labels = {},
+  locale = "en",
+  onClose,
+  onSelect,
+  initialTab = "project",
+  libraryHref = "",
+  defaultGenerateSize = "1024x1024",
+  promptContext = null,
+  defaultPromptMode = "manual"
+}) {
   const [tab, setTab] = useState(TABS.includes(initialTab) ? initialTab : "project");
   const [query, setQuery] = useState("");
   const [directory, setDirectory] = useState("");
@@ -1534,6 +1607,8 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
               generatedAsset={generatedAsset}
               error={generateError}
               defaultSize={defaultGenerateSize}
+              promptContext={promptContext}
+              defaultPromptMode={defaultPromptMode}
               onGenerate={generateAsset}
               onDownloadGenerated={downloadAsset}
               onSaveGenerated={saveGeneratedToProject}

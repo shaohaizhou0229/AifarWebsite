@@ -566,6 +566,13 @@
       "itemsPerPage": "لكل صفحة",
       "prompt": "وصف الصورة",
       "promptPlaceholder": "صف الصورة التي تريد إنشاءها",
+      "promptSource": "مصدر الوصف",
+      "promptModeContext": "استخدام محتوى الكتلة",
+      "promptModeManual": "وصف مخصص",
+      "contextSummary": "سياق الكتلة",
+      "contextSummaryEmpty": "لا يوجد ملخص متاح للكتلة.",
+      "promptSupplement": "ملاحظات النمط",
+      "promptSupplementPlaceholder": "اختياري: أضف النمط أو الأجواء أو التكوين أو ما يجب تجنبه",
       "size": "الحجم",
       "quality": "الجودة",
       "generateImage": "إنشاء صورة",
@@ -642,6 +649,18 @@
       "generationHistory": "سجل التوليد بالذكاء الاصطناعي",
       "usageTitle": "أماكن الاستخدام",
       "usagePending": "تم تجهيز تتبع الاستخدام لمحتوى الموقع وسيظهر المراجع الدقيقة بعد تفعيل الفهرس.",
+      "usageLoading": "جار فحص أماكن الاستخدام...",
+      "usageNone": "لم يتم العثور على استخدام حالي.",
+      "usageLoadFailed": "تعذر تحميل أماكن الاستخدام.",
+      "usageSourceLabels": {
+        "siteContent": "محتوى الموقع",
+        "document": "مركز الوثائق"
+      },
+      "usageStatusLabels": {
+        "draft": "مسودة",
+        "published": "منشور",
+        "hero": "الصورة الرئيسية"
+      },
       "notProvided": "غير متوفر"
     },
     "documents": {
@@ -2256,6 +2275,7 @@
       ],
       "envTitle": "المتغيرات المطلوبة",
       "envLead": "اضبط هذه القيم محليا وفي الإنتاج قبل تفعيل توليد الصور.",
+      "envStorageNote": "لا يتم حفظ مفاتيح API من لوحة الإدارة؛ حدّثها في بيئة النشر.",
       "qualityLabels": {
         "auto": "تلقائي",
         "low": "منخفضة",

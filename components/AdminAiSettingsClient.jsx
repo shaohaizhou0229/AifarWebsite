@@ -135,7 +135,9 @@ export function AdminAiSettingsClient({ labels, settings }) {
           {configured ? <CheckCircle2 size={22} aria-hidden="true" /> : <XCircle size={22} aria-hidden="true" />}
           <h2>{labels.envTitle}</h2>
           <p>{labels.envLead}</p>
+          <p>{labels.envStorageNote}</p>
           <code>OPENAI_API_KEY</code>
+          <code>OPENAI_IMAGE_ENABLED</code>
           <code>OPENAI_IMAGE_MODEL</code>
           <code>OPENAI_IMAGE_OUTPUT_FORMAT</code>
           <code>OPENAI_IMAGE_DEFAULT_SIZE</code>

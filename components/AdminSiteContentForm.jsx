@@ -10,9 +10,11 @@ import { SectionEditor } from "@/components/admin-site-content/SectionEditor";
 import { SectionSidebar } from "@/components/admin-site-content/SectionSidebar";
 import { SeoEditor } from "@/components/admin-site-content/SeoEditor";
 import { cloneContent, ensureLayout, formatDate, moveItem, updateSectionAt, updateSeo } from "@/components/admin-site-content/form-utils";
+import promptContextRules from "@/lib/asset-prompt-context.cjs";
 import { localizedPath } from "@/i18n/routing";
 
 const IMAGE_GENERATION_SIZES = ["1024x1024", "1024x1536", "1536x1024"];
+const { buildSectionImagePromptContext } = promptContextRules;
 
 function normalizeGenerateSize(size, fallback = "1024x1024") {
   return IMAGE_GENERATION_SIZES.includes(size) ? size : fallback;
@@ -368,11 +370,23 @@ export function AdminSiteContentForm({
     const targetSection = sections.find((section) => section.id === sectionId);
     const defaultSize = normalizeGenerateSize(imageSettings.defaultSize || "1024x1024");
     const imageSpec = getSectionImageSpec(targetSection, pathKey);
+    const hasSectionSpec = Boolean(Number(imageSpec.width || 0) && Number(imageSpec.height || 0));
+    const defaultGenerateSize = getClosestGenerateSize(imageSpec, defaultSize);
+    const promptContext = buildSectionImagePromptContext({
+      pageKey,
+      locale,
+      section: targetSection,
+      pathKey,
+      size: defaultGenerateSize,
+      sizeSource: hasSectionSpec ? "sectionImageSpec" : "aiDefault"
+    });
     setAssetPickerTarget({
       sectionId,
       pathKey,
       urlKey,
-      defaultGenerateSize: getClosestGenerateSize(imageSpec, defaultSize)
+      defaultGenerateSize,
+      promptContext,
+      defaultPromptMode: promptContext.hasContext ? "section_context" : "manual"
     });
   }
 
@@ -699,6 +713,8 @@ export function AdminSiteContentForm({
         initialTab="project"
         libraryHref={localizedPath(adminLocale || locale, "/admin/assets/")}
         defaultGenerateSize={assetPickerTarget?.defaultGenerateSize || normalizeGenerateSize(imageSettings.defaultSize || "1024x1024")}
+        promptContext={assetPickerTarget?.promptContext}
+        defaultPromptMode={assetPickerTarget?.defaultPromptMode || "manual"}
         onClose={() => setAssetPickerTarget(null)}
         onSelect={selectAsset}
       />

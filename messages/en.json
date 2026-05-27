@@ -566,6 +566,13 @@
       "itemsPerPage": "Per page",
       "prompt": "Image description",
       "promptPlaceholder": "Describe the image you want to create",
+      "promptSource": "Prompt source",
+      "promptModeContext": "Use block content",
+      "promptModeManual": "Write my own",
+      "contextSummary": "Block context",
+      "contextSummaryEmpty": "No block summary available.",
+      "promptSupplement": "Style notes",
+      "promptSupplementPlaceholder": "Optional: add visual style, mood, composition, or things to avoid",
       "size": "Size",
       "quality": "Quality",
       "generateImage": "Generate image",
@@ -642,6 +649,18 @@
       "generationHistory": "AI generation history",
       "usageTitle": "Usage locations",
       "usagePending": "Usage scanning is prepared for page content and will show exact references after the asset usage index is enabled.",
+      "usageLoading": "Checking usage locations...",
+      "usageNone": "No current usage found.",
+      "usageLoadFailed": "Unable to load usage locations.",
+      "usageSourceLabels": {
+        "siteContent": "Website content",
+        "document": "Document center"
+      },
+      "usageStatusLabels": {
+        "draft": "Draft",
+        "published": "Published",
+        "hero": "Main visual"
+      },
       "notProvided": "Not provided"
     },
     "documents": {
@@ -2256,6 +2275,7 @@
       ],
       "envTitle": "Required variables",
       "envLead": "Configure these values in local and production environments before enabling AI image generation.",
+      "envStorageNote": "API keys are not saved from the admin console; update them in the deployment environment.",
       "qualityLabels": {
         "auto": "Auto",
         "low": "Low",

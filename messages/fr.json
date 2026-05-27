@@ -566,6 +566,13 @@
       "itemsPerPage": "Par page",
       "prompt": "Description de l'image",
       "promptPlaceholder": "Décrivez l'image à créer",
+      "promptSource": "Source du prompt",
+      "promptModeContext": "Utiliser le bloc",
+      "promptModeManual": "Description libre",
+      "contextSummary": "Contexte du bloc",
+      "contextSummaryEmpty": "Aucun resume de bloc disponible.",
+      "promptSupplement": "Notes de style",
+      "promptSupplementPlaceholder": "Optionnel : style visuel, ambiance, composition ou elements a eviter",
       "size": "Taille",
       "quality": "Qualité",
       "generateImage": "Générer l'image",
@@ -642,6 +649,18 @@
       "generationHistory": "Historique IA",
       "usageTitle": "Emplacements",
       "usagePending": "Le suivi des usages est pret pour le contenu du site et affichera les references apres activation de l index.",
+      "usageLoading": "Verification des emplacements...",
+      "usageNone": "Aucun usage actuel trouve.",
+      "usageLoadFailed": "Impossible de charger les emplacements.",
+      "usageSourceLabels": {
+        "siteContent": "Contenu du site",
+        "document": "Centre docs"
+      },
+      "usageStatusLabels": {
+        "draft": "Brouillon",
+        "published": "Publie",
+        "hero": "Visuel principal"
+      },
       "notProvided": "Non renseigne"
     },
     "documents": {
@@ -2256,6 +2275,7 @@
       ],
       "envTitle": "Variables requises",
       "envLead": "Configurez ces valeurs avant d activer la generation IA.",
+      "envStorageNote": "Les cles API ne sont pas enregistrees depuis l admin ; modifiez-les dans l environnement de deploiement.",
       "qualityLabels": {
         "auto": "Auto",
         "low": "Basse",

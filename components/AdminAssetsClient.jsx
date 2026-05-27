@@ -43,6 +43,11 @@ function joinTags(tags = []) {
   return Array.isArray(tags) ? tags.join(", ") : "";
 }
 
+function localizeAdminHref(locale, href = "") {
+  if (!href.startsWith("/admin/")) return href;
+  return `/${locale}${href}`;
+}
+
 function AssetLibraryCard({ asset, labels, locale, selected, checked, onSelect, onToggle }) {
   return (
     <article className={`admin-asset-card ${selected ? "selected" : ""}`}>
@@ -64,7 +69,7 @@ function AssetLibraryCard({ asset, labels, locale, selected, checked, onSelect, 
   );
 }
 
-function AssetDetail({ asset, labels, locale, folders, saving, onSave }) {
+function AssetDetail({ asset, labels, locale, folders, saving, usageState, onSave }) {
   const [draft, setDraft] = useState({ displayName: "", altText: "", directoryPath: "", tags: "" });
 
   useEffect(() => {
@@ -139,7 +144,26 @@ function AssetDetail({ asset, labels, locale, folders, saving, onSave }) {
 
       <section className="admin-asset-info-block">
         <span className="admin-eyebrow">{t(labels, "usageTitle")}</span>
-        <p>{t(labels, "usagePending")}</p>
+        {usageState?.loading ? (
+          <p>{t(labels, "usageLoading")}</p>
+        ) : usageState?.error ? (
+          <p className="error">{usageState.error}</p>
+        ) : usageState?.items?.length ? (
+          <ul className="admin-asset-usage-list">
+            {usageState.items.map((item) => (
+              <li key={item.id}>
+                <a href={localizeAdminHref(locale, item.href)}>
+                  <strong>{item.title || t(labels, "notProvided")}</strong>
+                  <span>
+                    {[labels.usageSourceLabels?.[item.sourceType] || item.sourceType, labels.usageStatusLabels?.[item.status] || item.status, item.locale, item.detail].filter(Boolean).join(" / ")}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>{t(labels, "usageNone")}</p>
+        )}
       </section>
     </aside>
   );
@@ -164,6 +188,7 @@ export function AdminAssetsClient({ locale, page, assetLabels, initialData = nul
   const [message, setMessage] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerTab, setPickerTab] = useState("project");
+  const [usageState, setUsageState] = useState({ assetId: "", loading: false, error: "", items: [] });
 
   const folders = data.folders || data.directories || [];
   const tags = data.tags || [];
@@ -219,6 +244,30 @@ export function AdminAssetsClient({ locale, page, assetLabels, initialData = nul
     const timer = window.setTimeout(() => setMessage(""), 2800);
     return () => window.clearTimeout(timer);
   }, [message]);
+
+  useEffect(() => {
+    const assetId = selectedAsset?.id || "";
+    if (!assetId) {
+      setUsageState({ assetId: "", loading: false, error: "", items: [] });
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    setUsageState({ assetId, loading: true, error: "", items: [] });
+
+    fetch(`/api/admin/assets/${assetId}/usage/`, { signal: controller.signal })
+      .then(async (response) => {
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || t(assetLabels, "usageLoadFailed"));
+        setUsageState({ assetId, loading: false, error: "", items: result.usage || [] });
+      })
+      .catch((usageError) => {
+        if (usageError.name === "AbortError") return;
+        setUsageState({ assetId, loading: false, error: usageError.message || t(assetLabels, "usageLoadFailed"), items: [] });
+      });
+
+    return () => controller.abort();
+  }, [assetLabels, selectedAsset?.id]);
 
   function toggleAsset(assetId) {
     setSelectedIds((current) => current.includes(assetId) ? current.filter((id) => id !== assetId) : [...current, assetId]);
@@ -437,7 +486,7 @@ export function AdminAssetsClient({ locale, page, assetLabels, initialData = nul
             ) : null}
           </main>
 
-          <AssetDetail asset={selectedAsset} labels={assetLabels} locale={locale} folders={folders} saving={saving} onSave={saveAsset} />
+          <AssetDetail asset={selectedAsset} labels={assetLabels} locale={locale} folders={folders} saving={saving} usageState={usageState} onSave={saveAsset} />
         </div>
       </section>
 
