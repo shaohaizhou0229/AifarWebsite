@@ -19,12 +19,16 @@ import {
   Play,
   Plus,
   RefreshCw,
+  RotateCcw,
+  RotateCw,
   Search,
   Sparkles,
   Tag,
   Trash2,
   UploadCloud,
-  X
+  X,
+  ZoomIn,
+  ZoomOut
 } from "lucide-react";
 import assetRules from "@/lib/project-assets-core.cjs";
 
@@ -531,7 +535,9 @@ function AssetInspector({ asset, labels, locale, saving, folders, tags, onCreate
     <aside className="asset-inspector">
       <div className="asset-inspector-summary">
         <button className="asset-inspector-thumb" type="button" onClick={() => onPreview?.(asset)} title={t(labels, "previewOriginal")} aria-label={t(labels, "previewOriginal")}>
-          <img src={asset.url} alt={asset.altText || asset.displayName || asset.originalFilename} loading="lazy" />
+          <span className="asset-inspector-thumb-stage">
+            <img src={asset.url} alt={asset.altText || asset.displayName || asset.originalFilename} loading="lazy" />
+          </span>
         </button>
         <div className="asset-inspector-meta">
           <span>{labels.sourceLabels?.[asset.source] || asset.source}</span>
@@ -575,7 +581,65 @@ function AssetInspector({ asset, labels, locale, saving, folders, tags, onCreate
 }
 
 function AssetOriginalPreview({ asset, labels, onClose }) {
+  const frameRef = useRef(null);
+  const [zoom, setZoom] = useState(1);
+  const [rotation, setRotation] = useState(0);
+  const [frameSize, setFrameSize] = useState({ width: 0, height: 0 });
+  const [naturalSize, setNaturalSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    setZoom(1);
+    setRotation(0);
+    setNaturalSize({ width: 0, height: 0 });
+  }, [asset?.id, asset?.url]);
+
+  useEffect(() => {
+    const node = frameRef.current;
+    if (!node) return undefined;
+
+    function updateFrameSize() {
+      const rect = node.getBoundingClientRect();
+      setFrameSize({ width: rect.width, height: rect.height });
+    }
+
+    updateFrameSize();
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", updateFrameSize);
+      return () => window.removeEventListener("resize", updateFrameSize);
+    }
+
+    const observer = new ResizeObserver(updateFrameSize);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [asset]);
+
   if (!asset) return null;
+
+  const safeRotation = ((rotation % 360) + 360) % 360;
+  const sideways = safeRotation === 90 || safeRotation === 270;
+  const usableFrame = {
+    width: Math.max(0, frameSize.width - 36),
+    height: Math.max(0, frameSize.height - 36)
+  };
+  const canMeasure = usableFrame.width > 0 && usableFrame.height > 0 && naturalSize.width > 0 && naturalSize.height > 0;
+  const visualWidth = sideways ? naturalSize.height : naturalSize.width;
+  const visualHeight = sideways ? naturalSize.width : naturalSize.height;
+  const containScale = canMeasure ? Math.min(usableFrame.width / visualWidth, usableFrame.height / visualHeight) : 1;
+  const imageStyle = canMeasure
+    ? {
+      width: `${naturalSize.width * containScale * zoom}px`,
+      height: `${naturalSize.height * containScale * zoom}px`,
+      transform: `rotate(${safeRotation}deg)`
+    }
+    : {
+      width: "auto",
+      height: "auto",
+      maxWidth: "100%",
+      maxHeight: "100%",
+      transform: `rotate(${safeRotation}deg) scale(${zoom})`
+    };
+  const zoomLabel = formatTemplate(t(labels, "previewScale"), { scale: Math.round(zoom * 100) });
+  const previewAlt = asset.altText || asset.displayName || asset.originalFilename;
 
   return (
     <div className="asset-original-preview" role="dialog" aria-modal="true" aria-label={t(labels, "originalPreview")} onPointerDown={onClose}>
@@ -586,8 +650,28 @@ function AssetOriginalPreview({ asset, labels, onClose }) {
             <X size={18} aria-hidden="true" />
           </button>
         </header>
-        <div className="asset-original-preview-frame">
-          <img src={asset.url} alt={asset.altText || asset.displayName || asset.originalFilename} />
+        <div className="asset-original-preview-toolbar" aria-label={t(labels, "originalPreview")}>
+          <button type="button" onClick={() => setZoom((current) => Math.max(0.5, Number((current - 0.25).toFixed(2))))} disabled={zoom <= 0.5} title={t(labels, "zoomOut")} aria-label={t(labels, "zoomOut")}>
+            <ZoomOut size={16} aria-hidden="true" />
+          </button>
+          <span className="asset-original-preview-scale">{zoomLabel}</span>
+          <button type="button" onClick={() => setZoom((current) => Math.min(3, Number((current + 0.25).toFixed(2))))} disabled={zoom >= 3} title={t(labels, "zoomIn")} aria-label={t(labels, "zoomIn")}>
+            <ZoomIn size={16} aria-hidden="true" />
+          </button>
+          <button type="button" onClick={() => setRotation((current) => (current + 90) % 360)} title={t(labels, "rotateImage")} aria-label={t(labels, "rotateImage")}>
+            <RotateCw size={16} aria-hidden="true" />
+          </button>
+          <button type="button" onClick={() => { setZoom(1); setRotation(0); }} title={t(labels, "resetPreview")} aria-label={t(labels, "resetPreview")}>
+            <RotateCcw size={16} aria-hidden="true" />
+          </button>
+        </div>
+        <div className="asset-original-preview-frame" ref={frameRef}>
+          <img
+            src={asset.url}
+            alt={previewAlt}
+            onLoad={(event) => setNaturalSize({ width: event.currentTarget.naturalWidth || 0, height: event.currentTarget.naturalHeight || 0 })}
+            style={imageStyle}
+          />
         </div>
       </div>
     </div>
