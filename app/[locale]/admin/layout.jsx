@@ -24,7 +24,7 @@ export default async function AdminLayout({ children, params }) {
   }
 
   return (
-    <AdminShell locale={locale} labels={page} user={context.shellUser}>
+    <AdminShell locale={locale} labels={page} user={context.shellUser} permissions={context.profile?.adminPermissions || []}>
       {children}
     </AdminShell>
   );

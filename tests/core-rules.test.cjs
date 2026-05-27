@@ -21,17 +21,23 @@ test("admin permissions only allow explicit active permission values", () => {
     role: "admin",
     adminPermissions: [
       ADMIN_PERMISSIONS.users,
+      ADMIN_PERMISSIONS.assets,
       "admin.unknown",
       ADMIN_PERMISSIONS.users,
+      ADMIN_PERMISSIONS.settings,
       ADMIN_PERMISSIONS.collaboration
     ]
   };
 
   assert.deepEqual(normalizeAdminPermissions(profile.adminPermissions), [
     ADMIN_PERMISSIONS.users,
+    ADMIN_PERMISSIONS.assets,
+    ADMIN_PERMISSIONS.settings,
     ADMIN_PERMISSIONS.collaboration
   ]);
   assert.equal(hasAdminPermission(profile, ADMIN_PERMISSIONS.users), true);
+  assert.equal(hasAdminPermission(profile, ADMIN_PERMISSIONS.assets), true);
+  assert.equal(hasAdminPermission(profile, ADMIN_PERMISSIONS.settings), true);
   assert.equal(hasAdminPermission({ role: "user", adminPermissions: [ADMIN_PERMISSIONS.users] }, ADMIN_PERMISSIONS.users), false);
   assert.equal(canCreateCollaborationSpace(profile), true);
   assert.equal(canCreateCollaborationSpace({ role: "admin", adminPermissions: [ADMIN_PERMISSIONS.users] }), false);

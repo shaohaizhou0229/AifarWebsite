@@ -4,23 +4,26 @@ import {
   AuthRequiredError,
   createUserSupabaseClient,
   getCurrentAccessToken,
-  requireAdmin
+  requireAdminPermission
 } from "@/lib/auth";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import {
   MAX_PROJECT_ASSET_SIZE,
   PROJECT_ASSET_BUCKET,
   createProjectAssetRecord,
   createProjectAssetStoragePath
 } from "@/lib/project-assets";
+import {
+  getImageGenerationSettings,
+  normalizeImageOutputFormat,
+  normalizeImageQuality,
+  normalizeImageSize
+} from "@/lib/image-generation-settings";
 import { getProfile } from "@/lib/profiles";
 import { recordUserFootprint } from "@/lib/user-footprints";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-const IMAGE_SIZES = new Set(["1024x1024", "1024x1536", "1536x1024"]);
-const IMAGE_QUALITIES = new Set(["low", "medium", "high", "auto"]);
-const OUTPUT_FORMATS = new Set(["png", "jpeg", "webp"]);
 
 function permissionError(error) {
   if (error instanceof AuthRequiredError) {
@@ -36,11 +39,6 @@ function normalizePrompt(value) {
   return String(value || "").trim().slice(0, 1200);
 }
 
-function normalizeOutputFormat(value) {
-  const format = String(value || process.env.OPENAI_IMAGE_OUTPUT_FORMAT || "webp").trim().toLowerCase();
-  return OUTPUT_FORMATS.has(format) ? format : "webp";
-}
-
 async function fetchGeneratedImage(url) {
   const response = await fetch(url);
   if (!response.ok) {
@@ -51,9 +49,10 @@ async function fetchGeneratedImage(url) {
 
 async function requestGeneratedImage({ prompt, size, quality, outputFormat }) {
   const apiKey = process.env.OPENAI_API_KEY;
-  const model = String(process.env.OPENAI_IMAGE_MODEL || "").trim();
+  const settings = getImageGenerationSettings();
+  const model = settings.model;
 
-  if (!apiKey || !model) {
+  if (!settings.enabled || !apiKey || !model) {
     const error = new Error("Image generation is not configured.");
     error.code = "generationUnavailable";
     throw error;
@@ -92,16 +91,16 @@ async function requestGeneratedImage({ prompt, size, quality, outputFormat }) {
 
 export async function POST(request) {
   try {
-    const [{ user }, accessToken] = await Promise.all([requireAdmin(getProfile), getCurrentAccessToken()]);
+    const [{ user }, accessToken] = await Promise.all([requireAdminPermission(getProfile, ADMIN_PERMISSIONS.assets), getCurrentAccessToken()]);
     if (!accessToken) {
       return NextResponse.json({ error: "A valid admin session is required." }, { status: 401 });
     }
 
     const body = await request.json().catch(() => ({}));
     const prompt = normalizePrompt(body.prompt);
-    const size = IMAGE_SIZES.has(String(body.size || "")) ? String(body.size) : "1024x1024";
-    const quality = IMAGE_QUALITIES.has(String(body.quality || "")) ? String(body.quality) : "auto";
-    const outputFormat = normalizeOutputFormat(body.outputFormat);
+    const size = normalizeImageSize(body.size, normalizeImageSize(process.env.OPENAI_IMAGE_DEFAULT_SIZE, "1024x1024"));
+    const quality = normalizeImageQuality(body.quality, normalizeImageQuality(process.env.OPENAI_IMAGE_DEFAULT_QUALITY, "auto"));
+    const outputFormat = normalizeImageOutputFormat(body.outputFormat, normalizeImageOutputFormat(process.env.OPENAI_IMAGE_OUTPUT_FORMAT, "webp"));
 
     if (!prompt) {
       return NextResponse.json({ error: "Image prompt is required." }, { status: 400 });

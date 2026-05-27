@@ -10,6 +10,30 @@ import { SectionEditor } from "@/components/admin-site-content/SectionEditor";
 import { SectionSidebar } from "@/components/admin-site-content/SectionSidebar";
 import { SeoEditor } from "@/components/admin-site-content/SeoEditor";
 import { cloneContent, ensureLayout, formatDate, moveItem, updateSectionAt, updateSeo } from "@/components/admin-site-content/form-utils";
+import { localizedPath } from "@/i18n/routing";
+
+const IMAGE_GENERATION_SIZES = ["1024x1024", "1024x1536", "1536x1024"];
+
+function normalizeGenerateSize(size, fallback = "1024x1024") {
+  return IMAGE_GENERATION_SIZES.includes(size) ? size : fallback;
+}
+
+function getSectionImageSpec(section, pathKey) {
+  return section?.settings?.imageSpecs?.[pathKey] || {};
+}
+
+function getClosestGenerateSize(spec = {}, fallback = "1024x1024") {
+  const width = Number(spec.width || 0);
+  const height = Number(spec.height || 0);
+  if (!width || !height) return normalizeGenerateSize(spec.size, fallback);
+
+  const targetRatio = width / height;
+  return IMAGE_GENERATION_SIZES.reduce((best, size) => {
+    const [nextWidth, nextHeight] = size.split("x").map(Number);
+    const score = Math.abs((nextWidth / nextHeight) - targetRatio);
+    return score < best.score ? { size, score } : best;
+  }, { size: normalizeGenerateSize(fallback), score: Number.POSITIVE_INFINITY }).size;
+}
 
 function SnapshotMenu({
   labels,
@@ -99,6 +123,8 @@ function SnapshotMenu({
 export function AdminSiteContentForm({
   labels,
   assetLabels,
+  adminLocale,
+  imageSettings = {},
   initialPageKey,
   initialLocale,
   initialContent,
@@ -339,7 +365,15 @@ export function AdminSiteContentForm({
   }
 
   function openAssetPicker(sectionId, pathKey, urlKey) {
-    setAssetPickerTarget({ sectionId, pathKey, urlKey });
+    const targetSection = sections.find((section) => section.id === sectionId);
+    const defaultSize = normalizeGenerateSize(imageSettings.defaultSize || "1024x1024");
+    const imageSpec = getSectionImageSpec(targetSection, pathKey);
+    setAssetPickerTarget({
+      sectionId,
+      pathKey,
+      urlKey,
+      defaultGenerateSize: getClosestGenerateSize(imageSpec, defaultSize)
+    });
   }
 
   function selectAsset(asset) {
@@ -663,6 +697,8 @@ export function AdminSiteContentForm({
         labels={assetLabels}
         locale={locale}
         initialTab="project"
+        libraryHref={localizedPath(adminLocale || locale, "/admin/assets/")}
+        defaultGenerateSize={assetPickerTarget?.defaultGenerateSize || normalizeGenerateSize(imageSettings.defaultSize || "1024x1024")}
         onClose={() => setAssetPickerTarget(null)}
         onSelect={selectAsset}
       />

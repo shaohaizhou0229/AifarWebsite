@@ -498,7 +498,11 @@
       },
       "noStyleSettings": "This block has no style settings yet.",
       "noLayoutSettings": "This block has no layout settings yet.",
-      "noAdvancedSettings": "This block has no advanced settings yet."
+      "noAdvancedSettings": "This block has no advanced settings yet.",
+      "targetImageSize": "مواصفات الصورة",
+      "targetWidth": "العرض",
+      "targetHeight": "الارتفاع",
+      "imageSizeHint": "تستخدم لاقتراح حجم توليد الصورة لهذه الكتلة."
     },
     "assets": {
       "title": "اختيار أو رفع الصور",
@@ -629,7 +633,16 @@
       "bulkAltPlaceholder": "????? ?? ???? ???? ????? ???????",
       "applyBulk": "?????",
       "bulkFailed": "???? ????? ????? ???????.",
-      "deleteConfirm": "?? ???? ??? {count} ???? ????? ?? ????? ???????? ???? ????? ??????? ???."
+      "deleteConfirm": "?? ???? ??? {count} ???? ????? ?? ????? ???????? ???? ????? ??????? ???.",
+      "openLibrary": "فتح مكتبة الصور",
+      "suggestedSize": "الحجم المقترح: {size}",
+      "metadataSaved": "تم حفظ بيانات الصورة.",
+      "bulkUpdated": "تم تحديث الصور المحددة.",
+      "updatedAt": "آخر تحديث",
+      "generationHistory": "سجل التوليد بالذكاء الاصطناعي",
+      "usageTitle": "أماكن الاستخدام",
+      "usagePending": "تم تجهيز تتبع الاستخدام لمحتوى الموقع وسيظهر المراجع الدقيقة بعد تفعيل الفهرس.",
+      "notProvided": "غير متوفر"
     },
     "documents": {
       "markdownFile": "Markdown source file",
@@ -1119,8 +1132,11 @@
         "collaboration": "مساحة التعاون",
         "groups": {
           "workspace": "مساحة التشغيل",
-          "operations": "الطلبات والمهام"
-        }
+          "operations": "الطلبات والمهام",
+          "system": "إعدادات النظام"
+        },
+        "assets": "مكتبة الصور",
+        "aiSettings": "إعدادات خدمة الذكاء الاصطناعي"
       },
       "modules": [
         {
@@ -1129,6 +1145,13 @@
           "title": "Product content",
           "description": "Maintain product pages, copy, media, and public content.",
           "status": "planned"
+        },
+        {
+          "key": "assets",
+          "href": "/admin/assets/",
+          "title": "مكتبة الصور",
+          "description": "إدارة صور الموقع المشتركة والمجلدات والوسوم والرفع والصور المولدة بالذكاء الاصطناعي.",
+          "status": "active"
         },
         {
           "key": "downloads",
@@ -1218,7 +1241,9 @@
           "support": "تذاكر الدعم",
           "contact": "طلبات التواصل",
           "collaboration": "مهام التعاون",
-          "notifications": "إشعارات الإدارة"
+          "notifications": "إشعارات الإدارة",
+          "assets": "مكتبة الصور",
+          "aiSettings": "إعدادات خدمة الذكاء الاصطناعي"
         }
       },
       "ranges": {
@@ -1727,7 +1752,9 @@
         "docs": "?????????",
         "support": "????? ?????",
         "contact": "????? ???????",
-        "collaboration": "Collaboration"
+        "collaboration": "Collaboration",
+        "assets": "مكتبة الصور",
+        "settings": "إعدادات النظام"
       },
       "invite": {
         "title": "???? ??????",
@@ -1752,7 +1779,9 @@
             "docs": "?????????",
             "support": "????? ?????",
             "contact": "????? ???????",
-            "collaboration": "Collaboration"
+            "collaboration": "Collaboration",
+            "assets": "مكتبة الصور",
+            "settings": "إعدادات النظام"
           },
           "create": "????? ??????",
           "creating": "??? ???????...",
@@ -1846,7 +1875,9 @@
           "docs": "?????????",
           "support": "????? ?????",
           "contact": "????? ???????",
-          "collaboration": "Collaboration"
+          "collaboration": "Collaboration",
+          "assets": "مكتبة الصور",
+          "settings": "إعدادات النظام"
         },
         "delete": "??? ??????",
         "deleting": "??? ?????...",
@@ -2156,6 +2187,82 @@
         "open": "فتح",
         "failed": "تعذر تحديث الإشعار."
       }
+    },
+    "adminAssets": {
+      "seo": {
+        "title": "مكتبة الصور | Aifar",
+        "description": "إدارة صور الموقع والمجلدات والوسوم والرفع والصور المولدة بالذكاء الاصطناعي."
+      },
+      "eyebrow": "الأصول",
+      "deniedTitle": "يلزم إذن إدارة الصور.",
+      "deniedLead": "لا يملك حسابك صلاحية إدارة صور الموقع.",
+      "title": "مكتبة الصور",
+      "lead": "إدارة صور الموقع المشتركة والمجلدات والوسوم والرفع وسجل التوليد من مساحة واحدة.",
+      "breadcrumb": "مكتبة الصور",
+      "emptyTitle": "لا توجد صور بعد.",
+      "emptyLead": "ارفع صورة أو أنشئ صورة جديدة من المصمم أو من هذه المكتبة.",
+      "metrics": {
+        "totalAssets": "الصور",
+        "generatedVisible": "مولدة في الصفحة",
+        "folders": "المجلدات",
+        "tags": "الوسوم"
+      },
+      "actions": {
+        "upload": "رفع أو اختيار",
+        "generate": "توليد صورة"
+      }
+    },
+    "adminAiSettings": {
+      "seo": {
+        "title": "إعدادات خدمة الذكاء الاصطناعي | Aifar",
+        "description": "مراجعة مزود توليد الصور ومفتاح API والنموذج والقيم الافتراضية وحالة الخدمة."
+      },
+      "eyebrow": "إعدادات النظام",
+      "deniedTitle": "يلزم إذن إعدادات النظام.",
+      "deniedLead": "لا يملك حسابك صلاحية إدارة إعدادات الذكاء الاصطناعي.",
+      "title": "إعدادات خدمة الذكاء الاصطناعي",
+      "lead": "حفظ المفاتيح والنماذج والأحجام الافتراضية وحالة الخدمة داخل منطقة نظام محمية.",
+      "breadcrumb": "إعدادات الذكاء الاصطناعي",
+      "serviceEyebrow": "المزود",
+      "serviceTitle": "خدمة توليد الصور",
+      "serviceLead": "تقرأ القيم من متغيرات البيئة على الخادم حتى لا يظهر مفتاح API في المتصفح أو المحرر.",
+      "configured": "مهيأ",
+      "notConfigured": "غير مهيأ",
+      "provider": "المزود",
+      "apiKey": "مفتاح API",
+      "model": "النموذج",
+      "outputFormat": "تنسيق الإخراج",
+      "testConnection": "اختبار الاتصال",
+      "testing": "جار الاختبار...",
+      "testSuccess": "نجح اختبار الاتصال.",
+      "testFailed": "فشل اختبار الاتصال.",
+      "envGuide": "متغيرات البيئة",
+      "defaultsEyebrow": "الافتراضيات",
+      "defaultsTitle": "إعدادات التوليد الافتراضية",
+      "enabled": "حالة الخدمة",
+      "enabledYes": "مفعلة",
+      "enabledNo": "متوقفة",
+      "defaultSize": "الحجم الافتراضي",
+      "defaultQuality": "الجودة الافتراضية",
+      "defaultOutput": "الإخراج الافتراضي",
+      "envManagedHint": "تدار هذه القيم عبر متغيرات بيئة الخادم. يختار المصممون الأحجام والجودة المسموح بها فقط.",
+      "securityTitle": "حدود الوصول",
+      "securityLead": "يمكن فقط لمن لديه إذن إعدادات النظام عرض الحالة أو اختبار الاتصال.",
+      "policyTitle": "سياسة التوليد",
+      "policies": [
+        "يبقى مفتاح API على الخادم.",
+        "يقرأ منتقي الصور حجم صورة الكتلة أولا.",
+        "عند عدم وجود حجم للكتلة يستخدم الحجم الافتراضي."
+      ],
+      "envTitle": "المتغيرات المطلوبة",
+      "envLead": "اضبط هذه القيم محليا وفي الإنتاج قبل تفعيل توليد الصور.",
+      "qualityLabels": {
+        "auto": "تلقائي",
+        "low": "منخفضة",
+        "medium": "متوسطة",
+        "high": "عالية"
+      },
+      "availableSizes": "الأحجام المتاحة"
     }
   }
 }

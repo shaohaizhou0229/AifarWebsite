@@ -5,8 +5,9 @@ import {
   getCurrentAccessToken,
   getSupabaseAnonKey,
   getSupabaseStorageUrl,
-  requireAdmin
+  requireAdminPermission
 } from "@/lib/auth";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import {
   PROJECT_ASSET_BUCKET,
   PROJECT_ASSET_UPLOAD_CHUNK_SIZE,
@@ -29,7 +30,7 @@ function permissionError(error) {
 
 export async function POST(request) {
   try {
-    const [{ user }, accessToken] = await Promise.all([requireAdmin(getProfile), getCurrentAccessToken()]);
+    const [{ user }, accessToken] = await Promise.all([requireAdminPermission(getProfile, ADMIN_PERMISSIONS.assets), getCurrentAccessToken()]);
     if (!accessToken) {
       return NextResponse.json({ error: "A valid admin session is required." }, { status: 401 });
     }

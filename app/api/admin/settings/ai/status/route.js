@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { createProjectAssetFolder } from "@/lib/project-assets";
+import { getImageGenerationSettings } from "@/lib/image-generation-settings";
 import { getProfile } from "@/lib/profiles";
 
 export const runtime = "nodejs";
@@ -17,12 +17,11 @@ function permissionError(error) {
   return null;
 }
 
-export async function POST(request) {
+export async function GET() {
   try {
-    const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.assets);
-    const folder = await createProjectAssetFolder(user, await request.json().catch(() => ({})));
-    return NextResponse.json({ folder });
+    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.settings);
+    return NextResponse.json({ settings: getImageGenerationSettings() });
   } catch (error) {
-    return permissionError(error) || NextResponse.json({ error: error.message || "Could not create folder." }, { status: 400 });
+    return permissionError(error) || NextResponse.json({ error: error.message || "Could not load AI settings." }, { status: 400 });
   }
 }

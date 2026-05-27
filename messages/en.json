@@ -498,7 +498,11 @@
         "restored": "Restored",
         "template_applied": "Page plan applied",
         "manual": "Manual snapshot"
-      }
+      },
+      "targetImageSize": "Image size",
+      "targetWidth": "Width",
+      "targetHeight": "Height",
+      "imageSizeHint": "Used to suggest the AI generation size for this block."
     },
     "assets": {
       "title": "Choose or upload images",
@@ -629,7 +633,16 @@
       "bulkAltPlaceholder": "Set alt text for selected images",
       "applyBulk": "Apply",
       "bulkFailed": "Unable to update selected images.",
-      "deleteConfirm": "Delete {count} selected images from project files? This will only archive the records."
+      "deleteConfirm": "Delete {count} selected images from project files? This will only archive the records.",
+      "openLibrary": "Open image library",
+      "suggestedSize": "Suggested size: {size}",
+      "metadataSaved": "Image metadata saved.",
+      "bulkUpdated": "Selected images updated.",
+      "updatedAt": "Updated",
+      "generationHistory": "AI generation history",
+      "usageTitle": "Usage locations",
+      "usagePending": "Usage scanning is prepared for page content and will show exact references after the asset usage index is enabled.",
+      "notProvided": "Not provided"
     },
     "documents": {
       "markdownFile": "Markdown source file",
@@ -1119,8 +1132,11 @@
         "collaboration": "Collaboration workspace",
         "groups": {
           "workspace": "Operating workspace",
-          "operations": "Requests and tasks"
-        }
+          "operations": "Requests and tasks",
+          "system": "System settings"
+        },
+        "assets": "Image assets",
+        "aiSettings": "AI service settings"
       },
       "modules": [
         {
@@ -1128,6 +1144,13 @@
           "href": "/admin/product/",
           "title": "Product content",
           "description": "Maintain product pages, feature copy, media, and public website content.",
+          "status": "active"
+        },
+        {
+          "key": "assets",
+          "href": "/admin/assets/",
+          "title": "Image assets",
+          "description": "Manage reusable website images, folders, tags, uploads, and AI-generated assets.",
           "status": "active"
         },
         {
@@ -1218,7 +1241,9 @@
           "support": "Support tickets",
           "contact": "Contact requests",
           "collaboration": "Collaboration tasks",
-          "notifications": "Admin notifications"
+          "notifications": "Admin notifications",
+          "assets": "Image assets",
+          "aiSettings": "AI service settings"
         }
       },
       "ranges": {
@@ -1727,7 +1752,9 @@
         "docs": "Online docs",
         "support": "Support tickets",
         "contact": "Contact requests",
-        "collaboration": "Collaboration"
+        "collaboration": "Collaboration",
+        "assets": "Image assets",
+        "settings": "System settings"
       },
       "invite": {
         "title": "Invite user",
@@ -1752,7 +1779,9 @@
             "docs": "Online docs",
             "support": "Support tickets",
             "contact": "Contact requests",
-            "collaboration": "Collaboration"
+            "collaboration": "Collaboration",
+            "assets": "Image assets",
+            "settings": "System settings"
           },
           "create": "Create invitation",
           "creating": "Creating...",
@@ -1846,7 +1875,9 @@
           "docs": "Online docs",
           "support": "Support tickets",
           "contact": "Contact requests",
-          "collaboration": "Collaboration"
+          "collaboration": "Collaboration",
+          "assets": "Image assets",
+          "settings": "System settings"
         },
         "delete": "Delete account",
         "deleting": "Deleting...",
@@ -2156,6 +2187,82 @@
         "open": "Open",
         "failed": "Unable to update notification."
       }
+    },
+    "adminAssets": {
+      "seo": {
+        "title": "Image assets | Aifar",
+        "description": "Manage reusable website images, folders, tags, uploads, and AI-generated assets."
+      },
+      "eyebrow": "Asset library",
+      "deniedTitle": "Image asset permission required.",
+      "deniedLead": "Your account does not have permission to manage website image assets.",
+      "title": "Image asset library",
+      "lead": "Manage shared website images, folders, tags, uploads, generated images, and usage review from one workspace.",
+      "breadcrumb": "Image assets",
+      "emptyTitle": "No image assets yet.",
+      "emptyLead": "Upload images or generate a new asset from the page designer or this library.",
+      "metrics": {
+        "totalAssets": "Assets",
+        "generatedVisible": "Generated on page",
+        "folders": "Folders",
+        "tags": "Tags"
+      },
+      "actions": {
+        "upload": "Upload or choose",
+        "generate": "Generate image"
+      }
+    },
+    "adminAiSettings": {
+      "seo": {
+        "title": "AI service settings | Aifar",
+        "description": "Review AI image generation provider, API key status, model, defaults, size range, and service health."
+      },
+      "eyebrow": "System settings",
+      "deniedTitle": "System settings permission required.",
+      "deniedLead": "Your account does not have permission to manage AI service settings.",
+      "title": "AI service settings",
+      "lead": "Keep image generation keys, model defaults, size policy, and service status in a protected system configuration area.",
+      "breadcrumb": "AI service settings",
+      "serviceEyebrow": "Provider",
+      "serviceTitle": "Image generation service",
+      "serviceLead": "Runtime values are read from environment variables so API keys stay outside the browser and content editor.",
+      "configured": "Configured",
+      "notConfigured": "Not configured",
+      "provider": "Provider",
+      "apiKey": "API key",
+      "model": "Model",
+      "outputFormat": "Output format",
+      "testConnection": "Test connection",
+      "testing": "Testing...",
+      "testSuccess": "Connection check passed.",
+      "testFailed": "Connection check failed.",
+      "envGuide": "Environment keys",
+      "defaultsEyebrow": "Defaults",
+      "defaultsTitle": "Generation defaults",
+      "enabled": "Service status",
+      "enabledYes": "Enabled",
+      "enabledNo": "Disabled",
+      "defaultSize": "Default size",
+      "defaultQuality": "Default quality",
+      "defaultOutput": "Default output",
+      "envManagedHint": "These values are managed as server environment variables. Designers only choose allowed sizes and quality levels in the image picker.",
+      "securityTitle": "Access boundary",
+      "securityLead": "Only users with system settings permission can see configuration status or run connection tests.",
+      "policyTitle": "Generation policy",
+      "policies": [
+        "API keys stay server-side.",
+        "The image picker reads block image size first.",
+        "If a block has no size, the service default is used."
+      ],
+      "envTitle": "Required variables",
+      "envLead": "Configure these values in local and production environments before enabling AI image generation.",
+      "qualityLabels": {
+        "auto": "Auto",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      },
+      "availableSizes": "Available sizes"
     }
   }
 }

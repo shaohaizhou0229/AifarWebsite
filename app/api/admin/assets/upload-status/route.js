@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, AuthRequiredError, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { updateProjectAssetUploadStatus } from "@/lib/project-assets";
 import { getProfile } from "@/lib/profiles";
 
@@ -18,7 +19,7 @@ function permissionError(error) {
 
 export async function POST(request) {
   try {
-    const { user } = await requireAdmin(getProfile);
+    const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.assets);
     const input = await request.json().catch(() => ({}));
     const sessionId = String(input.sessionId || "");
     if (!sessionId) {

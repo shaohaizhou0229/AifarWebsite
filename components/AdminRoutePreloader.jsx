@@ -8,12 +8,14 @@ import { localizedPath } from "@/i18n/routing";
 const PRIMARY_ADMIN_PATHS = [
   "/admin/",
   "/admin/product/",
+  "/admin/assets/",
   "/admin/downloads/",
   "/admin/users/",
   "/admin/docs/",
   "/admin/support/",
   "/admin/contact/",
-  "/admin/collaboration/"
+  "/admin/collaboration/",
+  "/admin/settings/ai/"
 ];
 
 function normalizePath(value) {

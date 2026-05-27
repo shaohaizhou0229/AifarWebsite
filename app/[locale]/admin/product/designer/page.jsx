@@ -6,6 +6,7 @@ import { AdminSiteContentForm } from "@/components/AdminSiteContentForm";
 import { AdminRequiredError } from "@/lib/auth";
 import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
+import { getImageGenerationSettings } from "@/lib/image-generation-settings";
 import { SITE_LAYOUT_VERSION } from "@/lib/site-page-builder";
 import { getAdminSitePageContent, listSiteContentSnapshots } from "@/lib/site-content";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
@@ -77,6 +78,8 @@ export default async function AdminProductDesignerPage({ params, searchParams })
         <AdminSiteContentForm
           labels={labels}
           assetLabels={messages.forms.assets}
+          adminLocale={locale}
+          imageSettings={getImageGenerationSettings()}
           initialPageKey={initialPageKey}
           initialLocale={initialLocale}
           initialContent={initialContent}

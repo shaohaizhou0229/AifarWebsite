@@ -498,7 +498,11 @@
         "updates_list": "展示版本或更新亮点。",
         "cta_band": "用行动按钮完成转化。",
         "support_entry": "引导访客进入支持、文档和咨询。"
-      }
+      },
+      "targetImageSize": "图片规格",
+      "targetWidth": "宽度",
+      "targetHeight": "高度",
+      "imageSizeHint": "用于给当前区块的 AI 生图尺寸提供建议。"
     },
     "assets": {
       "title": "选择或上传图片",
@@ -629,7 +633,16 @@
       "bulkAltPlaceholder": "为选中的图片统一设置替代文本",
       "applyBulk": "应用",
       "bulkFailed": "无法更新已选图片。",
-      "deleteConfirm": "确认从项目文件中删除 {count} 张图片吗？这只会归档记录，不会物理删除文件。"
+      "deleteConfirm": "确认从项目文件中删除 {count} 张图片吗？这只会归档记录，不会物理删除文件。",
+      "openLibrary": "打开图片资产库",
+      "suggestedSize": "建议尺寸：{size}",
+      "metadataSaved": "图片信息已保存。",
+      "bulkUpdated": "已更新选中的图片。",
+      "updatedAt": "更新时间",
+      "generationHistory": "AI 生成历史",
+      "usageTitle": "使用位置",
+      "usagePending": "已为官网内容引用统计预留入口，启用资产使用索引后会显示精确引用。",
+      "notProvided": "未提供"
     },
     "documents": {
       "markdownFile": "Markdown 源文件",
@@ -1119,8 +1132,11 @@
         "collaboration": "协作空间",
         "groups": {
           "workspace": "运营工作台",
-          "operations": "请求与任务"
-        }
+          "operations": "请求与任务",
+          "system": "系统配置"
+        },
+        "assets": "图片资产库",
+        "aiSettings": "AI 服务配置"
       },
       "modules": [
         {
@@ -1128,6 +1144,13 @@
           "href": "/admin/product/",
           "title": "产品内容",
           "description": "维护产品页面和公开内容。",
+          "status": "active"
+        },
+        {
+          "key": "assets",
+          "href": "/admin/assets/",
+          "title": "图片资产库",
+          "description": "管理官网跨页面复用的图片、文件夹、标签、上传和 AI 生成资产。",
           "status": "active"
         },
         {
@@ -1218,7 +1241,9 @@
           "support": "支持工单",
           "contact": "联系请求",
           "collaboration": "协作任务",
-          "notifications": "后台通知"
+          "notifications": "后台通知",
+          "assets": "图片资产库",
+          "aiSettings": "AI 服务配置"
         }
       },
       "ranges": {
@@ -1727,7 +1752,9 @@
         "docs": "在线文档",
         "support": "支持工单",
         "contact": "联系请求",
-        "collaboration": "协作空间"
+        "collaboration": "协作空间",
+        "assets": "图片资产库",
+        "settings": "系统配置"
       },
       "invite": {
         "title": "邀请用户",
@@ -1752,7 +1779,9 @@
             "docs": "在线文档",
             "support": "支持工单",
             "contact": "联系请求",
-            "collaboration": "协作空间"
+            "collaboration": "协作空间",
+            "assets": "图片资产库",
+            "settings": "系统配置"
           },
           "create": "创建邀请",
           "creating": "正在创建...",
@@ -1846,7 +1875,9 @@
           "docs": "在线文档",
           "support": "支持工单",
           "contact": "联系请求",
-          "collaboration": "协作空间"
+          "collaboration": "协作空间",
+          "assets": "图片资产库",
+          "settings": "系统配置"
         },
         "delete": "注销账号",
         "deleting": "正在注销...",
@@ -2156,6 +2187,82 @@
         "open": "打开",
         "failed": "无法更新通知。"
       }
+    },
+    "adminAssets": {
+      "seo": {
+        "title": "图片资产库 | Aifar",
+        "description": "管理官网复用图片、文件夹、标签、上传图片和 AI 生成资产。"
+      },
+      "eyebrow": "资产管理",
+      "deniedTitle": "需要图片资产权限。",
+      "deniedLead": "你的账号无权管理官网图片资产。",
+      "title": "图片资产库",
+      "lead": "集中管理官网图片、文件夹、标签、上传、AI 生成历史和使用位置，页面设计器只保留轻量选图入口。",
+      "breadcrumb": "图片资产库",
+      "emptyTitle": "还没有图片资产。",
+      "emptyLead": "可以在这里上传图片，或从页面设计器里生成并保存新的图片资产。",
+      "metrics": {
+        "totalAssets": "图片总数",
+        "generatedVisible": "当前页 AI 生成",
+        "folders": "文件夹",
+        "tags": "标签"
+      },
+      "actions": {
+        "upload": "上传或选择",
+        "generate": "AI 生图"
+      }
+    },
+    "adminAiSettings": {
+      "seo": {
+        "title": "AI 服务配置 | Aifar",
+        "description": "查看 AI 生图服务商、API Key 状态、模型、默认参数、尺寸范围和服务状态。"
+      },
+      "eyebrow": "系统配置",
+      "deniedTitle": "需要系统配置权限。",
+      "deniedLead": "你的账号无权管理 AI 服务配置。",
+      "title": "AI 服务配置",
+      "lead": "把生图密钥、模型、默认参数、尺寸策略和服务状态放在受保护的系统配置区。",
+      "breadcrumb": "AI 服务配置",
+      "serviceEyebrow": "服务商",
+      "serviceTitle": "图片生成服务",
+      "serviceLead": "运行时配置从服务端环境变量读取，API Key 不进入浏览器和内容编辑器。",
+      "configured": "已配置",
+      "notConfigured": "未配置",
+      "provider": "服务商",
+      "apiKey": "API Key",
+      "model": "模型",
+      "outputFormat": "输出格式",
+      "testConnection": "测试连接",
+      "testing": "测试中...",
+      "testSuccess": "连接测试通过。",
+      "testFailed": "连接测试失败。",
+      "envGuide": "环境变量",
+      "defaultsEyebrow": "默认参数",
+      "defaultsTitle": "生图默认参数",
+      "enabled": "服务状态",
+      "enabledYes": "已启用",
+      "enabledNo": "已停用",
+      "defaultSize": "默认尺寸",
+      "defaultQuality": "默认质量",
+      "defaultOutput": "默认输出",
+      "envManagedHint": "这些值由服务端环境变量管理。设计师只在图片弹窗里选择允许的尺寸和质量。",
+      "securityTitle": "权限边界",
+      "securityLead": "只有具备系统配置权限的管理员可以查看配置状态或测试连接。",
+      "policyTitle": "生图策略",
+      "policies": [
+        "API Key 只保留在服务端。",
+        "图片弹窗优先读取当前区块图片尺寸。",
+        "区块没有填写尺寸时，回退到 AI 服务默认尺寸。"
+      ],
+      "envTitle": "必填配置",
+      "envLead": "启用 AI 生图前，需要在本地和生产环境配置以下变量。",
+      "qualityLabels": {
+        "auto": "自动",
+        "low": "低",
+        "medium": "中",
+        "high": "高"
+      },
+      "availableSizes": "可用尺寸范围"
     }
   }
 }

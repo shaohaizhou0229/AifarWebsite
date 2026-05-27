@@ -8,16 +8,35 @@ import { localizedPath } from "@/i18n/routing";
 const QUICK_JUMP_COMMANDS = [
   { key: "home", href: "/admin/" },
   { key: "product", href: "/admin/product/" },
+  { key: "assets", href: "/admin/assets/" },
   { key: "downloads", href: "/admin/downloads/" },
   { key: "users", href: "/admin/users/" },
   { key: "docs", href: "/admin/docs/" },
   { key: "support", href: "/admin/support/" },
   { key: "contact", href: "/admin/contact/" },
   { key: "collaboration", href: "/admin/collaboration/" },
+  { key: "aiSettings", href: "/admin/settings/ai/" },
   { key: "notifications", href: "/admin/notifications/" }
 ];
 
-export function AdminQuickJump({ locale, labels = {}, navLabels = {} }) {
+const COMMAND_PERMISSION_BY_KEY = {
+  product: "admin.product",
+  assets: "admin.assets",
+  downloads: "admin.downloads",
+  users: "admin.users",
+  docs: "admin.docs",
+  support: "admin.support",
+  contact: "admin.contact",
+  collaboration: "admin.collaboration",
+  aiSettings: "admin.settings"
+};
+
+function canSeeCommand(key, permissions = []) {
+  const permission = COMMAND_PERMISSION_BY_KEY[key];
+  return !permission || permissions.includes(permission);
+}
+
+export function AdminQuickJump({ locale, labels = {}, navLabels = {}, permissions = [] }) {
   const panelRef = useRef(null);
   const inputRef = useRef(null);
   const [open, setOpen] = useState(false);
@@ -60,12 +79,13 @@ export function AdminQuickJump({ locale, labels = {}, navLabels = {} }) {
   const commands = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     return QUICK_JUMP_COMMANDS
+      .filter((command) => canSeeCommand(command.key, permissions))
       .map((command) => ({
         ...command,
         label: navLabels[command.key] || labels.commands?.[command.key] || command.key
       }))
       .filter((command) => !normalizedQuery || command.label.toLowerCase().includes(normalizedQuery));
-  }, [labels.commands, navLabels, query]);
+  }, [labels.commands, navLabels, permissions, query]);
 
   return (
     <div className="admin-quick-jump">

@@ -66,6 +66,7 @@ export function AdminShell({
   breadcrumbs = [],
   actions = null,
   user = null,
+  permissions = [],
   children
 }) {
   const shell = labels.shell || {};
@@ -104,8 +105,8 @@ export function AdminShell({
             <p>{shell.projectTenantHint || "Multi-tenant switching is reserved for a later build."}</p>
           </div>
         </AdminAutoCloseDetails>
-        <AdminQuickJump locale={locale} labels={shell} navLabels={labels.nav} />
-        <AdminNav locale={locale} labels={labels.nav} current={current} variant="sidebar" />
+        <AdminQuickJump locale={locale} labels={shell} navLabels={labels.nav} permissions={permissions} />
+        <AdminNav locale={locale} labels={labels.nav} current={current} variant="sidebar" permissions={permissions} />
         <div className="admin-sidebar-spacer" />
         <AdminSidebarCollapse collapseLabel={shell.collapse || "Collapse"} expandLabel={shell.expand || "Expand"} />
         <div className="admin-sidebar-user">

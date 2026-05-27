@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, AuthRequiredError, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { isDatabaseConnectionLimitError } from "@/lib/db";
 import { listProjectAssets } from "@/lib/project-assets";
 import { getProfile } from "@/lib/profiles";
@@ -19,7 +20,7 @@ function permissionError(error) {
 
 export async function GET(request) {
   try {
-    await requireAdmin(getProfile);
+    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.assets);
     const searchParams = new URL(request.url).searchParams;
     const result = await listProjectAssets({
       q: searchParams.get("q") || "",

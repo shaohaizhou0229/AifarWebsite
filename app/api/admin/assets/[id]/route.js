@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { AdminRequiredError, AuthRequiredError, requireAdmin } from "@/lib/auth";
+import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
+import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import { getProjectAsset, updateProjectAsset } from "@/lib/project-assets";
 import { getProfile } from "@/lib/profiles";
 import { recordUserFootprint } from "@/lib/user-footprints";
@@ -21,7 +22,7 @@ export async function PATCH(request, { params }) {
   const { id } = await params;
 
   try {
-    const { user } = await requireAdmin(getProfile);
+    const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.assets);
     const asset = await updateProjectAsset(id, user, await request.json().catch(() => ({})));
     if (!asset) {
       return NextResponse.json({ error: "Asset not found." }, { status: 404 });
@@ -47,7 +48,7 @@ export async function GET(_request, { params }) {
   const { id } = await params;
 
   try {
-    await requireAdmin(getProfile);
+    await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.assets);
     const asset = await getProjectAsset(id);
     if (!asset) {
       return NextResponse.json({ error: "Asset not found." }, { status: 404 });

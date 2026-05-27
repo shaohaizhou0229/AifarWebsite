@@ -760,10 +760,19 @@ function BulkActionBar({ labels, count, activeMode, onMode, onDelete, onClear })
   );
 }
 
-function GeneratePanel({ labels, generating, generatedAsset, error, onDownloadGenerated, onGenerate, onSaveGenerated, onSelectGenerated }) {
+function normalizePanelSize(size) {
+  return IMAGE_SIZES.includes(size) ? size : "1024x1024";
+}
+
+function GeneratePanel({ labels, generating, generatedAsset, error, defaultSize = "1024x1024", onDownloadGenerated, onGenerate, onSaveGenerated, onSelectGenerated }) {
   const [prompt, setPrompt] = useState("");
-  const [size, setSize] = useState("1024x1024");
+  const normalizedDefaultSize = normalizePanelSize(defaultSize);
+  const [size, setSize] = useState(normalizedDefaultSize);
   const [quality, setQuality] = useState("auto");
+
+  useEffect(() => {
+    setSize(normalizedDefaultSize);
+  }, [normalizedDefaultSize]);
 
   return (
     <div className="asset-generate-panel">
@@ -786,6 +795,7 @@ function GeneratePanel({ labels, generating, generatedAsset, error, onDownloadGe
             </select>
           </label>
         </div>
+        <p className="muted-line">{formatTemplate(t(labels, "suggestedSize"), { size: normalizedDefaultSize })}</p>
         <button className="button primary" type="button" onClick={() => onGenerate({ prompt, size, quality })} disabled={generating || !prompt.trim()}>
           <Sparkles size={16} aria-hidden="true" />
           {generating ? t(labels, "generating") : t(labels, "generateImage")}
@@ -827,7 +837,7 @@ function GeneratePanel({ labels, generating, generatedAsset, error, onDownloadGe
   );
 }
 
-export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, onSelect, initialTab = "project" }) {
+export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, onSelect, initialTab = "project", libraryHref = "", defaultGenerateSize = "1024x1024" }) {
   const [tab, setTab] = useState(TABS.includes(initialTab) ? initialTab : "project");
   const [query, setQuery] = useState("");
   const [directory, setDirectory] = useState("");
@@ -881,13 +891,15 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
   useEffect(() => {
     if (!open) return undefined;
 
+    setTab(TABS.includes(initialTab) ? initialTab : "project");
+
     function closeOnEscape(event) {
       if (event.key === "Escape") onClose?.();
     }
 
     document.addEventListener("keydown", closeOnEscape);
     return () => document.removeEventListener("keydown", closeOnEscape);
-  }, [onClose, open]);
+  }, [initialTab, onClose, open]);
 
   useEffect(() => {
     setPage(1);
@@ -1362,6 +1374,12 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
             <p>{t(labels, "lead")}</p>
           </div>
           <div className="asset-picker-head-actions">
+            {libraryHref ? (
+              <a className="button secondary" href={libraryHref}>
+                <FolderOpen size={15} aria-hidden="true" />
+                {t(labels, "openLibrary")}
+              </a>
+            ) : null}
             <button className="button secondary" type="button" onClick={() => onClose?.()}>{t(labels, "cancel")}</button>
             <button className="button primary" type="button" onClick={() => chooseAsset()} disabled={!selectedAsset}>
               <Check size={15} aria-hidden="true" />
@@ -1515,6 +1533,7 @@ export function AssetPickerModal({ open, labels = {}, locale = "en", onClose, on
               generating={generating}
               generatedAsset={generatedAsset}
               error={generateError}
+              defaultSize={defaultGenerateSize}
               onGenerate={generateAsset}
               onDownloadGenerated={downloadAsset}
               onSaveGenerated={saveGeneratedToProject}

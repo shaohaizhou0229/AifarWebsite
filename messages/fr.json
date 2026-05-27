@@ -498,7 +498,11 @@
       },
       "noStyleSettings": "Ce bloc n a pas encore de reglages de style.",
       "noLayoutSettings": "Ce bloc n a pas encore de reglages de mise en page.",
-      "noAdvancedSettings": "Ce bloc n a pas encore de reglages avances."
+      "noAdvancedSettings": "Ce bloc n a pas encore de reglages avances.",
+      "targetImageSize": "Taille image",
+      "targetWidth": "Largeur",
+      "targetHeight": "Hauteur",
+      "imageSizeHint": "Sert a suggerer la taille IA pour ce bloc."
     },
     "assets": {
       "title": "Choisir ou importer des images",
@@ -629,7 +633,16 @@
       "bulkAltPlaceholder": "D?finir le texte alternatif des images s?lectionn?es",
       "applyBulk": "Appliquer",
       "bulkFailed": "Impossible de mettre ? jour les images s?lectionn?es.",
-      "deleteConfirm": "Supprimer {count} image(s) s?lectionn?e(s) des fichiers projet ? Les fichiers seront seulement archiv?s."
+      "deleteConfirm": "Supprimer {count} image(s) s?lectionn?e(s) des fichiers projet ? Les fichiers seront seulement archiv?s.",
+      "openLibrary": "Ouvrir la bibliotheque",
+      "suggestedSize": "Taille suggeree : {size}",
+      "metadataSaved": "Metadonnees enregistrees.",
+      "bulkUpdated": "Images selectionnees mises a jour.",
+      "updatedAt": "Mis a jour",
+      "generationHistory": "Historique IA",
+      "usageTitle": "Emplacements",
+      "usagePending": "Le suivi des usages est pret pour le contenu du site et affichera les references apres activation de l index.",
+      "notProvided": "Non renseigne"
     },
     "documents": {
       "markdownFile": "Markdown source file",
@@ -1119,8 +1132,11 @@
         "collaboration": "Espace collaboration",
         "groups": {
           "workspace": "Espace operations",
-          "operations": "Demandes et taches"
-        }
+          "operations": "Demandes et taches",
+          "system": "Configuration systeme"
+        },
+        "assets": "Bibliotheque images",
+        "aiSettings": "Configuration IA"
       },
       "modules": [
         {
@@ -1129,6 +1145,13 @@
           "title": "Contenu produit",
           "description": "Maintenir les pages produit, les textes et les contenus publics.",
           "status": "planned"
+        },
+        {
+          "key": "assets",
+          "href": "/admin/assets/",
+          "title": "Bibliotheque images",
+          "description": "Centralisez les images du site, dossiers, tags, uploads, historiques IA et preparation des emplacements d usage.",
+          "status": "active"
         },
         {
           "key": "downloads",
@@ -1218,7 +1241,9 @@
           "support": "Tickets support",
           "contact": "Demandes contact",
           "collaboration": "Taches collaboration",
-          "notifications": "Notifications admin"
+          "notifications": "Notifications admin",
+          "assets": "Bibliotheque images",
+          "aiSettings": "Configuration IA"
         }
       },
       "ranges": {
@@ -1727,7 +1752,9 @@
         "docs": "Docs en ligne",
         "support": "Tickets support",
         "contact": "Demandes de contact",
-        "collaboration": "Collaboration"
+        "collaboration": "Collaboration",
+        "assets": "Bibliotheque images",
+        "settings": "Configuration systeme"
       },
       "invite": {
         "title": "Inviter un utilisateur",
@@ -1752,7 +1779,9 @@
             "docs": "Docs en ligne",
             "support": "Tickets support",
             "contact": "Demandes de contact",
-            "collaboration": "Collaboration"
+            "collaboration": "Collaboration",
+            "assets": "Bibliotheque images",
+            "settings": "Configuration systeme"
           },
           "create": "Creer l invitation",
           "creating": "Creation...",
@@ -1846,7 +1875,9 @@
           "docs": "Docs en ligne",
           "support": "Tickets support",
           "contact": "Demandes de contact",
-          "collaboration": "Collaboration"
+          "collaboration": "Collaboration",
+          "assets": "Bibliotheque images",
+          "settings": "Configuration systeme"
         },
         "delete": "Supprimer le compte",
         "deleting": "Suppression...",
@@ -2156,6 +2187,82 @@
         "open": "Ouvrir",
         "failed": "Impossible de mettre a jour."
       }
+    },
+    "adminAssets": {
+      "seo": {
+        "title": "Bibliotheque images | Aifar",
+        "description": "Gerer les images du site, dossiers, tags, uploads et generations IA."
+      },
+      "eyebrow": "Ressources",
+      "deniedTitle": "Permission images requise.",
+      "deniedLead": "Votre compte ne peut pas gerer les images du site.",
+      "title": "Bibliotheque images",
+      "lead": "Centralisez les images du site, dossiers, tags, uploads, historiques IA et preparation des emplacements d usage.",
+      "breadcrumb": "Images",
+      "emptyTitle": "Aucune image pour le moment.",
+      "emptyLead": "Ajoutez une image ou genereez un nouveau visuel depuis le designer ou cette bibliotheque.",
+      "metrics": {
+        "totalAssets": "Images",
+        "generatedVisible": "Generees sur la page",
+        "folders": "Dossiers",
+        "tags": "Tags"
+      },
+      "actions": {
+        "upload": "Importer ou choisir",
+        "generate": "Generer une image"
+      }
+    },
+    "adminAiSettings": {
+      "seo": {
+        "title": "Configuration IA | Aifar",
+        "description": "Verifier le fournisseur IA, la cle API, le modele, les valeurs par defaut et le statut du service."
+      },
+      "eyebrow": "Configuration systeme",
+      "deniedTitle": "Permission configuration requise.",
+      "deniedLead": "Votre compte ne peut pas gerer la configuration IA.",
+      "title": "Configuration IA",
+      "lead": "Gardez les cles, modeles, tailles autorisees et etat du service dans une zone systeme protegee.",
+      "breadcrumb": "Configuration IA",
+      "serviceEyebrow": "Fournisseur",
+      "serviceTitle": "Service de generation image",
+      "serviceLead": "Les valeurs sont lues cote serveur afin de garder la cle API hors du navigateur et de l editeur.",
+      "configured": "Configure",
+      "notConfigured": "Non configure",
+      "provider": "Fournisseur",
+      "apiKey": "Cle API",
+      "model": "Modele",
+      "outputFormat": "Format",
+      "testConnection": "Tester",
+      "testing": "Test...",
+      "testSuccess": "Connexion validee.",
+      "testFailed": "Echec du test.",
+      "envGuide": "Variables",
+      "defaultsEyebrow": "Defauts",
+      "defaultsTitle": "Parametres par defaut",
+      "enabled": "Statut",
+      "enabledYes": "Active",
+      "enabledNo": "Desactive",
+      "defaultSize": "Taille par defaut",
+      "defaultQuality": "Qualite par defaut",
+      "defaultOutput": "Sortie par defaut",
+      "envManagedHint": "Ces valeurs sont gerees par variables d environnement serveur.",
+      "securityTitle": "Acces",
+      "securityLead": "Seuls les admins autorises peuvent voir le statut et tester la connexion.",
+      "policyTitle": "Regles IA",
+      "policies": [
+        "La cle API reste cote serveur.",
+        "Le selecteur lit d abord la taille du bloc.",
+        "Sans taille de bloc, la valeur par defaut est utilisee."
+      ],
+      "envTitle": "Variables requises",
+      "envLead": "Configurez ces valeurs avant d activer la generation IA.",
+      "qualityLabels": {
+        "auto": "Auto",
+        "low": "Basse",
+        "medium": "Moyenne",
+        "high": "Haute"
+      },
+      "availableSizes": "Tailles disponibles"
     }
   }
 }
