@@ -207,35 +207,37 @@ function AssetDetail({ asset, labels, locale, folders, saving, usageState, onSav
 
   return (
     <aside className="admin-asset-detail">
-      <div className="admin-asset-preview">
-        <img src={asset.url} alt={asset.altText || asset.displayName || asset.originalFilename} />
+      <div className="admin-asset-detail-hero">
+        <div className="admin-asset-preview">
+          <img src={asset.url} alt={asset.altText || asset.displayName || asset.originalFilename} />
+        </div>
+        <div className="admin-asset-detail-actions">
+          <button className="button secondary compact" type="button" onClick={copyAssetUrl} disabled={!asset.url}>
+            <Copy size={14} aria-hidden="true" />
+            {copied ? t(labels, "copyLinkSuccess") : t(labels, "copyLink")}
+          </button>
+          {asset.url ? (
+            <a className="button secondary compact" href={asset.url} target="_blank" rel="noreferrer">
+              <ExternalLink size={14} aria-hidden="true" />
+              {t(labels, "previewOriginal")}
+            </a>
+          ) : null}
+        </div>
+        <dl className="admin-asset-meta">
+          <div>
+            <dt>{t(labels, "source")}</dt>
+            <dd>{labels.sourceLabels?.[asset.source] || asset.source}</dd>
+          </div>
+          <div>
+            <dt>{t(labels, "size")}</dt>
+            <dd>{asset.width && asset.height ? `${asset.width} x ${asset.height}` : formatBytes(asset.fileSize, labels)}</dd>
+          </div>
+          <div>
+            <dt>{t(labels, "updatedAt")}</dt>
+            <dd>{formatDate(asset.updatedAt, locale) || "-"}</dd>
+          </div>
+        </dl>
       </div>
-      <div className="admin-asset-detail-actions">
-        <button className="button secondary compact" type="button" onClick={copyAssetUrl} disabled={!asset.url}>
-          <Copy size={14} aria-hidden="true" />
-          {copied ? t(labels, "copyLinkSuccess") : t(labels, "copyLink")}
-        </button>
-        {asset.url ? (
-          <a className="button secondary compact" href={asset.url} target="_blank" rel="noreferrer">
-            <ExternalLink size={14} aria-hidden="true" />
-            {t(labels, "previewOriginal")}
-          </a>
-        ) : null}
-      </div>
-      <dl className="admin-asset-meta">
-        <div>
-          <dt>{t(labels, "source")}</dt>
-          <dd>{labels.sourceLabels?.[asset.source] || asset.source}</dd>
-        </div>
-        <div>
-          <dt>{t(labels, "size")}</dt>
-          <dd>{asset.width && asset.height ? `${asset.width} x ${asset.height}` : formatBytes(asset.fileSize, labels)}</dd>
-        </div>
-        <div>
-          <dt>{t(labels, "updatedAt")}</dt>
-          <dd>{formatDate(asset.updatedAt, locale) || "-"}</dd>
-        </div>
-      </dl>
       <label className="asset-field">
         <span>{t(labels, "displayName")}</span>
         <input value={draft.displayName} onChange={(event) => setDraft((current) => ({ ...current, displayName: event.target.value }))} />
