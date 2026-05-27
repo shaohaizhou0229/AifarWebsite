@@ -5133,8 +5133,8 @@ h3 {
 
 .asset-inspector-summary {
   display: grid;
+  grid-template-rows: auto auto;
   gap: 10px;
-  overflow: hidden;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #fbfcfd;
@@ -5145,7 +5145,7 @@ h3 {
   position: relative;
   display: grid;
   width: 100%;
-  height: clamp(132px, 20vh, 190px);
+  height: 168px;
   place-items: center;
   overflow: hidden;
   border: 1px solid #eef1f5;
@@ -5157,24 +5157,24 @@ h3 {
 }
 
 .asset-inspector-thumb-stage {
-  position: relative;
+  position: absolute;
+  inset: 10px;
   display: grid;
-  width: 100%;
-  height: 100%;
   min-width: 0;
   min-height: 0;
   place-items: center;
   overflow: hidden;
   border-radius: 6px;
-  padding: 10px;
 }
 
 .asset-inspector-thumb-stage img {
+  position: absolute;
+  inset: 0;
   display: block;
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
   object-fit: contain;
 }
 
@@ -5821,8 +5821,9 @@ h3 {
 }
 
 .admin-asset-preview {
+  position: relative;
   display: grid;
-  height: clamp(150px, 18vh, 220px);
+  height: 190px;
   place-items: center;
   overflow: hidden;
   border: 1px solid #eef1f5;
@@ -5831,10 +5832,12 @@ h3 {
 }
 
 .admin-asset-preview img {
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
+  position: absolute;
+  inset: 10px;
+  width: calc(100% - 20px);
+  height: calc(100% - 20px);
+  max-width: none;
+  max-height: none;
   object-fit: contain;
 }
 
