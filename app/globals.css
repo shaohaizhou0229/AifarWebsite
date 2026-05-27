@@ -5574,8 +5574,17 @@ h3 {
 
 .admin-asset-side-rail {
   display: grid;
+  grid-template-rows: minmax(170px, 220px) minmax(0, 1fr);
   gap: 12px;
   align-self: start;
+  position: sticky;
+  top: 76px;
+  height: calc(100vh - 96px);
+  height: calc(100dvh - 96px);
+  max-height: calc(100vh - 96px);
+  max-height: calc(100dvh - 96px);
+  min-height: 0;
+  overflow: hidden;
   background: transparent;
   border: 0;
 }
@@ -5584,8 +5593,8 @@ h3 {
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
   gap: 8px;
-  max-height: 260px;
-  min-height: 190px;
+  min-height: 0;
+  max-height: none;
   padding: 10px;
 }
 
@@ -5797,8 +5806,10 @@ h3 {
 
 .admin-asset-detail {
   display: grid;
+  align-content: start;
   gap: 12px;
-  max-height: calc(100vh - 220px);
+  min-height: 0;
+  max-height: none;
   overflow: auto;
   padding: 12px;
 }
@@ -5813,7 +5824,7 @@ h3 {
 .admin-asset-detail-hero {
   display: grid;
   gap: 10px;
-  overflow: hidden;
+  overflow: visible;
   border: 1px solid rgba(183, 200, 213, 0.66);
   border-radius: 8px;
   background: #fff;
@@ -5823,7 +5834,7 @@ h3 {
 .admin-asset-preview {
   position: relative;
   display: grid;
-  height: 190px;
+  height: 176px;
   place-items: center;
   overflow: hidden;
   border: 1px solid #eef1f5;
@@ -9808,6 +9819,16 @@ body:has(.admin-shell)::before {
 
   .admin-asset-side-rail {
     grid-template-columns: minmax(260px, 0.9fr) minmax(0, 1.1fr);
+    grid-template-rows: none;
+    position: static;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .admin-asset-folders {
+    min-height: 190px;
+    max-height: 260px;
   }
 
   .admin-asset-detail {
