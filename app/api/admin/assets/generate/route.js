@@ -10,10 +10,15 @@ import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import {
   MAX_PROJECT_ASSET_SIZE,
   PROJECT_ASSET_BUCKET,
+  createProjectAssetFolder,
   createProjectAssetRecord,
-  createProjectAssetStoragePath
+  createProjectAssetStoragePath,
+  createProjectAssetTag,
+  normalizeAssetDirectory,
+  normalizeAssetTags
 } from "@/lib/project-assets";
 import {
+  closestImageSizeForSpec,
   getImageGenerationSettings,
   normalizeImageOutputFormat,
   normalizeImageQuality,
@@ -37,6 +42,12 @@ function permissionError(error) {
 
 function normalizePrompt(value) {
   return String(value || "").trim().slice(0, 1200);
+}
+
+function normalizeTargetDimension(value) {
+  const number = Number(value || 0);
+  if (!Number.isFinite(number) || number <= 0) return 0;
+  return Math.min(Math.max(Math.trunc(number), 128), 4096);
 }
 
 function normalizePromptMode(value) {
@@ -127,9 +138,16 @@ export async function POST(request) {
     const promptMode = normalizePromptMode(body.promptMode);
     const promptContext = normalizePromptContext(body.promptContext);
     const promptSupplement = normalizePrompt(body.promptSupplement).slice(0, 600);
-    const size = normalizeImageSize(body.size, normalizeImageSize(process.env.OPENAI_IMAGE_DEFAULT_SIZE, "1024x1024"));
+    const targetWidth = normalizeTargetDimension(body.targetWidth || body.width);
+    const targetHeight = normalizeTargetDimension(body.targetHeight || body.height);
+    const defaultSize = normalizeImageSize(process.env.OPENAI_IMAGE_DEFAULT_SIZE, "1024x1024");
+    const size = targetWidth && targetHeight
+      ? closestImageSizeForSpec({ targetWidth, targetHeight, size: body.size }, defaultSize)
+      : normalizeImageSize(body.size, defaultSize);
     const quality = normalizeImageQuality(body.quality, normalizeImageQuality(process.env.OPENAI_IMAGE_DEFAULT_QUALITY, "auto"));
     const outputFormat = normalizeImageOutputFormat(body.outputFormat, normalizeImageOutputFormat(process.env.OPENAI_IMAGE_OUTPUT_FORMAT, "webp"));
+    const directoryPath = normalizeAssetDirectory(body.directoryPath || "generated") || "generated";
+    const tags = normalizeAssetTags(body.tags?.length ? body.tags : ["generated"]);
 
     if (!prompt) {
       return NextResponse.json({ error: "Image prompt is required." }, { status: 400 });
@@ -141,8 +159,9 @@ export async function POST(request) {
     }
 
     const extension = outputFormat === "jpeg" ? "jpg" : outputFormat;
-    const storagePath = createProjectAssetStoragePath("generated", `generated.${extension}`);
+    const storagePath = createProjectAssetStoragePath(directoryPath, `generated.${extension}`);
     const mimeType = outputFormat === "jpeg" ? "image/jpeg" : `image/${outputFormat}`;
+    const [assetWidth, assetHeight] = size.split("x").map(Number);
     const supabase = createUserSupabaseClient(accessToken);
     const { error } = await supabase.storage
       .from(PROJECT_ASSET_BUCKET)
@@ -155,21 +174,30 @@ export async function POST(request) {
       throw new Error(error.message);
     }
 
+    await createProjectAssetFolder(user, { directoryPath });
+    await Promise.all(tags.map((name) => createProjectAssetTag(user, { name })));
+
     const asset = await createProjectAssetRecord(user, {
       storagePath,
       originalFilename: `generated-${Date.now()}.${extension}`,
       displayName: prompt.slice(0, 80),
-      directoryPath: "generated",
+      directoryPath,
       mimeType,
       fileSize: buffer.length,
       source: "generated",
       altText: prompt.slice(0, 300),
-      tags: ["generated"],
+      tags,
+      width: assetWidth,
+      height: assetHeight,
       metadata: {
         prompt,
         promptMode,
         promptSupplement,
         promptContext,
+        targetWidth,
+        targetHeight,
+        targetSize: targetWidth && targetHeight ? `${targetWidth}x${targetHeight}` : "",
+        sizeSource: targetWidth && targetHeight ? "assetLibraryCustom" : (promptContext?.sizeSource || "serviceDefault"),
         size,
         quality,
         outputFormat,
@@ -188,6 +216,8 @@ export async function POST(request) {
         size,
         quality,
         outputFormat,
+        targetWidth,
+        targetHeight,
         promptMode,
         pageKey: promptContext?.pageKey || "",
         sectionId: promptContext?.sectionId || ""

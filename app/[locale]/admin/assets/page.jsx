@@ -40,7 +40,7 @@ export default async function AdminAssetsPage({ params }) {
   }
 
   const [initialData, imageSettings] = await Promise.all([
-    listProjectAssets({ limit: 48 }),
+    listProjectAssets({ limit: 24 }),
     Promise.resolve(getImageGenerationSettings())
   ]);
 
@@ -63,6 +63,7 @@ export default async function AdminAssetsPage({ params }) {
         assetLabels={messages.forms.assets}
         initialData={initialData}
         defaultGenerateSize={imageSettings.defaultSize}
+        imageSettings={imageSettings}
         loadingLabel={messages.forms.common.pleaseWait}
         errorLabel={messages.forms.siteContent.loadFailed}
       />

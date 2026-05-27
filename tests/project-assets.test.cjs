@@ -15,6 +15,12 @@ const {
   validateAssetFileInput
 } = require("../lib/project-assets-core.cjs");
 const { buildSectionImagePromptContext } = require("../lib/asset-prompt-context.cjs");
+const {
+  closestImageSizeForSpec,
+  normalizeImageOutputFormat,
+  normalizeImageQuality,
+  normalizeImageSize
+} = require("../lib/image-generation-settings-core.cjs");
 
 test("asset validation accepts the configured image formats up to 5 MB", () => {
   for (const [name, type] of [
@@ -25,6 +31,15 @@ test("asset validation accepts the configured image formats up to 5 MB", () => {
   ]) {
     assert.deepEqual(validateAssetFileInput({ name, type, size: MAX_PROJECT_ASSET_SIZE }), { ok: true, code: "ok" });
   }
+});
+
+test("image generation settings map custom targets to supported service sizes", () => {
+  assert.equal(closestImageSizeForSpec({ targetWidth: 1440, targetHeight: 900 }, "1024x1024"), "1536x1024");
+  assert.equal(closestImageSizeForSpec({ targetWidth: 900, targetHeight: 1440 }, "1024x1024"), "1024x1536");
+  assert.equal(closestImageSizeForSpec({ targetWidth: 1200, targetHeight: 1200 }, "1024x1024"), "1024x1024");
+  assert.equal(normalizeImageSize("2048x2048", "1024x1024"), "1024x1024");
+  assert.equal(normalizeImageQuality("HIGH"), "high");
+  assert.equal(normalizeImageOutputFormat("jpg", "webp"), "webp");
 });
 
 test("asset validation rejects oversized and unsupported files", () => {

@@ -1,12 +1,32 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Archive, CheckSquare, FolderOpen, Image as ImageIcon, RefreshCw, Search, Sparkles, Tag, UploadCloud, X } from "lucide-react";
+import {
+  AlertCircle,
+  Archive,
+  Check,
+  CheckSquare,
+  Copy,
+  ExternalLink,
+  FolderOpen,
+  Image as ImageIcon,
+  Loader2,
+  RefreshCw,
+  Search,
+  Settings,
+  Sparkles,
+  Tag,
+  UploadCloud,
+  X
+} from "lucide-react";
 import { AdminAsyncState } from "@/components/AdminAsyncState";
-import { AssetPickerModal } from "@/components/AssetPickerModal";
 
-const ASSET_LIMIT = 48;
+const DEFAULT_ASSET_LIMIT = 24;
+const ASSET_PAGE_SIZE_OPTIONS = [24, 48];
+const MAX_UPLOAD_SIZE = 5 * 1024 * 1024;
 const SOURCE_OPTIONS = ["upload", "folder_upload", "generated"];
+const SUPPORTED_GENERATION_SIZES = ["1024x1024", "1024x1536", "1536x1024"];
+const SUPPORTED_UPLOAD_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp", "svg"]);
 
 function t(labels, key) {
   return labels?.[key] || key;
@@ -48,6 +68,72 @@ function localizeAdminHref(locale, href = "") {
   return `/${locale}${href}`;
 }
 
+function fileExtension(filename = "") {
+  const cleanName = String(filename || "").trim();
+  return cleanName.includes(".") ? cleanName.split(".").pop().toLowerCase() : "";
+}
+
+function validateUploadFile(file) {
+  if (!file?.name) return "missingName";
+  if (!SUPPORTED_UPLOAD_EXTENSIONS.has(fileExtension(file.name))) return "unsupportedType";
+  if (!file.size || file.size > MAX_UPLOAD_SIZE) return "tooLarge";
+  return "ok";
+}
+
+function validationMessage(labels, code) {
+  return labels.validation?.[code] || labels.validation?.uploadFailed || code;
+}
+
+function makeTaskId(file) {
+  return `${file.name}-${file.size}-${file.lastModified}-${Math.random().toString(16).slice(2)}`;
+}
+
+function normalizeRelativePath(value = "") {
+  return String(value || "")
+    .replace(/\\/g, "/")
+    .replace(/^\/+|\/+$/g, "")
+    .split("/")
+    .filter((part) => part && part !== "." && part !== "..")
+    .join("/");
+}
+
+function parseSize(size = "1024x1024") {
+  const [width, height] = String(size || "").split("x").map(Number);
+  return { width: width || 1024, height: height || 1024 };
+}
+
+function clampNumber(value, min, max, fallback) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return fallback;
+  return Math.min(Math.max(Math.trunc(number), min), max);
+}
+
+function closestGenerationSize(spec = {}, fallback = "1024x1024", supportedSizes = SUPPORTED_GENERATION_SIZES) {
+  const width = Number(spec.targetWidth || spec.width || 0);
+  const height = Number(spec.targetHeight || spec.height || 0);
+  const safeFallback = supportedSizes.includes(fallback) ? fallback : supportedSizes[0];
+  if (!width || !height) return supportedSizes.includes(spec.size) ? spec.size : safeFallback;
+
+  const targetRatio = width / height;
+  return supportedSizes.reduce((best, size) => {
+    const [nextWidth, nextHeight] = size.split("x").map(Number);
+    const nextScore = Math.abs((nextWidth / nextHeight) - targetRatio);
+    return nextScore < best.score ? { size, score: nextScore } : best;
+  }, { size: safeFallback, score: Number.POSITIVE_INFINITY }).size;
+}
+
+function getVisiblePages(currentPage, totalPages) {
+  const pages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
+  return Array.from(pages)
+    .filter((page) => page >= 1 && page <= totalPages)
+    .sort((a, b) => a - b)
+    .reduce((items, page, index, list) => {
+      if (index > 0 && page - list[index - 1] > 1) items.push(`gap-${page}`);
+      items.push(page);
+      return items;
+    }, []);
+}
+
 function AssetLibraryCard({ asset, labels, locale, selected, checked, onSelect, onToggle }) {
   return (
     <article className={`admin-asset-card ${selected ? "selected" : ""}`}>
@@ -55,7 +141,7 @@ function AssetLibraryCard({ asset, labels, locale, selected, checked, onSelect, 
         <input checked={checked} type="checkbox" onChange={() => onToggle(asset.id)} />
         <span aria-hidden="true">{checked ? <CheckSquare size={14} /> : null}</span>
       </label>
-      <button type="button" onClick={() => onSelect(asset)}>
+      <button type="button" onClick={() => onSelect(asset)} aria-label={t(labels, "viewAssetDetails")}>
         <span className="admin-asset-thumb">
           {asset.url ? <img src={asset.url} alt={asset.altText || asset.displayName || asset.originalFilename} loading="lazy" /> : <ImageIcon size={28} aria-hidden="true" />}
         </span>
@@ -69,8 +155,45 @@ function AssetLibraryCard({ asset, labels, locale, selected, checked, onSelect, 
   );
 }
 
+function AssetFolderPanel({ labels, folderItems, total, directory, onChange }) {
+  const [folderQuery, setFolderQuery] = useState("");
+  const visibleFolders = useMemo(() => {
+    const needle = folderQuery.trim().toLowerCase();
+    if (!needle) return folderItems;
+    return folderItems.filter((folder) => `${folder.displayName || ""} ${folder.directoryPath || ""}`.toLowerCase().includes(needle));
+  }, [folderItems, folderQuery]);
+
+  return (
+    <aside className="admin-asset-folders">
+      <div className="admin-asset-panel-head">
+        <strong>{t(labels, "foldersPanelTitle")}</strong>
+        <span>{formatTemplate(t(labels, "folderCountSummary"), { count: folderItems.length })}</span>
+      </div>
+      <label className="admin-asset-folder-search">
+        <Search size={14} aria-hidden="true" />
+        <input value={folderQuery} placeholder={t(labels, "folderSearchPlaceholder")} onChange={(event) => setFolderQuery(event.target.value)} />
+      </label>
+      <div className="admin-asset-folder-list">
+        <button className={!directory ? "active" : ""} type="button" onClick={() => onChange("")}>
+          <FolderOpen size={15} aria-hidden="true" />
+          <span>{t(labels, "allDirectories")}</span>
+          <small>{total}</small>
+        </button>
+        {visibleFolders.map((folder) => (
+          <button className={directory === folder.directoryPath ? "active" : ""} type="button" key={folder.directoryPath} onClick={() => onChange(folder.directoryPath)}>
+            <FolderOpen size={15} aria-hidden="true" />
+            <span>{folder.displayName || folder.directoryPath}</span>
+            <small>{folder.assetCount}</small>
+          </button>
+        ))}
+      </div>
+    </aside>
+  );
+}
+
 function AssetDetail({ asset, labels, locale, folders, saving, usageState, onSave }) {
   const [draft, setDraft] = useState({ displayName: "", altText: "", directoryPath: "", tags: "" });
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     setDraft({
@@ -79,7 +202,15 @@ function AssetDetail({ asset, labels, locale, folders, saving, usageState, onSav
       directoryPath: asset?.directoryPath || "",
       tags: joinTags(asset?.tags)
     });
+    setCopied(false);
   }, [asset]);
+
+  async function copyAssetUrl() {
+    if (!asset?.url || !navigator?.clipboard) return;
+    await navigator.clipboard.writeText(asset.url);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1800);
+  }
 
   if (!asset) {
     return (
@@ -96,6 +227,18 @@ function AssetDetail({ asset, labels, locale, folders, saving, usageState, onSav
     <aside className="admin-asset-detail">
       <div className="admin-asset-preview">
         <img src={asset.url} alt={asset.altText || asset.displayName || asset.originalFilename} />
+      </div>
+      <div className="admin-asset-detail-actions">
+        <button className="button secondary compact" type="button" onClick={copyAssetUrl} disabled={!asset.url}>
+          <Copy size={14} aria-hidden="true" />
+          {copied ? t(labels, "copyLinkSuccess") : t(labels, "copyLink")}
+        </button>
+        {asset.url ? (
+          <a className="button secondary compact" href={asset.url} target="_blank" rel="noreferrer">
+            <ExternalLink size={14} aria-hidden="true" />
+            {t(labels, "previewOriginal")}
+          </a>
+        ) : null}
       </div>
       <dl className="admin-asset-meta">
         <div>
@@ -138,7 +281,7 @@ function AssetDetail({ asset, labels, locale, folders, saving, usageState, onSav
         <section className="admin-asset-info-block">
           <span className="admin-eyebrow">{t(labels, "generationHistory")}</span>
           <p>{metadata.prompt || asset.altText || t(labels, "notProvided")}</p>
-          <small>{[metadata.model, metadata.size, metadata.quality].filter(Boolean).join(" / ")}</small>
+          <small>{[metadata.targetSize ? formatTemplate(t(labels, "targetSizeChip"), { size: metadata.targetSize }) : "", metadata.size ? formatTemplate(t(labels, "serviceSizeChip"), { size: metadata.size }) : "", metadata.quality].filter(Boolean).join(" / ")}</small>
         </section>
       ) : null}
 
@@ -169,14 +312,384 @@ function AssetDetail({ asset, labels, locale, folders, saving, usageState, onSav
   );
 }
 
-export function AdminAssetsClient({ locale, page, assetLabels, initialData = null, loadingLabel, errorLabel, defaultGenerateSize = "1024x1024" }) {
+function UploadTaskRow({ task, labels, onRetry, onRemove }) {
+  const isWorking = ["preparing", "uploading", "finalizing"].includes(task.status);
+  return (
+    <li className={`admin-asset-upload-task ${task.status}`}>
+      <span className="admin-asset-upload-thumb">
+        {task.previewUrl ? <img src={task.previewUrl} alt="" /> : <ImageIcon size={18} aria-hidden="true" />}
+      </span>
+      <span>
+        <strong title={task.file.name}>{task.file.name}</strong>
+        <small>{[formatBytes(task.file.size, labels), labels.uploadStatuses?.[task.status] || task.status].filter(Boolean).join(" / ")}</small>
+        {task.error ? <small className="error">{task.error}</small> : null}
+        <span className="admin-asset-progress"><i style={{ width: `${task.progress || 0}%` }} /></span>
+      </span>
+      {isWorking ? <Loader2 className="spin" size={16} aria-hidden="true" /> : null}
+      {task.status === "failed" ? (
+        <button type="button" onClick={() => onRetry(task)} title={t(labels, "retryUpload")} aria-label={t(labels, "retryUpload")}>
+          <RefreshCw size={15} aria-hidden="true" />
+        </button>
+      ) : null}
+      {["queued", "failed", "rejected", "completed"].includes(task.status) ? (
+        <button type="button" onClick={() => onRemove(task.id)} title={t(labels, "removeUploadTask")} aria-label={t(labels, "removeUploadTask")}>
+          <X size={15} aria-hidden="true" />
+        </button>
+      ) : null}
+    </li>
+  );
+}
+
+function AdminAssetUploadModal({ open, labels, folders, onClose, onUploaded }) {
+  const imageInputRef = useRef(null);
+  const folderInputRef = useRef(null);
+  const [defaultFolder, setDefaultFolder] = useState("");
+  const [tagText, setTagText] = useState("");
+  const [tasks, setTasks] = useState([]);
+  const tasksRef = useRef([]);
+  const [dragging, setDragging] = useState(false);
+
+  useEffect(() => {
+    tasksRef.current = tasks;
+  }, [tasks]);
+
+  useEffect(() => () => {
+    tasksRef.current.forEach((task) => {
+      if (task.previewUrl) URL.revokeObjectURL(task.previewUrl);
+    });
+  }, []);
+
+  if (!open) return null;
+
+  function updateTask(taskId, patch) {
+    setTasks((current) => current.map((task) => task.id === taskId ? { ...task, ...patch } : task));
+  }
+
+  function removeTask(taskId) {
+    setTasks((current) => {
+      const task = current.find((item) => item.id === taskId);
+      if (task?.previewUrl) URL.revokeObjectURL(task.previewUrl);
+      return current.filter((item) => item.id !== taskId);
+    });
+  }
+
+  function addFiles(fileList) {
+    const incoming = Array.from(fileList || []);
+    if (!incoming.length) return;
+    setTasks((current) => {
+      const existing = new Set(current.map((task) => `${task.file.name}-${task.file.size}-${task.file.lastModified}`));
+      const nextTasks = incoming.map((file) => {
+        const duplicateKey = `${file.name}-${file.size}-${file.lastModified}`;
+        const code = existing.has(duplicateKey) ? "duplicate" : validateUploadFile(file);
+        existing.add(duplicateKey);
+        return {
+          id: makeTaskId(file),
+          file,
+          relativePath: normalizeRelativePath(file.webkitRelativePath || file.name),
+          previewUrl: file.type?.startsWith("image/") && file.type !== "image/svg+xml" ? URL.createObjectURL(file) : "",
+          status: code === "ok" ? "queued" : "rejected",
+          progress: code === "ok" ? 0 : 100,
+          error: code === "ok" ? "" : validationMessage(labels, code)
+        };
+      });
+      return [...current, ...nextTasks];
+    });
+  }
+
+  async function uploadTask(task) {
+    const tags = splitTags(tagText);
+    const relativePath = normalizeRelativePath(defaultFolder ? `${defaultFolder}/${task.relativePath || task.file.name}` : task.relativePath || task.file.name);
+    updateTask(task.id, { status: "preparing", progress: 8, error: "" });
+    try {
+      const formData = new FormData();
+      formData.append("files", task.file);
+      formData.append("relativePaths", relativePath);
+      updateTask(task.id, { status: "uploading", progress: 45 });
+      const response = await fetch("/api/admin/assets/upload/", { method: "POST", body: formData });
+      const result = await response.json().catch(() => ({}));
+      const uploaded = result.results?.[0];
+      if (!response.ok || !uploaded?.ok) {
+        throw new Error(uploaded?.error || result.error || t(labels, "uploadFailed"));
+      }
+
+      let asset = uploaded.asset;
+      if (asset?.id && tags.length) {
+        updateTask(task.id, { status: "finalizing", progress: 82 });
+        const patchResponse = await fetch(`/api/admin/assets/${asset.id}/`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            displayName: asset.displayName || asset.originalFilename,
+            altText: asset.altText || "",
+            directoryPath: asset.directoryPath || "",
+            tags
+          })
+        });
+        const patchResult = await patchResponse.json().catch(() => ({}));
+        if (!patchResponse.ok) throw new Error(patchResult.error || t(labels, "saveFailed"));
+        asset = patchResult.asset;
+      }
+
+      updateTask(task.id, { status: "completed", progress: 100, asset });
+      onUploaded(asset);
+    } catch (error) {
+      updateTask(task.id, { status: "failed", progress: 100, error: error.message || t(labels, "uploadFailed") });
+    }
+  }
+
+  function startUploads() {
+    tasks.filter((task) => ["queued", "failed"].includes(task.status)).forEach(uploadTask);
+  }
+
+  const actionableCount = tasks.filter((task) => ["queued", "failed"].includes(task.status)).length;
+
+  return (
+    <div className="admin-asset-modal-backdrop" role="dialog" aria-modal="true" aria-label={t(labels, "uploadLibraryTitle")}>
+      <div className="admin-asset-modal">
+        <header className="admin-asset-modal-head">
+          <div>
+            <h2>{t(labels, "uploadLibraryTitle")}</h2>
+            <p>{t(labels, "uploadLibraryLead")}</p>
+          </div>
+          <button className="icon-button" type="button" onClick={onClose} aria-label={t(labels, "close")}>
+            <X size={16} aria-hidden="true" />
+          </button>
+        </header>
+        <div className="admin-asset-upload-layout">
+          <section
+            className={`admin-asset-upload-drop ${dragging ? "dragging" : ""}`}
+            onDragOver={(event) => {
+              event.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(event) => {
+              event.preventDefault();
+              setDragging(false);
+              addFiles(event.dataTransfer.files);
+            }}
+          >
+            <UploadCloud size={30} aria-hidden="true" />
+            <strong>{t(labels, "dropTitle")}</strong>
+            <p>{t(labels, "formatHint")}</p>
+            <div>
+              <button className="button primary compact" type="button" onClick={() => imageInputRef.current?.click()}>
+                {t(labels, "browseImages")}
+              </button>
+              <button className="button secondary compact" type="button" onClick={() => folderInputRef.current?.click()}>
+                {t(labels, "browseFolder")}
+              </button>
+            </div>
+            <input ref={imageInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml" multiple hidden onChange={(event) => addFiles(event.target.files)} />
+            <input ref={folderInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml" multiple hidden webkitdirectory="" directory="" onChange={(event) => addFiles(event.target.files)} />
+          </section>
+          <section className="admin-asset-upload-options">
+            <label className="asset-field">
+              <span>{t(labels, "uploadDefaultFolder")}</span>
+              <select value={defaultFolder} onChange={(event) => setDefaultFolder(event.target.value)}>
+                <option value="">{t(labels, "uncategorized")}</option>
+                {folders.map((folder) => <option value={folder} key={folder}>{folder}</option>)}
+              </select>
+            </label>
+            <label className="asset-field">
+              <span>{t(labels, "uploadTags")}</span>
+              <input value={tagText} placeholder={t(labels, "tagNamePlaceholder")} onChange={(event) => setTagText(event.target.value)} />
+            </label>
+          </section>
+          <section className="admin-asset-upload-queue">
+            <div className="admin-asset-panel-head">
+              <strong>{t(labels, "uploadQueue")}</strong>
+              <span>{formatTemplate(t(labels, "uploadQueueCount"), { count: tasks.length })}</span>
+            </div>
+            {tasks.length ? (
+              <ul>
+                {tasks.map((task) => (
+                  <UploadTaskRow key={task.id} task={task} labels={labels} onRetry={uploadTask} onRemove={removeTask} />
+                ))}
+              </ul>
+            ) : (
+              <p>{t(labels, "uploadQueueEmpty")}</p>
+            )}
+          </section>
+        </div>
+        <footer className="admin-asset-modal-actions">
+          <button className="button secondary" type="button" onClick={onClose}>{t(labels, "done")}</button>
+          <button className="button primary" type="button" onClick={startUploads} disabled={!actionableCount}>
+            <UploadCloud size={16} aria-hidden="true" />
+            {t(labels, "startUpload")}
+          </button>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+function AdminAssetGenerateModal({ open, labels, locale, folders, imageSettings, defaultGenerateSize, onClose, onGenerated }) {
+  const defaultSize = imageSettings?.defaultSize || defaultGenerateSize || "1024x1024";
+  const parsedDefault = parseSize(defaultSize);
+  const supportedSizes = imageSettings?.supportedSizes?.length ? imageSettings.supportedSizes : SUPPORTED_GENERATION_SIZES;
+  const [prompt, setPrompt] = useState("");
+  const [targetWidth, setTargetWidth] = useState(parsedDefault.width);
+  const [targetHeight, setTargetHeight] = useState(parsedDefault.height);
+  const [quality, setQuality] = useState(imageSettings?.defaultQuality || "auto");
+  const [directoryPath, setDirectoryPath] = useState("generated");
+  const [tagText, setTagText] = useState("generated");
+  const [generating, setGenerating] = useState(false);
+  const [error, setError] = useState("");
+  const [generatedAsset, setGeneratedAsset] = useState(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const nextDefault = parseSize(defaultSize);
+    setTargetWidth(nextDefault.width);
+    setTargetHeight(nextDefault.height);
+    setQuality(imageSettings?.defaultQuality || "auto");
+    setError("");
+  }, [defaultSize, imageSettings?.defaultQuality, open]);
+
+  if (!open) return null;
+
+  const configured = Boolean(imageSettings?.configured);
+  const safeWidth = clampNumber(targetWidth, 128, 4096, parsedDefault.width);
+  const safeHeight = clampNumber(targetHeight, 128, 4096, parsedDefault.height);
+  const actualSize = closestGenerationSize({ targetWidth: safeWidth, targetHeight: safeHeight }, defaultSize, supportedSizes);
+
+  async function submitGeneration() {
+    if (!configured || !prompt.trim()) return;
+    setGenerating(true);
+    setError("");
+    try {
+      const response = await fetch("/api/admin/assets/generate/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: prompt.trim(),
+          promptMode: "manual",
+          targetWidth: safeWidth,
+          targetHeight: safeHeight,
+          size: actualSize,
+          quality,
+          directoryPath,
+          tags: splitTags(tagText)
+        })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.code === "generationUnavailable" ? t(labels, "generationUnavailable") : result.error || t(labels, "generateFailed"));
+      setGeneratedAsset(result.asset);
+      onGenerated(result.asset);
+    } catch (generateError) {
+      setError(generateError.message || t(labels, "generateFailed"));
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  return (
+    <div className="admin-asset-modal-backdrop" role="dialog" aria-modal="true" aria-label={t(labels, "generateLibraryTitle")}>
+      <div className="admin-asset-modal admin-asset-generate-modal">
+        <header className="admin-asset-modal-head">
+          <div>
+            <h2>{t(labels, "generateLibraryTitle")}</h2>
+            <p>{t(labels, "generateLibraryLead")}</p>
+          </div>
+          <button className="icon-button" type="button" onClick={onClose} aria-label={t(labels, "close")}>
+            <X size={16} aria-hidden="true" />
+          </button>
+        </header>
+        <div className="admin-asset-generate-layout">
+          <section className="admin-asset-generate-form">
+            {!configured ? (
+              <div className="admin-asset-service-warning">
+                <AlertCircle size={17} aria-hidden="true" />
+                <span>{t(labels, "generationServiceDisabled")}</span>
+                <a href={localizeAdminHref(locale, "/admin/settings/ai/")}>
+                  <Settings size={14} aria-hidden="true" />
+                  {t(labels, "openAiSettings")}
+                </a>
+              </div>
+            ) : null}
+            <label className="asset-field">
+              <span>{t(labels, "prompt")}</span>
+              <textarea value={prompt} placeholder={t(labels, "promptPlaceholder")} onChange={(event) => setPrompt(event.target.value)} />
+            </label>
+            <div className="admin-asset-size-grid">
+              <label className="asset-field">
+                <span>{t(labels, "targetWidth")}</span>
+                <input type="number" min="128" max="4096" step="1" value={targetWidth} onChange={(event) => setTargetWidth(event.target.value)} />
+              </label>
+              <label className="asset-field">
+                <span>{t(labels, "targetHeight")}</span>
+                <input type="number" min="128" max="4096" step="1" value={targetHeight} onChange={(event) => setTargetHeight(event.target.value)} />
+              </label>
+            </div>
+            <div className="admin-asset-size-result">
+              <span>{formatTemplate(t(labels, "targetSizeChip"), { size: `${safeWidth}x${safeHeight}` })}</span>
+              <strong>{formatTemplate(t(labels, "serviceSizeChip"), { size: actualSize })}</strong>
+              <small>{t(labels, "actualGenerationSize")}</small>
+            </div>
+            <div className="admin-asset-size-grid">
+              <label className="asset-field">
+                <span>{t(labels, "quality")}</span>
+                <select value={quality} onChange={(event) => setQuality(event.target.value)}>
+                  {(imageSettings?.supportedQualities || ["auto", "low", "medium", "high"]).map((item) => (
+                    <option value={item} key={item}>{labels.qualityLabels?.[item] || item}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="asset-field">
+                <span>{t(labels, "saveFolder")}</span>
+                <select value={directoryPath} onChange={(event) => setDirectoryPath(event.target.value)}>
+                  <option value="generated">generated</option>
+                  {folders.filter((folder) => folder !== "generated").map((folder) => <option value={folder} key={folder}>{folder}</option>)}
+                </select>
+              </label>
+            </div>
+            <label className="asset-field">
+              <span>{t(labels, "uploadTags")}</span>
+              <input value={tagText} placeholder={t(labels, "tagNamePlaceholder")} onChange={(event) => setTagText(event.target.value)} />
+            </label>
+            {error ? <p className="form-message error">{error}</p> : null}
+          </section>
+          <section className="admin-asset-generated-preview">
+            {generating ? (
+              <div className="admin-asset-preview-empty">
+                <Loader2 className="spin" size={26} aria-hidden="true" />
+                <p>{t(labels, "generating")}</p>
+              </div>
+            ) : generatedAsset?.url ? (
+              <>
+                <img src={generatedAsset.url} alt={generatedAsset.altText || generatedAsset.displayName || ""} />
+                <strong>{t(labels, "generatedSaved")}</strong>
+              </>
+            ) : (
+              <div className="admin-asset-preview-empty">
+                <ImageIcon size={26} aria-hidden="true" />
+                <p>{t(labels, "noGeneratedImage")}</p>
+              </div>
+            )}
+          </section>
+        </div>
+        <footer className="admin-asset-modal-actions">
+          <button className="button secondary" type="button" onClick={onClose}>{t(labels, "done")}</button>
+          <button className="button primary" type="button" onClick={submitGeneration} disabled={!configured || generating || !prompt.trim()}>
+            {generating ? <Loader2 className="spin" size={16} aria-hidden="true" /> : <Sparkles size={16} aria-hidden="true" />}
+            {generating ? t(labels, "generating") : t(labels, "generateAndSave")}
+          </button>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+export function AdminAssetsClient({ locale, page, assetLabels, initialData = null, loadingLabel, errorLabel, defaultGenerateSize = "1024x1024", imageSettings = null }) {
   const skipInitialFetch = useRef(Boolean(initialData));
-  const [data, setData] = useState(initialData || { assets: [], folders: [], folderItems: [], tags: [], total: 0, page: 1 });
+  const [data, setData] = useState(initialData || { assets: [], folders: [], folderItems: [], tags: [], total: 0, page: 1, limit: DEFAULT_ASSET_LIMIT });
   const [query, setQuery] = useState("");
   const [directory, setDirectory] = useState("");
   const [source, setSource] = useState("");
   const [tag, setTag] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
+  const [pageSize, setPageSize] = useState(Number(initialData?.limit || DEFAULT_ASSET_LIMIT));
   const [selectedAsset, setSelectedAsset] = useState(initialData?.assets?.[0] || null);
   const [selectedIds, setSelectedIds] = useState([]);
   const [bulkFolder, setBulkFolder] = useState("");
@@ -186,23 +699,24 @@ export function AdminAssetsClient({ locale, page, assetLabels, initialData = nul
   const [bulkSaving, setBulkSaving] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const [pickerTab, setPickerTab] = useState("project");
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [generateOpen, setGenerateOpen] = useState(false);
   const [usageState, setUsageState] = useState({ assetId: "", loading: false, error: "", items: [] });
 
   const folders = data.folders || data.directories || [];
   const tags = data.tags || [];
   const checkedIds = useMemo(() => new Set(selectedIds), [selectedIds]);
   const currentPage = Number(data.page || pageNumber || 1);
-  const totalPages = Math.max(1, Math.ceil(Number(data.total || 0) / ASSET_LIMIT));
+  const totalPages = Math.max(1, Math.ceil(Number(data.total || 0) / pageSize));
   const generatedVisible = (data.assets || []).filter((asset) => asset.source === "generated").length;
+  const visiblePages = getVisiblePages(currentPage, totalPages);
 
   const loadAssets = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
       const params = new URLSearchParams();
-      params.set("limit", String(ASSET_LIMIT));
+      params.set("limit", String(pageSize));
       params.set("page", String(pageNumber));
       if (query.trim()) params.set("q", query.trim());
       if (directory) params.set("directory", directory);
@@ -223,7 +737,7 @@ export function AdminAssetsClient({ locale, page, assetLabels, initialData = nul
     } finally {
       setLoading(false);
     }
-  }, [assetLabels, directory, errorLabel, pageNumber, query, source, tag]);
+  }, [assetLabels, directory, errorLabel, pageNumber, pageSize, query, source, tag]);
 
   useEffect(() => {
     if (skipInitialFetch.current) {
@@ -237,7 +751,7 @@ export function AdminAssetsClient({ locale, page, assetLabels, initialData = nul
   useEffect(() => {
     setPageNumber(1);
     setSelectedIds([]);
-  }, [directory, query, source, tag]);
+  }, [directory, pageSize, query, source, tag]);
 
   useEffect(() => {
     if (!message) return undefined;
@@ -273,17 +787,11 @@ export function AdminAssetsClient({ locale, page, assetLabels, initialData = nul
     setSelectedIds((current) => current.includes(assetId) ? current.filter((id) => id !== assetId) : [...current, assetId]);
   }
 
-  function openPicker(tabName) {
-    setPickerTab(tabName);
-    setPickerOpen(true);
-  }
-
-  function selectFromPicker(asset) {
+  function selectCreatedAsset(asset, successKey) {
     if (asset) {
       setSelectedAsset(asset);
-      setMessage(t(assetLabels, "assetSelected"));
+      setMessage(t(assetLabels, successKey));
     }
-    setPickerOpen(false);
     loadAssets();
   }
 
@@ -368,11 +876,11 @@ export function AdminAssetsClient({ locale, page, assetLabels, initialData = nul
         </div>
 
         <div className="admin-asset-actions">
-          <button className="button primary" type="button" onClick={() => openPicker("project")}>
+          <button className="button primary" type="button" onClick={() => setUploadOpen(true)}>
             <UploadCloud size={16} aria-hidden="true" />
             {page.actions.upload}
           </button>
-          <button className="button secondary" type="button" onClick={() => openPicker("generate")}>
+          <button className="button secondary" type="button" onClick={() => setGenerateOpen(true)}>
             <Sparkles size={16} aria-hidden="true" />
             {page.actions.generate}
           </button>
@@ -408,20 +916,6 @@ export function AdminAssetsClient({ locale, page, assetLabels, initialData = nul
         ) : null}
 
         <div className="admin-asset-workspace">
-          <aside className="admin-asset-folders">
-            <button className={!directory ? "active" : ""} type="button" onClick={() => setDirectory("")}>
-              <FolderOpen size={15} aria-hidden="true" />
-              <span>{t(assetLabels, "allDirectories")}</span>
-            </button>
-            {(data.folderItems || []).map((folder) => (
-              <button className={directory === folder.directoryPath ? "active" : ""} type="button" key={folder.directoryPath} onClick={() => setDirectory(folder.directoryPath)}>
-                <FolderOpen size={15} aria-hidden="true" />
-                <span>{folder.displayName || folder.directoryPath}</span>
-                <small>{folder.assetCount}</small>
-              </button>
-            ))}
-          </aside>
-
           <main className="admin-asset-main">
             {selectedIds.length ? (
               <div className="admin-asset-bulk">
@@ -473,34 +967,63 @@ export function AdminAssetsClient({ locale, page, assetLabels, initialData = nul
               )}
             </AdminAsyncState>
 
-            {Number(data.total || 0) > ASSET_LIMIT ? (
-              <div className="admin-asset-pagination">
+            <nav className="admin-asset-pagination" aria-label={t(assetLabels, "paginationLabel")}>
+              <span>{formatTemplate(t(assetLabels, "paginationSummary"), { total: Number(data.total || 0) })}</span>
+              <div>
                 <button className="button secondary compact" type="button" disabled={currentPage <= 1} onClick={() => setPageNumber((current) => Math.max(1, current - 1))}>
                   {t(assetLabels, "previousPage")}
                 </button>
-                <span>{currentPage} / {totalPages}</span>
-                <button className="button secondary compact" type="button" disabled={currentPage >= totalPages} onClick={() => setPageNumber((current) => current + 1)}>
+                {visiblePages.map((item) => typeof item === "number" ? (
+                  <button className={`button secondary compact ${item === currentPage ? "active" : ""}`} type="button" key={item} onClick={() => setPageNumber(item)} aria-current={item === currentPage ? "page" : undefined}>
+                    {item}
+                  </button>
+                ) : (
+                  <span key={item}>...</span>
+                ))}
+                <button className="button secondary compact" type="button" disabled={currentPage >= totalPages} onClick={() => setPageNumber((current) => Math.min(totalPages, current + 1))}>
                   {t(assetLabels, "nextPage")}
                 </button>
               </div>
-            ) : null}
+              <label>
+                <span>{t(assetLabels, "itemsPerPage")}</span>
+                <select value={pageSize} onChange={(event) => setPageSize(Number(event.target.value))}>
+                  {ASSET_PAGE_SIZE_OPTIONS.map((option) => <option value={option} key={option}>{option}</option>)}
+                </select>
+              </label>
+              <small>{formatTemplate(t(assetLabels, "paginationPageStatus"), { page: currentPage, totalPages })}</small>
+            </nav>
           </main>
 
-          <AssetDetail asset={selectedAsset} labels={assetLabels} locale={locale} folders={folders} saving={saving} usageState={usageState} onSave={saveAsset} />
+          <aside className="admin-asset-side-rail">
+            <AssetFolderPanel labels={assetLabels} folderItems={data.folderItems || []} total={Number(data.total || 0)} directory={directory} onChange={setDirectory} />
+            <AssetDetail asset={selectedAsset} labels={assetLabels} locale={locale} folders={folders} saving={saving} usageState={usageState} onSave={saveAsset} />
+          </aside>
         </div>
       </section>
 
-      <AssetPickerModal
-        open={pickerOpen}
+      <AdminAssetUploadModal
+        open={uploadOpen}
         labels={assetLabels}
-        locale={locale}
-        initialTab={pickerTab}
-        defaultGenerateSize={defaultGenerateSize}
+        folders={folders}
         onClose={() => {
-          setPickerOpen(false);
+          setUploadOpen(false);
           loadAssets();
         }}
-        onSelect={selectFromPicker}
+        onUploaded={(asset) => selectCreatedAsset(asset, "assetUploaded")}
+      />
+
+      <AdminAssetGenerateModal
+        open={generateOpen}
+        labels={assetLabels}
+        locale={locale}
+        folders={folders}
+        imageSettings={imageSettings}
+        defaultGenerateSize={defaultGenerateSize}
+        onClose={() => {
+          setGenerateOpen(false);
+          loadAssets();
+        }}
+        onGenerated={(asset) => selectCreatedAsset(asset, "generatedSaved")}
       />
     </>
   );
