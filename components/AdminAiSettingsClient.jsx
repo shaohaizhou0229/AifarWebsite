@@ -72,7 +72,7 @@ export function AdminAiSettingsClient({ labels, settings }) {
             </a>
           </div>
           {testState.message ? (
-            <p className={`form-message ${testState.status === "success" ? "success" : "error"}`} role="status">
+            <p className={`form-message ${testState.status === "success" ? "success" : "error"}`} role={testState.status === "error" ? "alert" : "status"} aria-live="polite">
               {testState.message}
             </p>
           ) : null}
@@ -88,19 +88,19 @@ export function AdminAiSettingsClient({ labels, settings }) {
           <div className="ai-settings-grid">
             <label>
               <span>{labels.enabled}</span>
-              <input value={settings.enabled ? labels.enabledYes : labels.enabledNo} readOnly />
+              <input autoComplete="off" name="aiImageEnabled" value={settings.enabled ? labels.enabledYes : labels.enabledNo} readOnly />
             </label>
             <label>
               <span>{labels.defaultSize}</span>
-              <input value={settings.defaultSize} readOnly />
+              <input autoComplete="off" name="aiDefaultTargetSize" value={settings.defaultSize} readOnly />
             </label>
             <label>
               <span>{labels.defaultQuality}</span>
-              <input value={labels.qualityLabels?.[settings.defaultQuality] || settings.defaultQuality} readOnly />
+              <input autoComplete="off" name="aiDefaultQuality" value={labels.qualityLabels?.[settings.defaultQuality] || settings.defaultQuality} readOnly />
             </label>
             <label>
               <span>{labels.defaultOutput}</span>
-              <input value={settings.outputFormat} readOnly />
+              <input autoComplete="off" name="aiDefaultOutput" value={settings.outputFormat} readOnly />
             </label>
           </div>
           <div className="ai-settings-options">
@@ -140,12 +140,12 @@ export function AdminAiSettingsClient({ labels, settings }) {
           <h2>{labels.envTitle}</h2>
           <p>{labels.envLead}</p>
           <p>{labels.envStorageNote}</p>
-          <code>OPENAI_API_KEY</code>
-          <code>OPENAI_IMAGE_ENABLED</code>
-          <code>OPENAI_IMAGE_MODEL</code>
-          <code>OPENAI_IMAGE_OUTPUT_FORMAT</code>
-          <code>OPENAI_IMAGE_DEFAULT_SIZE</code>
-          <code>OPENAI_IMAGE_DEFAULT_QUALITY</code>
+          <code translate="no">OPENAI_API_KEY</code>
+          <code translate="no">OPENAI_IMAGE_ENABLED</code>
+          <code translate="no">OPENAI_IMAGE_MODEL</code>
+          <code translate="no">OPENAI_IMAGE_OUTPUT_FORMAT</code>
+          <code translate="no">OPENAI_IMAGE_DEFAULT_SIZE</code>
+          <code translate="no">OPENAI_IMAGE_DEFAULT_QUALITY</code>
         </article>
       </aside>
     </section>

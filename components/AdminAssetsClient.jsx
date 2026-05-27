@@ -120,12 +120,12 @@ function AssetLibraryCard({ asset, labels, locale, selected, checked, onSelect, 
   return (
     <article className={`admin-asset-card ${selected ? "selected" : ""}`}>
       <label className="admin-asset-check" title={t(labels, "selectForBatch")}>
-        <input checked={checked} type="checkbox" onChange={() => onToggle(asset.id)} />
+        <input aria-label={t(labels, "selectForBatch")} checked={checked} name={`assetSelection-${asset.id}`} type="checkbox" onChange={() => onToggle(asset.id)} />
         <span aria-hidden="true">{checked ? <CheckSquare size={14} /> : null}</span>
       </label>
       <button type="button" onClick={() => onSelect(asset)} aria-label={t(labels, "viewAssetDetails")}>
         <span className="admin-asset-thumb">
-          {asset.url ? <img src={asset.url} alt={asset.altText || asset.displayName || asset.originalFilename} loading="lazy" /> : <ImageIcon size={28} aria-hidden="true" />}
+          {asset.url ? <img src={asset.url} alt={asset.altText || asset.displayName || asset.originalFilename} width={asset.width || 320} height={asset.height || 240} loading="lazy" /> : <ImageIcon size={28} aria-hidden="true" />}
         </span>
         <span className="admin-asset-copy">
           <strong title={asset.displayName || asset.originalFilename}>{asset.displayName || asset.originalFilename}</strong>
@@ -153,7 +153,7 @@ function AssetFolderPanel({ labels, folderItems, total, directory, onChange }) {
       </div>
       <label className="admin-asset-folder-search">
         <Search size={14} aria-hidden="true" />
-        <input value={folderQuery} placeholder={t(labels, "folderSearchPlaceholder")} onChange={(event) => setFolderQuery(event.target.value)} />
+        <input autoComplete="off" name="assetFolderSearch" value={folderQuery} placeholder={t(labels, "folderSearchPlaceholder")} onChange={(event) => setFolderQuery(event.target.value)} />
       </label>
       <div className="admin-asset-folder-list">
         <button className={!directory ? "active" : ""} type="button" onClick={() => onChange("")}>
@@ -209,7 +209,7 @@ function AssetDetail({ asset, labels, locale, folders, saving, usageState, onSav
     <aside className="admin-asset-detail">
       <div className="admin-asset-detail-hero">
         <div className="admin-asset-preview">
-          <img src={asset.url} alt={asset.altText || asset.displayName || asset.originalFilename} />
+          <img src={asset.url} alt={asset.altText || asset.displayName || asset.originalFilename} width={asset.width || 320} height={asset.height || 240} />
         </div>
         <div className="admin-asset-detail-actions">
           <button className="button secondary compact" type="button" onClick={copyAssetUrl} disabled={!asset.url}>
@@ -240,22 +240,22 @@ function AssetDetail({ asset, labels, locale, folders, saving, usageState, onSav
       </div>
       <label className="asset-field">
         <span>{t(labels, "displayName")}</span>
-        <input value={draft.displayName} onChange={(event) => setDraft((current) => ({ ...current, displayName: event.target.value }))} />
+        <input autoComplete="off" name="assetDisplayName" value={draft.displayName} onChange={(event) => setDraft((current) => ({ ...current, displayName: event.target.value }))} />
       </label>
       <label className="asset-field">
         <span>{t(labels, "altText")}</span>
-        <input value={draft.altText} onChange={(event) => setDraft((current) => ({ ...current, altText: event.target.value }))} />
+        <input autoComplete="off" name="assetAltText" value={draft.altText} onChange={(event) => setDraft((current) => ({ ...current, altText: event.target.value }))} />
       </label>
       <label className="asset-field">
         <span>{t(labels, "directoryPath")}</span>
-        <select value={draft.directoryPath} onChange={(event) => setDraft((current) => ({ ...current, directoryPath: event.target.value }))}>
+        <select name="assetDirectoryPath" value={draft.directoryPath} onChange={(event) => setDraft((current) => ({ ...current, directoryPath: event.target.value }))}>
           <option value="">{t(labels, "uncategorized")}</option>
           {folders.map((folder) => <option value={folder} key={folder}>{folder}</option>)}
         </select>
       </label>
       <label className="asset-field">
         <span>{t(labels, "tags")}</span>
-        <input value={draft.tags} placeholder={t(labels, "tagNamePlaceholder")} onChange={(event) => setDraft((current) => ({ ...current, tags: event.target.value }))} />
+        <input autoComplete="off" name="assetTags" value={draft.tags} placeholder={t(labels, "tagNamePlaceholder")} onChange={(event) => setDraft((current) => ({ ...current, tags: event.target.value }))} />
       </label>
       <button className="button primary compact" type="button" onClick={() => onSave(asset, { ...draft, tags: splitTags(draft.tags) })} disabled={saving || !draft.displayName.trim()}>
         {saving ? t(labels, "saving") : t(labels, "saveMetadata")}
@@ -301,7 +301,7 @@ function UploadTaskRow({ task, labels, onRetry, onRemove }) {
   return (
     <li className={`admin-asset-upload-task ${task.status}`}>
       <span className="admin-asset-upload-thumb">
-        {task.previewUrl ? <img src={task.previewUrl} alt="" /> : <ImageIcon size={18} aria-hidden="true" />}
+        {task.previewUrl ? <img src={task.previewUrl} alt="" width="48" height="48" /> : <ImageIcon size={18} aria-hidden="true" />}
       </span>
       <span>
         <strong title={task.file.name}>{task.file.name}</strong>
@@ -464,20 +464,20 @@ function AdminAssetUploadModal({ open, labels, folders, onClose, onUploaded }) {
                 {t(labels, "browseFolder")}
               </button>
             </div>
-            <input ref={imageInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml" multiple hidden onChange={(event) => addFiles(event.target.files)} />
-            <input ref={folderInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml" multiple hidden webkitdirectory="" directory="" onChange={(event) => addFiles(event.target.files)} />
+            <input ref={imageInputRef} name="assetImageFiles" type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml" multiple hidden onChange={(event) => addFiles(event.target.files)} />
+            <input ref={folderInputRef} name="assetFolderFiles" type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml" multiple hidden webkitdirectory="" directory="" onChange={(event) => addFiles(event.target.files)} />
           </section>
           <section className="admin-asset-upload-options">
             <label className="asset-field">
               <span>{t(labels, "uploadDefaultFolder")}</span>
-              <select value={defaultFolder} onChange={(event) => setDefaultFolder(event.target.value)}>
+              <select name="uploadDefaultFolder" value={defaultFolder} onChange={(event) => setDefaultFolder(event.target.value)}>
                 <option value="">{t(labels, "uncategorized")}</option>
                 {folders.map((folder) => <option value={folder} key={folder}>{folder}</option>)}
               </select>
             </label>
             <label className="asset-field">
               <span>{t(labels, "uploadTags")}</span>
-              <input value={tagText} placeholder={t(labels, "tagNamePlaceholder")} onChange={(event) => setTagText(event.target.value)} />
+              <input autoComplete="off" name="uploadTags" value={tagText} placeholder={t(labels, "tagNamePlaceholder")} onChange={(event) => setTagText(event.target.value)} />
             </label>
           </section>
           <section className="admin-asset-upload-queue">
@@ -594,7 +594,7 @@ function AdminAssetGenerateModal({ open, labels, locale, folders, imageSettings,
             ) : null}
             <label className="asset-field">
               <span>{t(labels, "prompt")}</span>
-              <textarea value={prompt} placeholder={t(labels, "promptPlaceholder")} onChange={(event) => setPrompt(event.target.value)} />
+              <textarea autoComplete="off" name="generationPrompt" value={prompt} placeholder={t(labels, "promptPlaceholder")} onChange={(event) => setPrompt(event.target.value)} />
             </label>
             <div className="admin-asset-size-source">
               <span>{t(labels, "targetImageSize")}</span>
@@ -603,11 +603,11 @@ function AdminAssetGenerateModal({ open, labels, locale, folders, imageSettings,
             <div className="admin-asset-size-grid">
               <label className="asset-field">
                 <span>{t(labels, "targetWidth")}</span>
-                <input type="number" min="128" max="4096" step="1" value={targetWidth} onChange={(event) => setTargetWidth(event.target.value)} />
+                <input inputMode="numeric" name="targetWidth" type="number" min="128" max="4096" step="1" value={targetWidth} onChange={(event) => setTargetWidth(event.target.value)} />
               </label>
               <label className="asset-field">
                 <span>{t(labels, "targetHeight")}</span>
-                <input type="number" min="128" max="4096" step="1" value={targetHeight} onChange={(event) => setTargetHeight(event.target.value)} />
+                <input inputMode="numeric" name="targetHeight" type="number" min="128" max="4096" step="1" value={targetHeight} onChange={(event) => setTargetHeight(event.target.value)} />
               </label>
             </div>
             <div className="admin-asset-size-result">
@@ -618,7 +618,7 @@ function AdminAssetGenerateModal({ open, labels, locale, folders, imageSettings,
             <div className="admin-asset-size-grid">
               <label className="asset-field">
                 <span>{t(labels, "quality")}</span>
-                <select value={quality} onChange={(event) => setQuality(event.target.value)}>
+                <select name="generationQuality" value={quality} onChange={(event) => setQuality(event.target.value)}>
                   {(imageSettings?.supportedQualities || ["auto", "low", "medium", "high"]).map((item) => (
                     <option value={item} key={item}>{labels.qualityLabels?.[item] || item}</option>
                   ))}
@@ -626,7 +626,7 @@ function AdminAssetGenerateModal({ open, labels, locale, folders, imageSettings,
               </label>
               <label className="asset-field">
                 <span>{t(labels, "saveFolder")}</span>
-                <select value={directoryPath} onChange={(event) => setDirectoryPath(event.target.value)}>
+                <select name="generationFolder" value={directoryPath} onChange={(event) => setDirectoryPath(event.target.value)}>
                   <option value="generated">generated</option>
                   {folders.filter((folder) => folder !== "generated").map((folder) => <option value={folder} key={folder}>{folder}</option>)}
                 </select>
@@ -634,9 +634,9 @@ function AdminAssetGenerateModal({ open, labels, locale, folders, imageSettings,
             </div>
             <label className="asset-field">
               <span>{t(labels, "uploadTags")}</span>
-              <input value={tagText} placeholder={t(labels, "tagNamePlaceholder")} onChange={(event) => setTagText(event.target.value)} />
+              <input autoComplete="off" name="generationTags" value={tagText} placeholder={t(labels, "tagNamePlaceholder")} onChange={(event) => setTagText(event.target.value)} />
             </label>
-            {error ? <p className="form-message error">{error}</p> : null}
+            {error ? <p className="form-message error" role="alert">{error}</p> : null}
           </section>
           <section className="admin-asset-generated-preview">
             {generating ? (
@@ -646,7 +646,7 @@ function AdminAssetGenerateModal({ open, labels, locale, folders, imageSettings,
               </div>
             ) : generatedAsset?.url ? (
               <>
-                <img src={generatedAsset.url} alt={generatedAsset.altText || generatedAsset.displayName || ""} />
+                <img src={generatedAsset.url} alt={generatedAsset.altText || generatedAsset.displayName || ""} width={generatedAsset.width || 320} height={generatedAsset.height || 320} />
                 <strong>{t(labels, "generatedSaved")}</strong>
               </>
             ) : (
@@ -880,17 +880,17 @@ export function AdminAssetsClient({ locale, page, assetLabels, initialData = nul
         <form className="admin-asset-filter" onSubmit={(event) => event.preventDefault()}>
           <label>
             <Search size={15} aria-hidden="true" />
-            <input value={query} placeholder={t(assetLabels, "searchPlaceholder")} onChange={(event) => setQuery(event.target.value)} />
+            <input autoComplete="off" name="assetSearch" value={query} placeholder={t(assetLabels, "searchPlaceholder")} onChange={(event) => setQuery(event.target.value)} />
           </label>
-          <select value={directory} onChange={(event) => setDirectory(event.target.value)} aria-label={t(assetLabels, "directoryPath")}>
+          <select name="assetDirectoryFilter" value={directory} onChange={(event) => setDirectory(event.target.value)} aria-label={t(assetLabels, "directoryPath")}>
             <option value="">{t(assetLabels, "allDirectories")}</option>
             {folders.map((folder) => <option value={folder} key={folder}>{folder}</option>)}
           </select>
-          <select value={source} onChange={(event) => setSource(event.target.value)} aria-label={t(assetLabels, "source")}>
+          <select name="assetSourceFilter" value={source} onChange={(event) => setSource(event.target.value)} aria-label={t(assetLabels, "source")}>
             <option value="">{t(assetLabels, "allSources")}</option>
             {SOURCE_OPTIONS.map((item) => <option value={item} key={item}>{assetLabels.sourceLabels?.[item] || item}</option>)}
           </select>
-          <select value={tag} onChange={(event) => setTag(event.target.value)} aria-label={t(assetLabels, "tags")}>
+          <select name="assetTagFilter" value={tag} onChange={(event) => setTag(event.target.value)} aria-label={t(assetLabels, "tags")}>
             <option value="">{t(assetLabels, "allTags")}</option>
             {tags.map((item) => <option value={item} key={item}>{item}</option>)}
           </select>
@@ -908,7 +908,7 @@ export function AdminAssetsClient({ locale, page, assetLabels, initialData = nul
             {selectedIds.length ? (
               <div className="admin-asset-bulk">
                 <strong>{formatTemplate(t(assetLabels, "selectedCount"), { count: selectedIds.length })}</strong>
-                <select value={bulkFolder} onChange={(event) => setBulkFolder(event.target.value)} aria-label={t(assetLabels, "targetFolder")}>
+                <select name="bulkFolder" value={bulkFolder} onChange={(event) => setBulkFolder(event.target.value)} aria-label={t(assetLabels, "targetFolder")}>
                   <option value="">{t(assetLabels, "uncategorized")}</option>
                   {folders.map((folder) => <option value={folder} key={folder}>{folder}</option>)}
                 </select>
@@ -916,7 +916,7 @@ export function AdminAssetsClient({ locale, page, assetLabels, initialData = nul
                   <FolderOpen size={14} aria-hidden="true" />
                   {t(assetLabels, "bulkMove")}
                 </button>
-                <input value={bulkTags} placeholder={t(assetLabels, "tagNamePlaceholder")} onChange={(event) => setBulkTags(event.target.value)} />
+                <input autoComplete="off" name="bulkTags" value={bulkTags} placeholder={t(assetLabels, "tagNamePlaceholder")} onChange={(event) => setBulkTags(event.target.value)} />
                 <button type="button" onClick={() => applyBulk("tags")} disabled={bulkSaving || !bulkTags.trim()}>
                   <Tag size={14} aria-hidden="true" />
                   {t(assetLabels, "bulkTags")}
@@ -966,7 +966,7 @@ export function AdminAssetsClient({ locale, page, assetLabels, initialData = nul
                     {item}
                   </button>
                 ) : (
-                  <span key={item}>...</span>
+                  <span key={item}>…</span>
                 ))}
                 <button className="button secondary compact" type="button" disabled={currentPage >= totalPages} onClick={() => setPageNumber((current) => Math.min(totalPages, current + 1))}>
                   {t(assetLabels, "nextPage")}
@@ -974,7 +974,7 @@ export function AdminAssetsClient({ locale, page, assetLabels, initialData = nul
               </div>
               <label>
                 <span>{t(assetLabels, "itemsPerPage")}</span>
-                <select value={pageSize} onChange={(event) => setPageSize(Number(event.target.value))}>
+                <select name="assetPageSize" value={pageSize} onChange={(event) => setPageSize(Number(event.target.value))}>
                   {ASSET_PAGE_SIZE_OPTIONS.map((option) => <option value={option} key={option}>{option}</option>)}
                 </select>
               </label>
