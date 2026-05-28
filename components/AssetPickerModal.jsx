@@ -954,7 +954,7 @@ function GeneratePanel({
           </label>
         </div>
         <button
-          className="button primary"
+          className="button primary asset-generate-submit"
           type="button"
           onClick={() => onGenerate({
             prompt: finalPrompt,
