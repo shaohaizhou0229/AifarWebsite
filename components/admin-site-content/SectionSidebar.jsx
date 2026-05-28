@@ -1,9 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Plus, X } from "lucide-react";
+import { Eye, Plus, RefreshCw, Search, X } from "lucide-react";
 import { SITE_SECTION_LABELS, createBlankSection } from "@/lib/site-page-builder";
+import sectionTemplateUi from "@/lib/section-template-ui.cjs";
 import { SitePageSections } from "@/components/SitePageSections";
+
+const {
+  TEMPLATE_INDUSTRY_FILTERS,
+  createTemplatePreviewPage,
+  filterSectionTemplates
+} = sectionTemplateUi;
 
 const STRUCTURE_GROUPS = [
   { key: "hero", types: ["hero"] },
@@ -46,12 +53,78 @@ function createPreviewSection(type, labels) {
   };
 }
 
-export function SectionSidebar({ labels, locale, onAddSection }) {
+function getIndustryLabel(labels, industry) {
+  return labels.templateIndustries?.[industry] || industry;
+}
+
+function getSourceLabel(labels, source) {
+  return labels.templateSources?.[source] || source || labels.emptyValue;
+}
+
+function getPageLabel(labels, pageKey) {
+  if (!pageKey) return labels.templateAllPages || labels.emptyValue;
+  if (pageKey === "home") return labels.homePage;
+  if (pageKey === "product") return labels.productPage;
+  return pageKey;
+}
+
+function TemplateCard({ labels, locale, template, onInsertTemplate, onPreviewTemplate }) {
+  const previewPage = useMemo(() => createTemplatePreviewPage(template), [template]);
+
+  return (
+    <article className="section-library-row template-library-row">
+      <button className="section-library-preview" type="button" onClick={() => onPreviewTemplate(template)} aria-label={labels.previewTemplate}>
+        <div className="section-library-preview-page">
+          <SitePageSections page={previewPage} locale={locale} />
+        </div>
+      </button>
+      <div className="section-library-copy">
+        <div className="template-library-meta">
+          <span>{getIndustryLabel(labels, template.industry)}</span>
+          <span>{getSourceLabel(labels, template.source)}</span>
+          <span>{getPageLabel(labels, template.pageKey)}</span>
+        </div>
+        <strong>{template.name}</strong>
+        <p>{template.description || template.purpose || labels.addSection}</p>
+      </div>
+      <div className="template-library-actions">
+        <button className="button secondary compact" type="button" onClick={() => onPreviewTemplate(template)}>
+          <Eye size={15} aria-hidden="true" />
+          {labels.previewTemplate}
+        </button>
+        <button className="button primary compact" type="button" onClick={() => onInsertTemplate(template)}>
+          <Plus size={15} aria-hidden="true" />
+          {labels.insertBlock}
+        </button>
+      </div>
+    </article>
+  );
+}
+
+export function SectionSidebar({
+  labels,
+  locale,
+  sectionTemplates = [],
+  sectionTemplatesLoading = false,
+  sectionTemplatesError = "",
+  onReloadSectionTemplates,
+  onAddSection,
+  onInsertTemplate,
+  onPreviewTemplate
+}) {
+  const [libraryMode, setLibraryMode] = useState("templates");
+  const [popoverOpen, setPopoverOpen] = useState(true);
   const [activeGroupKey, setActiveGroupKey] = useState("");
+  const [activeIndustry, setActiveIndustry] = useState("all");
+  const [templateQuery, setTemplateQuery] = useState("");
   const closeTimerRef = useRef(null);
   const activeGroup = useMemo(
     () => activeGroupKey ? STRUCTURE_GROUPS.find((group) => group.key === activeGroupKey) : null,
     [activeGroupKey]
+  );
+  const filteredTemplates = useMemo(
+    () => filterSectionTemplates(sectionTemplates, { industry: activeIndustry, query: templateQuery }),
+    [sectionTemplates, activeIndustry, templateQuery]
   );
 
   useEffect(() => () => {
@@ -67,19 +140,31 @@ export function SectionSidebar({ labels, locale, onAddSection }) {
     }
   }
 
-  function openGroup(groupKey) {
+  function openTemplateLibrary(industry = activeIndustry) {
     clearCloseTimer();
+    setLibraryMode("templates");
+    setActiveGroupKey("");
+    setActiveIndustry(industry);
+    setPopoverOpen(true);
+  }
+
+  function openBlockLibrary(groupKey) {
+    clearCloseTimer();
+    setLibraryMode("blocks");
     setActiveGroupKey(groupKey);
+    setPopoverOpen(true);
   }
 
   function closeLibrary() {
     clearCloseTimer();
+    setPopoverOpen(false);
     setActiveGroupKey("");
   }
 
   function scheduleCloseLibrary() {
     clearCloseTimer();
     closeTimerRef.current = window.setTimeout(() => {
+      setPopoverOpen(false);
       setActiveGroupKey("");
       closeTimerRef.current = null;
     }, 160);
@@ -89,6 +174,14 @@ export function SectionSidebar({ labels, locale, onAddSection }) {
     onAddSection(type);
     closeLibrary();
   }
+
+  function insertTemplate(template) {
+    onInsertTemplate(template);
+    closeLibrary();
+  }
+
+  const showTemplatePopover = popoverOpen && libraryMode === "templates";
+  const showBlockPopover = popoverOpen && libraryMode === "blocks" && activeGroup;
 
   return (
     <aside
@@ -107,22 +200,110 @@ export function SectionSidebar({ labels, locale, onAddSection }) {
           <strong>{labels.blockLibrary}</strong>
         </div>
       </div>
+      <div className="section-library-mode-switch" role="tablist" aria-label={labels.blockLibrary}>
+        <button
+          className={libraryMode === "templates" ? "active" : ""}
+          type="button"
+          onClick={() => openTemplateLibrary()}
+        >
+          {labels.templateLibrary}
+        </button>
+        <button
+          className={libraryMode === "blocks" ? "active" : ""}
+          type="button"
+          onClick={() => openBlockLibrary(activeGroupKey || STRUCTURE_GROUPS[0].key)}
+        >
+          {labels.basicBlocks}
+        </button>
+      </div>
       <nav className="site-structure-list" aria-label={labels.webStructure}>
-        {STRUCTURE_GROUPS.map((group) => (
+        {libraryMode === "templates" ? TEMPLATE_INDUSTRY_FILTERS.map((industry) => (
+          <button
+            className={industry === activeIndustry ? "active" : ""}
+            type="button"
+            key={industry}
+            onMouseEnter={() => openTemplateLibrary(industry)}
+            onFocus={() => openTemplateLibrary(industry)}
+            onClick={() => openTemplateLibrary(industry)}
+          >
+            {getIndustryLabel(labels, industry)}
+          </button>
+        )) : STRUCTURE_GROUPS.map((group) => (
           <button
             className={group.key === activeGroupKey ? "active" : ""}
             type="button"
             key={group.key}
-            onMouseEnter={() => openGroup(group.key)}
-            onFocus={() => openGroup(group.key)}
-            onClick={() => openGroup(group.key)}
+            onMouseEnter={() => openBlockLibrary(group.key)}
+            onFocus={() => openBlockLibrary(group.key)}
+            onClick={() => openBlockLibrary(group.key)}
           >
             {labels.sectionCategories?.[group.key] || group.key}
           </button>
         ))}
       </nav>
 
-      {activeGroup ? (
+      {showTemplatePopover ? (
+        <div
+          className="section-library-popover template-library-popover"
+          role="region"
+          aria-label={labels.templateLibrary}
+          onMouseEnter={clearCloseTimer}
+          onMouseLeave={scheduleCloseLibrary}
+        >
+          <header className="section-library-head template-library-head">
+            <div>
+              <p className="eyebrow">{getIndustryLabel(labels, activeIndustry)}</p>
+              <strong>{labels.chooseTemplate}</strong>
+            </div>
+            <div className="template-library-head-actions">
+              <button className="icon-button" type="button" onClick={onReloadSectionTemplates} title={labels.templateRetry} aria-label={labels.templateRetry}>
+                <RefreshCw size={15} aria-hidden="true" />
+              </button>
+              <button className="icon-button" type="button" onClick={closeLibrary} title={labels.closePreview} aria-label={labels.closePreview}>
+                <X size={15} aria-hidden="true" />
+              </button>
+            </div>
+          </header>
+          <div className="template-library-search">
+            <Search size={15} aria-hidden="true" />
+            <input
+              aria-label={labels.searchTemplates}
+              value={templateQuery}
+              placeholder={labels.searchTemplates}
+              onChange={(event) => setTemplateQuery(event.target.value)}
+            />
+          </div>
+          <div className="section-library-list">
+            {sectionTemplatesLoading ? (
+              <p className="muted-line">{labels.templateLoading}</p>
+            ) : null}
+            {!sectionTemplatesLoading && sectionTemplatesError ? (
+              <div className="template-library-state">
+                <p className="form-message error">{sectionTemplatesError}</p>
+                <button className="button secondary compact" type="button" onClick={onReloadSectionTemplates}>
+                  <RefreshCw size={15} aria-hidden="true" />
+                  {labels.templateRetry}
+                </button>
+              </div>
+            ) : null}
+            {!sectionTemplatesLoading && !sectionTemplatesError && filteredTemplates.length ? filteredTemplates.map((template) => (
+              <TemplateCard
+                key={template.id}
+                labels={labels}
+                locale={locale}
+                template={template}
+                onInsertTemplate={insertTemplate}
+                onPreviewTemplate={onPreviewTemplate}
+              />
+            )) : null}
+            {!sectionTemplatesLoading && !sectionTemplatesError && !filteredTemplates.length ? (
+              <p className="muted-line">{labels.templateEmpty}</p>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+
+      {showBlockPopover ? (
         <div
           className="section-library-popover"
           role="region"

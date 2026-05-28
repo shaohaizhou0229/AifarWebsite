@@ -12,10 +12,16 @@ import { SeoEditor } from "@/components/admin-site-content/SeoEditor";
 import { cloneContent, ensureLayout, formatDate, moveItem, updateSectionAt, updateSeo } from "@/components/admin-site-content/form-utils";
 import promptContextRules from "@/lib/asset-prompt-context.cjs";
 import imageGenerationRules from "@/lib/image-generation-settings-core.cjs";
+import sectionTemplateUi from "@/lib/section-template-ui.cjs";
 import { localizedPath } from "@/i18n/routing";
 
 const { buildSectionImagePromptContext } = promptContextRules;
 const { normalizeImageSize, resolveImageTargetSize } = imageGenerationRules;
+const {
+  buildSectionTemplatesUrl,
+  createTemplatePreviewPage,
+  insertTemplateSection
+} = sectionTemplateUi;
 
 function getSectionImageSpec(section, pathKey) {
   return section?.settings?.imageSpecs?.[pathKey] || {};
@@ -133,15 +139,22 @@ export function AdminSiteContentForm({
   const [previewOpen, setPreviewOpen] = useState(false);
   const [pageSettingsOpen, setPageSettingsOpen] = useState(false);
   const [snapshotPreview, setSnapshotPreview] = useState(null);
+  const [templatePreview, setTemplatePreview] = useState(null);
   const [assetPickerTarget, setAssetPickerTarget] = useState(null);
   const [hoveredSectionId, setHoveredSectionId] = useState("");
+  const [sectionTemplates, setSectionTemplates] = useState([]);
+  const [sectionTemplatesLoading, setSectionTemplatesLoading] = useState(false);
+  const [sectionTemplatesError, setSectionTemplatesError] = useState("");
+  const [sectionTemplatesReloadToken, setSectionTemplatesReloadToken] = useState(0);
   const canvasPreviewRef = useRef(null);
   const modalPreviewRef = useRef(null);
   const snapshotPreviewRef = useRef(null);
+  const templatePreviewRef = useRef(null);
   const pendingScrollRestoreRef = useRef(null);
   const [canvasPreviewScale, setCanvasPreviewScale] = useState(1);
   const [modalPreviewScale, setModalPreviewScale] = useState(1);
   const [snapshotPreviewScale, setSnapshotPreviewScale] = useState(1);
+  const [templatePreviewScale, setTemplatePreviewScale] = useState(1);
 
   const currentPage = useMemo(
     () => pageOptions.find((option) => option.key === pageKey) || pageOptions[0],
@@ -166,19 +179,54 @@ export function AdminSiteContentForm({
   }, []);
 
   useEffect(() => {
-    if (!previewOpen && !pageSettingsOpen && !snapshotPreview) return undefined;
+    if (!previewOpen && !pageSettingsOpen && !snapshotPreview && !templatePreview) return undefined;
 
     function closeOnEscape(event) {
       if (event.key === "Escape") {
         setPreviewOpen(false);
         setPageSettingsOpen(false);
         setSnapshotPreview(null);
+        setTemplatePreview(null);
       }
     }
 
     document.addEventListener("keydown", closeOnEscape);
     return () => document.removeEventListener("keydown", closeOnEscape);
-  }, [previewOpen, pageSettingsOpen, snapshotPreview]);
+  }, [previewOpen, pageSettingsOpen, snapshotPreview, templatePreview]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSectionTemplates() {
+      setSectionTemplatesLoading(true);
+      setSectionTemplatesError("");
+      try {
+        const response = await fetch(buildSectionTemplatesUrl({ locale, pageKey }));
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(data.error || labels.templateLoadFailed);
+        }
+
+        if (!cancelled) {
+          setSectionTemplates(Array.isArray(data.templates) ? data.templates : []);
+        }
+      } catch (templateError) {
+        if (!cancelled) {
+          setSectionTemplatesError(templateError.message || labels.templateLoadFailed);
+        }
+      } finally {
+        if (!cancelled) {
+          setSectionTemplatesLoading(false);
+        }
+      }
+    }
+
+    loadSectionTemplates();
+    return () => {
+      cancelled = true;
+    };
+  }, [locale, pageKey, sectionTemplatesReloadToken, labels.templateLoadFailed]);
 
   useEffect(() => {
     setSnapshots(initialSnapshots);
@@ -215,11 +263,13 @@ export function AdminSiteContentForm({
     bindScaleObserver(canvasPreviewRef.current, setCanvasPreviewScale);
     if (previewOpen) bindScaleObserver(modalPreviewRef.current, setModalPreviewScale);
     if (snapshotPreview) bindScaleObserver(snapshotPreviewRef.current, setSnapshotPreviewScale);
+    if (templatePreview) bindScaleObserver(templatePreviewRef.current, setTemplatePreviewScale);
     if (!previewOpen) setModalPreviewScale(1);
     if (!snapshotPreview) setSnapshotPreviewScale(1);
+    if (!templatePreview) setTemplatePreviewScale(1);
 
     return () => observers.forEach((observer) => observer.disconnect());
-  }, [previewMode, previewOpen, snapshotPreview]);
+  }, [previewMode, previewOpen, snapshotPreview, templatePreview]);
 
   useLayoutEffect(() => {
     if (!pendingScrollRestoreRef.current) return undefined;
@@ -430,6 +480,30 @@ export function AdminSiteContentForm({
     setSelectedSectionId(section.id);
   }
 
+  function reloadSectionTemplates() {
+    setSectionTemplatesReloadToken((current) => current + 1);
+  }
+
+  function insertSectionTemplate(template, afterSectionId = selectedSectionId) {
+    queueDesignerScrollRestore();
+    setMessage("");
+    setError("");
+
+    try {
+      const result = insertTemplateSection(sections, template, { afterSectionId });
+      setContent((current) => ({
+        ...current,
+        layoutVersion: SITE_LAYOUT_VERSION,
+        sections: result.sections
+      }));
+      setSelectedSectionId(result.insertedSection.id);
+      setTemplatePreview(null);
+      setMessage(labels.templateInserted || labels.saved);
+    } catch (templateError) {
+      setError(templateError.message || labels.templateInsertFailed);
+    }
+  }
+
   function duplicateSection(sectionId) {
     const index = sections.findIndex((section) => section.id === sectionId);
     if (index < 0) return;
@@ -567,7 +641,17 @@ export function AdminSiteContentForm({
 
         <div className="site-designer-grid">
           <aside className="site-designer-library">
-            <SectionSidebar labels={labels} locale={locale} onAddSection={addSection} />
+            <SectionSidebar
+              labels={labels}
+              locale={locale}
+              sectionTemplates={sectionTemplates}
+              sectionTemplatesLoading={sectionTemplatesLoading}
+              sectionTemplatesError={sectionTemplatesError}
+              onReloadSectionTemplates={reloadSectionTemplates}
+              onAddSection={addSection}
+              onInsertTemplate={insertSectionTemplate}
+              onPreviewTemplate={setTemplatePreview}
+            />
           </aside>
 
           <main className="site-designer-canvas-panel">
@@ -689,6 +773,49 @@ export function AdminSiteContentForm({
             <div className={`cms-live-preview site-preview-modal-canvas ${previewMode}`} ref={snapshotPreviewRef}>
               <div className="cms-live-preview-page" style={{ "--cms-preview-scale": snapshotPreviewScale }}>
                 <SitePageSections page={ensureLayout(snapshotPreview.content)} locale={locale} />
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {templatePreview ? (
+        <div className="site-preview-modal" role="dialog" aria-modal="true" aria-label={labels.templatePreview} onPointerDown={() => setTemplatePreview(null)}>
+          <div className="site-preview-modal-panel template-preview-modal" onPointerDown={(event) => event.stopPropagation()}>
+            <header className="site-preview-modal-head">
+              <div>
+                <p className="eyebrow">{labels.templatePreview}</p>
+                <strong>{templatePreview.name}</strong>
+              </div>
+              <div className="template-preview-actions">
+                <button className="button primary compact" type="button" onClick={() => insertSectionTemplate(templatePreview)}>
+                  {labels.insertBlock}
+                </button>
+                <button className="button secondary compact" type="button" onClick={() => setTemplatePreview(null)}>
+                  {labels.closePreview}
+                </button>
+              </div>
+            </header>
+            <div className="template-preview-meta">
+              <span>{labels.templateIndustry}: {labels.templateIndustries?.[templatePreview.industry] || templatePreview.industry}</span>
+              <span>{labels.templatePurpose}: {templatePreview.purpose || labels.emptyValue}</span>
+              <span>{labels.templateSource}: {labels.templateSources?.[templatePreview.source] || templatePreview.source}</span>
+              <span>
+                {labels.templatePageScope}: {templatePreview.pageKey === "home"
+                  ? labels.homePage
+                  : templatePreview.pageKey === "product"
+                    ? labels.productPage
+                    : labels.templateAllPages}
+              </span>
+            </div>
+            {templatePreview.tags?.length ? (
+              <div className="template-preview-tags" aria-label={labels.templateTags}>
+                {templatePreview.tags.map((tag) => <span key={tag}>{tag}</span>)}
+              </div>
+            ) : null}
+            <div className={`cms-live-preview site-preview-modal-canvas ${previewMode}`} ref={templatePreviewRef}>
+              <div className="cms-live-preview-page" style={{ "--cms-preview-scale": templatePreviewScale }}>
+                <SitePageSections page={createTemplatePreviewPage(templatePreview)} locale={locale} />
               </div>
             </div>
           </div>
