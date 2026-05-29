@@ -2,7 +2,10 @@ import Link from "next/link";
 import { ArrowDown, ArrowUp, Copy, Plus, Trash2 } from "lucide-react";
 import { Card } from "@/components/Card";
 import { Release } from "@/components/Rows";
+import sectionSettingControls from "@/lib/section-setting-controls.cjs";
 import { localizedPath } from "@/i18n/routing";
+
+const { getSectionRenderAttributes } = sectionSettingControls;
 
 function resolveHref(locale, href = "") {
   if (!href) return "";
@@ -34,8 +37,22 @@ function cleanRows(items, minColumns = 1) {
     .filter((row) => row.slice(0, minColumns).some(hasText));
 }
 
-function sectionTone(section) {
-  return section?.settings?.tone === "alt" ? " section alt" : "section";
+function sectionRootProps(section, baseClassName = "section") {
+  const renderAttributes = getSectionRenderAttributes(section);
+  return {
+    className: [
+      baseClassName,
+      section?.settings?.tone === "alt" ? "alt" : "",
+      renderAttributes.className
+    ].filter(Boolean).join(" "),
+    ...renderAttributes.attributes
+  };
+}
+
+function columnClass(section, fallback) {
+  const columns = Number(section?.settings?.layout?.cardColumns || 0);
+  if ([1, 2, 3, 4].includes(columns)) return `columns-${columns}`;
+  return fallback;
 }
 
 function SectionHead({ title, lead, actionLabel, actionHref, locale }) {
@@ -61,7 +78,7 @@ function HeroSection({ section, locale }) {
 
   if (section.variant === "simple") {
     return (
-      <section className="page-hero">
+      <section {...sectionRootProps(section, "page-hero")}>
         <div className="section-inner">
           {content.eyebrow ? <p className="eyebrow">{content.eyebrow}</p> : null}
           <h1>{content.title}</h1>
@@ -83,7 +100,7 @@ function HeroSection({ section, locale }) {
   }
 
   return (
-    <section className="hero home-hero" style={{ "--home-hero-image": `url("${imageSrc || "/assets/images/aifar-hero.png"}")` }}>
+    <section {...sectionRootProps(section, "hero home-hero")} style={{ "--home-hero-image": `url("${imageSrc || "/assets/images/aifar-hero.png"}")` }}>
       <div className="section-inner hero-grid home-hero-grid">
         <div className="hero-copy">
           {content.eyebrow ? <p className="eyebrow">{content.eyebrow}</p> : null}
@@ -112,7 +129,7 @@ function TrustBarSection({ section }) {
   if (!items.length) return null;
 
   return (
-    <section className="section section-tight">
+    <section {...sectionRootProps(section, "section section-tight")}>
       <div className="section-inner trust-row" aria-label={content.ariaLabel || undefined}>
         {items.map(([value, label], index) => (
           <div key={`${value}-${index}`}>
@@ -128,10 +145,10 @@ function TrustBarSection({ section }) {
 function CardGridSection({ section, locale }) {
   const content = section.content || {};
   const items = cleanRows(content.items, 2);
-  const columns = section.variant === "three" ? "three" : "four";
+  const columns = columnClass(section, section.variant === "three" ? "three" : "four");
 
   return (
-    <section className={sectionTone(section)}>
+    <section {...sectionRootProps(section)}>
       <div className="section-inner">
         <SectionHead title={content.title} lead={content.lead} actionLabel={content.actionLabel} actionHref={content.actionHref} locale={locale} />
         <div className={`grid ${columns}`}>
@@ -149,7 +166,7 @@ function FeatureListSection({ section }) {
   const items = cleanRows(content.items, 1);
 
   return (
-    <section className={sectionTone(section)}>
+    <section {...sectionRootProps(section)}>
       <div className="section-inner">
         <SectionHead title={content.title} lead={content.lead} />
         <div className="feature-list">
@@ -174,7 +191,7 @@ function MediaFeatureSection({ section }) {
   if (isImageOnly && !imageSrc) return null;
 
   return (
-    <section className={sectionTone(section)}>
+    <section {...sectionRootProps(section)}>
       <div className="section-inner">
         {isImageOnly ? (
           <div className="hero-media product-page-media">
@@ -215,7 +232,7 @@ function ScenarioSplitSection({ section }) {
   if (!content.title && !content.lead && !items.length) return null;
 
   return (
-    <section className={sectionTone(section)}>
+    <section {...sectionRootProps(section)}>
       <div className="section-inner scenario-split">
         <div>
           {content.eyebrow ? <p className="eyebrow">{content.eyebrow}</p> : null}
@@ -242,7 +259,7 @@ function WorkflowStepsSection({ section }) {
   if (!content.title && !items.length) return null;
 
   return (
-    <section className={sectionTone(section)}>
+    <section {...sectionRootProps(section)}>
       <div className="section-inner">
         <SectionHead title={content.title} lead={content.lead} />
         <div className="workflow-steps">
@@ -265,7 +282,7 @@ function ModuleShowcaseSection({ section }) {
   if (!content.title && !items.length) return null;
 
   return (
-    <section className={sectionTone(section)}>
+    <section {...sectionRootProps(section)}>
       <div className="section-inner">
         <SectionHead title={content.title} lead={content.lead} />
         <div className="module-showcase-grid">
@@ -288,7 +305,7 @@ function SecurityAssuranceSection({ section }) {
   if (!content.title && !items.length) return null;
 
   return (
-    <section className={sectionTone(section)}>
+    <section {...sectionRootProps(section)}>
       <div className="section-inner security-assurance">
         <div>
           {content.eyebrow ? <p className="eyebrow">{content.eyebrow}</p> : null}
@@ -317,7 +334,7 @@ function DownloadPanelSection({ section, locale }) {
   if (!content.title && !content.primaryCta && !items.length) return null;
 
   return (
-    <section className={sectionTone(section)}>
+    <section {...sectionRootProps(section)}>
       <div className="section-inner download-panel-section">
         <div>
           {content.eyebrow ? <p className="eyebrow">{content.eyebrow}</p> : null}
@@ -347,7 +364,7 @@ function FaqBandSection({ section }) {
   if (!content.title && !items.length) return null;
 
   return (
-    <section className={sectionTone(section)}>
+    <section {...sectionRootProps(section)}>
       <div className="section-inner">
         <SectionHead title={content.title} lead={content.lead} />
         <div className="faq-band-list">
@@ -366,11 +383,11 @@ function FaqBandSection({ section }) {
 function SupportEntrySection({ section, locale }) {
   const content = section.content || {};
   const items = cleanRows(content.items, 2);
-  const columns = section.variant === "three" ? "three" : "four";
+  const columns = columnClass(section, section.variant === "three" ? "three" : "four");
   const anchorId = section.settings?.anchorId || undefined;
 
   return (
-    <section className={sectionTone(section)} id={anchorId}>
+    <section {...sectionRootProps(section)} id={anchorId}>
       <div className="section-inner">
         <SectionHead title={content.title} lead={content.lead} />
         <div className={`support-entry-grid grid ${columns}`}>
@@ -404,7 +421,7 @@ function UpdatesSection({ section, locale }) {
   const items = cleanRows(content.items, 1);
 
   return (
-    <section className={sectionTone(section)}>
+    <section {...sectionRootProps(section)}>
       <div className="section-inner">
         <SectionHead title={content.title} actionLabel={content.actionLabel} actionHref={content.actionHref} locale={locale} />
         <div className="release-list">
@@ -422,7 +439,7 @@ function CtaSection({ section, locale }) {
   if (!content.eyebrow && !content.title && !content.lead && !content.primaryCta && !content.secondaryCta) return null;
 
   return (
-    <section className={sectionTone(section)}>
+    <section {...sectionRootProps(section)}>
       <div className="section-inner cta-band">
         {content.eyebrow ? <p className="eyebrow">{content.eyebrow}</p> : null}
         <h2>{content.title}</h2>

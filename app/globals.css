@@ -1248,6 +1248,274 @@ h3 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.grid.columns-1,
+.cms-section-settings[data-card-columns="1"] .grid,
+.cms-section-settings[data-card-columns="1"] .workflow-steps,
+.cms-section-settings[data-card-columns="1"] .module-showcase-grid,
+.cms-section-settings[data-card-columns="1"] .scenario-card-grid,
+.cms-section-settings[data-card-columns="1"] .security-checklist,
+.cms-section-settings[data-card-columns="1"] .faq-band-list,
+.cms-section-settings[data-card-columns="1"] .trust-row {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.grid.columns-2,
+.cms-section-settings[data-card-columns="2"] .grid,
+.cms-section-settings[data-card-columns="2"] .workflow-steps,
+.cms-section-settings[data-card-columns="2"] .module-showcase-grid,
+.cms-section-settings[data-card-columns="2"] .scenario-card-grid,
+.cms-section-settings[data-card-columns="2"] .security-checklist,
+.cms-section-settings[data-card-columns="2"] .faq-band-list,
+.cms-section-settings[data-card-columns="2"] .trust-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid.columns-3,
+.cms-section-settings[data-card-columns="3"] .grid,
+.cms-section-settings[data-card-columns="3"] .workflow-steps,
+.cms-section-settings[data-card-columns="3"] .module-showcase-grid,
+.cms-section-settings[data-card-columns="3"] .scenario-card-grid,
+.cms-section-settings[data-card-columns="3"] .security-checklist,
+.cms-section-settings[data-card-columns="3"] .faq-band-list,
+.cms-section-settings[data-card-columns="3"] .trust-row {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.grid.columns-4,
+.cms-section-settings[data-card-columns="4"] .grid,
+.cms-section-settings[data-card-columns="4"] .workflow-steps,
+.cms-section-settings[data-card-columns="4"] .module-showcase-grid,
+.cms-section-settings[data-card-columns="4"] .scenario-card-grid,
+.cms-section-settings[data-card-columns="4"] .security-checklist,
+.cms-section-settings[data-card-columns="4"] .faq-band-list,
+.cms-section-settings[data-card-columns="4"] .trust-row {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.cms-section-settings {
+  --cms-accent: var(--teal);
+  --cms-accent-soft: var(--soft-teal);
+}
+
+.cms-section-settings[data-color-scheme="brand"] {
+  --cms-accent: var(--teal);
+  --cms-accent-soft: rgba(231, 245, 244, 0.78);
+}
+
+.cms-section-settings[data-color-scheme="blue"] {
+  --cms-accent: var(--blue);
+  --cms-accent-soft: rgba(232, 241, 251, 0.88);
+}
+
+.cms-section-settings[data-color-scheme="green"] {
+  --cms-accent: var(--green);
+  --cms-accent-soft: rgba(47, 125, 82, 0.1);
+}
+
+.cms-section-settings[data-color-scheme="neutral"] {
+  --cms-accent: var(--muted);
+  --cms-accent-soft: rgba(238, 243, 247, 0.92);
+}
+
+.cms-section-settings .eyebrow,
+.cms-section-settings .icon,
+.cms-section-settings .scenario-card span,
+.cms-section-settings .workflow-step span,
+.cms-section-settings .module-showcase-card span {
+  color: var(--cms-accent);
+}
+
+.cms-section-settings[data-text-size="small"] :is(h1, h2) {
+  font-size: 2.15rem;
+}
+
+.cms-section-settings[data-text-size="small"] :is(.lead, p) {
+  font-size: 0.95rem;
+}
+
+.cms-section-settings[data-text-size="large"] :is(h1, h2) {
+  font-size: 3.35rem;
+}
+
+.cms-section-settings[data-text-size="large"] :is(.lead, p) {
+  font-size: 1.12rem;
+}
+
+.cms-section-settings[data-title-weight="500"] :is(h1, h2, h3) {
+  font-weight: 500;
+}
+
+.cms-section-settings[data-title-weight="600"] :is(h1, h2, h3) {
+  font-weight: 600;
+}
+
+.cms-section-settings[data-title-weight="700"] :is(h1, h2, h3) {
+  font-weight: 700;
+}
+
+.cms-section-settings[data-title-weight="800"] :is(h1, h2, h3) {
+  font-weight: 800;
+}
+
+.cms-section-settings[data-card-spacing="compact"] :is(.grid, .feature-list, .workflow-steps, .module-showcase-grid, .security-checklist, .download-panel-list, .faq-band-list, .release-list) {
+  gap: 9px;
+}
+
+.cms-section-settings[data-card-spacing="relaxed"] :is(.grid, .feature-list, .workflow-steps, .module-showcase-grid, .security-checklist, .download-panel-list, .faq-band-list, .release-list) {
+  gap: 24px;
+}
+
+.cms-section-settings[data-card-style="flat"] :is(.card, .feature, .scenario-card, .workflow-step, .module-showcase-card, .security-checklist article, .download-panel-list article, .faq-band-list article, .release, .trust-row div) {
+  border-color: rgba(183, 200, 213, 0.5);
+  background: #fff;
+  box-shadow: none;
+}
+
+.cms-section-settings[data-card-style="outlined"] :is(.card, .feature, .scenario-card, .workflow-step, .module-showcase-card, .security-checklist article, .download-panel-list article, .faq-band-list article, .release, .trust-row div) {
+  border-color: color-mix(in srgb, var(--cms-accent) 35%, rgba(183, 200, 213, 0.75));
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: none;
+}
+
+.cms-section-settings[data-card-style="shadow"] :is(.card, .feature, .scenario-card, .workflow-step, .module-showcase-card, .security-checklist article, .download-panel-list article, .faq-band-list article, .release, .trust-row div) {
+  border-color: rgba(183, 200, 213, 0.72);
+  box-shadow: var(--shadow-tight);
+}
+
+.cms-section-settings[data-icon-style="line"] .icon {
+  background: transparent;
+  box-shadow: none;
+}
+
+.cms-section-settings[data-icon-style="filled"] .icon,
+.cms-section-settings[data-icon-style="filled"] .security-checklist article > span {
+  background: var(--cms-accent);
+  color: #fff;
+}
+
+.cms-section-settings[data-button-style="outline"] .actions .button.primary {
+  border-color: var(--cms-accent);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: none;
+  color: var(--cms-accent);
+}
+
+.cms-section-settings[data-button-style="solid"] .actions .button.primary {
+  background: var(--cms-accent);
+  color: #fff;
+}
+
+.cms-section-settings[data-image-radius="none"] .hero-media {
+  border-radius: 0;
+}
+
+.cms-section-settings[data-image-radius="small"] .hero-media {
+  border-radius: 8px;
+}
+
+.cms-section-settings[data-image-radius="medium"] .hero-media {
+  border-radius: 18px;
+}
+
+.cms-section-settings[data-image-radius="large"] .hero-media {
+  border-radius: 28px;
+}
+
+.cms-section-settings[data-content-align="center"] :is(.section-head, .hero-copy, .page-hero .section-inner, .cta-band) {
+  align-items: center;
+  text-align: center;
+}
+
+.cms-section-settings[data-content-align="center"] .section-head {
+  flex-direction: column;
+  justify-content: center;
+}
+
+.cms-section-settings[data-content-align="center"] .actions {
+  justify-content: center;
+}
+
+.cms-section-settings[data-desktop-arrangement="stacked"] :is(.media-feature, .scenario-split, .security-assurance, .download-panel-section) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.cms-section-settings[data-image-position="left"] .media-feature .hero-media {
+  order: -1;
+}
+
+.cms-section-settings[data-image-position="top"] .media-feature {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.cms-section-settings[data-image-position="top"] .media-feature .hero-media {
+  order: -1;
+}
+
+.cms-section-settings[data-entrance-animation="fade"] {
+  animation: cms-section-fade 420ms ease both;
+}
+
+.cms-section-settings[data-entrance-animation="fade-up"] {
+  animation: cms-section-fade-up 460ms ease both;
+}
+
+.cms-section-settings[data-entrance-animation="stagger"] :is(.card, .feature, .workflow-step, .module-showcase-card, .scenario-card, .release) {
+  animation: cms-section-fade-up 420ms ease both;
+}
+
+.cms-section-settings[data-hover-in="lift"] :is(.card, .feature, .workflow-step, .module-showcase-card, .scenario-card, .release):hover {
+  transform: translateY(-4px);
+}
+
+.cms-section-settings[data-hover-in="reveal"] :is(.card, .feature, .workflow-step, .module-showcase-card, .scenario-card, .release):hover {
+  border-color: var(--cms-accent);
+  box-shadow: var(--shadow-tight);
+}
+
+.cms-section-settings[data-hover-out="fade"] :is(.card, .feature, .workflow-step, .module-showcase-card, .scenario-card, .release) {
+  transition: opacity 180ms ease, transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.cms-section-settings[data-hover-out="fade"]:hover :is(.card, .feature, .workflow-step, .module-showcase-card, .scenario-card, .release):not(:hover) {
+  opacity: 0.7;
+}
+
+@keyframes cms-section-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cms-section-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 760px) {
+  .cms-section-settings[data-mobile-arrangement="single-column"] :is(.media-feature, .scenario-split, .security-assurance, .download-panel-section),
+  .cms-section-settings[data-mobile-arrangement="image-top"] :is(.media-feature, .scenario-split, .security-assurance, .download-panel-section),
+  .cms-section-settings[data-mobile-arrangement="image-bottom"] :is(.media-feature, .scenario-split, .security-assurance, .download-panel-section) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cms-section-settings[data-mobile-arrangement="image-top"] .media-feature .hero-media {
+    order: -1;
+  }
+
+  .cms-section-settings[data-mobile-arrangement="image-bottom"] .media-feature .hero-media {
+    order: 2;
+  }
+}
+
 .card {
   min-height: 190px;
   border: 1px solid rgba(183, 200, 213, 0.78);
@@ -3681,7 +3949,7 @@ button.section-library-preview {
 .builder-setting-tabs {
   display: grid;
   align-self: start;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 4px;
   border: 1px solid rgba(183, 200, 213, 0.72);
   border-radius: 8px;

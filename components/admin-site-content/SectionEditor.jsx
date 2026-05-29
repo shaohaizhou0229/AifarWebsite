@@ -2,23 +2,17 @@
 
 import { useMemo, useState } from "react";
 import { SITE_SECTION_LABELS } from "@/lib/site-page-builder";
+import sectionSettingControls from "@/lib/section-setting-controls.cjs";
 import { Field, RowEditor, TextInput } from "./EditorControls";
 import { SectionImageUpload } from "./SectionImageUpload";
 
-const STYLE_TYPES = new Set([
-  "card_grid",
-  "feature_list",
-  "capability_matrix",
-  "scenario_split",
-  "workflow_steps",
-  "module_showcase",
-  "security_assurance",
-  "download_panel",
-  "faq_band",
-  "support_entry",
-  "updates_list",
-  "cta_band"
-]);
+const {
+  getLayoutControlsForSection,
+  getStyleControlsForSection,
+  patchSectionLayoutToken,
+  patchSectionStyleToken,
+  sanitizeAnchorId
+} = sectionSettingControls;
 
 const VARIANT_OPTIONS = {
   hero: [
@@ -47,17 +41,44 @@ function getSectionTitle(section, labels) {
   return labels.sectionTypes?.[section.type] || SITE_SECTION_LABELS[section.type] || section.type;
 }
 
-function SelectField({ label, value, options, labels, onChange }) {
+function tokenLabel(labels, value) {
+  return labels.settingTokenValues?.[String(value)] || value;
+}
+
+function controlLabel(labels, key) {
+  return labels.settingControlLabels?.[key] || labels[key] || key;
+}
+
+function SelectField({ label, value, options, labels, onChange, labelGroup = "" }) {
   return (
     <Field label={label}>
       <select value={value || options[0]?.[0] || ""} onChange={(event) => onChange(event.target.value)}>
         {options.map(([optionValue, labelKey]) => (
           <option key={optionValue} value={optionValue}>
-            {labels.variants?.[labelKey] || labels.tones?.[labelKey] || optionValue}
+            {labelGroup === "tokens"
+              ? tokenLabel(labels, labelKey)
+              : labels.variants?.[labelKey] || labels.tones?.[labelKey] || optionValue}
           </option>
         ))}
       </select>
     </Field>
+  );
+}
+
+function tokenOptions(values) {
+  return [["", "inherit"], ...values.map((value) => [String(value), String(value)])];
+}
+
+function TokenSelect({ labels, label, value, values, onChange }) {
+  return (
+    <SelectField
+      label={label}
+      value={value === undefined || value === null ? "" : String(value)}
+      labels={labels}
+      options={tokenOptions(values)}
+      labelGroup="tokens"
+      onChange={onChange}
+    />
   );
 }
 
@@ -114,7 +135,14 @@ function ContentTab({ section, labels, defaultTargetSize, onPatchSection, onPatc
   }
 
   if (section.type === "trust_bar") {
-    return <RowEditor labels={labels} rows={contentValues.items} columns={2} placeholders={[labels.value, labels.description]} onChange={(rows) => onPatchSectionContent(section.id, "items", rows)} />;
+    return (
+      <>
+        <Field label={labels.ariaLabel}>
+          <TextInput value={contentValues.ariaLabel} onChange={(value) => onPatchSectionContent(section.id, "ariaLabel", value)} />
+        </Field>
+        <RowEditor labels={labels} rows={contentValues.items} columns={2} placeholders={[labels.value, labels.description]} onChange={(rows) => onPatchSectionContent(section.id, "items", rows)} />
+      </>
+    );
   }
 
   if (section.type === "card_grid" || section.type === "capability_matrix") {
@@ -240,60 +268,101 @@ function ContentTab({ section, labels, defaultTargetSize, onPatchSection, onPatc
 }
 
 function StyleTab({ section, labels, onPatchSection }) {
-  if (!STYLE_TYPES.has(section.type)) {
+  const controls = getStyleControlsForSection(section.type);
+  const styleValues = section.settings?.style || {};
+
+  if (!controls.length) {
     return <p className="muted-line">{labels.noStyleSettings}</p>;
   }
 
   return (
-    <SelectField
-      label={labels.sectionTone}
-      value={section.settings?.tone || "plain"}
-      labels={labels}
-      options={[
-        ["plain", "plain"],
-        ["alt", "alt"]
-      ]}
-      onChange={(value) => onPatchSection(section.id, (current) => ({ ...current, settings: { ...(current.settings || {}), tone: value } }))}
-    />
+    <>
+      <SelectField
+        label={labels.sectionTone}
+        value={section.settings?.tone || "plain"}
+        labels={labels}
+        options={[
+          ["plain", "plain"],
+          ["alt", "alt"]
+        ]}
+        onChange={(value) => onPatchSection(section.id, (current) => ({ ...current, settings: { ...(current.settings || {}), tone: value } }))}
+      />
+      {controls.includes("textSize") ? (
+        <TokenSelect labels={labels} label={controlLabel(labels, "textSize")} value={styleValues.textSize} values={["small", "medium", "large"]} onChange={(value) => onPatchSection(section.id, (current) => patchSectionStyleToken(current, "textSize", value))} />
+      ) : null}
+      {controls.includes("titleWeight") ? (
+        <TokenSelect labels={labels} label={controlLabel(labels, "titleWeight")} value={styleValues.titleWeight} values={["500", "600", "700", "800"]} onChange={(value) => onPatchSection(section.id, (current) => patchSectionStyleToken(current, "titleWeight", value))} />
+      ) : null}
+      {controls.includes("cardStyle") ? (
+        <TokenSelect labels={labels} label={controlLabel(labels, "cardStyle")} value={styleValues.cardStyle} values={["flat", "outlined", "shadow"]} onChange={(value) => onPatchSection(section.id, (current) => patchSectionStyleToken(current, "cardStyle", value))} />
+      ) : null}
+      {controls.includes("iconStyle") ? (
+        <TokenSelect labels={labels} label={controlLabel(labels, "iconStyle")} value={styleValues.iconStyle} values={["line", "filled"]} onChange={(value) => onPatchSection(section.id, (current) => patchSectionStyleToken(current, "iconStyle", value))} />
+      ) : null}
+      {controls.includes("buttonStyle") ? (
+        <TokenSelect labels={labels} label={controlLabel(labels, "buttonStyle")} value={styleValues.buttonStyle} values={["solid", "outline"]} onChange={(value) => onPatchSection(section.id, (current) => patchSectionStyleToken(current, "buttonStyle", value))} />
+      ) : null}
+      {controls.includes("colorScheme") ? (
+        <TokenSelect labels={labels} label={controlLabel(labels, "colorScheme")} value={styleValues.colorScheme} values={["default", "brand", "blue", "green", "neutral"]} onChange={(value) => onPatchSection(section.id, (current) => patchSectionStyleToken(current, "colorScheme", value))} />
+      ) : null}
+      {controls.includes("imageRadius") ? (
+        <TokenSelect labels={labels} label={controlLabel(labels, "imageRadius")} value={styleValues.imageRadius} values={["none", "small", "medium", "large"]} onChange={(value) => onPatchSection(section.id, (current) => patchSectionStyleToken(current, "imageRadius", value))} />
+      ) : null}
+      {controls.includes("cardSpacing") ? (
+        <TokenSelect labels={labels} label={controlLabel(labels, "cardSpacing")} value={styleValues.cardSpacing} values={["compact", "normal", "relaxed"]} onChange={(value) => onPatchSection(section.id, (current) => patchSectionStyleToken(current, "cardSpacing", value))} />
+      ) : null}
+    </>
   );
 }
 
 function LayoutTab({ section, labels, onPatchSection }) {
+  const controls = getLayoutControlsForSection(section.type);
+  const layoutValues = section.settings?.layout || {};
   const options = VARIANT_OPTIONS[section.type];
-  if (!options) {
+  const hasAnchor = section.type === "support_entry";
+
+  if (!options && !controls.length && !hasAnchor) {
     return <p className="muted-line">{labels.noLayoutSettings}</p>;
   }
 
   return (
-    <SelectField
-      label={labels.variant}
-      value={section.variant}
-      labels={labels}
-      options={options}
-      onChange={(value) => onPatchSection(section.id, (current) => ({ ...current, variant: value }))}
-    />
-  );
-}
-
-function AdvancedTab({ section, labels, onPatchSection, onPatchSectionContent }) {
-  const contentValues = section.content || {};
-  const hasAnchor = section.type === "support_entry";
-  const hasAria = section.type === "trust_bar";
-
-  if (!hasAnchor && !hasAria) {
-    return <p className="muted-line">{labels.noAdvancedSettings}</p>;
-  }
-
-  return (
     <>
+      {options ? (
+        <SelectField
+          label={labels.variant}
+          value={section.variant}
+          labels={labels}
+          options={options}
+          onChange={(value) => onPatchSection(section.id, (current) => ({ ...current, variant: value }))}
+        />
+      ) : null}
+      {controls.includes("desktopArrangement") ? (
+        <TokenSelect labels={labels} label={controlLabel(labels, "desktopArrangement")} value={layoutValues.desktopArrangement} values={["split", "stacked", "overlay", "background"]} onChange={(value) => onPatchSection(section.id, (current) => patchSectionLayoutToken(current, "desktopArrangement", value))} />
+      ) : null}
+      {controls.includes("mobileArrangement") ? (
+        <TokenSelect labels={labels} label={controlLabel(labels, "mobileArrangement")} value={layoutValues.mobileArrangement} values={["single-column", "image-top", "image-bottom"]} onChange={(value) => onPatchSection(section.id, (current) => patchSectionLayoutToken(current, "mobileArrangement", value))} />
+      ) : null}
+      {controls.includes("cardColumns") ? (
+        <TokenSelect labels={labels} label={controlLabel(labels, "cardColumns")} value={layoutValues.cardColumns} values={[1, 2, 3, 4]} onChange={(value) => onPatchSection(section.id, (current) => patchSectionLayoutToken(current, "cardColumns", Number(value) || ""))} />
+      ) : null}
+      {controls.includes("contentAlign") ? (
+        <TokenSelect labels={labels} label={controlLabel(labels, "contentAlign")} value={layoutValues.contentAlign} values={["left", "center"]} onChange={(value) => onPatchSection(section.id, (current) => patchSectionLayoutToken(current, "contentAlign", value))} />
+      ) : null}
+      {controls.includes("imagePosition") ? (
+        <TokenSelect labels={labels} label={controlLabel(labels, "imagePosition")} value={layoutValues.imagePosition} values={["left", "right", "top", "background"]} onChange={(value) => onPatchSection(section.id, (current) => patchSectionLayoutToken(current, "imagePosition", value))} />
+      ) : null}
+      {controls.includes("entranceAnimation") ? (
+        <TokenSelect labels={labels} label={controlLabel(labels, "entranceAnimation")} value={layoutValues.entranceAnimation} values={["none", "fade", "fade-up", "stagger"]} onChange={(value) => onPatchSection(section.id, (current) => patchSectionLayoutToken(current, "entranceAnimation", value))} />
+      ) : null}
+      {controls.includes("hoverIn") ? (
+        <TokenSelect labels={labels} label={controlLabel(labels, "hoverIn")} value={layoutValues.hoverIn} values={["none", "lift", "reveal"]} onChange={(value) => onPatchSection(section.id, (current) => patchSectionLayoutToken(current, "hoverIn", value))} />
+      ) : null}
+      {controls.includes("hoverOut") ? (
+        <TokenSelect labels={labels} label={controlLabel(labels, "hoverOut")} value={layoutValues.hoverOut} values={["none", "reset", "fade"]} onChange={(value) => onPatchSection(section.id, (current) => patchSectionLayoutToken(current, "hoverOut", value))} />
+      ) : null}
       {hasAnchor ? (
         <Field label={labels.anchorId}>
-          <TextInput value={section.settings?.anchorId} onChange={(value) => onPatchSection(section.id, (current) => ({ ...current, settings: { ...(current.settings || {}), anchorId: value } }))} />
-        </Field>
-      ) : null}
-      {hasAria ? (
-        <Field label={labels.ariaLabel}>
-          <TextInput value={contentValues.ariaLabel} onChange={(value) => onPatchSectionContent(section.id, "ariaLabel", value)} />
+          <TextInput value={section.settings?.anchorId} onChange={(value) => onPatchSection(section.id, (current) => ({ ...current, settings: { ...(current.settings || {}), anchorId: sanitizeAnchorId(value) } }))} />
         </Field>
       ) : null}
     </>
@@ -304,8 +373,7 @@ export function SectionEditor({ section, labels, defaultTargetSize = "1024x1024"
   const tabs = useMemo(() => [
     ["content", labels.settingTabs?.content || labels.inspector],
     ["style", labels.settingTabs?.style || labels.sectionTone],
-    ["layout", labels.settingTabs?.layout || labels.variant],
-    ["advanced", labels.settingTabs?.advanced || labels.anchorId]
+    ["layout", labels.settingTabs?.layout || labels.variant]
   ], [labels]);
   const [activeTab, setActiveTab] = useState("content");
 
@@ -336,7 +404,6 @@ export function SectionEditor({ section, labels, defaultTargetSize = "1024x1024"
       ) : null}
       {activeTab === "style" ? <StyleTab section={section} labels={labels} onPatchSection={onPatchSection} /> : null}
       {activeTab === "layout" ? <LayoutTab section={section} labels={labels} onPatchSection={onPatchSection} /> : null}
-      {activeTab === "advanced" ? <AdvancedTab section={section} labels={labels} onPatchSection={onPatchSection} onPatchSectionContent={onPatchSectionContent} /> : null}
     </div>
   );
 }
