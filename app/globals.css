@@ -3742,11 +3742,17 @@ button.section-library-preview {
 .template-library-actions {
   display: grid;
   gap: 7px;
-  min-width: 92px;
+  min-width: 112px;
 }
 
 .template-library-actions .button {
   justify-content: center;
+}
+
+.template-library-actions .danger,
+.template-preview-actions .danger {
+  border-color: rgba(220, 38, 38, 0.32);
+  color: #b91c1c;
 }
 
 .template-library-state {
@@ -3772,7 +3778,7 @@ button.section-library-preview {
 }
 
 .template-preview-modal {
-  grid-template-rows: auto auto auto minmax(0, 1fr);
+  grid-template-rows: auto auto auto auto minmax(0, 1fr);
 }
 
 .section-recognition-modal {
@@ -3941,9 +3947,71 @@ button.section-library-preview {
   align-items: flex-start;
 }
 
+.section-recognition-result-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
 .section-recognition-result-head strong {
   display: block;
   margin-top: 2px;
+}
+
+.section-recognition-candidate-form,
+.template-metadata-form {
+  display: grid;
+  gap: 10px;
+}
+
+.section-recognition-candidate-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid rgba(183, 200, 213, 0.58);
+  border-radius: 8px;
+  background: #fbfcfd;
+  padding: 10px;
+}
+
+.section-recognition-candidate-form label,
+.template-metadata-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.section-recognition-candidate-form label:nth-child(2),
+.section-recognition-candidate-form label:nth-child(6) {
+  grid-column: 1 / -1;
+}
+
+.section-recognition-candidate-form span,
+.template-metadata-field span,
+.template-metadata-favorite span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.section-recognition-candidate-form input,
+.section-recognition-candidate-form select,
+.section-recognition-candidate-form textarea,
+.template-metadata-field input,
+.template-metadata-field select,
+.template-metadata-field textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(183, 200, 213, 0.9);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  padding: 9px 10px;
+}
+
+.section-recognition-candidate-form textarea,
+.template-metadata-field textarea {
+  resize: vertical;
 }
 
 .section-recognition-meta {
@@ -3988,6 +4056,38 @@ button.section-library-preview {
 .template-preview-tags {
   border-bottom: 1px solid rgba(183, 200, 213, 0.36);
   padding: 0 18px 12px;
+}
+
+.template-metadata-modal {
+  width: min(620px, 96vw);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.template-metadata-form {
+  min-height: 0;
+  overflow: auto;
+  padding: 16px 18px;
+}
+
+.template-metadata-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.template-metadata-favorite {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.template-metadata-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  border-top: 1px solid rgba(183, 200, 213, 0.56);
+  background: #f7f9fb;
+  padding: 12px 18px;
 }
 
 .template-card {

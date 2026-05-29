@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Eye, Plus, RefreshCw, Search, Sparkles, X } from "lucide-react";
+import { Archive, Edit3, Eye, Plus, RefreshCw, Search, Sparkles, X } from "lucide-react";
 import { SITE_SECTION_LABELS, createBlankSection } from "@/lib/site-page-builder";
 import sectionTemplateUi from "@/lib/section-template-ui.cjs";
 import { SitePageSections } from "@/components/SitePageSections";
@@ -9,7 +9,8 @@ import { SitePageSections } from "@/components/SitePageSections";
 const {
   TEMPLATE_INDUSTRY_FILTERS,
   createTemplatePreviewPage,
-  filterSectionTemplates
+  filterSectionTemplates,
+  isEditableTemplate
 } = sectionTemplateUi;
 
 const STRUCTURE_GROUPS = [
@@ -68,8 +69,9 @@ function getPageLabel(labels, pageKey) {
   return pageKey;
 }
 
-function TemplateCard({ labels, locale, template, onInsertTemplate, onPreviewTemplate }) {
+function TemplateCard({ labels, locale, template, onInsertTemplate, onPreviewTemplate, onEditTemplate, onArchiveTemplate }) {
   const previewPage = useMemo(() => createTemplatePreviewPage(template), [template]);
+  const editable = isEditableTemplate(template);
 
   return (
     <article className="section-library-row template-library-row">
@@ -96,6 +98,18 @@ function TemplateCard({ labels, locale, template, onInsertTemplate, onPreviewTem
           <Plus size={15} aria-hidden="true" />
           {labels.insertBlock}
         </button>
+        {editable ? (
+          <>
+            <button className="button secondary compact" type="button" onClick={() => onEditTemplate(template)}>
+              <Edit3 size={15} aria-hidden="true" />
+              {labels.editTemplateInfo}
+            </button>
+            <button className="button secondary compact danger" type="button" onClick={() => onArchiveTemplate(template)}>
+              <Archive size={15} aria-hidden="true" />
+              {labels.archiveSectionTemplate}
+            </button>
+          </>
+        ) : null}
       </div>
     </article>
   );
@@ -111,6 +125,8 @@ export function SectionSidebar({
   onAddSection,
   onInsertTemplate,
   onPreviewTemplate,
+  onEditTemplate,
+  onArchiveTemplate,
   onOpenRecognition
 }) {
   const [libraryMode, setLibraryMode] = useState("templates");
@@ -309,6 +325,8 @@ export function SectionSidebar({
                 template={template}
                 onInsertTemplate={insertTemplate}
                 onPreviewTemplate={onPreviewTemplate}
+                onEditTemplate={onEditTemplate}
+                onArchiveTemplate={onArchiveTemplate}
               />
             )) : null}
             {!sectionTemplatesLoading && !sectionTemplatesError && !filteredTemplates.length ? (

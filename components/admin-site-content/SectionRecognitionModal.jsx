@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, Image as ImageIcon, Plus, RefreshCw, Sparkles, UploadCloud, X } from "lucide-react";
+import { AlertTriangle, Image as ImageIcon, Plus, RefreshCw, Save, Sparkles, UploadCloud, X } from "lucide-react";
 import { SitePageSections } from "@/components/SitePageSections";
 import sectionTemplateRules from "@/lib/section-template-rules.cjs";
 import sectionTemplateUi from "@/lib/section-template-ui.cjs";
 
 const { SECTION_TEMPLATE_INDUSTRIES, SITE_SECTION_TYPES } = sectionTemplateRules;
-const { createTemplatePreviewPage } = sectionTemplateUi;
+const { createTemplateMetadataDraft, createTemplatePreviewPage } = sectionTemplateUi;
 const SUPPORTED_PAGE_KEYS = new Set(["home", "product"]);
 
 function getIndustryLabel(labels, industry) {
@@ -42,7 +42,8 @@ export function SectionRecognitionModal({
   pageKey,
   pageOptions = [],
   onClose,
-  onInsertTemplate
+  onInsertTemplate,
+  onSaveTemplate
 }) {
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
@@ -51,8 +52,11 @@ export function SectionRecognitionModal({
   const [sectionTypeHint, setSectionTypeHint] = useState("auto");
   const [purposeHint, setPurposeHint] = useState("");
   const [candidate, setCandidate] = useState(null);
+  const [candidateDraft, setCandidateDraft] = useState(() => createTemplateMetadataDraft(null));
+  const [savedTemplate, setSavedTemplate] = useState(null);
   const [recognition, setRecognition] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [savingTemplate, setSavingTemplate] = useState(false);
   const [error, setError] = useState("");
 
   const targetPages = useMemo(
@@ -68,11 +72,18 @@ export function SectionRecognitionModal({
     if (previewUrl) URL.revokeObjectURL(previewUrl);
   }, [previewUrl]);
 
+  useEffect(() => {
+    if (!candidate) return;
+    setCandidateDraft(createTemplateMetadataDraft(candidate));
+    setSavedTemplate(null);
+  }, [candidate]);
+
   function updateFile(nextFile) {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setFile(nextFile || null);
     setPreviewUrl(nextFile ? URL.createObjectURL(nextFile) : "");
     setCandidate(null);
+    setSavedTemplate(null);
     setRecognition(null);
     setError("");
   }
@@ -122,8 +133,27 @@ export function SectionRecognitionModal({
 
   function insertCandidate() {
     if (!candidate) return;
-    onInsertTemplate(candidate);
+    onInsertTemplate(savedTemplate || candidate);
     onClose();
+  }
+
+  function patchCandidateDraft(key, value) {
+    setCandidateDraft((current) => ({ ...current, [key]: value }));
+    setSavedTemplate(null);
+  }
+
+  async function saveCandidateTemplate() {
+    if (!candidate || !onSaveTemplate) return;
+    setSavingTemplate(true);
+    setError("");
+    try {
+      const template = await onSaveTemplate(candidate, candidateDraft);
+      setSavedTemplate(template || null);
+    } catch (saveError) {
+      setError(saveError.message || labels.aiTemplateSaveFailed);
+    } finally {
+      setSavingTemplate(false);
+    }
   }
 
   return (
@@ -228,16 +258,58 @@ export function SectionRecognitionModal({
                 <div className="section-recognition-result-head">
                   <div>
                     <p className="eyebrow">{labels.aiCandidateReady}</p>
-                    <strong>{candidate.name}</strong>
+                    <strong>{candidateDraft.name || candidate.name}</strong>
                   </div>
-                  <button className="button primary compact" type="button" onClick={insertCandidate}>
-                    <Plus size={15} aria-hidden="true" />
-                    {labels.aiInsertCandidate}
-                  </button>
+                  <div className="section-recognition-result-actions">
+                    <button className="button secondary compact" type="button" onClick={saveCandidateTemplate} disabled={savingTemplate || busy || Boolean(savedTemplate) || !onSaveTemplate}>
+                      <Save size={15} aria-hidden="true" />
+                      {savingTemplate ? labels.saving : savedTemplate ? labels.aiTemplateSavedShort : labels.saveAiSectionTemplate}
+                    </button>
+                    <button className="button primary compact" type="button" onClick={insertCandidate} disabled={savingTemplate}>
+                      <Plus size={15} aria-hidden="true" />
+                      {labels.aiInsertCandidate}
+                    </button>
+                  </div>
                 </div>
+                <div className="section-recognition-candidate-form">
+                  <label>
+                    <span>{labels.templateName}</span>
+                    <input value={candidateDraft.name} onChange={(event) => patchCandidateDraft("name", event.target.value)} maxLength={80} disabled={savingTemplate || busy} />
+                  </label>
+                  <label>
+                    <span>{labels.templateDescription}</span>
+                    <textarea value={candidateDraft.description} onChange={(event) => patchCandidateDraft("description", event.target.value)} maxLength={180} rows={2} disabled={savingTemplate || busy} />
+                  </label>
+                  <label>
+                    <span>{labels.templateIndustry}</span>
+                    <select value={candidateDraft.industry} onChange={(event) => patchCandidateDraft("industry", event.target.value)} disabled={savingTemplate || busy}>
+                      {SECTION_TEMPLATE_INDUSTRIES.map((item) => (
+                        <option value={item} key={item}>{getIndustryLabel(labels, item)}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    <span>{labels.templatePageScope}</span>
+                    <select value={candidateDraft.pageKey} onChange={(event) => patchCandidateDraft("pageKey", event.target.value)} disabled={savingTemplate || busy}>
+                      <option value="">{labels.templateAllPages}</option>
+                      {targetPages.map((option) => (
+                        <option value={option.key} key={option.key}>{option.label || getPageLabel(labels, option.key)}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    <span>{labels.templatePurpose}</span>
+                    <input value={candidateDraft.purpose} onChange={(event) => patchCandidateDraft("purpose", event.target.value)} maxLength={80} disabled={savingTemplate || busy} />
+                  </label>
+                  <label>
+                    <span>{labels.templateTags}</span>
+                    <input value={candidateDraft.tagsText} onChange={(event) => patchCandidateDraft("tagsText", event.target.value)} placeholder={labels.templateTagsPlaceholder} maxLength={160} disabled={savingTemplate || busy} />
+                  </label>
+                </div>
+                {savedTemplate ? <p className="form-message success">{labels.aiTemplateSaved}</p> : null}
                 <div className="template-preview-meta section-recognition-meta">
-                  <span>{labels.templateIndustry}: {getIndustryLabel(labels, candidate.industry)}</span>
-                  <span>{labels.templatePurpose}: {candidate.purpose || labels.emptyValue}</span>
+                  <span>{labels.templateIndustry}: {getIndustryLabel(labels, candidateDraft.industry || candidate.industry)}</span>
+                  <span>{labels.templatePurpose}: {candidateDraft.purpose || candidate.purpose || labels.emptyValue}</span>
                   <span>{labels.aiRecognitionConfidence}: {Math.round((recognition?.confidence || 0) * 100)}%</span>
                   <span>{labels.aiSectionTypeHint}: {getSectionTypeLabel(labels, recognition?.detectedSectionType || candidate.content?.sections?.[0]?.type)}</span>
                 </div>

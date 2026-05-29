@@ -2,9 +2,13 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const {
   buildSectionTemplatesUrl,
+  createAiCandidateTemplateSavePayload,
+  createTemplateMetadataDraft,
+  createTemplateMetadataPayload,
   createTemplatePreviewPage,
   filterSectionTemplates,
-  insertTemplateSection
+  insertTemplateSection,
+  isEditableTemplate
 } = require("../lib/section-template-ui.cjs");
 
 function createTemplate(overrides = {}) {
@@ -95,6 +99,77 @@ test("AI pending review template insertion creates a fresh section without mutat
   assert.equal(result.insertedSection.id, "hero-ai-copy");
   assert.equal(result.insertedSection.type, "hero");
   assert.equal(candidate.content.sections[0].id, "hero-source");
+});
+
+test("AI candidate save payload strips preview-only fields and marks template ready", () => {
+  const candidate = createTemplate({
+    id: "ai-section-template-preview-1",
+    locale: "zh-CN",
+    source: "ai",
+    status: "pending_review",
+    isSystem: false,
+    riskFlags: ["manual_review_required"],
+    recognition: { sourceImage: { name: "source.png" } }
+  });
+  const payload = createAiCandidateTemplateSavePayload(candidate, {
+    name: "Saved AI block",
+    description: "Reusable AI block",
+    industry: "custom",
+    purpose: "landing_entry",
+    tagsText: "ai, screenshot, ai",
+    pageKey: "home",
+    isFavorite: true
+  }, { locale: "zh-CN" });
+
+  assert.equal(payload.id, undefined);
+  assert.equal(payload.isSystem, undefined);
+  assert.equal(payload.recognition, undefined);
+  assert.equal(payload.sourceImage, undefined);
+  assert.equal(payload.source, "ai");
+  assert.equal(payload.status, "ready");
+  assert.equal(payload.locale, "zh-CN");
+  assert.equal(payload.pageKey, "home");
+  assert.equal(payload.isFavorite, true);
+  assert.deepEqual(payload.tags, ["ai", "screenshot"]);
+  assert.deepEqual(payload.riskFlags, ["manual_review_required"]);
+  assert.equal(candidate.status, "pending_review");
+});
+
+test("template metadata payload and editability stay scoped to non-system templates", () => {
+  assert.deepEqual(createTemplateMetadataDraft(null), {
+    name: "",
+    description: "",
+    industry: "custom",
+    purpose: "general",
+    tagsText: "",
+    pageKey: "",
+    isFavorite: false
+  });
+  assert.equal(isEditableTemplate(createTemplate()), false);
+  assert.equal(isEditableTemplate(createTemplate({ id: "database-ai-template", source: "ai", isSystem: false })), true);
+
+  const payload = createTemplateMetadataPayload({
+    name: "Custom block",
+    description: "Edited metadata",
+    industry: "marketing",
+    purpose: "cta",
+    tagsText: "sale, hero, sale",
+    pageKey: "downloads",
+    isFavorite: false,
+    content: { sections: [{ id: "bad" }] }
+  });
+
+  assert.deepEqual(payload, {
+    name: "Custom block",
+    description: "Edited metadata",
+    industry: "marketing",
+    purpose: "cta",
+    tags: ["sale", "hero"],
+    pageKey: "",
+    isFavorite: false
+  });
+
+  assert.equal(isEditableTemplate(createTemplate({ id: "system-spoof", source: "ai", isSystem: false })), false);
 });
 
 test("template insertion appends when there is no selected section", () => {

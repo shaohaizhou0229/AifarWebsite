@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Clock3, Eye, Monitor, RotateCcw, Settings, Smartphone, Sparkles, Trash2, X } from "lucide-react";
+import { Archive, Clock3, Edit3, Eye, Monitor, RotateCcw, Settings, Smartphone, Sparkles, Trash2, X } from "lucide-react";
 import { AssetPickerModal } from "@/components/AssetPickerModal";
 import { SITE_LAYOUT_VERSION, createBlankSection } from "@/lib/site-page-builder";
 import { SitePageSections } from "@/components/SitePageSections";
@@ -9,6 +9,7 @@ import { CmsToolbar } from "@/components/admin-site-content/CmsToolbar";
 import { SectionEditor } from "@/components/admin-site-content/SectionEditor";
 import { SectionRecognitionModal } from "@/components/admin-site-content/SectionRecognitionModal";
 import { SectionSidebar } from "@/components/admin-site-content/SectionSidebar";
+import { SectionTemplateMetadataModal } from "@/components/admin-site-content/SectionTemplateMetadataModal";
 import { SeoEditor } from "@/components/admin-site-content/SeoEditor";
 import { cloneContent, ensureLayout, formatDate, moveItem, updateSectionAt, updateSeo } from "@/components/admin-site-content/form-utils";
 import promptContextRules from "@/lib/asset-prompt-context.cjs";
@@ -20,8 +21,11 @@ const { buildSectionImagePromptContext } = promptContextRules;
 const { normalizeImageSize, resolveImageTargetSize } = imageGenerationRules;
 const {
   buildSectionTemplatesUrl,
+  createAiCandidateTemplateSavePayload,
+  createTemplateMetadataPayload,
   createTemplatePreviewPage,
-  insertTemplateSection
+  insertTemplateSection,
+  isEditableTemplate
 } = sectionTemplateUi;
 
 function getSectionImageSpec(section, pathKey) {
@@ -141,6 +145,10 @@ export function AdminSiteContentForm({
   const [pageSettingsOpen, setPageSettingsOpen] = useState(false);
   const [snapshotPreview, setSnapshotPreview] = useState(null);
   const [templatePreview, setTemplatePreview] = useState(null);
+  const [templateMetadataEditor, setTemplateMetadataEditor] = useState(null);
+  const [templateMetadataError, setTemplateMetadataError] = useState("");
+  const [templateMetadataSaving, setTemplateMetadataSaving] = useState(false);
+  const [templateActionBusyId, setTemplateActionBusyId] = useState("");
   const [recognitionOpen, setRecognitionOpen] = useState(false);
   const [assetPickerTarget, setAssetPickerTarget] = useState(null);
   const [hoveredSectionId, setHoveredSectionId] = useState("");
@@ -181,7 +189,7 @@ export function AdminSiteContentForm({
   }, []);
 
   useEffect(() => {
-    if (!previewOpen && !pageSettingsOpen && !snapshotPreview && !templatePreview && !recognitionOpen) return undefined;
+    if (!previewOpen && !pageSettingsOpen && !snapshotPreview && !templatePreview && !templateMetadataEditor && !recognitionOpen) return undefined;
 
     function closeOnEscape(event) {
       if (event.key === "Escape") {
@@ -189,13 +197,14 @@ export function AdminSiteContentForm({
         setPageSettingsOpen(false);
         setSnapshotPreview(null);
         setTemplatePreview(null);
+        setTemplateMetadataEditor(null);
         setRecognitionOpen(false);
       }
     }
 
     document.addEventListener("keydown", closeOnEscape);
     return () => document.removeEventListener("keydown", closeOnEscape);
-  }, [previewOpen, pageSettingsOpen, snapshotPreview, templatePreview, recognitionOpen]);
+  }, [previewOpen, pageSettingsOpen, snapshotPreview, templatePreview, templateMetadataEditor, recognitionOpen]);
 
   useEffect(() => {
     let cancelled = false;
@@ -487,6 +496,86 @@ export function AdminSiteContentForm({
     setSectionTemplatesReloadToken((current) => current + 1);
   }
 
+  async function saveAiCandidateTemplate(candidate, draft) {
+    setMessage("");
+    setError("");
+    const payload = createAiCandidateTemplateSavePayload(candidate, draft, { locale });
+
+    try {
+      const response = await fetch("/api/admin/site-content/section-templates/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || labels.aiTemplateSaveFailed);
+      setSectionTemplatesReloadToken((current) => current + 1);
+      setMessage(labels.aiTemplateSaved);
+      return data.template;
+    } catch (saveError) {
+      setError(saveError.message || labels.aiTemplateSaveFailed);
+      throw saveError;
+    }
+  }
+
+  function openTemplateMetadataEditor(template) {
+    if (!isEditableTemplate(template)) return;
+    setTemplateMetadataError("");
+    setTemplateMetadataEditor(template);
+  }
+
+  async function updateTemplateMetadata(draft) {
+    if (!templateMetadataEditor) return;
+    setTemplateMetadataSaving(true);
+    setTemplateMetadataError("");
+    setMessage("");
+    setError("");
+    const payload = createTemplateMetadataPayload(draft);
+
+    try {
+      const response = await fetch(`/api/admin/site-content/section-templates/${templateMetadataEditor.id}/`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || labels.templateInfoSaveFailed);
+      const nextTemplate = data.template;
+      setSectionTemplates((current) => current.map((template) => template.id === nextTemplate.id ? nextTemplate : template));
+      setTemplatePreview((current) => current?.id === nextTemplate.id ? nextTemplate : current);
+      setTemplateMetadataEditor(null);
+      setMessage(labels.templateInfoSaved);
+      reloadSectionTemplates();
+    } catch (updateError) {
+      setTemplateMetadataError(updateError.message || labels.templateInfoSaveFailed);
+    } finally {
+      setTemplateMetadataSaving(false);
+    }
+  }
+
+  async function archiveSectionTemplate(template) {
+    if (!isEditableTemplate(template)) return;
+    if (!window.confirm(labels.confirmArchiveSectionTemplate)) return;
+
+    setTemplateActionBusyId(template.id);
+    setMessage("");
+    setError("");
+    try {
+      const response = await fetch(`/api/admin/site-content/section-templates/${template.id}/`, { method: "DELETE" });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || labels.templateArchiveFailed);
+      setSectionTemplates((current) => current.filter((item) => item.id !== template.id));
+      setTemplatePreview((current) => current?.id === template.id ? null : current);
+      setTemplateMetadataEditor((current) => current?.id === template.id ? null : current);
+      setMessage(labels.templateArchived);
+      reloadSectionTemplates();
+    } catch (archiveError) {
+      setError(archiveError.message || labels.templateArchiveFailed);
+    } finally {
+      setTemplateActionBusyId("");
+    }
+  }
+
   function insertSectionTemplate(template, afterSectionId = selectedSectionId) {
     queueDesignerScrollRestore();
     setMessage("");
@@ -654,6 +743,8 @@ export function AdminSiteContentForm({
               onAddSection={addSection}
               onInsertTemplate={insertSectionTemplate}
               onPreviewTemplate={setTemplatePreview}
+              onEditTemplate={openTemplateMetadataEditor}
+              onArchiveTemplate={archiveSectionTemplate}
               onOpenRecognition={() => setRecognitionOpen(true)}
             />
           </aside>
@@ -792,6 +883,18 @@ export function AdminSiteContentForm({
                 <strong>{templatePreview.name}</strong>
               </div>
               <div className="template-preview-actions">
+                {isEditableTemplate(templatePreview) ? (
+                  <>
+                    <button className="button secondary compact" type="button" onClick={() => openTemplateMetadataEditor(templatePreview)}>
+                      <Edit3 size={15} aria-hidden="true" />
+                      {labels.editTemplateInfo}
+                    </button>
+                    <button className="button secondary compact danger" type="button" onClick={() => archiveSectionTemplate(templatePreview)} disabled={templateActionBusyId === templatePreview.id}>
+                      <Archive size={15} aria-hidden="true" />
+                      {labels.archiveSectionTemplate}
+                    </button>
+                  </>
+                ) : null}
                 <button className="button primary compact" type="button" onClick={() => insertSectionTemplate(templatePreview)}>
                   {labels.insertBlock}
                 </button>
@@ -804,6 +907,7 @@ export function AdminSiteContentForm({
               <span>{labels.templateIndustry}: {labels.templateIndustries?.[templatePreview.industry] || templatePreview.industry}</span>
               <span>{labels.templatePurpose}: {templatePreview.purpose || labels.emptyValue}</span>
               <span>{labels.templateSource}: {labels.templateSources?.[templatePreview.source] || templatePreview.source}</span>
+              <span>{labels.templateStatus}: {labels.templateStatuses?.[templatePreview.status] || templatePreview.status || labels.emptyValue}</span>
               <span>
                 {labels.templatePageScope}: {templatePreview.pageKey === "home"
                   ? labels.homePage
@@ -815,6 +919,11 @@ export function AdminSiteContentForm({
             {templatePreview.tags?.length ? (
               <div className="template-preview-tags" aria-label={labels.templateTags}>
                 {templatePreview.tags.map((tag) => <span key={tag}>{tag}</span>)}
+              </div>
+            ) : null}
+            {templatePreview.riskFlags?.length ? (
+              <div className="template-preview-tags section-recognition-risks" aria-label={labels.aiRecognitionRisks}>
+                {templatePreview.riskFlags.map((flag) => <span key={flag}>{labels.aiRiskFlags?.[flag] || flag}</span>)}
               </div>
             ) : null}
             <div className={`cms-live-preview site-preview-modal-canvas ${previewMode}`} ref={templatePreviewRef}>
@@ -834,6 +943,19 @@ export function AdminSiteContentForm({
           pageOptions={pageOptions}
           onClose={() => setRecognitionOpen(false)}
           onInsertTemplate={insertSectionTemplate}
+          onSaveTemplate={saveAiCandidateTemplate}
+        />
+      ) : null}
+
+      {templateMetadataEditor ? (
+        <SectionTemplateMetadataModal
+          labels={labels}
+          template={templateMetadataEditor}
+          pageOptions={pageOptions}
+          busy={templateMetadataSaving}
+          error={templateMetadataError}
+          onClose={() => setTemplateMetadataEditor(null)}
+          onSave={updateTemplateMetadata}
         />
       ) : null}
 
