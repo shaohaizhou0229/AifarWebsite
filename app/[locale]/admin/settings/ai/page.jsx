@@ -5,7 +5,7 @@ import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { AdminRequiredError } from "@/lib/auth";
 import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { getImageGenerationSettings } from "@/lib/image-generation-settings";
+import { getAiServiceSettings } from "@/lib/image-generation-settings";
 import { getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -51,7 +51,7 @@ export default async function AdminAiSettingsPage({ params }) {
           { label: page.breadcrumb }
         ]}
       />
-      <AdminAiSettingsClient labels={page} settings={getImageGenerationSettings()} />
+      <AdminAiSettingsClient labels={page} settings={getAiServiceSettings()} />
     </>
   );
 }

@@ -30,12 +30,12 @@ function getRiskLabel(labels, flag) {
 }
 
 function normalizeResponseError(data, fallback, labels) {
-  if (data?.code === "recognitionUnavailable") return labels.aiRecognitionUnavailable || fallback;
-  if (data?.code === "recognition_timeout") return labels.aiRecognitionTimeout || fallback;
-  if (data?.code === "screenshot_type") return labels.aiInvalidScreenshot || fallback;
-  if (data?.code === "screenshot_too_large") return labels.aiInvalidScreenshot || fallback;
-  if (data?.code === "screenshot_required") return labels.aiNoScreenshot || fallback;
-  return data?.error || fallback;
+  if (data?.code === "recognitionUnavailable") return { code: data.code, message: labels.aiRecognitionUnavailable || fallback };
+  if (data?.code === "recognition_timeout") return { code: data.code, message: labels.aiRecognitionTimeout || fallback };
+  if (data?.code === "screenshot_type") return { code: data.code, message: labels.aiInvalidScreenshot || fallback };
+  if (data?.code === "screenshot_too_large") return { code: data.code, message: labels.aiInvalidScreenshot || fallback };
+  if (data?.code === "screenshot_required") return { code: data.code, message: labels.aiNoScreenshot || fallback };
+  return { code: data?.code || "", message: data?.error || fallback };
 }
 
 export function SectionRecognitionModal({
@@ -43,6 +43,8 @@ export function SectionRecognitionModal({
   locale,
   pageKey,
   pageOptions = [],
+  canManageAiSettings = false,
+  aiSettingsHref = "",
   onClose,
   onInsertTemplate,
   onSaveTemplate
@@ -60,6 +62,7 @@ export function SectionRecognitionModal({
   const [busy, setBusy] = useState(false);
   const [savingTemplate, setSavingTemplate] = useState(false);
   const [error, setError] = useState("");
+  const [errorCode, setErrorCode] = useState("");
 
   const targetPages = useMemo(
     () => pageOptions.filter((option) => SUPPORTED_PAGE_KEYS.has(option.key)),
@@ -88,6 +91,7 @@ export function SectionRecognitionModal({
     setSavedTemplate(null);
     setRecognition(null);
     setError("");
+    setErrorCode("");
   }
 
   function onFileChange(event) {
@@ -98,11 +102,13 @@ export function SectionRecognitionModal({
   async function recognizeCandidate() {
     if (!file) {
       setError(labels.aiNoScreenshot || labels.aiRecognitionFailed);
+      setErrorCode("screenshot_required");
       return;
     }
 
     setBusy(true);
     setError("");
+    setErrorCode("");
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), CLIENT_RECOGNITION_TIMEOUT_MS);
 
@@ -123,11 +129,15 @@ export function SectionRecognitionModal({
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(normalizeResponseError(data, labels.aiRecognitionFailed, labels));
+        const normalizedError = normalizeResponseError(data, labels.aiRecognitionFailed, labels);
+        const error = new Error(normalizedError.message);
+        error.code = normalizedError.code;
+        throw error;
       }
 
       setCandidate(data.candidate || null);
       setRecognition(data.recognition || null);
+      setErrorCode("");
     } catch (recognitionError) {
       setCandidate(null);
       setRecognition(null);
@@ -135,6 +145,7 @@ export function SectionRecognitionModal({
         ? labels.aiRecognitionTimeout
         : recognitionError.message;
       setError(message || labels.aiRecognitionFailed);
+      setErrorCode(recognitionError?.name === "AbortError" ? "recognition_timeout" : recognitionError?.code || "");
     } finally {
       clearTimeout(timeout);
       setBusy(false);
@@ -156,6 +167,7 @@ export function SectionRecognitionModal({
     if (!candidate || !onSaveTemplate) return;
     setSavingTemplate(true);
     setError("");
+    setErrorCode("");
     try {
       const template = await onSaveTemplate(candidate, candidateDraft);
       setSavedTemplate(template || null);
@@ -259,7 +271,21 @@ export function SectionRecognitionModal({
             {error ? (
               <div className="section-recognition-state error" role="alert">
                 <AlertTriangle size={16} aria-hidden="true" />
-                <p>{error}</p>
+                <div>
+                  <p>{error}</p>
+                  {errorCode === "recognitionUnavailable" ? (
+                    <div className="section-recognition-help">
+                      <span>{labels.aiRecognitionConfigHint}</span>
+                      {canManageAiSettings && aiSettingsHref ? (
+                        <a className="button secondary compact" href={aiSettingsHref}>
+                          {labels.aiOpenSettings}
+                        </a>
+                      ) : (
+                        <small>{labels.aiAskAdminSettings}</small>
+                      )}
+                    </div>
+                  ) : null}
+                </div>
               </div>
             ) : null}
 

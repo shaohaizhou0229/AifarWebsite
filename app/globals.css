@@ -3936,6 +3936,23 @@ button.section-library-preview {
   margin: 0;
 }
 
+.section-recognition-help {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.section-recognition-help span,
+.section-recognition-help small {
+  color: #7f1d1d;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.section-recognition-help .button {
+  justify-self: start;
+}
+
 .section-recognition-result {
   min-height: 0;
   overflow: auto;

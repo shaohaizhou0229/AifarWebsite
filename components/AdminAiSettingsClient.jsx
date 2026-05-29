@@ -3,80 +3,154 @@
 import { useState } from "react";
 import { CheckCircle2, KeyRound, ShieldCheck, Sparkles, TestTube2, XCircle } from "lucide-react";
 
+const TEST_TARGETS = {
+  imageGeneration: "imageGeneration",
+  sectionTemplateRecognition: "sectionTemplateRecognition"
+};
+
+const IDLE_TEST_STATE = { status: "idle", message: "", checkedAt: "" };
+
 function statusClass(configured) {
   return configured ? "success" : "warning";
 }
 
-export function AdminAiSettingsClient({ labels, settings }) {
-  const [testState, setTestState] = useState({ status: "idle", message: "", checkedAt: "" });
-  const configured = Boolean(settings?.configured);
+function enabledLabel(labels, enabled) {
+  return enabled ? labels.enabledYes : labels.enabledNo;
+}
 
-  async function testConnection() {
-    setTestState({ status: "loading", message: labels.testing, checkedAt: "" });
+function formatTimeout(labels, timeoutMs) {
+  const value = Number(timeoutMs || 0);
+  return value > 0 ? `${value} ${labels.milliseconds}` : labels.notConfigured;
+}
+
+function resolveTestMessage(labels, result, fallback) {
+  if (result?.ok) return labels.testSuccess;
+  return labels.testErrorCodes?.[result?.code] || result?.error || fallback;
+}
+
+function ServiceCard({ labels, target, title, lead, settings, fields, testState, onTest }) {
+  const configured = Boolean(settings?.configured);
+  const loading = testState.status === "loading";
+
+  return (
+    <article className="admin-panel ai-service-card">
+      <div className="admin-panel-header">
+        <div>
+          <span className="admin-eyebrow">{labels.serviceEyebrow}</span>
+          <h2>{title}</h2>
+          <p>{lead}</p>
+        </div>
+        <span className={`admin-status admin-status-${statusClass(configured)}`}>
+          {configured ? labels.configured : labels.notConfigured}
+        </span>
+      </div>
+      <dl className="ai-settings-list">
+        {fields.map((field) => (
+          <div key={field.label}>
+            <dt>{field.label}</dt>
+            <dd>{field.value || labels.notConfigured}</dd>
+          </div>
+        ))}
+      </dl>
+      <div className="admin-actions-row">
+        <button className="button primary" type="button" onClick={() => onTest(target)} disabled={loading}>
+          <TestTube2 size={16} aria-hidden="true" />
+          {loading ? labels.testing : labels.testConnection}
+        </button>
+        <a className="button secondary" href="#ai-env-guide">
+          <KeyRound size={16} aria-hidden="true" />
+          {labels.envGuide}
+        </a>
+      </div>
+      {testState.message ? (
+        <p className={`form-message ${testState.status === "success" ? "success" : "error"}`} role={testState.status === "error" ? "alert" : "status"} aria-live="polite">
+          {testState.message}
+        </p>
+      ) : null}
+    </article>
+  );
+}
+
+export function AdminAiSettingsClient({ labels, settings }) {
+  const imageGeneration = settings?.imageGeneration || settings || {};
+  const sectionTemplateRecognition = settings?.sectionTemplateRecognition || {};
+  const [testStates, setTestStates] = useState({
+    [TEST_TARGETS.imageGeneration]: IDLE_TEST_STATE,
+    [TEST_TARGETS.sectionTemplateRecognition]: IDLE_TEST_STATE
+  });
+  const allConfigured = Boolean(imageGeneration?.configured && sectionTemplateRecognition?.configured);
+
+  async function testConnection(target) {
+    setTestStates((current) => ({
+      ...current,
+      [target]: { status: "loading", message: labels.testing, checkedAt: "" }
+    }));
     try {
-      const response = await fetch("/api/admin/settings/ai/test/", { method: "POST" });
+      const response = await fetch("/api/admin/settings/ai/test/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ target })
+      });
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.ok) {
-        throw new Error(result.error || labels.testFailed);
+        const error = new Error(resolveTestMessage(labels, result, labels.testFailed));
+        error.result = result;
+        throw error;
       }
-      setTestState({
-        status: "success",
-        message: labels.testSuccess,
-        checkedAt: result.checkedAt || new Date().toISOString()
-      });
+      setTestStates((current) => ({
+        ...current,
+        [target]: {
+          status: "success",
+          message: resolveTestMessage(labels, result, labels.testSuccess),
+          checkedAt: result.checkedAt || new Date().toISOString()
+        }
+      }));
     } catch (error) {
-      setTestState({ status: "error", message: error.message || labels.testFailed, checkedAt: "" });
+      setTestStates((current) => ({
+        ...current,
+        [target]: { status: "error", message: error.message || labels.testFailed, checkedAt: "" }
+      }));
     }
   }
+
+  const imageFields = [
+    { label: labels.provider, value: imageGeneration.provider },
+    { label: labels.enabled, value: enabledLabel(labels, imageGeneration.enabled) },
+    { label: labels.apiKey, value: imageGeneration.apiKeyPreview || labels.notConfigured },
+    { label: labels.model, value: imageGeneration.model || labels.notConfigured },
+    { label: labels.outputFormat, value: imageGeneration.outputFormat }
+  ];
+  const recognitionFields = [
+    { label: labels.provider, value: sectionTemplateRecognition.provider },
+    { label: labels.enabled, value: enabledLabel(labels, sectionTemplateRecognition.enabled) },
+    { label: labels.apiKey, value: sectionTemplateRecognition.apiKeyPreview || labels.notConfigured },
+    { label: labels.model, value: sectionTemplateRecognition.model || labels.notConfigured },
+    { label: labels.timeoutMs, value: formatTimeout(labels, sectionTemplateRecognition.timeoutMs) }
+  ];
 
   return (
     <section className="ai-settings-shell">
       <div className="ai-settings-main">
-        <article className="admin-panel ai-service-card">
-          <div className="admin-panel-header">
-            <div>
-              <span className="admin-eyebrow">{labels.serviceEyebrow}</span>
-              <h2>{labels.serviceTitle}</h2>
-              <p>{labels.serviceLead}</p>
-            </div>
-            <span className={`admin-status admin-status-${statusClass(configured)}`}>
-              {configured ? labels.configured : labels.notConfigured}
-            </span>
-          </div>
-          <dl className="ai-settings-list">
-            <div>
-              <dt>{labels.provider}</dt>
-              <dd>{settings.provider}</dd>
-            </div>
-            <div>
-              <dt>{labels.apiKey}</dt>
-              <dd>{settings.apiKeyPreview || labels.notConfigured}</dd>
-            </div>
-            <div>
-              <dt>{labels.model}</dt>
-              <dd>{settings.model || labels.notConfigured}</dd>
-            </div>
-            <div>
-              <dt>{labels.outputFormat}</dt>
-              <dd>{settings.outputFormat}</dd>
-            </div>
-          </dl>
-          <div className="admin-actions-row">
-            <button className="button primary" type="button" onClick={testConnection} disabled={testState.status === "loading"}>
-              <TestTube2 size={16} aria-hidden="true" />
-              {testState.status === "loading" ? labels.testing : labels.testConnection}
-            </button>
-            <a className="button secondary" href="#ai-env-guide">
-              <KeyRound size={16} aria-hidden="true" />
-              {labels.envGuide}
-            </a>
-          </div>
-          {testState.message ? (
-            <p className={`form-message ${testState.status === "success" ? "success" : "error"}`} role={testState.status === "error" ? "alert" : "status"} aria-live="polite">
-              {testState.message}
-            </p>
-          ) : null}
-        </article>
+        <ServiceCard
+          labels={labels}
+          target={TEST_TARGETS.imageGeneration}
+          title={labels.imageServiceTitle || labels.serviceTitle}
+          lead={labels.imageServiceLead || labels.serviceLead}
+          settings={imageGeneration}
+          fields={imageFields}
+          testState={testStates[TEST_TARGETS.imageGeneration]}
+          onTest={testConnection}
+        />
+        <ServiceCard
+          labels={labels}
+          target={TEST_TARGETS.sectionTemplateRecognition}
+          title={labels.recognitionServiceTitle}
+          lead={labels.recognitionServiceLead}
+          settings={sectionTemplateRecognition}
+          fields={recognitionFields}
+          testState={testStates[TEST_TARGETS.sectionTemplateRecognition]}
+          onTest={testConnection}
+        />
 
         <article className="admin-panel">
           <div className="admin-panel-header">
@@ -88,25 +162,25 @@ export function AdminAiSettingsClient({ labels, settings }) {
           <div className="ai-settings-grid">
             <label>
               <span>{labels.enabled}</span>
-              <input autoComplete="off" name="aiImageEnabled" value={settings.enabled ? labels.enabledYes : labels.enabledNo} readOnly />
+              <input autoComplete="off" name="aiImageEnabled" value={enabledLabel(labels, imageGeneration.enabled)} readOnly />
             </label>
             <label>
               <span>{labels.defaultSize}</span>
-              <input autoComplete="off" name="aiDefaultTargetSize" value={settings.defaultSize} readOnly />
+              <input autoComplete="off" name="aiDefaultTargetSize" value={imageGeneration.defaultSize || labels.notConfigured} readOnly />
             </label>
             <label>
               <span>{labels.defaultQuality}</span>
-              <input autoComplete="off" name="aiDefaultQuality" value={labels.qualityLabels?.[settings.defaultQuality] || settings.defaultQuality} readOnly />
+              <input autoComplete="off" name="aiDefaultQuality" value={labels.qualityLabels?.[imageGeneration.defaultQuality] || imageGeneration.defaultQuality || labels.notConfigured} readOnly />
             </label>
             <label>
               <span>{labels.defaultOutput}</span>
-              <input autoComplete="off" name="aiDefaultOutput" value={settings.outputFormat} readOnly />
+              <input autoComplete="off" name="aiDefaultOutput" value={imageGeneration.outputFormat || labels.notConfigured} readOnly />
             </label>
           </div>
           <div className="ai-settings-options">
             <strong>{labels.availableSizes}</strong>
             <div>
-              {(settings.supportedSizes || []).map((size) => <span key={size}>{size}</span>)}
+              {(imageGeneration.supportedSizes || []).map((size) => <span key={size}>{size}</span>)}
             </div>
           </div>
           <div className="ai-size-rule-card">
@@ -136,7 +210,7 @@ export function AdminAiSettingsClient({ labels, settings }) {
           </ul>
         </article>
         <article className="admin-panel" id="ai-env-guide">
-          {configured ? <CheckCircle2 size={22} aria-hidden="true" /> : <XCircle size={22} aria-hidden="true" />}
+          {allConfigured ? <CheckCircle2 size={22} aria-hidden="true" /> : <XCircle size={22} aria-hidden="true" />}
           <h2>{labels.envTitle}</h2>
           <p>{labels.envLead}</p>
           <p>{labels.envStorageNote}</p>
@@ -146,6 +220,9 @@ export function AdminAiSettingsClient({ labels, settings }) {
           <code translate="no">OPENAI_IMAGE_OUTPUT_FORMAT</code>
           <code translate="no">OPENAI_IMAGE_DEFAULT_SIZE</code>
           <code translate="no">OPENAI_IMAGE_DEFAULT_QUALITY</code>
+          <code translate="no">OPENAI_SECTION_TEMPLATE_ENABLED</code>
+          <code translate="no">OPENAI_SECTION_TEMPLATE_MODEL</code>
+          <code translate="no">OPENAI_SECTION_TEMPLATE_TIMEOUT_MS</code>
         </article>
       </aside>
     </section>

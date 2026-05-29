@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { getImageGenerationSettings } from "@/lib/image-generation-settings";
+import { getAiServiceSettings } from "@/lib/image-generation-settings";
 import { getProfile } from "@/lib/profiles";
 
 export const runtime = "nodejs";
@@ -20,7 +20,12 @@ function permissionError(error) {
 export async function GET() {
   try {
     await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.settings);
-    return NextResponse.json({ settings: getImageGenerationSettings() });
+    const settings = getAiServiceSettings();
+    return NextResponse.json({
+      settings,
+      imageGeneration: settings.imageGeneration,
+      sectionTemplateRecognition: settings.sectionTemplateRecognition
+    });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: error.message || "Could not load AI settings." }, { status: 400 });
   }

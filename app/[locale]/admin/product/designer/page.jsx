@@ -52,6 +52,14 @@ export default async function AdminProductDesignerPage({ params, searchParams })
     redirect(localizedPath(locale, "/login/"));
   }
 
+  let canManageAiSettings = false;
+  try {
+    await requireAdminPermissionCached(ADMIN_PERMISSIONS.settings);
+    canManageAiSettings = true;
+  } catch {
+    canManageAiSettings = false;
+  }
+
   const initialPageKey = query?.page === "product" ? "product" : "home";
   const initialLocale = locales.includes(query?.contentLocale) ? query.contentLocale : locale;
   const mode = query?.mode === "new" ? "new" : "edit";
@@ -80,6 +88,8 @@ export default async function AdminProductDesignerPage({ params, searchParams })
           assetLabels={messages.forms.assets}
           adminLocale={locale}
           imageSettings={getImageGenerationSettings()}
+          canManageAiSettings={canManageAiSettings}
+          aiSettingsHref={localizedPath(locale, "/admin/settings/ai/")}
           initialPageKey={initialPageKey}
           initialLocale={initialLocale}
           initialContent={initialContent}

@@ -122,6 +122,8 @@ export function AdminSiteContentForm({
   assetLabels,
   adminLocale,
   imageSettings = {},
+  canManageAiSettings = false,
+  aiSettingsHref = "",
   initialPageKey,
   initialLocale,
   initialContent,
@@ -941,6 +943,8 @@ export function AdminSiteContentForm({
           locale={locale}
           pageKey={pageKey}
           pageOptions={pageOptions}
+          canManageAiSettings={canManageAiSettings}
+          aiSettingsHref={aiSettingsHref}
           onClose={() => setRecognitionOpen(false)}
           onInsertTemplate={insertSectionTemplate}
           onSaveTemplate={saveAiCandidateTemplate}
