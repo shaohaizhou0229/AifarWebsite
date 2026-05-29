@@ -68,6 +68,18 @@ export function SectionMiniPreview({ section, labels }) {
     );
   }
 
+  if (section?.type === "ai_layout") {
+    const elements = Array.isArray(content.elements) ? content.elements : [];
+    return (
+      <div className="section-mini-preview mini-ai-layout">
+        <strong>{title}</strong>
+        <div className="mini-lines">
+          {elements.length ? elements.slice(0, 4).map((element, index) => <span key={element.id || `${element.type}-${index}`} />) : <span />}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="section-mini-preview">
       <strong>{title}</strong>

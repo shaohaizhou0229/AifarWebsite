@@ -394,6 +394,7 @@
         "updates_list": "更新列表",
         "cta_band": "行动区",
         "support_entry": "支持与咨询入口",
+        "ai_layout": "AI 自由布局",
         "scenario_split": "场景分栏",
         "workflow_steps": "流程步骤",
         "module_showcase": "模块展示",
@@ -457,6 +458,18 @@
   "aiRecognitionConfidence": "置信度",
   "aiRecognitionNotes": "识别说明",
   "aiRecognitionRisks": "风险标记",
+  "aiDetectedElements": "识别到的元素",
+  "aiLayoutElements": "AI 布局元素",
+  "aiLayoutNoElements": "尚未识别到元素。",
+  "aiLayoutImageSlot": "图片槽位",
+  "aiLayoutElementTypes": {
+    "text": "文字",
+    "button": "按钮",
+    "image": "图片",
+    "card": "卡片",
+    "badge": "徽标",
+    "icon": "图标"
+  },
   "aiNoScreenshot": "请先上传截图。",
   "aiInvalidScreenshot": "请上传 PNG、JPG、JPEG 或 WEBP 图片，且不超过 5 MB。",
   "aiManualReviewRequired": "需要人工复核",
@@ -548,7 +561,8 @@
         "four": "四列",
         "three": "三列",
         "imageRight": "图片在右",
-        "imageOnly": "仅图片"
+        "imageOnly": "仅图片",
+        "screenshot_composition": "截图构图"
       },
       "tones": {
         "plain": "普通背景",
@@ -655,7 +669,8 @@
         "faq_band": "回答评估阶段常见问题。",
         "updates_list": "展示版本或更新亮点。",
         "cta_band": "用行动按钮完成转化。",
-        "support_entry": "引导访客进入支持、文档和咨询。"
+        "support_entry": "引导访客进入支持、文档和咨询。",
+        "ai_layout": "根据截图生成新的安全自由布局。"
       },
       "targetImageSize": "图片规格",
       "targetWidth": "宽度",

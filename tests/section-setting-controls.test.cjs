@@ -24,6 +24,8 @@ test("style and layout controls are scoped by section type", () => {
   assert.deepEqual(getStyleControlsForSection("card_grid").includes("cardStyle"), true);
   assert.deepEqual(getLayoutControlsForSection("support_entry").includes("cardColumns"), true);
   assert.deepEqual(getLayoutControlsForSection("updates_list").includes("imagePosition"), false);
+  assert.deepEqual(getStyleControlsForSection("ai_layout").includes("imageRadius"), true);
+  assert.deepEqual(getLayoutControlsForSection("ai_layout").includes("contentAlign"), true);
 });
 
 test("style token patching only accepts visible allowlisted values", () => {

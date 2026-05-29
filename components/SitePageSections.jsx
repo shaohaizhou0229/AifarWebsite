@@ -17,12 +17,12 @@ function isClientRoutableHref(href = "") {
   return href.startsWith("/") && !href.startsWith("/api/");
 }
 
-function SiteActionLink({ className, href, children }) {
+function SiteActionLink({ className, href, children, ...props }) {
   if (!href) return null;
   if (isClientRoutableHref(href)) {
-    return <Link className={className} href={href}>{children}</Link>;
+    return <Link className={className} href={href} {...props}>{children}</Link>;
   }
-  return <a className={className} href={href}>{children}</a>;
+  return <a className={className} href={href} {...props}>{children}</a>;
 }
 
 function hasText(value) {
@@ -148,7 +148,7 @@ function CardGridSection({ section, locale }) {
   const columns = columnClass(section, section.variant === "three" ? "three" : "four");
 
   return (
-    <section {...sectionRootProps(section)}>
+    <section {...sectionRootProps(section, "section ai-layout-section")}>
       <div className="section-inner">
         <SectionHead title={content.title} lead={content.lead} actionLabel={content.actionLabel} actionHref={content.actionHref} locale={locale} />
         <div className={`grid ${columns}`}>
@@ -453,6 +453,116 @@ function CtaSection({ section, locale }) {
   );
 }
 
+function clampNumber(value, fallback, min, max) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return fallback;
+  return Math.min(max, Math.max(min, number));
+}
+
+function percent(value) {
+  return `${Math.round(value * 10000) / 100}%`;
+}
+
+function aiElementBoxStyle(element = {}) {
+  const box = element.box || {};
+  const x = clampNumber(box.x, 0, 0, 0.98);
+  const y = clampNumber(box.y, 0, 0, 0.98);
+  let width = clampNumber(box.width, 0.2, 0.02, 1);
+  let height = clampNumber(box.height, 0.1, 0.02, 1);
+  if (x + width > 1) width = Math.max(0.02, 1 - x);
+  if (y + height > 1) height = Math.max(0.02, 1 - y);
+
+  return {
+    left: percent(x),
+    top: percent(y),
+    width: percent(width),
+    height: percent(height),
+    zIndex: String(Math.min(20, Math.max(0, Number(element.zIndex || 0))))
+  };
+}
+
+function aiElementAttributes(element = {}) {
+  const appearance = element.appearance || {};
+  const attrs = {};
+  for (const [key, attr] of [
+    ["textSize", "data-ai-size"],
+    ["weight", "data-ai-weight"],
+    ["align", "data-ai-align"],
+    ["tone", "data-ai-tone"],
+    ["radius", "data-ai-radius"]
+  ]) {
+    if (appearance[key]) attrs[attr] = String(appearance[key]);
+  }
+  return attrs;
+}
+
+function AiLayoutElement({ element, locale }) {
+  const type = element?.type || "";
+  const className = `ai-layout-element ai-layout-${type}`;
+  const attrs = aiElementAttributes(element);
+  const style = aiElementBoxStyle(element);
+
+  if (type === "button") {
+    const label = element.text || "";
+    if (!label) return null;
+    const button = <span>{label}</span>;
+    return element.href ? (
+      <SiteActionLink className={className} href={resolveHref(locale, element.href)} style={style} {...attrs}>{button}</SiteActionLink>
+    ) : (
+      <span className={className} style={style} {...attrs}>{button}</span>
+    );
+  }
+
+  if (type === "image") {
+    const imageSrc = element.imageUrl || element.imagePath || "";
+    return (
+      <div className={className} style={style} {...attrs}>
+        {imageSrc ? <img src={imageSrc} alt={element.alt || ""} /> : <span>{element.alt || ""}</span>}
+      </div>
+    );
+  }
+
+  if (type === "icon") {
+    return (
+      <span className={className} style={style} aria-label={element.label || undefined} {...attrs}>
+        {element.icon || element.label || ""}
+      </span>
+    );
+  }
+
+  return (
+    <div className={className} style={style} {...attrs}>
+      {element.text || ""}
+    </div>
+  );
+}
+
+function AiLayoutSection({ section, locale }) {
+  const content = section.content || {};
+  const canvas = content.canvas || {};
+  const elements = Array.isArray(content.elements) ? content.elements : [];
+  const aspectRatio = clampNumber(canvas.aspectRatio, 1.6, 0.45, 3.2);
+
+  return (
+    <section {...sectionRootProps(section)}>
+      <div className="section-inner">
+        <div
+          className="ai-layout-canvas"
+          data-ai-background={canvas.background || "default"}
+          data-ai-padding={canvas.padding || "normal"}
+          data-ai-max-width={canvas.maxWidth || "content"}
+          data-mobile-mode={canvas.mobileMode || "scale"}
+          style={{ "--ai-layout-aspect": String(aspectRatio) }}
+        >
+          {elements.map((element, index) => (
+            <AiLayoutElement element={element} locale={locale} key={element.id || `${element.type}-${index}`} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function SitePageSections({
   page,
   locale,
@@ -486,6 +596,7 @@ export function SitePageSections({
     if (section.type === "support_entry") return <SupportEntrySection section={section} locale={locale} key={section.id} />;
     if (section.type === "updates_list") return <UpdatesSection section={section} locale={locale} key={section.id} />;
     if (section.type === "cta_band") return <CtaSection section={section} locale={locale} key={section.id} />;
+    if (section.type === "ai_layout") return <AiLayoutSection section={section} locale={locale} key={section.id} />;
     return null;
   }
 

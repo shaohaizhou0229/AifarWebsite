@@ -113,6 +113,97 @@ function TextFields({ labels, contentValues, section, fields, onPatchSectionCont
   ));
 }
 
+function patchAiLayoutElement(section, elementId, updater) {
+  const elements = Array.isArray(section.content?.elements) ? section.content.elements : [];
+  return {
+    ...section,
+    content: {
+      ...(section.content || {}),
+      elements: elements.map((element) => (
+        element.id === elementId ? updater(element) : element
+      ))
+    }
+  };
+}
+
+function formatElementPosition(element) {
+  const box = element.box || {};
+  const parts = ["x", "y", "width", "height"].map((key) => {
+    const value = Number(box[key] || 0);
+    return `${key}: ${Math.round(value * 100)}%`;
+  });
+  return parts.join(" / ");
+}
+
+function AiLayoutContentTab({ section, labels, onPatchSection, onOpenAssetPicker }) {
+  const elements = Array.isArray(section.content?.elements) ? section.content.elements : [];
+
+  if (!elements.length) {
+    return <p className="muted-line">{labels.aiLayoutNoElements}</p>;
+  }
+
+  function patchElement(elementId, updater) {
+    onPatchSection(section.id, (current) => patchAiLayoutElement(current, elementId, updater));
+  }
+
+  return (
+    <div className="ai-layout-element-list">
+      <p className="muted-line">{labels.aiLayoutElements}</p>
+      {elements.map((element, index) => {
+        const typeLabel = labels.aiLayoutElementTypes?.[element.type] || element.type;
+        const title = `${index + 1}. ${typeLabel}`;
+        return (
+          <article className="ai-layout-element-editor" key={element.id || `${element.type}-${index}`}>
+            <header>
+              <strong>{title}</strong>
+              <span>{formatElementPosition(element)}</span>
+            </header>
+            {["text", "button", "badge", "card"].includes(element.type) ? (
+              <Field label={element.type === "button" ? labels.primaryCta : labels.title}>
+                <TextInput
+                  multiline={element.type === "text" || element.type === "card"}
+                  value={element.text}
+                  onChange={(value) => patchElement(element.id, (current) => ({ ...current, text: value }))}
+                />
+              </Field>
+            ) : null}
+            {element.type === "button" ? (
+              <Field label={labels.primaryHref}>
+                <TextInput value={element.href} onChange={(value) => patchElement(element.id, (current) => ({ ...current, href: value }))} />
+              </Field>
+            ) : null}
+            {element.type === "icon" ? (
+              <div className="form-grid two">
+                <Field label={labels.icon}>
+                  <TextInput value={element.icon} onChange={(value) => patchElement(element.id, (current) => ({ ...current, icon: value }))} />
+                </Field>
+                <Field label={labels.ariaLabel}>
+                  <TextInput value={element.label} onChange={(value) => patchElement(element.id, (current) => ({ ...current, label: value }))} />
+                </Field>
+              </div>
+            ) : null}
+            {element.type === "image" ? (
+              <div className="ai-layout-image-editor">
+                <Field label={labels.heroAlt}>
+                  <TextInput value={element.alt} onChange={(value) => patchElement(element.id, (current) => ({ ...current, alt: value }))} />
+                </Field>
+                {element.imageUrl ? <img className="cms-image-preview" src={element.imageUrl} alt={element.alt || labels.heroImage} /> : <p className="muted-line">{labels.noImage}</p>}
+                <button
+                  className="button secondary compact"
+                  type="button"
+                  onClick={() => onOpenAssetPicker?.(section.id, "imagePath", "imageUrl", { aiLayoutElementId: element.id })}
+                >
+                  {labels.chooseImage}
+                </button>
+              </div>
+            ) : null}
+          </article>
+        );
+      })}
+    </div>
+  );
+}
+
 function ContentTab({ section, labels, defaultTargetSize, onPatchSection, onPatchSectionContent, onOpenAssetPicker }) {
   const contentValues = section.content || {};
   const commonText = [
@@ -120,6 +211,10 @@ function ContentTab({ section, labels, defaultTargetSize, onPatchSection, onPatc
     { key: "title", label: "title" },
     { key: "lead", label: "lead", multiline: true }
   ];
+
+  if (section.type === "ai_layout") {
+    return <AiLayoutContentTab section={section} labels={labels} onPatchSection={onPatchSection} onOpenAssetPicker={onOpenAssetPicker} />;
+  }
 
   if (section.type === "hero") {
     return (

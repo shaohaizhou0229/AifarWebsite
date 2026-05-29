@@ -414,7 +414,7 @@ export function AdminSiteContentForm({
     }
   }
 
-  function openAssetPicker(sectionId, pathKey, urlKey) {
+  function openAssetPicker(sectionId, pathKey, urlKey, options = {}) {
     const targetSection = sections.find((section) => section.id === sectionId);
     const defaultSize = normalizeImageSize(imageSettings.defaultSize || "1024x1024");
     const targetSize = resolveImageTargetSize({
@@ -435,6 +435,7 @@ export function AdminSiteContentForm({
       sectionId,
       pathKey,
       urlKey,
+      aiLayoutElementId: options.aiLayoutElementId || "",
       targetSize,
       defaultGenerateSize: targetSize.actualSize,
       promptContext,
@@ -445,17 +446,37 @@ export function AdminSiteContentForm({
   function selectAsset(asset) {
     if (!assetPickerTarget || !asset?.storagePath) return;
     queueDesignerScrollRestore();
-    patchSection(assetPickerTarget.sectionId, (section) => ({
-      ...section,
-      content: {
-        ...(section.content || {}),
-        [assetPickerTarget.pathKey]: asset.storagePath,
-        [assetPickerTarget.urlKey]: asset.url,
-        ...(assetPickerTarget.pathKey === "heroImagePath"
-          ? { heroAlt: section.content?.heroAlt || asset.altText || asset.filename || "" }
-          : { imageAlt: section.content?.imageAlt || asset.altText || asset.filename || "" })
+    patchSection(assetPickerTarget.sectionId, (section) => {
+      if (section.type === "ai_layout" && assetPickerTarget.aiLayoutElementId) {
+        const elements = Array.isArray(section.content?.elements) ? section.content.elements : [];
+        return {
+          ...section,
+          content: {
+            ...(section.content || {}),
+            elements: elements.map((element) => element.id === assetPickerTarget.aiLayoutElementId
+              ? {
+                  ...element,
+                  imagePath: asset.storagePath,
+                  imageUrl: asset.url,
+                  alt: element.alt || asset.altText || asset.filename || ""
+                }
+              : element)
+          }
+        };
       }
-    }));
+
+      return {
+        ...section,
+        content: {
+          ...(section.content || {}),
+          [assetPickerTarget.pathKey]: asset.storagePath,
+          [assetPickerTarget.urlKey]: asset.url,
+          ...(assetPickerTarget.pathKey === "heroImagePath"
+            ? { heroAlt: section.content?.heroAlt || asset.altText || asset.filename || "" }
+            : { imageAlt: section.content?.imageAlt || asset.altText || asset.filename || "" })
+        }
+      };
+    });
     setMessage(labels.assetSelected || labels.uploaded);
     setAssetPickerTarget(null);
   }

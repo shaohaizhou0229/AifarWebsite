@@ -29,6 +29,18 @@ function getRiskLabel(labels, flag) {
   return labels.aiRiskFlags?.[flag] || flag;
 }
 
+function getAiElementTypeLabel(labels, type) {
+  return labels.aiLayoutElementTypes?.[type] || type;
+}
+
+function formatElementBox(element) {
+  const box = element?.box || {};
+  return ["x", "y", "width", "height"].map((key) => {
+    const value = Number(box[key] || 0);
+    return `${key} ${Math.round(value * 100)}%`;
+  }).join(" / ");
+}
+
 function normalizeResponseError(data, fallback, labels) {
   if (data?.code === "recognitionUnavailable") return { code: data.code, message: labels.aiRecognitionUnavailable || fallback };
   if (data?.code === "recognition_timeout") return { code: data.code, message: labels.aiRecognitionTimeout || fallback };
@@ -368,6 +380,21 @@ export function SectionRecognitionModal({
                   <ul className="section-recognition-notes" aria-label={labels.aiRecognitionNotes}>
                     {recognition.notes.map((note) => <li key={note}>{note}</li>)}
                   </ul>
+                ) : null}
+                {recognition?.detectedElements?.length ? (
+                  <details className="section-recognition-elements">
+                    <summary>{labels.aiDetectedElements}</summary>
+                    {recognition.layoutSummary ? <p>{recognition.layoutSummary}</p> : null}
+                    <div>
+                      {recognition.detectedElements.map((element, index) => (
+                        <span key={element.id || `${element.type}-${index}`}>
+                          <strong>{getAiElementTypeLabel(labels, element.type)}</strong>
+                          {element.text || element.alt || element.label || element.icon ? ` - ${element.text || element.alt || element.label || element.icon}` : ""}
+                          <small>{formatElementBox(element)}</small>
+                        </span>
+                      ))}
+                    </div>
+                  </details>
                 ) : null}
                 <div className="cms-live-preview section-recognition-preview">
                   <div className="cms-live-preview-page">

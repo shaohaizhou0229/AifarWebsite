@@ -71,6 +71,79 @@ test("section template content rejects multiple sections", () => {
   );
 });
 
+test("ai layout templates normalize safe relative elements without fixed page width", () => {
+  const template = normalizeSectionTemplateInput({
+    name: "AI screenshot layout",
+    industry: "custom",
+    source: "ai",
+    content: {
+      id: "ai-layout-source",
+      type: "ai_layout",
+      variant: "screenshot_composition",
+      settings: {
+        style: { textSize: "medium", buttonStyle: "solid" },
+        layout: { contentAlign: "center" }
+      },
+      content: {
+        canvas: {
+          aspectRatio: 1.7,
+          sourceWidth: 1440,
+          sourceHeight: 860,
+          width: 1440,
+          maxWidth: "content"
+        },
+        elements: [
+          { id: "title", type: "text", text: "Fast onboarding", x: 0.2, y: 0.1, width: 0.6, height: 0.14 },
+          { id: "cta", type: "button", text: "Start", href: "/contact/", box: { x: 0.44, y: 0.3, width: 0.12, height: 0.07 } },
+          { id: "image", type: "image", alt: "Product placeholder", x: 0.18, y: 0.5, width: 0.64, height: 0.36 }
+        ]
+      }
+    }
+  });
+  const section = template.content.sections[0];
+
+  assert.equal(section.type, "ai_layout");
+  assert.equal(section.variant, "screenshot_composition");
+  assert.equal(section.content.canvas.maxWidth, "content");
+  assert.equal(section.content.canvas.width, undefined);
+  assert.equal(section.content.elements[0].box.x, 0.2);
+  assert.equal(section.content.elements[1].href, "/contact/");
+});
+
+test("ai layout rejects unsafe elements and clamps overflowing coordinates", () => {
+  assert.throws(
+    () => normalizeSectionTemplateContent({
+      type: "ai_layout",
+      variant: "screenshot_composition",
+      content: {
+        elements: [{ type: "video", x: 0, y: 0, width: 1, height: 1 }]
+      }
+    }),
+    /Unsupported AI layout element type/
+  );
+
+  const content = normalizeSectionTemplateContent({
+    type: "ai_layout",
+    variant: "screenshot_composition",
+    content: {
+      elements: [{ type: "text", text: "Safe", x: 0.9, y: 0.92, width: 0.4, height: 0.4 }]
+    }
+  });
+
+  assert.equal(content.sections[0].content.elements[0].box.width, 0.1);
+  assert.equal(content.sections[0].content.elements[0].box.height, 0.08);
+  assert.throws(
+    () => normalizeSectionTemplateContent({
+      type: "ai_layout",
+      variant: "screenshot_composition",
+      content: {
+        elements: [{ type: "text", text: "<script>alert(1)</script>", x: 0, y: 0, width: 1, height: 0.1 }]
+      }
+    }),
+    /Unsafe AI layout value/
+  );
+});
+
 test("section template rules reject unsupported section types and variants", () => {
   assert.throws(
     () => normalizeSectionTemplateContent({ type: "free_html", variant: "default", content: {} }),

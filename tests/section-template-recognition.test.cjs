@@ -163,6 +163,8 @@ test("OpenAI recognition payload uses Responses image input and structured JSON 
   assert.equal(payload.input[1].content[1].type, "input_image");
   assert.equal(payload.input[1].content[1].detail, "high");
   assert.equal(payload.text.format.type, "json_schema");
+  assert.match(payload.input[1].content[0].text, /normalized x, y, width, height/);
+  assert.match(payload.input[1].content[0].text, /ai_layout/);
 });
 
 test("SiliconFlow recognition payloads use vision first and JSON text conversion second", () => {
@@ -183,6 +185,8 @@ test("SiliconFlow recognition payloads use vision first and JSON text conversion
   assert.equal(templatePayload.model, "Qwen/Qwen3-32B");
   assert.equal(templatePayload.response_format.type, "json_object");
   assert.match(templatePayload.messages[1].content, /Allowed section types/);
+  assert.match(visionPayload.messages[1].content[0].text, /normalized box coordinates/);
+  assert.match(templatePayload.messages[1].content, /screenshot_composition/);
 });
 
 test("response JSON extraction supports output_text and nested Responses content", () => {
@@ -213,7 +217,9 @@ test("legal AI result becomes pending review candidate with manual risk flag", (
   assert.equal(output.candidate.industry, "public_service");
   assert.equal(output.candidate.pageKey, "home");
   assert.equal(output.candidate.content.sections.length, 1);
-  assert.equal(output.candidate.content.sections[0].type, "hero");
+  assert.equal(output.candidate.content.sections[0].type, "ai_layout");
+  assert.equal(output.candidate.content.sections[0].variant, "screenshot_composition");
+  assert.ok(output.candidate.content.sections[0].content.elements.length >= 1);
   assert.ok(output.candidate.riskFlags.includes("manual_review_required"));
   assert.equal(output.recognition.sourceImage.filename, "section.png");
 });
@@ -298,7 +304,9 @@ test("local UAT recognition output returns one safe pending-review AI candidate"
   assert.equal(output.candidate.source, "ai");
   assert.equal(output.candidate.status, "pending_review");
   assert.equal(output.candidate.content.sections.length, 1);
-  assert.equal(output.candidate.content.sections[0].type, "card_grid");
+  assert.equal(output.candidate.content.sections[0].type, "ai_layout");
+  assert.equal(output.candidate.content.sections[0].content.canvas.maxWidth, "content");
+  assert.ok(output.recognition.detectedElements.length >= 1);
   assert.equal(output.recognition.mode, "uat");
   assert.equal(output.recognition.uatMode, true);
   assert.ok(output.candidate.riskFlags.includes("manual_review_required"));
@@ -326,7 +334,8 @@ test("low confidence and external links add risk flags and clear unsafe external
     {}
   );
 
-  assert.equal(output.candidate.content.sections[0].content.primaryHref, "");
+  const button = output.candidate.content.sections[0].content.elements.find((element) => element.type === "button");
+  assert.equal(button.href, "");
   assert.ok(output.candidate.riskFlags.includes("low_confidence"));
   assert.ok(output.candidate.riskFlags.includes("external_links_removed"));
   assert.ok(output.candidate.riskFlags.includes("manual_review_required"));
@@ -343,7 +352,7 @@ test("illegal section type tokens html css js and multiple sections are rejected
   );
   assert.throws(
     () => normalizeRecognitionCandidate(createRecognitionResult({ template: { section: { ...createRecognitionResult().template.section, content: { title: "<script>alert(1)</script>" } } } }), normalizeRecognitionRequestFields(), {}),
-    /Unsafe template value/
+    /Unsafe (template|AI layout) value/
   );
   assert.throws(
     () => normalizeRecognitionCandidate(createRecognitionResult({ template: { section: { sections: [createRecognitionResult().template.section, createRecognitionResult().template.section] } } }), normalizeRecognitionRequestFields(), {}),

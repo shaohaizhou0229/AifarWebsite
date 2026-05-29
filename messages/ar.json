@@ -394,6 +394,7 @@
         "updates_list": "قائمة التحديثات",
         "cta_band": "شريط الدعوة",
         "support_entry": "Support and request entry",
+        "ai_layout": "AI free layout",
         "scenario_split": "Scenario split",
         "workflow_steps": "Workflow steps",
         "module_showcase": "Module showcase",
@@ -407,7 +408,8 @@
         "four": "أربعة أعمدة",
         "three": "ثلاثة أعمدة",
         "imageRight": "الصورة يميناً",
-        "imageOnly": "صورة فقط"
+        "imageOnly": "صورة فقط",
+        "screenshot_composition": "Screenshot composition"
       },
       "tones": {
         "plain": "عادي",
@@ -514,7 +516,8 @@
         "faq_band": "Answer common evaluation questions.",
         "updates_list": "Show release or update highlights.",
         "cta_band": "Close with conversion actions.",
-        "support_entry": "Route visitors to support, docs, and inquiries."
+        "support_entry": "Route visitors to support, docs, and inquiries.",
+        "ai_layout": "Generate a new safe layout from a screenshot."
       },
       "sectionCategories": {
         "hero": "Hero",
@@ -572,6 +575,18 @@
   "aiRecognitionConfidence": "Confidence",
   "aiRecognitionNotes": "Recognition notes",
   "aiRecognitionRisks": "Risk flags",
+  "aiDetectedElements": "Detected elements",
+  "aiLayoutElements": "AI layout elements",
+  "aiLayoutNoElements": "No recognized elements yet.",
+  "aiLayoutImageSlot": "Image slot",
+  "aiLayoutElementTypes": {
+    "text": "Text",
+    "button": "Button",
+    "image": "Image",
+    "card": "Card",
+    "badge": "Badge",
+    "icon": "Icon"
+  },
   "aiNoScreenshot": "Please upload a screenshot first.",
   "aiInvalidScreenshot": "Please upload a PNG, JPG, JPEG, or WEBP image up to 5 MB.",
   "aiManualReviewRequired": "Manual review required",

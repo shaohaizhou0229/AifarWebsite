@@ -394,6 +394,7 @@
         "updates_list": "Liste des mises a jour",
         "cta_band": "Bandeau CTA",
         "support_entry": "Entree support et demandes",
+        "ai_layout": "Mise en page IA libre",
         "scenario_split": "Scenarios",
         "workflow_steps": "Etapes",
         "module_showcase": "Modules",
@@ -407,7 +408,8 @@
         "four": "Quatre colonnes",
         "three": "Trois colonnes",
         "imageRight": "Image a droite",
-        "imageOnly": "Image seule"
+        "imageOnly": "Image seule",
+        "screenshot_composition": "Composition de capture"
       },
       "tones": {
         "plain": "Simple",
@@ -514,7 +516,8 @@
         "faq_band": "Repondre aux questions courantes.",
         "updates_list": "Afficher les mises a jour.",
         "cta_band": "Terminer par des actions.",
-        "support_entry": "Diriger vers support, docs et demandes."
+        "support_entry": "Diriger vers support, docs et demandes.",
+        "ai_layout": "Generer une nouvelle mise en page sure depuis une capture."
       },
       "sectionCategories": {
         "hero": "Hero",
@@ -572,6 +575,18 @@
   "aiRecognitionConfidence": "Confiance",
   "aiRecognitionNotes": "Notes de reconnaissance",
   "aiRecognitionRisks": "Marqueurs de risque",
+  "aiDetectedElements": "Elements detectes",
+  "aiLayoutElements": "Elements de mise en page IA",
+  "aiLayoutNoElements": "Aucun element reconnu pour le moment.",
+  "aiLayoutImageSlot": "Emplacement image",
+  "aiLayoutElementTypes": {
+    "text": "Texte",
+    "button": "Bouton",
+    "image": "Image",
+    "card": "Carte",
+    "badge": "Badge",
+    "icon": "Icone"
+  },
   "aiNoScreenshot": "Importez d'abord une capture.",
   "aiInvalidScreenshot": "Importez une image PNG, JPG, JPEG ou WEBP de 5 Mo maximum.",
   "aiManualReviewRequired": "Verification manuelle requise",

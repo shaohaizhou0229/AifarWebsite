@@ -15,7 +15,7 @@ function loadSitePageBuilder() {
     exports: {}
   };
   vm.runInNewContext(
-    `${source}\nmodule.exports = { SITE_LAYOUT_VERSION, normalizeSitePageContent };`,
+    `${source}\nmodule.exports = { SITE_LAYOUT_VERSION, createBlankSection, normalizeSitePageContent };`,
     context,
     { filename }
   );
@@ -34,6 +34,16 @@ test("explicit page designer layouts do not auto-add support entry blocks", () =
   const normalized = normalizeSitePageContent("home", fallback, content);
 
   assert.equal(normalized.sections.length, 0);
+});
+
+test("AI layout blank section stays inside page designer layout model", () => {
+  const { createBlankSection } = loadSitePageBuilder();
+  const section = createBlankSection("ai_layout", "ai-layout-1");
+
+  assert.equal(section.type, "ai_layout");
+  assert.equal(section.variant, "screenshot_composition");
+  assert.equal(section.content.canvas.maxWidth, "content");
+  assert.equal(section.content.elements.length, 0);
 });
 
 test("legacy home content still receives support entry during migration", () => {
