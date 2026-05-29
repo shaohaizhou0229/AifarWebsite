@@ -1,6 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const {
+  DEFAULT_RECOGNITION_TIMEOUT_MS,
   MAX_SCREENSHOT_SIZE,
   buildOpenAIRecognitionPayload,
   createDataUrl,
@@ -73,7 +74,15 @@ test("recognition settings report unavailable when disabled or missing api key",
   assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_ENABLED: "false", OPENAI_API_KEY: "sk-test" }).configured, false);
   assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_ENABLED: "true", OPENAI_API_KEY: "" }).configured, false);
   assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_ENABLED: "true", OPENAI_API_KEY: "sk-test", OPENAI_SECTION_TEMPLATE_MODEL: "" }).configured, false);
+  assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_ENABLED: "true", OPENAI_API_KEY: "\"\"", OPENAI_SECTION_TEMPLATE_MODEL: "\"\"" }).configured, false);
   assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_ENABLED: "true", OPENAI_API_KEY: "sk-test", OPENAI_SECTION_TEMPLATE_MODEL: "gpt-4.1-mini" }).configured, true);
+});
+
+test("recognition settings clamp external API timeout", () => {
+  assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_TIMEOUT_MS: "" }).timeoutMs, DEFAULT_RECOGNITION_TIMEOUT_MS);
+  assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_TIMEOUT_MS: "1" }).timeoutMs, 5000);
+  assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_TIMEOUT_MS: "999999" }).timeoutMs, 120000);
+  assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_TIMEOUT_MS: "32000" }).timeoutMs, 32000);
 });
 
 test("recognition request fields stay inside existing page industry and section whitelists", () => {

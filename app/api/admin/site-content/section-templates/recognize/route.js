@@ -8,6 +8,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const {
+  RECOGNITION_TIMEOUT_CODE,
   RECOGNITION_UNAVAILABLE_CODE,
   buildOpenAIRecognitionPayload,
   createDataUrl,
@@ -37,18 +38,36 @@ function normalizeFileMetadata(file) {
 }
 
 async function requestRecognizedSection({ dataUrl, fields, settings }) {
-  const response = await fetch("https://api.openai.com/v1/responses", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(buildOpenAIRecognitionPayload({
-      model: settings.model,
-      dataUrl,
-      fields
-    }))
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), settings.timeoutMs);
+  let response;
+
+  try {
+    response = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(buildOpenAIRecognitionPayload({
+        model: settings.model,
+        dataUrl,
+        fields
+      }))
+    });
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      const timeoutError = new Error("AI section recognition timed out.");
+      timeoutError.code = RECOGNITION_TIMEOUT_CODE;
+      timeoutError.status = 504;
+      throw timeoutError;
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
+
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {

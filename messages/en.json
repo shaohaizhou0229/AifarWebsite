@@ -467,6 +467,7 @@
   "aiInsertCandidate": "Insert into canvas",
   "aiRecognitionFailed": "Unable to recognize this screenshot.",
   "aiRecognitionUnavailable": "AI recognition is not configured yet.",
+  "aiRecognitionTimeout": "AI recognition timed out. Check the configuration or network and try again.",
   "aiRecognitionConfidence": "Confidence",
   "aiRecognitionNotes": "Recognition notes",
   "aiRecognitionRisks": "Risk flags",

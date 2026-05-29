@@ -9,6 +9,7 @@ import sectionTemplateUi from "@/lib/section-template-ui.cjs";
 const { SECTION_TEMPLATE_INDUSTRIES, SITE_SECTION_TYPES } = sectionTemplateRules;
 const { createTemplateMetadataDraft, createTemplatePreviewPage } = sectionTemplateUi;
 const SUPPORTED_PAGE_KEYS = new Set(["home", "product"]);
+const CLIENT_RECOGNITION_TIMEOUT_MS = 70000;
 
 function getIndustryLabel(labels, industry) {
   return labels.templateIndustries?.[industry] || industry;
@@ -30,6 +31,7 @@ function getRiskLabel(labels, flag) {
 
 function normalizeResponseError(data, fallback, labels) {
   if (data?.code === "recognitionUnavailable") return labels.aiRecognitionUnavailable || fallback;
+  if (data?.code === "recognition_timeout") return labels.aiRecognitionTimeout || fallback;
   if (data?.code === "screenshot_type") return labels.aiInvalidScreenshot || fallback;
   if (data?.code === "screenshot_too_large") return labels.aiInvalidScreenshot || fallback;
   if (data?.code === "screenshot_required") return labels.aiNoScreenshot || fallback;
@@ -101,6 +103,9 @@ export function SectionRecognitionModal({
 
     setBusy(true);
     setError("");
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), CLIENT_RECOGNITION_TIMEOUT_MS);
+
     try {
       const formData = new FormData();
       formData.set("screenshot", file);
@@ -112,6 +117,7 @@ export function SectionRecognitionModal({
 
       const response = await fetch("/api/admin/site-content/section-templates/recognize/", {
         method: "POST",
+        signal: controller.signal,
         body: formData
       });
       const data = await response.json().catch(() => ({}));
@@ -125,8 +131,12 @@ export function SectionRecognitionModal({
     } catch (recognitionError) {
       setCandidate(null);
       setRecognition(null);
-      setError(recognitionError.message || labels.aiRecognitionFailed);
+      const message = recognitionError?.name === "AbortError"
+        ? labels.aiRecognitionTimeout
+        : recognitionError.message;
+      setError(message || labels.aiRecognitionFailed);
     } finally {
+      clearTimeout(timeout);
       setBusy(false);
     }
   }

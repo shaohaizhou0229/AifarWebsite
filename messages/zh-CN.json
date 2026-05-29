@@ -448,6 +448,7 @@
   "aiInsertCandidate": "插入画布",
   "aiRecognitionFailed": "无法识别这张截图。",
   "aiRecognitionUnavailable": "AI 识别尚未配置。",
+  "aiRecognitionTimeout": "AI 识别请求超时，请检查配置或网络后重试。",
   "aiRecognitionConfidence": "置信度",
   "aiRecognitionNotes": "识别说明",
   "aiRecognitionRisks": "风险标记",

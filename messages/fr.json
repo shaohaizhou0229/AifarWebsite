@@ -563,6 +563,7 @@
   "aiInsertCandidate": "Inserer dans le canevas",
   "aiRecognitionFailed": "Impossible de reconnaitre cette capture.",
   "aiRecognitionUnavailable": "La reconnaissance IA n'est pas encore configuree.",
+  "aiRecognitionTimeout": "La reconnaissance IA a expire. Verifiez la configuration ou le reseau, puis reessayez.",
   "aiRecognitionConfidence": "Confiance",
   "aiRecognitionNotes": "Notes de reconnaissance",
   "aiRecognitionRisks": "Marqueurs de risque",
