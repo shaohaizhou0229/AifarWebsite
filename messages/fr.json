@@ -516,12 +516,47 @@
         "corporate": "Site entreprise",
         "custom": "Personnalise"
       },
-      "templateSources": {
-        "system": "Systeme",
-        "manual": "Manuel",
-        "ai": "IA"
-      },
-      "settingTabs": {
+  "templateSources": {
+    "system": "Systeme",
+    "manual": "Manuel",
+    "ai": "IA"
+  },
+  "aiRecognizeBlock": "Reconnaissance IA",
+  "aiRecognizeTitle": "Reconnaissance de bloc par IA",
+  "aiRecognizeLead": "Importez une capture d'un bloc web, genereez un candidat a verifier, puis inserez-le dans le canevas.",
+  "aiScreenshot": "Capture",
+  "aiChooseScreenshot": "Importer une capture",
+  "aiReplaceScreenshot": "Remplacer la capture",
+  "aiScreenshotHint": "PNG, JPG, JPEG ou WEBP. Maximum 5 Mo.",
+  "aiIndustry": "Secteur",
+  "aiTargetPage": "Page cible",
+  "aiSectionTypeHint": "Indice de type de bloc",
+  "aiAutoDetect": "Detection auto",
+  "aiPurposeHint": "Indice d'usage",
+  "aiPurposePlaceholder": "Optionnel, ex. entree service",
+  "aiAnalyzeScreenshot": "Analyser la capture",
+  "aiAnalyzing": "Reconnaissance...",
+  "aiReanalyze": "Relancer",
+  "aiCandidate": "Bloc candidat",
+  "aiCandidateReady": "Candidat pret",
+  "aiInsertCandidate": "Inserer dans le canevas",
+  "aiRecognitionFailed": "Impossible de reconnaitre cette capture.",
+  "aiRecognitionUnavailable": "La reconnaissance IA n'est pas encore configuree.",
+  "aiRecognitionConfidence": "Confiance",
+  "aiRecognitionNotes": "Notes de reconnaissance",
+  "aiRecognitionRisks": "Marqueurs de risque",
+  "aiNoScreenshot": "Importez d'abord une capture.",
+  "aiInvalidScreenshot": "Importez une image PNG, JPG, JPEG ou WEBP de 5 Mo maximum.",
+  "aiManualReviewRequired": "Verification manuelle requise",
+  "aiRiskFlags": {
+    "low_confidence": "Confiance faible",
+    "copyright_review": "Verification droits d'auteur",
+    "brand_asset_detected": "Actif de marque detecte",
+    "external_links_removed": "Liens externes retires",
+    "unsupported_motion": "Animation non prise en charge",
+    "manual_review_required": "Verification manuelle requise"
+  },
+  "settingTabs": {
         "content": "Contenu",
         "style": "Style",
         "layout": "Mise en page",

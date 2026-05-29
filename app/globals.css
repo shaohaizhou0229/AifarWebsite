@@ -3511,6 +3511,10 @@ h3 {
 }
 
 .section-library-mode-switch button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   border: 0;
   border-radius: 6px;
   background: transparent;
@@ -3520,6 +3524,10 @@ h3 {
   font-size: 0.82rem;
   font-weight: 700;
   min-height: 34px;
+}
+
+.section-library-mode-switch button:last-child {
+  grid-column: 1 / -1;
 }
 
 .section-library-mode-switch button.active {
@@ -3765,6 +3773,211 @@ button.section-library-preview {
 
 .template-preview-modal {
   grid-template-rows: auto auto auto minmax(0, 1fr);
+}
+
+.section-recognition-modal {
+  width: min(1320px, 96vw);
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.section-recognition-head > div {
+  min-width: 0;
+}
+
+.section-recognition-head span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 3px;
+}
+
+.section-recognition-body {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.82fr) minmax(420px, 1.18fr);
+  gap: 14px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.section-recognition-upload,
+.section-recognition-controls,
+.section-recognition-result {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.section-recognition-upload {
+  border-right: 1px solid rgba(183, 200, 213, 0.56);
+  padding-right: 14px;
+}
+
+.section-recognition-dropzone {
+  display: grid;
+  min-height: 320px;
+  border: 1px dashed rgba(39, 108, 246, 0.45);
+  border-radius: 8px;
+  background: #f8fbfd;
+  cursor: pointer;
+  overflow: hidden;
+  place-items: center;
+}
+
+.section-recognition-dropzone input,
+.section-recognition-file-row input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.section-recognition-dropzone span {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  color: var(--muted);
+  padding: 28px;
+  text-align: center;
+}
+
+.section-recognition-dropzone strong {
+  color: var(--ink);
+}
+
+.section-recognition-dropzone small {
+  max-width: 300px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.section-recognition-dropzone img {
+  width: 100%;
+  height: 100%;
+  max-height: min(62vh, 620px);
+  object-fit: contain;
+  background: #fff;
+}
+
+.section-recognition-file-row,
+.section-recognition-actions,
+.section-recognition-result-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.section-recognition-file-row span {
+  min-width: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.section-recognition-control-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.section-recognition-control-grid label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.section-recognition-control-grid span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.section-recognition-control-grid input,
+.section-recognition-control-grid select {
+  width: 100%;
+  border: 1px solid rgba(183, 200, 213, 0.9);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  padding: 9px 10px;
+}
+
+.section-recognition-actions {
+  justify-content: flex-end;
+}
+
+.section-recognition-state {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #991b1b;
+  padding: 10px;
+}
+
+.section-recognition-state p {
+  margin: 0;
+}
+
+.section-recognition-result {
+  min-height: 0;
+  overflow: auto;
+  border-top: 1px solid rgba(183, 200, 213, 0.56);
+  padding-top: 12px;
+}
+
+.section-recognition-result-head {
+  align-items: flex-start;
+}
+
+.section-recognition-result-head strong {
+  display: block;
+  margin-top: 2px;
+}
+
+.section-recognition-meta {
+  border-bottom: 0;
+  padding: 0;
+}
+
+.section-recognition-risks {
+  border-bottom: 0;
+  padding: 0;
+}
+
+.section-recognition-risks span {
+  border-color: rgba(194, 109, 45, 0.34);
+  background: #fff7ed;
+  color: #a34d16;
+}
+
+.section-recognition-notes {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.section-recognition-preview {
+  height: min(48vh, 520px);
+  padding: 10px;
+}
+
+.section-recognition-preview .cms-live-preview-page {
+  width: 1040px;
 }
 
 .template-preview-meta {

@@ -420,12 +420,47 @@
         "corporate": "Corporate",
         "custom": "Custom"
       },
-      "templateSources": {
-        "system": "System",
-        "manual": "Manual",
-        "ai": "AI"
-      },
-      "settingTabs": {
+  "templateSources": {
+    "system": "System",
+    "manual": "Manual",
+    "ai": "AI"
+  },
+  "aiRecognizeBlock": "AI recognition",
+  "aiRecognizeTitle": "AI section recognition",
+  "aiRecognizeLead": "Upload one website section screenshot, generate a reviewable candidate, then insert it into the current canvas.",
+  "aiScreenshot": "Screenshot",
+  "aiChooseScreenshot": "Upload screenshot",
+  "aiReplaceScreenshot": "Replace screenshot",
+  "aiScreenshotHint": "PNG, JPG, JPEG, or WEBP. Maximum 5 MB.",
+  "aiIndustry": "Industry",
+  "aiTargetPage": "Target page",
+  "aiSectionTypeHint": "Block type hint",
+  "aiAutoDetect": "Auto detect",
+  "aiPurposeHint": "Purpose hint",
+  "aiPurposePlaceholder": "Optional, e.g. service entry",
+  "aiAnalyzeScreenshot": "Analyze screenshot",
+  "aiAnalyzing": "Recognizing...",
+  "aiReanalyze": "Recognize again",
+  "aiCandidate": "Candidate section",
+  "aiCandidateReady": "Candidate ready",
+  "aiInsertCandidate": "Insert into canvas",
+  "aiRecognitionFailed": "Unable to recognize this screenshot.",
+  "aiRecognitionUnavailable": "AI recognition is not configured yet.",
+  "aiRecognitionConfidence": "Confidence",
+  "aiRecognitionNotes": "Recognition notes",
+  "aiRecognitionRisks": "Risk flags",
+  "aiNoScreenshot": "Please upload a screenshot first.",
+  "aiInvalidScreenshot": "Please upload a PNG, JPG, JPEG, or WEBP image up to 5 MB.",
+  "aiManualReviewRequired": "Manual review required",
+  "aiRiskFlags": {
+    "low_confidence": "Low confidence",
+    "copyright_review": "Copyright review",
+    "brand_asset_detected": "Brand asset detected",
+    "external_links_removed": "External links removed",
+    "unsupported_motion": "Unsupported motion",
+    "manual_review_required": "Manual review required"
+  },
+  "settingTabs": {
         "content": "Content",
         "style": "Style",
         "layout": "Layout",

@@ -7,6 +7,7 @@ import { SITE_LAYOUT_VERSION, createBlankSection } from "@/lib/site-page-builder
 import { SitePageSections } from "@/components/SitePageSections";
 import { CmsToolbar } from "@/components/admin-site-content/CmsToolbar";
 import { SectionEditor } from "@/components/admin-site-content/SectionEditor";
+import { SectionRecognitionModal } from "@/components/admin-site-content/SectionRecognitionModal";
 import { SectionSidebar } from "@/components/admin-site-content/SectionSidebar";
 import { SeoEditor } from "@/components/admin-site-content/SeoEditor";
 import { cloneContent, ensureLayout, formatDate, moveItem, updateSectionAt, updateSeo } from "@/components/admin-site-content/form-utils";
@@ -140,6 +141,7 @@ export function AdminSiteContentForm({
   const [pageSettingsOpen, setPageSettingsOpen] = useState(false);
   const [snapshotPreview, setSnapshotPreview] = useState(null);
   const [templatePreview, setTemplatePreview] = useState(null);
+  const [recognitionOpen, setRecognitionOpen] = useState(false);
   const [assetPickerTarget, setAssetPickerTarget] = useState(null);
   const [hoveredSectionId, setHoveredSectionId] = useState("");
   const [sectionTemplates, setSectionTemplates] = useState([]);
@@ -179,7 +181,7 @@ export function AdminSiteContentForm({
   }, []);
 
   useEffect(() => {
-    if (!previewOpen && !pageSettingsOpen && !snapshotPreview && !templatePreview) return undefined;
+    if (!previewOpen && !pageSettingsOpen && !snapshotPreview && !templatePreview && !recognitionOpen) return undefined;
 
     function closeOnEscape(event) {
       if (event.key === "Escape") {
@@ -187,12 +189,13 @@ export function AdminSiteContentForm({
         setPageSettingsOpen(false);
         setSnapshotPreview(null);
         setTemplatePreview(null);
+        setRecognitionOpen(false);
       }
     }
 
     document.addEventListener("keydown", closeOnEscape);
     return () => document.removeEventListener("keydown", closeOnEscape);
-  }, [previewOpen, pageSettingsOpen, snapshotPreview, templatePreview]);
+  }, [previewOpen, pageSettingsOpen, snapshotPreview, templatePreview, recognitionOpen]);
 
   useEffect(() => {
     let cancelled = false;
@@ -651,6 +654,7 @@ export function AdminSiteContentForm({
               onAddSection={addSection}
               onInsertTemplate={insertSectionTemplate}
               onPreviewTemplate={setTemplatePreview}
+              onOpenRecognition={() => setRecognitionOpen(true)}
             />
           </aside>
 
@@ -820,6 +824,17 @@ export function AdminSiteContentForm({
             </div>
           </div>
         </div>
+      ) : null}
+
+      {recognitionOpen ? (
+        <SectionRecognitionModal
+          labels={labels}
+          locale={locale}
+          pageKey={pageKey}
+          pageOptions={pageOptions}
+          onClose={() => setRecognitionOpen(false)}
+          onInsertTemplate={insertSectionTemplate}
+        />
       ) : null}
 
       <AssetPickerModal

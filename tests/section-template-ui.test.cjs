@@ -83,6 +83,20 @@ test("template insertion creates a fresh section without mutating the template",
   assert.equal(currentSections.length, 2);
 });
 
+test("AI pending review template insertion creates a fresh section without mutating the candidate", () => {
+  const candidate = createTemplate({
+    id: "ai-section-template-preview-1",
+    source: "ai",
+    status: "pending_review",
+    riskFlags: ["manual_review_required"]
+  });
+  const result = insertTemplateSection([], candidate, { idSuffix: "ai-copy" });
+
+  assert.equal(result.insertedSection.id, "hero-ai-copy");
+  assert.equal(result.insertedSection.type, "hero");
+  assert.equal(candidate.content.sections[0].id, "hero-source");
+});
+
 test("template insertion appends when there is no selected section", () => {
   const result = insertTemplateSection([], createTemplate(), { idSuffix: "first" });
 

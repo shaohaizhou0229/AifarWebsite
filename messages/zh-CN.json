@@ -401,12 +401,47 @@
         "corporate": "企业官网",
         "custom": "自定义"
       },
-      "templateSources": {
-        "system": "系统",
-        "manual": "人工",
-        "ai": "AI"
-      },
-      "settingTabs": {
+  "templateSources": {
+    "system": "系统",
+    "manual": "人工",
+    "ai": "AI"
+  },
+  "aiRecognizeBlock": "AI 识别",
+  "aiRecognizeTitle": "AI 识别区块",
+  "aiRecognizeLead": "上传一张网站区块截图，生成待审候选区块，再插入当前画布。",
+  "aiScreenshot": "截图",
+  "aiChooseScreenshot": "上传截图",
+  "aiReplaceScreenshot": "更换截图",
+  "aiScreenshotHint": "支持 PNG、JPG、JPEG、WEBP，最大 5 MB。",
+  "aiIndustry": "行业",
+  "aiTargetPage": "目标页面",
+  "aiSectionTypeHint": "区块类型提示",
+  "aiAutoDetect": "自动识别",
+  "aiPurposeHint": "用途提示",
+  "aiPurposePlaceholder": "可选，例如服务入口",
+  "aiAnalyzeScreenshot": "开始识别",
+  "aiAnalyzing": "识别中...",
+  "aiReanalyze": "重新识别",
+  "aiCandidate": "候选区块",
+  "aiCandidateReady": "候选已生成",
+  "aiInsertCandidate": "插入画布",
+  "aiRecognitionFailed": "无法识别这张截图。",
+  "aiRecognitionUnavailable": "AI 识别尚未配置。",
+  "aiRecognitionConfidence": "置信度",
+  "aiRecognitionNotes": "识别说明",
+  "aiRecognitionRisks": "风险标记",
+  "aiNoScreenshot": "请先上传截图。",
+  "aiInvalidScreenshot": "请上传 PNG、JPG、JPEG 或 WEBP 图片，且不超过 5 MB。",
+  "aiManualReviewRequired": "需要人工复核",
+  "aiRiskFlags": {
+    "low_confidence": "低置信度",
+    "copyright_review": "版权复核",
+    "brand_asset_detected": "疑似品牌资产",
+    "external_links_removed": "已移除外部链接",
+    "unsupported_motion": "不支持的动效",
+    "manual_review_required": "需要人工复核"
+  },
+  "settingTabs": {
         "content": "内容",
         "style": "样式",
         "layout": "布局",

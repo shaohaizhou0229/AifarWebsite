@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Eye, Plus, RefreshCw, Search, X } from "lucide-react";
+import { Eye, Plus, RefreshCw, Search, Sparkles, X } from "lucide-react";
 import { SITE_SECTION_LABELS, createBlankSection } from "@/lib/site-page-builder";
 import sectionTemplateUi from "@/lib/section-template-ui.cjs";
 import { SitePageSections } from "@/components/SitePageSections";
@@ -110,7 +110,8 @@ export function SectionSidebar({
   onReloadSectionTemplates,
   onAddSection,
   onInsertTemplate,
-  onPreviewTemplate
+  onPreviewTemplate,
+  onOpenRecognition
 }) {
   const [libraryMode, setLibraryMode] = useState("templates");
   const [popoverOpen, setPopoverOpen] = useState(true);
@@ -180,6 +181,12 @@ export function SectionSidebar({
     closeLibrary();
   }
 
+  function openRecognition() {
+    clearCloseTimer();
+    closeLibrary();
+    onOpenRecognition?.();
+  }
+
   const showTemplatePopover = popoverOpen && libraryMode === "templates";
   const showBlockPopover = popoverOpen && libraryMode === "blocks" && activeGroup;
 
@@ -214,6 +221,14 @@ export function SectionSidebar({
           onClick={() => openBlockLibrary(activeGroupKey || STRUCTURE_GROUPS[0].key)}
         >
           {labels.basicBlocks}
+        </button>
+        <button
+          type="button"
+          onClick={openRecognition}
+          title={labels.aiRecognizeBlock}
+        >
+          <Sparkles size={15} aria-hidden="true" />
+          {labels.aiRecognizeBlock}
         </button>
       </div>
       <nav className="site-structure-list" aria-label={labels.webStructure}>
