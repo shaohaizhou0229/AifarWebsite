@@ -8,6 +8,9 @@ const {
   maskSecret,
   normalizeAiSettingsTestTarget
 } = require("../lib/ai-service-settings.cjs");
+const {
+  buildSiliconFlowImagePayload
+} = require("../lib/image-generation-settings-core.cjs");
 
 test("AI service settings expose image generation and section recognition status", () => {
   const settings = getAiServiceSettings({
@@ -44,6 +47,57 @@ test("AI service settings treat blank quoted secrets as missing", () => {
   assert.equal(recognitionSettings.configured, false);
   assert.equal(recognitionSettings.hasApiKey, false);
   assert.equal(maskSecret("\"\""), "");
+});
+
+test("AI service settings expose SiliconFlow provider configuration", () => {
+  const settings = getAiServiceSettings({
+    AI_IMAGE_PROVIDER: "siliconflow",
+    AI_SECTION_TEMPLATE_PROVIDER: "siliconflow",
+    SILICONFLOW_API_KEY: "sf-test-secret",
+    SILICONFLOW_BASE_URL: "https://api.siliconflow.cn/v1/",
+    SILICONFLOW_IMAGE_MODEL: "Kwai-Kolors/Kolors",
+    SILICONFLOW_VISION_MODEL: "Qwen/Qwen2.5-VL-72B-Instruct",
+    SILICONFLOW_TEXT_MODEL: "Qwen/Qwen3-32B",
+    SILICONFLOW_TIMEOUT_MS: "52000"
+  });
+
+  assert.equal(settings.imageGeneration.providerKey, "siliconflow");
+  assert.equal(settings.imageGeneration.provider, "SiliconFlow");
+  assert.equal(settings.imageGeneration.baseUrl, "https://api.siliconflow.cn/v1");
+  assert.equal(settings.imageGeneration.configured, true);
+  assert.equal(settings.sectionTemplateRecognition.providerKey, "siliconflow");
+  assert.equal(settings.sectionTemplateRecognition.configured, true);
+  assert.deepEqual(settings.sectionTemplateRecognition.modelIds, [
+    "Qwen/Qwen2.5-VL-72B-Instruct",
+    "Qwen/Qwen3-32B"
+  ]);
+  assert.equal(settings.sectionTemplateRecognition.timeoutMs, 52000);
+});
+
+test("AI service settings fall back to OpenAI for unknown providers", () => {
+  const settings = getImageGenerationSettings({
+    AI_IMAGE_PROVIDER: "unknown",
+    OPENAI_API_KEY: "sk-test-secret",
+    OPENAI_IMAGE_MODEL: "gpt-image-1"
+  });
+
+  assert.equal(settings.providerKey, "openai");
+  assert.equal(settings.configured, true);
+});
+
+test("SiliconFlow image payload maps quality to stable generation knobs", () => {
+  const payload = buildSiliconFlowImagePayload({
+    model: "Kwai-Kolors/Kolors",
+    prompt: "A clean product hero background",
+    size: "1024x1536",
+    quality: "high"
+  });
+
+  assert.equal(payload.model, "Kwai-Kolors/Kolors");
+  assert.equal(payload.image_size, "1024x1536");
+  assert.equal(payload.batch_size, 1);
+  assert.equal(payload.num_inference_steps, 40);
+  assert.equal(payload.guidance_scale, 8);
 });
 
 test("section recognition settings expose local-only UAT mode state", () => {

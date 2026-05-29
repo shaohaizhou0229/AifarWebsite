@@ -18,6 +18,8 @@ import {
   normalizeAssetTags
 } from "@/lib/project-assets";
 import {
+  buildOpenAIImagePayload,
+  buildSiliconFlowImagePayload,
   closestImageSizeForSpec,
   getImageGenerationSettings,
   normalizeImageOutputFormat,
@@ -30,6 +32,11 @@ import { recordUserFootprint } from "@/lib/user-footprints";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+const AI_PROVIDER_KEYS = {
+  openai: "openai",
+  siliconflow: "siliconflow"
+};
 
 function permissionError(error) {
   if (error instanceof AuthRequiredError) {
@@ -75,39 +82,47 @@ function normalizePromptContext(value) {
   };
 }
 
-async function fetchGeneratedImage(url) {
+function mimeTypeForOutputFormat(format) {
+  return format === "jpeg" ? "image/jpeg" : `image/${format}`;
+}
+
+function outputFormatFromMimeType(mimeType, fallback = "webp") {
+  const normalized = String(mimeType || "").toLowerCase();
+  if (normalized.includes("image/png")) return "png";
+  if (normalized.includes("image/jpeg") || normalized.includes("image/jpg")) return "jpeg";
+  if (normalized.includes("image/webp")) return "webp";
+  return fallback;
+}
+
+async function fetchGeneratedImage(url, fallbackOutputFormat) {
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error("Generated image could not be downloaded.");
   }
-  return Buffer.from(await response.arrayBuffer());
+  const mimeType = response.headers.get("content-type")?.split(";")[0]?.trim() || mimeTypeForOutputFormat(fallbackOutputFormat);
+  const outputFormat = outputFormatFromMimeType(mimeType, fallbackOutputFormat);
+  return {
+    buffer: Buffer.from(await response.arrayBuffer()),
+    mimeType: mimeTypeForOutputFormat(outputFormat),
+    outputFormat
+  };
 }
 
-async function requestGeneratedImage({ prompt, size, quality, outputFormat }) {
+async function requestOpenAIGeneratedImage({ settings, prompt, size, quality, outputFormat }) {
   const apiKey = process.env.OPENAI_API_KEY;
-  const settings = getImageGenerationSettings();
-  const model = settings.model;
-
-  if (!settings.enabled || !apiKey || !model) {
-    const error = new Error("Image generation is not configured.");
-    error.code = "generationUnavailable";
-    throw error;
-  }
-
-  const response = await fetch("https://api.openai.com/v1/images/generations", {
+  const response = await fetch(`${settings.baseUrl}/images/generations`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-      model,
+    body: JSON.stringify(buildOpenAIImagePayload({
+      model: settings.model,
       prompt,
       size,
       quality,
-      n: 1,
-      output_format: outputFormat
-    })
+      outputFormat
+    }))
   });
   const data = await response.json().catch(() => ({}));
 
@@ -117,12 +132,74 @@ async function requestGeneratedImage({ prompt, size, quality, outputFormat }) {
 
   const image = data.data?.[0];
   if (image?.b64_json) {
-    return Buffer.from(image.b64_json, "base64");
+    return {
+      buffer: Buffer.from(image.b64_json, "base64"),
+      mimeType: mimeTypeForOutputFormat(outputFormat),
+      outputFormat
+    };
   }
   if (image?.url) {
-    return fetchGeneratedImage(image.url);
+    return fetchGeneratedImage(image.url, outputFormat);
   }
   throw new Error("Image generation did not return an image.");
+}
+
+async function requestSiliconFlowGeneratedImage({ settings, prompt, size, quality, outputFormat }) {
+  const apiKey = process.env.SILICONFLOW_API_KEY;
+  const response = await fetch(`${settings.baseUrl}/images/generations`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(buildSiliconFlowImagePayload({
+      model: settings.model,
+      prompt,
+      size,
+      quality
+    }))
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.error?.message || data.message || "Image generation failed.");
+  }
+
+  const image = data.data?.[0] || data.images?.[0];
+  const base64 = image?.b64_json || image?.base64 || image?.image_base64;
+  const url = image?.url || image?.image_url;
+  if (base64) {
+    return {
+      buffer: Buffer.from(base64, "base64"),
+      mimeType: mimeTypeForOutputFormat(outputFormat),
+      outputFormat
+    };
+  }
+  if (url) {
+    return fetchGeneratedImage(url, outputFormat);
+  }
+  throw new Error("Image generation did not return an image.");
+}
+
+async function requestGeneratedImage({ prompt, size, quality, outputFormat }) {
+  const settings = getImageGenerationSettings();
+
+  if (!settings.configured) {
+    const error = new Error("Image generation is not configured.");
+    error.code = "generationUnavailable";
+    throw error;
+  }
+
+  const result = settings.providerKey === AI_PROVIDER_KEYS.siliconflow
+    ? await requestSiliconFlowGeneratedImage({ settings, prompt, size, quality, outputFormat })
+    : await requestOpenAIGeneratedImage({ settings, prompt, size, quality, outputFormat });
+
+  return {
+    ...result,
+    provider: settings.provider,
+    providerKey: settings.providerKey,
+    model: settings.model
+  };
 }
 
 export async function POST(request) {
@@ -153,14 +230,16 @@ export async function POST(request) {
       return NextResponse.json({ error: "Image prompt is required." }, { status: 400 });
     }
 
-    const buffer = await requestGeneratedImage({ prompt, size, quality, outputFormat });
+    const generated = await requestGeneratedImage({ prompt, size, quality, outputFormat });
+    const buffer = generated.buffer;
     if (!buffer.length || buffer.length > MAX_PROJECT_ASSET_SIZE) {
       return NextResponse.json({ error: "Generated image is larger than 5 MB. Try a lower quality setting." }, { status: 400 });
     }
 
-    const extension = outputFormat === "jpeg" ? "jpg" : outputFormat;
+    const storedOutputFormat = normalizeImageOutputFormat(generated.outputFormat, outputFormat);
+    const extension = storedOutputFormat === "jpeg" ? "jpg" : storedOutputFormat;
     const storagePath = createProjectAssetStoragePath(directoryPath, `generated.${extension}`);
-    const mimeType = outputFormat === "jpeg" ? "image/jpeg" : `image/${outputFormat}`;
+    const mimeType = generated.mimeType || mimeTypeForOutputFormat(storedOutputFormat);
     const [assetWidth, assetHeight] = size.split("x").map(Number);
     const supabase = createUserSupabaseClient(accessToken);
     const { error } = await supabase.storage
@@ -200,8 +279,11 @@ export async function POST(request) {
         sizeSource,
         size,
         quality,
-        outputFormat,
-        model: process.env.OPENAI_IMAGE_MODEL
+        outputFormat: storedOutputFormat,
+        requestedOutputFormat: outputFormat,
+        provider: generated.provider,
+        providerKey: generated.providerKey,
+        model: generated.model
       }
     });
 
@@ -220,6 +302,7 @@ export async function POST(request) {
         targetHeight,
         sizeSource,
         promptMode,
+        provider: generated.providerKey,
         pageKey: promptContext?.pageKey || "",
         sectionId: promptContext?.sectionId || ""
       }

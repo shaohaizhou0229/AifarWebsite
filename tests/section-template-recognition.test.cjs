@@ -4,8 +4,11 @@ const {
   DEFAULT_RECOGNITION_TIMEOUT_MS,
   MAX_SCREENSHOT_SIZE,
   buildOpenAIRecognitionPayload,
+  buildSiliconFlowTemplatePayload,
+  buildSiliconFlowVisionPayload,
   createUatRecognitionOutput,
   createDataUrl,
+  extractChatCompletionText,
   extractResponseJson,
   getSectionTemplateRecognitionSettings,
   getSectionTemplateRecognitionUatMode,
@@ -80,6 +83,26 @@ test("recognition settings report unavailable when disabled or missing api key",
   assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_ENABLED: "true", OPENAI_API_KEY: "sk-test", OPENAI_SECTION_TEMPLATE_MODEL: "gpt-4.1-mini" }).configured, true);
 });
 
+test("recognition settings support SiliconFlow vision and text models", () => {
+  const settings = getSectionTemplateRecognitionSettings({
+    AI_SECTION_TEMPLATE_PROVIDER: "siliconflow",
+    SILICONFLOW_API_KEY: "sf-test-secret",
+    SILICONFLOW_BASE_URL: "https://api.siliconflow.cn/v1/",
+    SILICONFLOW_VISION_MODEL: "Qwen/Qwen2.5-VL-72B-Instruct",
+    SILICONFLOW_TEXT_MODEL: "Qwen/Qwen3-32B",
+    SILICONFLOW_TIMEOUT_MS: "60000"
+  });
+
+  assert.equal(settings.providerKey, "siliconflow");
+  assert.equal(settings.provider, "SiliconFlow");
+  assert.equal(settings.baseUrl, "https://api.siliconflow.cn/v1");
+  assert.equal(settings.configured, true);
+  assert.equal(settings.visionModel, "Qwen/Qwen2.5-VL-72B-Instruct");
+  assert.equal(settings.textModel, "Qwen/Qwen3-32B");
+  assert.deepEqual(settings.modelIds, ["Qwen/Qwen2.5-VL-72B-Instruct", "Qwen/Qwen3-32B"]);
+  assert.equal(settings.timeoutMs, 60000);
+});
+
 test("recognition settings clamp external API timeout", () => {
   assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_TIMEOUT_MS: "" }).timeoutMs, DEFAULT_RECOGNITION_TIMEOUT_MS);
   assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_TIMEOUT_MS: "1" }).timeoutMs, 5000);
@@ -142,10 +165,38 @@ test("OpenAI recognition payload uses Responses image input and structured JSON 
   assert.equal(payload.text.format.type, "json_schema");
 });
 
+test("SiliconFlow recognition payloads use vision first and JSON text conversion second", () => {
+  const fields = normalizeRecognitionRequestFields({ locale: "zh-CN", pageKey: "home" });
+  const visionPayload = buildSiliconFlowVisionPayload({
+    model: "Qwen/Qwen2.5-VL-72B-Instruct",
+    dataUrl: "data:image/png;base64,AAAA",
+    fields
+  });
+  const templatePayload = buildSiliconFlowTemplatePayload({
+    model: "Qwen/Qwen3-32B",
+    visionSummary: "A split hero with title, lead, and two buttons.",
+    fields
+  });
+
+  assert.equal(visionPayload.model, "Qwen/Qwen2.5-VL-72B-Instruct");
+  assert.equal(visionPayload.messages[1].content[1].type, "image_url");
+  assert.equal(templatePayload.model, "Qwen/Qwen3-32B");
+  assert.equal(templatePayload.response_format.type, "json_object");
+  assert.match(templatePayload.messages[1].content, /Allowed section types/);
+});
+
 test("response JSON extraction supports output_text and nested Responses content", () => {
   assert.deepEqual(extractResponseJson({ output_text: "{\"ok\":true}" }), { ok: true });
   assert.deepEqual(
     extractResponseJson({ output: [{ content: [{ type: "output_text", text: "{\"ok\":true}" }] }] }),
+    { ok: true }
+  );
+  assert.equal(
+    extractChatCompletionText({ choices: [{ message: { content: "hello" } }] }),
+    "hello"
+  );
+  assert.deepEqual(
+    extractResponseJson({ choices: [{ message: { content: "Here is JSON: {\"ok\":true}" } }] }),
     { ok: true }
   );
 });

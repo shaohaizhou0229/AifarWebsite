@@ -11,14 +11,22 @@ const {
   RECOGNITION_TIMEOUT_CODE,
   RECOGNITION_UNAVAILABLE_CODE,
   buildOpenAIRecognitionPayload,
+  buildSiliconFlowTemplatePayload,
+  buildSiliconFlowVisionPayload,
   createUatRecognitionOutput,
   createDataUrl,
+  extractChatCompletionText,
   extractResponseJson,
   getSectionTemplateRecognitionSettings,
   normalizeRecognitionCandidate,
   normalizeRecognitionRequestFields,
   validateScreenshotFileInput
 } = recognitionRules;
+
+const AI_PROVIDER_KEYS = {
+  openai: "openai",
+  siliconflow: "siliconflow"
+};
 
 function permissionError(error) {
   if (error instanceof AuthRequiredError) {
@@ -38,25 +46,81 @@ function normalizeFileMetadata(file) {
   };
 }
 
+async function fetchRecognitionJson({ url, apiKey, body, signal }) {
+  const response = await fetch(url, {
+    method: "POST",
+    signal,
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body)
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const error = new Error(data.error?.message || data.message || "Section template recognition failed.");
+    error.code = "recognition_failed";
+    error.status = response.status >= 500 ? 502 : 400;
+    throw error;
+  }
+
+  return data;
+}
+
+async function requestOpenAIRecognizedSection({ dataUrl, fields, settings, signal }) {
+  return fetchRecognitionJson({
+    url: `${settings.baseUrl}/responses`,
+    apiKey: process.env.OPENAI_API_KEY,
+    signal,
+    body: buildOpenAIRecognitionPayload({
+      model: settings.model,
+      dataUrl,
+      fields
+    })
+  });
+}
+
+async function requestSiliconFlowRecognizedSection({ dataUrl, fields, settings, signal }) {
+  const visionResponse = await fetchRecognitionJson({
+    url: `${settings.baseUrl}/chat/completions`,
+    apiKey: process.env.SILICONFLOW_API_KEY,
+    signal,
+    body: buildSiliconFlowVisionPayload({
+      model: settings.visionModel,
+      dataUrl,
+      fields
+    })
+  });
+  const visionSummary = extractChatCompletionText(visionResponse);
+  if (!visionSummary) {
+    const error = new Error("Section screenshot analysis did not return text.");
+    error.code = "invalid_recognition_response";
+    error.status = 400;
+    throw error;
+  }
+
+  return fetchRecognitionJson({
+    url: `${settings.baseUrl}/chat/completions`,
+    apiKey: process.env.SILICONFLOW_API_KEY,
+    signal,
+    body: buildSiliconFlowTemplatePayload({
+      model: settings.textModel,
+      visionSummary,
+      fields
+    })
+  });
+}
+
 async function requestRecognizedSection({ dataUrl, fields, settings }) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), settings.timeoutMs);
-  let response;
 
   try {
-    response = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      signal: controller.signal,
-      headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(buildOpenAIRecognitionPayload({
-        model: settings.model,
-        dataUrl,
-        fields
-      }))
-    });
+    if (settings.providerKey === AI_PROVIDER_KEYS.siliconflow) {
+      return requestSiliconFlowRecognizedSection({ dataUrl, fields, settings, signal: controller.signal });
+    }
+    return requestOpenAIRecognizedSection({ dataUrl, fields, settings, signal: controller.signal });
   } catch (error) {
     if (error?.name === "AbortError") {
       const timeoutError = new Error("AI section recognition timed out.");
@@ -68,17 +132,6 @@ async function requestRecognizedSection({ dataUrl, fields, settings }) {
   } finally {
     clearTimeout(timeout);
   }
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    const error = new Error(data.error?.message || "Section template recognition failed.");
-    error.code = "recognition_failed";
-    error.status = response.status >= 500 ? 502 : 400;
-    throw error;
-  }
-
-  return data;
 }
 
 export async function POST(request) {
@@ -116,9 +169,13 @@ export async function POST(request) {
           error: "AI section recognition is not configured.",
           code: RECOGNITION_UNAVAILABLE_CODE,
           details: {
+            provider: settings.provider,
+            providerKey: settings.providerKey,
             enabled: settings.enabled,
             hasApiKey: settings.hasApiKey,
             hasModel: Boolean(settings.model),
+            hasVisionModel: Boolean(settings.visionModel),
+            hasTextModel: Boolean(settings.textModel),
             uatModeRequested: settings.uatModeRequested,
             uatModeAvailable: settings.uatModeAvailable,
             uatModeEnabled: settings.uatModeEnabled

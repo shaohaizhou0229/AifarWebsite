@@ -122,6 +122,7 @@ export function AdminAiSettingsClient({ labels, settings }) {
 
   const imageFields = [
     { label: labels.provider, value: imageGeneration.provider },
+    { label: labels.baseUrl, value: imageGeneration.baseUrl },
     { label: labels.enabled, value: enabledLabel(labels, imageGeneration.enabled) },
     { label: labels.apiKey, value: imageGeneration.apiKeyPreview || labels.notConfigured },
     { label: labels.model, value: imageGeneration.model || labels.notConfigured },
@@ -129,9 +130,12 @@ export function AdminAiSettingsClient({ labels, settings }) {
   ];
   const recognitionFields = [
     { label: labels.provider, value: sectionTemplateRecognition.provider },
+    { label: labels.baseUrl, value: sectionTemplateRecognition.baseUrl },
     { label: labels.enabled, value: enabledLabel(labels, sectionTemplateRecognition.enabled) },
     { label: labels.apiKey, value: sectionTemplateRecognition.apiKeyPreview || labels.notConfigured },
     { label: labels.model, value: sectionTemplateRecognition.model || labels.notConfigured },
+    ...(sectionTemplateRecognition.visionModel ? [{ label: labels.visionModel, value: sectionTemplateRecognition.visionModel }] : []),
+    ...(sectionTemplateRecognition.textModel ? [{ label: labels.textModel, value: sectionTemplateRecognition.textModel }] : []),
     { label: labels.timeoutMs, value: formatTimeout(labels, sectionTemplateRecognition.timeoutMs) },
     { label: labels.uatMode, value: formatUatMode(labels, sectionTemplateRecognition) }
   ];
@@ -222,6 +226,15 @@ export function AdminAiSettingsClient({ labels, settings }) {
           <h2>{labels.envTitle}</h2>
           <p>{labels.envLead}</p>
           <p>{labels.envStorageNote}</p>
+          <code translate="no">AI_IMAGE_PROVIDER</code>
+          <code translate="no">AI_IMAGE_ENABLED</code>
+          <code translate="no">AI_IMAGE_DEFAULT_SIZE</code>
+          <code translate="no">AI_IMAGE_DEFAULT_QUALITY</code>
+          <code translate="no">AI_IMAGE_OUTPUT_FORMAT</code>
+          <code translate="no">AI_SECTION_TEMPLATE_PROVIDER</code>
+          <code translate="no">AI_SECTION_TEMPLATE_ENABLED</code>
+          <code translate="no">AI_SECTION_TEMPLATE_TIMEOUT_MS</code>
+          <code translate="no">AI_SECTION_TEMPLATE_UAT_MODE</code>
           <code translate="no">OPENAI_API_KEY</code>
           <code translate="no">OPENAI_IMAGE_ENABLED</code>
           <code translate="no">OPENAI_IMAGE_MODEL</code>
@@ -232,6 +245,12 @@ export function AdminAiSettingsClient({ labels, settings }) {
           <code translate="no">OPENAI_SECTION_TEMPLATE_MODEL</code>
           <code translate="no">OPENAI_SECTION_TEMPLATE_TIMEOUT_MS</code>
           <code translate="no">OPENAI_SECTION_TEMPLATE_UAT_MODE</code>
+          <code translate="no">SILICONFLOW_API_KEY</code>
+          <code translate="no">SILICONFLOW_BASE_URL</code>
+          <code translate="no">SILICONFLOW_IMAGE_MODEL</code>
+          <code translate="no">SILICONFLOW_VISION_MODEL</code>
+          <code translate="no">SILICONFLOW_TEXT_MODEL</code>
+          <code translate="no">SILICONFLOW_TIMEOUT_MS</code>
         </article>
       </aside>
     </section>
