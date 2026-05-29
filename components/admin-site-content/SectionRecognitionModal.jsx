@@ -123,6 +123,7 @@ export function SectionRecognitionModal({
 
       const response = await fetch("/api/admin/site-content/section-templates/recognize/", {
         method: "POST",
+        credentials: "include",
         signal: controller.signal,
         body: formData
       });

@@ -218,6 +218,71 @@ test("legal AI result becomes pending review candidate with manual risk flag", (
   assert.equal(output.recognition.sourceImage.filename, "section.png");
 });
 
+test("recognized settings move allowlisted flat tokens into style and layout groups", () => {
+  const output = normalizeRecognitionCandidate(
+    createRecognitionResult({
+      template: {
+        section: {
+          ...createRecognitionResult().template.section,
+          settings: {
+            textSize: "large",
+            cardColumns: 2,
+            style: { cardStyle: "outlined" }
+          }
+        }
+      }
+    }),
+    normalizeRecognitionRequestFields(),
+    {}
+  );
+
+  assert.equal(output.candidate.content.sections[0].settings.style.textSize, "large");
+  assert.equal(output.candidate.content.sections[0].settings.style.cardStyle, "outlined");
+  assert.equal(output.candidate.content.sections[0].settings.layout.cardColumns, 2);
+});
+
+test("recognized settings drop invalid known token values before strict validation", () => {
+  const output = normalizeRecognitionCandidate(
+    createRecognitionResult({
+      template: {
+        section: {
+          ...createRecognitionResult().template.section,
+          settings: {
+            style: { textSize: "large" },
+            layout: { imagePosition: "bottom", contentAlign: "center" }
+          }
+        }
+      }
+    }),
+    normalizeRecognitionRequestFields(),
+    {}
+  );
+
+  assert.equal(output.candidate.content.sections[0].settings.style.textSize, "large");
+  assert.equal(output.candidate.content.sections[0].settings.layout.imagePosition, undefined);
+  assert.equal(output.candidate.content.sections[0].settings.layout.contentAlign, "center");
+});
+
+test("recognized settings still reject unknown flat settings", () => {
+  assert.throws(
+    () => normalizeRecognitionCandidate(
+      createRecognitionResult({
+        template: {
+          section: {
+            ...createRecognitionResult().template.section,
+            settings: {
+              unknownSetting: "value"
+            }
+          }
+        }
+      }),
+      normalizeRecognitionRequestFields(),
+      {}
+    ),
+    /Unsupported section setting unknownSetting/
+  );
+});
+
 test("local UAT recognition output returns one safe pending-review AI candidate", () => {
   const output = createUatRecognitionOutput(
     normalizeRecognitionRequestFields({
