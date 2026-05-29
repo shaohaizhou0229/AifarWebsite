@@ -44,6 +44,16 @@ export async function POST(request) {
     const settings = getAiServiceSettings()[target];
     const messages = TARGET_MESSAGES[target];
 
+    if (target === AI_SETTINGS_TEST_TARGETS.sectionTemplateRecognition && settings.uatModeEnabled) {
+      return NextResponse.json({
+        ok: true,
+        target,
+        mode: "uat",
+        checkedAt: new Date().toISOString(),
+        model: "local-uat-section-template"
+      });
+    }
+
     if (!settings.enabled) {
       return NextResponse.json({ ok: false, target, code: "disabled", error: messages.disabled }, { status: 400 });
     }

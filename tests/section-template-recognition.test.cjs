@@ -4,9 +4,11 @@ const {
   DEFAULT_RECOGNITION_TIMEOUT_MS,
   MAX_SCREENSHOT_SIZE,
   buildOpenAIRecognitionPayload,
+  createUatRecognitionOutput,
   createDataUrl,
   extractResponseJson,
   getSectionTemplateRecognitionSettings,
+  getSectionTemplateRecognitionUatMode,
   normalizeRecognitionCandidate,
   normalizeRecognitionRequestFields,
   validateScreenshotFileInput
@@ -85,6 +87,26 @@ test("recognition settings clamp external API timeout", () => {
   assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_TIMEOUT_MS: "32000" }).timeoutMs, 32000);
 });
 
+test("recognition UAT mode is local only and does not make real config configured", () => {
+  assert.deepEqual(
+    getSectionTemplateRecognitionUatMode({ OPENAI_SECTION_TEMPLATE_UAT_MODE: "true", NODE_ENV: "development" }),
+    { uatModeRequested: true, uatModeAvailable: true, uatModeEnabled: true }
+  );
+  assert.deepEqual(
+    getSectionTemplateRecognitionUatMode({ OPENAI_SECTION_TEMPLATE_UAT_MODE: "true", NODE_ENV: "production" }),
+    { uatModeRequested: true, uatModeAvailable: false, uatModeEnabled: false }
+  );
+
+  const settings = getSectionTemplateRecognitionSettings({
+    OPENAI_SECTION_TEMPLATE_ENABLED: "true",
+    OPENAI_SECTION_TEMPLATE_UAT_MODE: "true",
+    NODE_ENV: "development"
+  });
+
+  assert.equal(settings.configured, false);
+  assert.equal(settings.uatModeEnabled, true);
+});
+
 test("recognition request fields stay inside existing page industry and section whitelists", () => {
   assert.deepEqual(
     normalizeRecognitionRequestFields({
@@ -143,6 +165,28 @@ test("legal AI result becomes pending review candidate with manual risk flag", (
   assert.equal(output.candidate.content.sections[0].type, "hero");
   assert.ok(output.candidate.riskFlags.includes("manual_review_required"));
   assert.equal(output.recognition.sourceImage.filename, "section.png");
+});
+
+test("local UAT recognition output returns one safe pending-review AI candidate", () => {
+  const output = createUatRecognitionOutput(
+    normalizeRecognitionRequestFields({
+      locale: "zh-CN",
+      pageKey: "home",
+      industry: "custom",
+      sectionTypeHint: "card_grid",
+      purposeHint: "uat workflow"
+    }),
+    { filename: "uat.png", mimeType: "image/png", size: 1024 }
+  );
+
+  assert.equal(output.candidate.source, "ai");
+  assert.equal(output.candidate.status, "pending_review");
+  assert.equal(output.candidate.content.sections.length, 1);
+  assert.equal(output.candidate.content.sections[0].type, "card_grid");
+  assert.equal(output.recognition.mode, "uat");
+  assert.equal(output.recognition.uatMode, true);
+  assert.ok(output.candidate.riskFlags.includes("manual_review_required"));
+  assert.ok(output.candidate.riskFlags.includes("low_confidence"));
 });
 
 test("low confidence and external links add risk flags and clear unsafe external hrefs", () => {

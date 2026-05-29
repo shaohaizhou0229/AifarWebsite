@@ -46,6 +46,25 @@ test("AI service settings treat blank quoted secrets as missing", () => {
   assert.equal(maskSecret("\"\""), "");
 });
 
+test("section recognition settings expose local-only UAT mode state", () => {
+  const localSettings = getSectionTemplateRecognitionServiceSettings({
+    OPENAI_SECTION_TEMPLATE_UAT_MODE: "true",
+    NODE_ENV: "development"
+  });
+  const productionSettings = getSectionTemplateRecognitionServiceSettings({
+    OPENAI_SECTION_TEMPLATE_UAT_MODE: "true",
+    NODE_ENV: "production"
+  });
+
+  assert.equal(localSettings.configured, false);
+  assert.equal(localSettings.uatModeRequested, true);
+  assert.equal(localSettings.uatModeAvailable, true);
+  assert.equal(localSettings.uatModeEnabled, true);
+  assert.equal(productionSettings.uatModeRequested, true);
+  assert.equal(productionSettings.uatModeAvailable, false);
+  assert.equal(productionSettings.uatModeEnabled, false);
+});
+
 test("AI settings test target defaults to image generation and accepts recognition", () => {
   assert.equal(normalizeAiSettingsTestTarget(""), AI_SETTINGS_TEST_TARGETS.imageGeneration);
   assert.equal(normalizeAiSettingsTestTarget("unknown"), AI_SETTINGS_TEST_TARGETS.imageGeneration);

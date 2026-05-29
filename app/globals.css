@@ -3936,6 +3936,20 @@ button.section-library-preview {
   margin: 0;
 }
 
+.section-recognition-state.info {
+  border-color: rgba(37, 99, 235, 0.24);
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.section-recognition-state.info small {
+  display: block;
+  color: #1e40af;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  margin-top: 4px;
+}
+
 .section-recognition-help {
   display: grid;
   gap: 8px;

@@ -23,7 +23,14 @@ function formatTimeout(labels, timeoutMs) {
   return value > 0 ? `${value} ${labels.milliseconds}` : labels.notConfigured;
 }
 
+function formatUatMode(labels, settings = {}) {
+  if (settings.uatModeEnabled) return labels.uatModeEnabled;
+  if (settings.uatModeRequested && !settings.uatModeAvailable) return labels.uatModeUnavailable;
+  return labels.uatModeDisabled;
+}
+
 function resolveTestMessage(labels, result, fallback) {
+  if (result?.ok && result?.mode === "uat") return labels.testUatSuccess || labels.testSuccess;
   if (result?.ok) return labels.testSuccess;
   return labels.testErrorCodes?.[result?.code] || result?.error || fallback;
 }
@@ -125,7 +132,8 @@ export function AdminAiSettingsClient({ labels, settings }) {
     { label: labels.enabled, value: enabledLabel(labels, sectionTemplateRecognition.enabled) },
     { label: labels.apiKey, value: sectionTemplateRecognition.apiKeyPreview || labels.notConfigured },
     { label: labels.model, value: sectionTemplateRecognition.model || labels.notConfigured },
-    { label: labels.timeoutMs, value: formatTimeout(labels, sectionTemplateRecognition.timeoutMs) }
+    { label: labels.timeoutMs, value: formatTimeout(labels, sectionTemplateRecognition.timeoutMs) },
+    { label: labels.uatMode, value: formatUatMode(labels, sectionTemplateRecognition) }
   ];
 
   return (
@@ -223,6 +231,7 @@ export function AdminAiSettingsClient({ labels, settings }) {
           <code translate="no">OPENAI_SECTION_TEMPLATE_ENABLED</code>
           <code translate="no">OPENAI_SECTION_TEMPLATE_MODEL</code>
           <code translate="no">OPENAI_SECTION_TEMPLATE_TIMEOUT_MS</code>
+          <code translate="no">OPENAI_SECTION_TEMPLATE_UAT_MODE</code>
         </article>
       </aside>
     </section>

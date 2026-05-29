@@ -343,6 +343,15 @@ export function SectionRecognitionModal({
                   </label>
                 </div>
                 {savedTemplate ? <p className="form-message success">{labels.aiTemplateSaved}</p> : null}
+                {recognition?.mode === "uat" || recognition?.uatMode ? (
+                  <div className="section-recognition-state info" role="status">
+                    <Sparkles size={16} aria-hidden="true" />
+                    <div>
+                      <p>{labels.aiRecognitionUatMode}</p>
+                      <small>{labels.aiRecognitionUatModeHint}</small>
+                    </div>
+                  </div>
+                ) : null}
                 <div className="template-preview-meta section-recognition-meta">
                   <span>{labels.templateIndustry}: {getIndustryLabel(labels, candidateDraft.industry || candidate.industry)}</span>
                   <span>{labels.templatePurpose}: {candidateDraft.purpose || candidate.purpose || labels.emptyValue}</span>

@@ -11,6 +11,7 @@ const {
   RECOGNITION_TIMEOUT_CODE,
   RECOGNITION_UNAVAILABLE_CODE,
   buildOpenAIRecognitionPayload,
+  createUatRecognitionOutput,
   createDataUrl,
   extractResponseJson,
   getSectionTemplateRecognitionSettings,
@@ -95,6 +96,20 @@ export async function POST(request) {
     }
 
     const settings = getSectionTemplateRecognitionSettings();
+    const fields = normalizeRecognitionRequestFields({
+      locale: formData.get("locale"),
+      pageKey: formData.get("pageKey"),
+      industry: formData.get("industry"),
+      sectionTypeHint: formData.get("sectionTypeHint"),
+      purposeHint: formData.get("purposeHint")
+    });
+
+    if (settings.uatModeEnabled) {
+      return NextResponse.json(
+        createUatRecognitionOutput(fields, normalizeFileMetadata(screenshot))
+      );
+    }
+
     if (!settings.configured) {
       return NextResponse.json(
         {
@@ -103,20 +118,16 @@ export async function POST(request) {
           details: {
             enabled: settings.enabled,
             hasApiKey: settings.hasApiKey,
-            hasModel: Boolean(settings.model)
+            hasModel: Boolean(settings.model),
+            uatModeRequested: settings.uatModeRequested,
+            uatModeAvailable: settings.uatModeAvailable,
+            uatModeEnabled: settings.uatModeEnabled
           }
         },
         { status: 503 }
       );
     }
 
-    const fields = normalizeRecognitionRequestFields({
-      locale: formData.get("locale"),
-      pageKey: formData.get("pageKey"),
-      industry: formData.get("industry"),
-      sectionTypeHint: formData.get("sectionTypeHint"),
-      purposeHint: formData.get("purposeHint")
-    });
     const buffer = Buffer.from(await screenshot.arrayBuffer());
     const dataUrl = createDataUrl(buffer, screenshot.type);
     const responseJson = await requestRecognizedSection({ dataUrl, fields, settings });
