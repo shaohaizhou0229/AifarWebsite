@@ -118,9 +118,9 @@ async function requestRecognizedSection({ dataUrl, fields, settings }) {
 
   try {
     if (settings.providerKey === AI_PROVIDER_KEYS.siliconflow) {
-      return requestSiliconFlowRecognizedSection({ dataUrl, fields, settings, signal: controller.signal });
+      return await requestSiliconFlowRecognizedSection({ dataUrl, fields, settings, signal: controller.signal });
     }
-    return requestOpenAIRecognizedSection({ dataUrl, fields, settings, signal: controller.signal });
+    return await requestOpenAIRecognizedSection({ dataUrl, fields, settings, signal: controller.signal });
   } catch (error) {
     if (error?.name === "AbortError") {
       const timeoutError = new Error("AI section recognition timed out.");
