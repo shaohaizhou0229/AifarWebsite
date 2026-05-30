@@ -252,6 +252,82 @@ test("legal AI result becomes pending review candidate with manual risk flag", (
   assert.equal(output.recognition.sourceImage.filename, "section.png");
 });
 
+test("recognition tolerates non-object detected elements from AI output", () => {
+  const output = normalizeRecognitionCandidate(
+    createRecognitionResult({
+      recognition: {
+        detectedElements: [
+          "headline: ignored",
+          {
+            id: "headline-1",
+            type: "text",
+            text: "Take quick action",
+            box: { x: 0.2, y: 0.18, width: 0.6, height: 0.12 },
+            zIndex: 2
+          },
+          null
+        ]
+      }
+    }),
+    normalizeRecognitionRequestFields({ locale: "zh-CN", pageKey: "home" }),
+    { filename: "section.png", mimeType: "image/png", size: 1024 }
+  );
+
+  assert.equal(output.candidate.content.sections[0].type, "ai_layout");
+  assert.equal(output.recognition.detectedElements.length, 1);
+  assert.equal(output.recognition.detectedElements[0].type, "text");
+  assert.equal(output.recognition.detectedElements[0].text, "Take quick action");
+});
+
+test("recognition tolerates non-object ai layout content elements", () => {
+  const output = normalizeRecognitionCandidate(
+    createRecognitionResult({
+      template: {
+        section: {
+          id: "ai-layout",
+          type: "ai_layout",
+          variant: "screenshot_composition",
+          settings: {
+            style: { textSize: "medium" },
+            layout: { contentAlign: "center" }
+          },
+          content: {
+            canvas: {
+              aspectRatio: 1.6,
+              background: "default",
+              padding: "normal",
+              maxWidth: "content",
+              mobileMode: "scale"
+            },
+            elements: [
+              "button: ignored",
+              {
+                id: "button-1",
+                type: "button",
+                text: "Try Demo",
+                href: "/contact/",
+                box: { x: 0.44, y: 0.36, width: 0.12, height: 0.06 },
+                zIndex: 3
+              }
+            ]
+          }
+        }
+      },
+      recognition: {
+        detectedElements: ["invalid detected element"]
+      }
+    }),
+    normalizeRecognitionRequestFields({ locale: "zh-CN", pageKey: "home" }),
+    { filename: "section.png", mimeType: "image/png", size: 1024 }
+  );
+
+  const elements = output.candidate.content.sections[0].content.elements;
+  assert.equal(elements.length, 1);
+  assert.equal(elements[0].type, "button");
+  assert.equal(output.recognition.detectedElements.length, 1);
+  assert.equal(output.recognition.detectedElements[0].type, "button");
+});
+
 test("recognized settings move allowlisted flat tokens into style and layout groups", () => {
   const output = normalizeRecognitionCandidate(
     createRecognitionResult({
