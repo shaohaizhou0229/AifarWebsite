@@ -10,6 +10,8 @@ const { SECTION_TEMPLATE_INDUSTRIES, SITE_SECTION_TYPES } = sectionTemplateRules
 const { createTemplateMetadataDraft, createTemplatePreviewPage } = sectionTemplateUi;
 const SUPPORTED_PAGE_KEYS = new Set(["home", "product"]);
 const CLIENT_RECOGNITION_TIMEOUT_MS = 310000;
+const MAX_CLIENT_SCREENSHOT_EDGE = 1280;
+const MAX_CLIENT_SCREENSHOT_QUALITY = 0.82;
 
 function getIndustryLabel(labels, industry) {
   return labels.templateIndustries?.[industry] || industry;
@@ -50,6 +52,34 @@ function normalizeResponseError(data, fallback, labels) {
   return { code: data?.code || "", message: data?.error || fallback };
 }
 
+async function compressScreenshotFile(file) {
+  if (!file || !file.type?.startsWith("image/")) return file;
+  const imageUrl = URL.createObjectURL(file);
+  try {
+    const image = await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = imageUrl;
+    });
+    const scale = Math.min(1, MAX_CLIENT_SCREENSHOT_EDGE / Math.max(image.naturalWidth || 1, image.naturalHeight || 1));
+    if (scale >= 1 && file.size <= 900 * 1024) return file;
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round((image.naturalWidth || 1) * scale));
+    canvas.height = Math.max(1, Math.round((image.naturalHeight || 1) * scale));
+    const context = canvas.getContext("2d");
+    if (!context) return file;
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/webp", MAX_CLIENT_SCREENSHOT_QUALITY));
+    if (!blob || blob.size >= file.size) return file;
+    return new File([blob], file.name.replace(/\.[^.]+$/, ".webp"), { type: "image/webp" });
+  } catch {
+    return file;
+  } finally {
+    URL.revokeObjectURL(imageUrl);
+  }
+}
+
 export function SectionRecognitionModal({
   labels,
   locale,
@@ -59,7 +89,8 @@ export function SectionRecognitionModal({
   aiSettingsHref = "",
   onClose,
   onInsertTemplate,
-  onSaveTemplate
+  onSaveTemplate,
+  onTaskCreated
 }) {
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
@@ -125,15 +156,16 @@ export function SectionRecognitionModal({
     const timeout = setTimeout(() => controller.abort(), CLIENT_RECOGNITION_TIMEOUT_MS);
 
     try {
+      const uploadFile = await compressScreenshotFile(file);
       const formData = new FormData();
-      formData.set("screenshot", file);
+      formData.set("screenshot", uploadFile);
       formData.set("locale", locale || "en");
       formData.set("pageKey", targetPageKey || "");
       formData.set("industry", industry);
       formData.set("sectionTypeHint", sectionTypeHint);
       formData.set("purposeHint", purposeHint);
 
-      const response = await fetch("/api/admin/site-content/section-templates/recognize/", {
+      const response = await fetch("/api/admin/site-content/section-templates/recognition-tasks/", {
         method: "POST",
         credentials: "include",
         signal: controller.signal,
@@ -148,8 +180,8 @@ export function SectionRecognitionModal({
         throw error;
       }
 
-      setCandidate(data.candidate || null);
-      setRecognition(data.recognition || null);
+      onTaskCreated?.(data.task);
+      onClose();
       setErrorCode("");
     } catch (recognitionError) {
       setCandidate(null);

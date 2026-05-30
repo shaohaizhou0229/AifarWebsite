@@ -5,6 +5,7 @@ const {
   DEFAULT_SILICONFLOW_RECOGNITION_TIMEOUT_MS,
   MAX_SCREENSHOT_SIZE,
   buildOpenAIRecognitionPayload,
+  buildSiliconFlowDirectRecognitionPayload,
   buildSiliconFlowTemplatePayload,
   buildSiliconFlowVisionPayload,
   createUatRecognitionOutput,
@@ -104,6 +105,18 @@ test("recognition settings support SiliconFlow vision and text models", () => {
   assert.equal(settings.timeoutMs, 60000);
 });
 
+test("SiliconFlow recognition can be configured with a vision model only", () => {
+  const settings = getSectionTemplateRecognitionSettings({
+    AI_SECTION_TEMPLATE_PROVIDER: "siliconflow",
+    SILICONFLOW_API_KEY: "sf-test-secret",
+    SILICONFLOW_VISION_MODEL: "Qwen/Qwen3-VL-8B-Instruct",
+    SILICONFLOW_TEXT_MODEL: ""
+  });
+
+  assert.equal(settings.configured, true);
+  assert.equal(settings.visionModel, "Qwen/Qwen3-VL-8B-Instruct");
+});
+
 test("recognition settings clamp external API timeout", () => {
   assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_TIMEOUT_MS: "" }).timeoutMs, DEFAULT_RECOGNITION_TIMEOUT_MS);
   assert.equal(getSectionTemplateRecognitionSettings({ AI_SECTION_TEMPLATE_PROVIDER: "siliconflow" }).timeoutMs, DEFAULT_SILICONFLOW_RECOGNITION_TIMEOUT_MS);
@@ -189,6 +202,19 @@ test("SiliconFlow recognition payloads use vision first and JSON text conversion
   assert.match(templatePayload.messages[1].content, /Allowed section types/);
   assert.match(visionPayload.messages[1].content[0].text, /normalized box coordinates/);
   assert.match(templatePayload.messages[1].content, /screenshot_composition/);
+});
+
+test("SiliconFlow direct recognition payload can create ai layout from one vision call", () => {
+  const payload = buildSiliconFlowDirectRecognitionPayload({
+    model: "Qwen/Qwen3-VL-8B-Instruct",
+    dataUrl: "data:image/webp;base64,AAA",
+    fields: normalizeRecognitionRequestFields({ locale: "zh-CN", pageKey: "home" })
+  });
+
+  assert.equal(payload.model, "Qwen/Qwen3-VL-8B-Instruct");
+  assert.equal(payload.response_format.type, "json_object");
+  assert.match(payload.messages[1].content[0].text, /ai_layout/);
+  assert.equal(payload.messages[1].content[1].image_url.url, "data:image/webp;base64,AAA");
 });
 
 test("response JSON extraction supports output_text and nested Responses content", () => {

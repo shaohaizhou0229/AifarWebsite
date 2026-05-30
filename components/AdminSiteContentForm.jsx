@@ -8,6 +8,7 @@ import { SitePageSections } from "@/components/SitePageSections";
 import { CmsToolbar } from "@/components/admin-site-content/CmsToolbar";
 import { SectionEditor } from "@/components/admin-site-content/SectionEditor";
 import { SectionRecognitionModal } from "@/components/admin-site-content/SectionRecognitionModal";
+import { SectionRecognitionTaskDock } from "@/components/admin-site-content/SectionRecognitionTaskDock";
 import { SectionSidebar } from "@/components/admin-site-content/SectionSidebar";
 import { SectionTemplateMetadataModal } from "@/components/admin-site-content/SectionTemplateMetadataModal";
 import { SeoEditor } from "@/components/admin-site-content/SeoEditor";
@@ -158,6 +159,9 @@ export function AdminSiteContentForm({
   const [sectionTemplatesLoading, setSectionTemplatesLoading] = useState(false);
   const [sectionTemplatesError, setSectionTemplatesError] = useState("");
   const [sectionTemplatesReloadToken, setSectionTemplatesReloadToken] = useState(0);
+  const [recognitionTasks, setRecognitionTasks] = useState([]);
+  const [recognitionTasksReloadToken, setRecognitionTasksReloadToken] = useState(0);
+  const [recognitionTaskBusyId, setRecognitionTaskBusyId] = useState("");
   const canvasPreviewRef = useRef(null);
   const modalPreviewRef = useRef(null);
   const snapshotPreviewRef = useRef(null);
@@ -241,6 +245,38 @@ export function AdminSiteContentForm({
       cancelled = true;
     };
   }, [locale, pageKey, sectionTemplatesReloadToken, labels.templateLoadFailed]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadRecognitionTasks() {
+      try {
+        const params = new URLSearchParams();
+        params.set("locale", locale);
+        if (pageKey === "home" || pageKey === "product") params.set("page", pageKey);
+        const response = await fetch(`/api/admin/site-content/section-templates/recognition-tasks/?${params.toString()}`);
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || labels.aiTaskLoadFailed || labels.aiRecognitionFailed);
+        if (!cancelled) setRecognitionTasks(Array.isArray(data.tasks) ? data.tasks : []);
+      } catch (taskError) {
+        if (!cancelled) setError(taskError.message || labels.aiTaskLoadFailed || labels.aiRecognitionFailed);
+      }
+    }
+
+    loadRecognitionTasks();
+    return () => {
+      cancelled = true;
+    };
+  }, [locale, pageKey, recognitionTasksReloadToken, labels.aiRecognitionFailed, labels.aiTaskLoadFailed]);
+
+  useEffect(() => {
+    const hasActiveTask = recognitionTasks.some((task) => task.status === "queued" || task.status === "running");
+    if (!hasActiveTask) return undefined;
+    const timer = window.setInterval(() => {
+      setRecognitionTasksReloadToken((current) => current + 1);
+    }, 4500);
+    return () => window.clearInterval(timer);
+  }, [recognitionTasks]);
 
   useEffect(() => {
     setSnapshots(initialSnapshots);
@@ -538,6 +574,34 @@ export function AdminSiteContentForm({
     } catch (saveError) {
       setError(saveError.message || labels.aiTemplateSaveFailed);
       throw saveError;
+    }
+  }
+
+  function addRecognitionTask(task) {
+    if (!task) return;
+    setRecognitionTasks((current) => [task, ...current.filter((item) => item.id !== task.id)].slice(0, 12));
+    setMessage(labels.aiTaskCreated || labels.aiAnalyzing);
+    setRecognitionTasksReloadToken((current) => current + 1);
+  }
+
+  function reloadRecognitionTasks() {
+    setRecognitionTasksReloadToken((current) => current + 1);
+  }
+
+  async function runRecognitionTaskAction(task, action) {
+    if (!task?.id) return;
+    setRecognitionTaskBusyId(task.id);
+    setError("");
+    try {
+      const response = await fetch(`/api/admin/site-content/section-templates/recognition-tasks/${task.id}/${action}/`, { method: "POST" });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || labels.aiTaskActionFailed || labels.aiRecognitionFailed);
+      setRecognitionTasks((current) => current.map((item) => item.id === task.id ? data.task : item));
+      setRecognitionTasksReloadToken((current) => current + 1);
+    } catch (taskError) {
+      setError(taskError.message || labels.aiTaskActionFailed || labels.aiRecognitionFailed);
+    } finally {
+      setRecognitionTaskBusyId("");
     }
   }
 
@@ -969,8 +1033,21 @@ export function AdminSiteContentForm({
           onClose={() => setRecognitionOpen(false)}
           onInsertTemplate={insertSectionTemplate}
           onSaveTemplate={saveAiCandidateTemplate}
+          onTaskCreated={addRecognitionTask}
         />
       ) : null}
+
+      <SectionRecognitionTaskDock
+        labels={labels}
+        tasks={recognitionTasks}
+        busyTaskId={recognitionTaskBusyId}
+        onRefresh={reloadRecognitionTasks}
+        onCancel={(task) => runRecognitionTaskAction(task, "cancel")}
+        onRetry={(task) => runRecognitionTaskAction(task, "retry")}
+        onPreview={setTemplatePreview}
+        onInsert={insertSectionTemplate}
+        onSaveTemplate={saveAiCandidateTemplate}
+      />
 
       {templateMetadataEditor ? (
         <SectionTemplateMetadataModal

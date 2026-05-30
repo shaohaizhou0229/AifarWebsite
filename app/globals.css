@@ -4365,6 +4365,184 @@ button.section-library-preview {
   width: 1040px;
 }
 
+.section-recognition-task-dock {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 80;
+  width: min(420px, calc(100vw - 32px));
+  color: #111827;
+}
+
+.section-recognition-task-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 999px;
+  padding: 10px 12px;
+  background: #0f172a;
+  color: #fff;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+  cursor: pointer;
+}
+
+.section-recognition-task-summary span {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.section-recognition-task-summary strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: #2563eb;
+  font-size: 12px;
+}
+
+.section-recognition-task-panel {
+  margin-top: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.36);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.2);
+  overflow: hidden;
+}
+
+.section-recognition-task-panel header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.section-recognition-task-panel header strong {
+  display: block;
+  font-size: 15px;
+}
+
+.section-recognition-task-list {
+  display: grid;
+  gap: 10px;
+  max-height: min(460px, calc(100vh - 180px));
+  overflow: auto;
+  padding: 12px;
+}
+
+.section-recognition-task-row {
+  display: grid;
+  gap: 9px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+  background: #fff;
+}
+
+.section-recognition-task-row.succeeded {
+  border-color: rgba(22, 163, 74, 0.32);
+}
+
+.section-recognition-task-row.failed {
+  border-color: rgba(220, 38, 38, 0.32);
+}
+
+.section-recognition-task-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.section-recognition-task-main > svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: #2563eb;
+}
+
+.section-recognition-task-row.succeeded .section-recognition-task-main > svg {
+  color: #16a34a;
+}
+
+.section-recognition-task-row.failed .section-recognition-task-main > svg {
+  color: #dc2626;
+}
+
+.section-recognition-task-main strong,
+.section-recognition-task-main span,
+.section-recognition-task-main small {
+  display: block;
+}
+
+.section-recognition-task-main strong {
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.section-recognition-task-main span,
+.section-recognition-task-main small {
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.section-recognition-task-progress {
+  height: 5px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.section-recognition-task-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2563eb, #14b8a6);
+}
+
+.section-recognition-task-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.section-recognition-task-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  background: #fff;
+  color: #334155;
+  cursor: pointer;
+}
+
+.section-recognition-task-actions button:hover:not(:disabled) {
+  border-color: #2563eb;
+  color: #1d4ed8;
+}
+
+.section-recognition-task-actions button.danger:hover:not(:disabled) {
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.spin {
+  animation: section-recognition-spin 0.9s linear infinite;
+}
+
+@keyframes section-recognition-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (max-width: 900px) {
   .section-recognition-modal {
     width: min(720px, 96vw);
