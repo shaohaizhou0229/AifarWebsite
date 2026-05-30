@@ -9,7 +9,7 @@ import sectionTemplateUi from "@/lib/section-template-ui.cjs";
 const { SECTION_TEMPLATE_INDUSTRIES, SITE_SECTION_TYPES } = sectionTemplateRules;
 const { createTemplateMetadataDraft, createTemplatePreviewPage } = sectionTemplateUi;
 const SUPPORTED_PAGE_KEYS = new Set(["home", "product"]);
-const CLIENT_RECOGNITION_TIMEOUT_MS = 130000;
+const CLIENT_RECOGNITION_TIMEOUT_MS = 310000;
 
 function getIndustryLabel(labels, industry) {
   return labels.templateIndustries?.[industry] || industry;

@@ -108,7 +108,7 @@ test("recognition settings clamp external API timeout", () => {
   assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_TIMEOUT_MS: "" }).timeoutMs, DEFAULT_RECOGNITION_TIMEOUT_MS);
   assert.equal(getSectionTemplateRecognitionSettings({ AI_SECTION_TEMPLATE_PROVIDER: "siliconflow" }).timeoutMs, DEFAULT_SILICONFLOW_RECOGNITION_TIMEOUT_MS);
   assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_TIMEOUT_MS: "1" }).timeoutMs, 5000);
-  assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_TIMEOUT_MS: "999999" }).timeoutMs, 120000);
+  assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_TIMEOUT_MS: "999999" }).timeoutMs, 300000);
   assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_TIMEOUT_MS: "32000" }).timeoutMs, 32000);
 });
 

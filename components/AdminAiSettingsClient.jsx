@@ -310,7 +310,7 @@ export function AdminAiSettingsClient({ labels, settings, draft }) {
               <input value={form.SILICONFLOW_TEXT_MODEL || ""} onChange={(event) => updateField("SILICONFLOW_TEXT_MODEL", event.target.value)} />
             </FormField>
             <FormField label={labels.timeoutMs}>
-              <input inputMode="numeric" value={form.AI_SECTION_TEMPLATE_TIMEOUT_MS || "120000"} onChange={(event) => {
+              <input inputMode="numeric" value={form.AI_SECTION_TEMPLATE_TIMEOUT_MS || "240000"} onChange={(event) => {
                 updateField("AI_SECTION_TEMPLATE_TIMEOUT_MS", event.target.value);
                 updateField("SILICONFLOW_TIMEOUT_MS", event.target.value);
               }} />
