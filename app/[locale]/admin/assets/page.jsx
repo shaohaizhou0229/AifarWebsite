@@ -5,7 +5,7 @@ import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { AdminRequiredError } from "@/lib/auth";
 import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { getImageGenerationSettings } from "@/lib/image-generation-settings";
+import { getImageGenerationSettingsAsync } from "@/lib/image-generation-settings";
 import { listProjectAssets } from "@/lib/project-assets";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
@@ -41,7 +41,7 @@ export default async function AdminAssetsPage({ params }) {
 
   const [initialData, imageSettings] = await Promise.all([
     listProjectAssets({ limit: 24 }),
-    Promise.resolve(getImageGenerationSettings())
+    getImageGenerationSettingsAsync()
   ]);
 
   return (

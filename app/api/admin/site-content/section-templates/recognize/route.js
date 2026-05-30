@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
+import { getSectionTemplateRecognitionSettingsAsync } from "@/lib/image-generation-settings";
 import { getProfile } from "@/lib/profiles";
 import recognitionRules from "@/lib/section-template-recognition.cjs";
 
@@ -17,7 +18,6 @@ const {
   createDataUrl,
   extractChatCompletionText,
   extractResponseJson,
-  getSectionTemplateRecognitionSettings,
   normalizeRecognitionCandidate,
   normalizeRecognitionRequestFields,
   validateScreenshotFileInput
@@ -71,7 +71,7 @@ async function fetchRecognitionJson({ url, apiKey, body, signal }) {
 async function requestOpenAIRecognizedSection({ dataUrl, fields, settings, signal }) {
   return fetchRecognitionJson({
     url: `${settings.baseUrl}/responses`,
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: settings.apiKey,
     signal,
     body: buildOpenAIRecognitionPayload({
       model: settings.model,
@@ -84,7 +84,7 @@ async function requestOpenAIRecognizedSection({ dataUrl, fields, settings, signa
 async function requestSiliconFlowRecognizedSection({ dataUrl, fields, settings, signal }) {
   const visionResponse = await fetchRecognitionJson({
     url: `${settings.baseUrl}/chat/completions`,
-    apiKey: process.env.SILICONFLOW_API_KEY,
+    apiKey: settings.apiKey,
     signal,
     body: buildSiliconFlowVisionPayload({
       model: settings.visionModel,
@@ -102,7 +102,7 @@ async function requestSiliconFlowRecognizedSection({ dataUrl, fields, settings, 
 
   return fetchRecognitionJson({
     url: `${settings.baseUrl}/chat/completions`,
-    apiKey: process.env.SILICONFLOW_API_KEY,
+    apiKey: settings.apiKey,
     signal,
     body: buildSiliconFlowTemplatePayload({
       model: settings.textModel,
@@ -148,7 +148,7 @@ export async function POST(request) {
       );
     }
 
-    const settings = getSectionTemplateRecognitionSettings();
+    const settings = await getSectionTemplateRecognitionSettingsAsync({ includeSecret: true });
     const fields = normalizeRecognitionRequestFields({
       locale: formData.get("locale"),
       pageKey: formData.get("pageKey"),

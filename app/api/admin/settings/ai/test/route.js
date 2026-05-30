@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
 import aiServiceSettings from "@/lib/ai-service-settings.cjs";
+import { getAiServiceSettingsAsync } from "@/lib/image-generation-settings";
 import { getProfile } from "@/lib/profiles";
 
 export const runtime = "nodejs";
@@ -19,7 +20,6 @@ function permissionError(error) {
 
 const {
   AI_SETTINGS_TEST_TARGETS,
-  getAiServiceSettings,
   normalizeAiSettingsTestTarget
 } = aiServiceSettings;
 
@@ -37,9 +37,7 @@ const TARGET_MESSAGES = {
 };
 
 function providerApiKey(settings) {
-  return settings.providerKey === "siliconflow"
-    ? process.env.SILICONFLOW_API_KEY
-    : process.env.OPENAI_API_KEY;
+  return settings.apiKey || "";
 }
 
 function modelIds(settings) {
@@ -119,7 +117,7 @@ export async function POST(request) {
     await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.settings);
     const payload = await request.json().catch(() => ({}));
     const target = normalizeAiSettingsTestTarget(payload.target);
-    const settings = getAiServiceSettings()[target];
+    const settings = (await getAiServiceSettingsAsync({ includeSecret: true }))[target];
     const messages = TARGET_MESSAGES[target];
 
     if (target === AI_SETTINGS_TEST_TARGETS.sectionTemplateRecognition && settings.uatModeEnabled) {

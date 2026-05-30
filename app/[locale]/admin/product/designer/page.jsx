@@ -6,7 +6,7 @@ import { AdminSiteContentForm } from "@/components/AdminSiteContentForm";
 import { AdminRequiredError } from "@/lib/auth";
 import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { getImageGenerationSettings } from "@/lib/image-generation-settings";
+import { getImageGenerationSettingsAsync } from "@/lib/image-generation-settings";
 import { SITE_LAYOUT_VERSION } from "@/lib/site-page-builder";
 import { getAdminSitePageContent, listSiteContentSnapshots } from "@/lib/site-content";
 import { getLocaleMessages, getPageMessages } from "@/i18n/messages";
@@ -64,9 +64,10 @@ export default async function AdminProductDesignerPage({ params, searchParams })
   const initialLocale = locales.includes(query?.contentLocale) ? query.contentLocale : locale;
   const mode = query?.mode === "new" ? "new" : "edit";
   const fallback = await getPageMessages(initialLocale, initialPageKey);
-  const [contentState, snapshots] = await Promise.all([
+  const [contentState, snapshots, imageSettings] = await Promise.all([
     getAdminSitePageContent(initialPageKey, initialLocale, fallback),
-    listSiteContentSnapshots(initialPageKey, initialLocale)
+    listSiteContentSnapshots(initialPageKey, initialLocale),
+    getImageGenerationSettingsAsync()
   ]);
   const labels = messages.forms.siteContent;
   const initialContent = mode === "new" ? createBlankDesign(contentState.content) : contentState.content;
@@ -87,7 +88,7 @@ export default async function AdminProductDesignerPage({ params, searchParams })
           labels={labels}
           assetLabels={messages.forms.assets}
           adminLocale={locale}
-          imageSettings={getImageGenerationSettings()}
+          imageSettings={imageSettings}
           canManageAiSettings={canManageAiSettings}
           aiSettingsHref={localizedPath(locale, "/admin/settings/ai/")}
           initialPageKey={initialPageKey}

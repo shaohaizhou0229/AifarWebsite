@@ -5,7 +5,7 @@ import { AdminAccessDenied, AdminPageHeader } from "@/components/AdminShell";
 import { AdminRequiredError } from "@/lib/auth";
 import { requireAdminPermissionCached } from "@/lib/admin-context";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { getAiServiceSettings } from "@/lib/image-generation-settings";
+import { buildAiSettingsEditDraft, getAiServiceSettingsAsync } from "@/lib/image-generation-settings";
 import { getPageMessages } from "@/i18n/messages";
 import { localizedPath } from "@/i18n/routing";
 import { buildMetadata } from "@/i18n/seo";
@@ -37,6 +37,8 @@ export default async function AdminAiSettingsPage({ params }) {
     redirect(localizedPath(locale, "/login/"));
   }
 
+  const settings = await getAiServiceSettingsAsync();
+
   return (
     <>
       <AdminPageHeader
@@ -51,7 +53,7 @@ export default async function AdminAiSettingsPage({ params }) {
           { label: page.breadcrumb }
         ]}
       />
-      <AdminAiSettingsClient labels={page} settings={getAiServiceSettings()} />
+      <AdminAiSettingsClient labels={page} settings={settings} draft={buildAiSettingsEditDraft(settings)} />
     </>
   );
 }

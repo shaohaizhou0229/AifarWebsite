@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { AdminRequiredError, AuthRequiredError, requireAdminPermission } from "@/lib/auth";
 import { ADMIN_PERMISSIONS } from "@/lib/admin-permissions";
-import { getAiServiceSettings } from "@/lib/image-generation-settings";
+import { buildAiSettingsEditDraft, getAiServiceSettingsAsync, saveAiServiceSettings } from "@/lib/image-generation-settings";
 import { getProfile } from "@/lib/profiles";
 
 export const runtime = "nodejs";
@@ -20,13 +20,35 @@ function permissionError(error) {
 export async function GET() {
   try {
     await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.settings);
-    const settings = getAiServiceSettings();
+    const settings = await getAiServiceSettingsAsync();
     return NextResponse.json({
       settings,
       imageGeneration: settings.imageGeneration,
-      sectionTemplateRecognition: settings.sectionTemplateRecognition
+      sectionTemplateRecognition: settings.sectionTemplateRecognition,
+      environmentKey: settings.environmentKey,
+      source: settings.source,
+      draft: buildAiSettingsEditDraft(settings)
     });
   } catch (error) {
     return permissionError(error) || NextResponse.json({ error: error.message || "Could not load AI settings." }, { status: 400 });
+  }
+}
+
+export async function PUT(request) {
+  try {
+    const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.settings);
+    const payload = await request.json().catch(() => ({}));
+    await saveAiServiceSettings(user, payload);
+    const settings = await getAiServiceSettingsAsync();
+    return NextResponse.json({
+      settings,
+      imageGeneration: settings.imageGeneration,
+      sectionTemplateRecognition: settings.sectionTemplateRecognition,
+      environmentKey: settings.environmentKey,
+      source: settings.source,
+      draft: buildAiSettingsEditDraft(settings)
+    });
+  } catch (error) {
+    return permissionError(error) || NextResponse.json({ error: error.message || "Could not save AI settings." }, { status: 400 });
   }
 }

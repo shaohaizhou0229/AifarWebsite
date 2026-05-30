@@ -49,6 +49,22 @@ test("AI service settings treat blank quoted secrets as missing", () => {
   assert.equal(maskSecret("\"\""), "");
 });
 
+test("AI service settings only include raw secrets when explicitly requested", () => {
+  const publicSettings = getAiServiceSettings({
+    AI_IMAGE_PROVIDER: "siliconflow",
+    SILICONFLOW_API_KEY: "sf-test-secret",
+    SILICONFLOW_IMAGE_MODEL: "Kwai-Kolors/Kolors"
+  });
+  const privateSettings = getAiServiceSettings({
+    AI_IMAGE_PROVIDER: "siliconflow",
+    SILICONFLOW_API_KEY: "sf-test-secret",
+    SILICONFLOW_IMAGE_MODEL: "Kwai-Kolors/Kolors"
+  }, { includeSecret: true });
+
+  assert.equal(publicSettings.imageGeneration.apiKey, undefined);
+  assert.equal(privateSettings.imageGeneration.apiKey, "sf-test-secret");
+});
+
 test("AI service settings expose SiliconFlow provider configuration", () => {
   const settings = getAiServiceSettings({
     AI_IMAGE_PROVIDER: "siliconflow",

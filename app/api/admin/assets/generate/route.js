@@ -21,7 +21,7 @@ import {
   buildOpenAIImagePayload,
   buildSiliconFlowImagePayload,
   closestImageSizeForSpec,
-  getImageGenerationSettings,
+  getImageGenerationSettingsAsync,
   normalizeImageOutputFormat,
   normalizeImageQuality,
   normalizeImageSize,
@@ -109,7 +109,7 @@ async function fetchGeneratedImage(url, fallbackOutputFormat) {
 }
 
 async function requestOpenAIGeneratedImage({ settings, prompt, size, quality, outputFormat }) {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = settings.apiKey;
   const response = await fetch(`${settings.baseUrl}/images/generations`, {
     method: "POST",
     headers: {
@@ -145,7 +145,7 @@ async function requestOpenAIGeneratedImage({ settings, prompt, size, quality, ou
 }
 
 async function requestSiliconFlowGeneratedImage({ settings, prompt, size, quality, outputFormat }) {
-  const apiKey = process.env.SILICONFLOW_API_KEY;
+  const apiKey = settings.apiKey;
   const response = await fetch(`${settings.baseUrl}/images/generations`, {
     method: "POST",
     headers: {
@@ -182,7 +182,7 @@ async function requestSiliconFlowGeneratedImage({ settings, prompt, size, qualit
 }
 
 async function requestGeneratedImage({ prompt, size, quality, outputFormat }) {
-  const settings = getImageGenerationSettings();
+  const settings = await getImageGenerationSettingsAsync({ includeSecret: true });
 
   if (!settings.configured) {
     const error = new Error("Image generation is not configured.");
@@ -216,13 +216,14 @@ export async function POST(request) {
     const promptSupplement = normalizePrompt(body.promptSupplement).slice(0, 600);
     const targetWidth = normalizeTargetDimension(body.targetWidth || body.width);
     const targetHeight = normalizeTargetDimension(body.targetHeight || body.height);
-    const defaultSize = normalizeImageSize(process.env.OPENAI_IMAGE_DEFAULT_SIZE, "1024x1024");
+    const imageSettings = await getImageGenerationSettingsAsync();
+    const defaultSize = normalizeImageSize(imageSettings.defaultSize, "1024x1024");
     const size = targetWidth && targetHeight
       ? closestImageSizeForSpec({ targetWidth, targetHeight, size: body.size }, defaultSize)
       : normalizeImageSize(body.size, defaultSize);
     const sizeSource = normalizeSizeSource(body.sizeSource, targetWidth && targetHeight ? (promptContext?.sizeSource || "customTarget") : "serviceDefault");
-    const quality = normalizeImageQuality(body.quality, normalizeImageQuality(process.env.OPENAI_IMAGE_DEFAULT_QUALITY, "auto"));
-    const outputFormat = normalizeImageOutputFormat(body.outputFormat, normalizeImageOutputFormat(process.env.OPENAI_IMAGE_OUTPUT_FORMAT, "webp"));
+    const quality = normalizeImageQuality(body.quality, normalizeImageQuality(imageSettings.defaultQuality, "auto"));
+    const outputFormat = normalizeImageOutputFormat(body.outputFormat, normalizeImageOutputFormat(imageSettings.outputFormat, "webp"));
     const directoryPath = normalizeAssetDirectory(body.directoryPath || "generated") || "generated";
     const tags = normalizeAssetTags(body.tags?.length ? body.tags : ["generated"]);
 

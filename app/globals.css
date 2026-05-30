@@ -7472,13 +7472,19 @@ button.section-library-preview {
   font-weight: 650;
 }
 
-.ai-settings-grid input {
+.ai-settings-grid input,
+.ai-settings-grid select {
   border: 1px solid var(--admin-border);
   border-radius: 8px;
   background: #f8fafc;
   color: var(--admin-ink);
   font: inherit;
   padding: 10px;
+}
+
+.ai-settings-edit-form {
+  display: grid;
+  gap: 18px;
 }
 
 .ai-settings-options {
