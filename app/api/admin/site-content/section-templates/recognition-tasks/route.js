@@ -11,7 +11,7 @@ import {
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 180;
+export const maxDuration = 300;
 
 function permissionError(error) {
   if (error instanceof AuthRequiredError) {

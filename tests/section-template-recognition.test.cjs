@@ -179,6 +179,7 @@ test("OpenAI recognition payload uses Responses image input and structured JSON 
   assert.equal(payload.input[1].content[1].detail, "high");
   assert.equal(payload.text.format.type, "json_schema");
   assert.match(payload.input[1].content[0].text, /normalized x, y, width, height/);
+  assert.match(payload.input[1].content[0].text, /Do not return an empty elements array/);
   assert.match(payload.input[1].content[0].text, /ai_layout/);
 });
 
@@ -201,6 +202,7 @@ test("SiliconFlow recognition payloads use vision first and JSON text conversion
   assert.equal(templatePayload.response_format.type, "json_object");
   assert.match(templatePayload.messages[1].content, /Allowed section types/);
   assert.match(visionPayload.messages[1].content[0].text, /normalized box coordinates/);
+  assert.match(visionPayload.messages[1].content[0].text, /ELEMENT_JSON/);
   assert.match(templatePayload.messages[1].content, /screenshot_composition/);
 });
 
@@ -326,6 +328,50 @@ test("recognition tolerates non-object ai layout content elements", () => {
   assert.equal(elements[0].type, "button");
   assert.equal(output.recognition.detectedElements.length, 1);
   assert.equal(output.recognition.detectedElements[0].type, "button");
+});
+
+test("empty AI layout output falls back to a reviewable hero composition", () => {
+  const output = normalizeRecognitionCandidate(
+    createRecognitionResult({
+      template: {
+        name: "Hero with badge and demo CTA",
+        description: "A centered hero section with a headline, subheadline, demo button, and large image placeholder.",
+        purpose: "feature_hero",
+        tags: ["hero", "demo"],
+        section: {
+          id: "ai-layout",
+          type: "ai_layout",
+          variant: "screenshot_composition",
+          settings: {
+            style: { textSize: "medium" },
+            layout: { contentAlign: "center" }
+          },
+          content: {
+            canvas: {
+              aspectRatio: 1.6,
+              background: "default",
+              padding: "normal",
+              maxWidth: "content",
+              mobileMode: "scale"
+            },
+            elements: []
+          }
+        }
+      },
+      recognition: {
+        detectedElements: []
+      }
+    }),
+    normalizeRecognitionRequestFields({ locale: "zh-CN", pageKey: "home" }),
+    { filename: "section.png", mimeType: "image/png", size: 1024 }
+  );
+
+  const elements = output.candidate.content.sections[0].content.elements;
+  assert.equal(elements.length, 5);
+  assert.deepEqual(elements.map((element) => element.type), ["badge", "text", "text", "button", "image"]);
+  assert.equal(elements[1].text, "Hero with badge and demo CTA");
+  assert.equal(elements[3].text, "Try Demo");
+  assert.equal(output.recognition.detectedElements.length, 5);
 });
 
 test("recognized settings move allowlisted flat tokens into style and layout groups", () => {

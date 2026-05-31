@@ -10,6 +10,8 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const DATABASE_TEMPLATE_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 function permissionError(error) {
   if (error instanceof AuthRequiredError) {
     return NextResponse.json({ error: error.message }, { status: 401 });
@@ -20,8 +22,21 @@ function permissionError(error) {
   return null;
 }
 
+function validateEditableTemplateId(id) {
+  const value = String(id || "").trim();
+  if (value.startsWith("system-")) {
+    return NextResponse.json({ error: "System section templates cannot be edited or archived.", code: "systemTemplateReadonly" }, { status: 400 });
+  }
+  if (!DATABASE_TEMPLATE_ID_PATTERN.test(value)) {
+    return NextResponse.json({ error: "Only saved section templates can be edited or archived.", code: "unsavedSectionTemplate" }, { status: 400 });
+  }
+  return null;
+}
+
 export async function PATCH(request, { params }) {
   const { id } = await params;
+  const invalidIdResponse = validateEditableTemplateId(id);
+  if (invalidIdResponse) return invalidIdResponse;
 
   try {
     const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.product);
@@ -38,6 +53,8 @@ export async function PATCH(request, { params }) {
 
 export async function DELETE(_request, { params }) {
   const { id } = await params;
+  const invalidIdResponse = validateEditableTemplateId(id);
+  if (invalidIdResponse) return invalidIdResponse;
 
   try {
     const { user } = await requireAdminPermission(getProfile, ADMIN_PERMISSIONS.product);

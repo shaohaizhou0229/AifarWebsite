@@ -146,7 +146,9 @@ test("template metadata payload and editability stay scoped to non-system templa
     isFavorite: false
   });
   assert.equal(isEditableTemplate(createTemplate()), false);
-  assert.equal(isEditableTemplate(createTemplate({ id: "database-ai-template", source: "ai", isSystem: false })), true);
+  assert.equal(isEditableTemplate(createTemplate({ id: "5d15c632-a273-4820-8b0f-084a1b01d660", source: "ai", isSystem: false })), true);
+  assert.equal(isEditableTemplate(createTemplate({ id: "ai-section-template-preview-1", source: "ai", isSystem: false })), false);
+  assert.equal(isEditableTemplate(createTemplate({ id: "database-ai-template", source: "ai", isSystem: false })), false);
 
   const payload = createTemplateMetadataPayload({
     name: "Custom block",
