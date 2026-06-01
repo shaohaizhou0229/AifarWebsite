@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowDown, ArrowUp, Copy, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Copy, Image as ImageIcon, Plus, Trash2 } from "lucide-react";
 import { Card } from "@/components/Card";
 import { Release } from "@/components/Rows";
 import sectionSettingControls from "@/lib/section-setting-controls.cjs";
@@ -148,7 +148,7 @@ function CardGridSection({ section, locale }) {
   const columns = columnClass(section, section.variant === "three" ? "three" : "four");
 
   return (
-    <section {...sectionRootProps(section, "section ai-layout-section")}>
+    <section {...sectionRootProps(section)}>
       <div className="section-inner">
         <SectionHead title={content.title} lead={content.lead} actionLabel={content.actionLabel} actionHref={content.actionHref} locale={locale} />
         <div className={`grid ${columns}`}>
@@ -489,10 +489,16 @@ function aiElementAttributes(element = {}) {
     ["weight", "data-ai-weight"],
     ["align", "data-ai-align"],
     ["tone", "data-ai-tone"],
-    ["radius", "data-ai-radius"]
+    ["radius", "data-ai-radius"],
+    ["variant", "data-ai-variant"],
+    ["fill", "data-ai-fill"],
+    ["padding", "data-ai-padding"],
+    ["fit", "data-ai-fit"],
+    ["lineClamp", "data-ai-line-clamp"]
   ]) {
     if (appearance[key]) attrs[attr] = String(appearance[key]);
   }
+  if (element.role) attrs["data-ai-role"] = String(element.role);
   return attrs;
 }
 
@@ -517,7 +523,14 @@ function AiLayoutElement({ element, locale }) {
     const imageSrc = element.imageUrl || element.imagePath || "";
     return (
       <div className={className} style={style} {...attrs}>
-        {imageSrc ? <img src={imageSrc} alt={element.alt || ""} /> : <span>{element.alt || ""}</span>}
+        {imageSrc ? (
+          <img src={imageSrc} alt={element.alt || ""} />
+        ) : (
+          <span className="ai-layout-image-placeholder" aria-label={element.alt || undefined}>
+            <ImageIcon size={24} aria-hidden="true" />
+            <em>{element.alt || ""}</em>
+          </span>
+        )}
       </div>
     );
   }
@@ -544,7 +557,7 @@ function AiLayoutSection({ section, locale }) {
   const aspectRatio = clampNumber(canvas.aspectRatio, 1.6, 0.45, 3.2);
 
   return (
-    <section {...sectionRootProps(section)}>
+    <section {...sectionRootProps(section, "section ai-layout-section")}>
       <div className="section-inner">
         <div
           className="ai-layout-canvas"

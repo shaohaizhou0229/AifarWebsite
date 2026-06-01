@@ -13,12 +13,14 @@ const {
   RECOGNITION_TIMEOUT_CODE,
   RECOGNITION_UNAVAILABLE_CODE,
   buildOpenAIRecognitionPayload,
+  buildSiliconFlowDirectRecognitionPayload,
   buildSiliconFlowTemplatePayload,
   buildSiliconFlowVisionPayload,
   createUatRecognitionOutput,
   createDataUrl,
   extractChatCompletionText,
   extractResponseJson,
+  getImageDimensionsFromBuffer,
   normalizeRecognitionCandidate,
   normalizeRecognitionRequestFields,
   validateScreenshotFileInput
@@ -83,12 +85,26 @@ async function requestOpenAIRecognizedSection({ dataUrl, fields, settings, signa
 }
 
 async function requestSiliconFlowRecognizedSection({ dataUrl, fields, settings, signal }) {
+  const visionModel = settings.visionModel || settings.modelIds?.[0] || settings.model;
+  if (!settings.textModel) {
+    return fetchRecognitionJson({
+      url: `${settings.baseUrl}/chat/completions`,
+      apiKey: settings.apiKey,
+      signal,
+      body: buildSiliconFlowDirectRecognitionPayload({
+        model: visionModel,
+        dataUrl,
+        fields
+      })
+    });
+  }
+
   const visionResponse = await fetchRecognitionJson({
     url: `${settings.baseUrl}/chat/completions`,
     apiKey: settings.apiKey,
     signal,
     body: buildSiliconFlowVisionPayload({
-      model: settings.visionModel,
+      model: visionModel,
       dataUrl,
       fields
     })
@@ -158,9 +174,16 @@ export async function POST(request) {
       purposeHint: formData.get("purposeHint")
     });
 
+    const buffer = Buffer.from(await screenshot.arrayBuffer());
+    const sourceImage = {
+      ...normalizeFileMetadata(screenshot),
+      ...getImageDimensionsFromBuffer(buffer)
+    };
+    fields.sourceImage = sourceImage;
+
     if (settings.uatModeEnabled) {
       return NextResponse.json(
-        createUatRecognitionOutput(fields, normalizeFileMetadata(screenshot))
+        createUatRecognitionOutput(fields, sourceImage)
       );
     }
 
@@ -186,11 +209,10 @@ export async function POST(request) {
       );
     }
 
-    const buffer = Buffer.from(await screenshot.arrayBuffer());
     const dataUrl = createDataUrl(buffer, screenshot.type);
     const responseJson = await requestRecognizedSection({ dataUrl, fields, settings });
     const result = extractResponseJson(responseJson);
-    const output = normalizeRecognitionCandidate(result, fields, normalizeFileMetadata(screenshot));
+    const output = normalizeRecognitionCandidate(result, fields, sourceImage);
 
     return NextResponse.json(output);
   } catch (error) {

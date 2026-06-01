@@ -135,6 +135,62 @@ function formatElementPosition(element) {
   return parts.join(" / ");
 }
 
+const AI_LAYOUT_GROUPS = [
+  { key: "copy", roles: ["eyebrow", "headline", "body"], types: ["text", "badge"] },
+  { key: "actions", roles: ["cta"], types: ["button"] },
+  { key: "media", roles: ["media"], types: ["image", "icon"] },
+  { key: "structure", roles: ["card", "decorative"], types: ["card"] }
+];
+
+function aiLayoutRole(element = {}) {
+  if (element.role) return element.role;
+  if (element.type === "badge") return "eyebrow";
+  if (element.type === "button") return "cta";
+  if (element.type === "image") return "media";
+  if (element.type === "card") return "card";
+  if (element.type === "icon") return "decorative";
+  return "body";
+}
+
+function aiLayoutRoleLabel(labels, role, type) {
+  return labels.aiLayoutRoles?.[role] || labels.aiLayoutElementTypes?.[type] || role || type;
+}
+
+function aiLayoutFieldLabel(labels, element = {}) {
+  const role = aiLayoutRole(element);
+  if (labels.aiLayoutFieldLabels?.[role]) return labels.aiLayoutFieldLabels[role];
+  if (element.type === "button") return labels.primaryCta;
+  if (element.type === "image") return labels.heroAlt;
+  return labels.title;
+}
+
+function aiLayoutGroupLabel(labels, groupKey) {
+  return labels.aiLayoutGroups?.[groupKey] || labels.aiLayoutElements;
+}
+
+function AiLayoutPositionDetails({ element, labels }) {
+  const box = element.box || {};
+  const positionRows = ["x", "y", "width", "height"].map((key) => {
+    const value = Number(box[key] || 0);
+    return [key, `${Math.round(value * 100)}%`];
+  });
+
+  return (
+    <details className="ai-layout-element-position">
+      <summary>{labels.aiLayoutPosition || "Position"}</summary>
+      <dl>
+        {positionRows.map(([key, value]) => (
+          <div key={key}>
+            <dt>{key}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
+      <p>{formatElementPosition(element)}</p>
+    </details>
+  );
+}
+
 function AiLayoutContentTab({ section, labels, onPatchSection, onOpenAssetPicker }) {
   const elements = Array.isArray(section.content?.elements) ? section.content.elements : [];
 
@@ -146,60 +202,83 @@ function AiLayoutContentTab({ section, labels, onPatchSection, onOpenAssetPicker
     onPatchSection(section.id, (current) => patchAiLayoutElement(current, elementId, updater));
   }
 
+  const indexedElements = elements.map((element, index) => ({
+    element,
+    index,
+    role: aiLayoutRole(element)
+  }));
+  const groupedElements = AI_LAYOUT_GROUPS.map((group) => ({
+    ...group,
+    items: indexedElements.filter(({ element, role }) => group.roles.includes(role) || group.types.includes(element.type))
+  })).filter((group) => group.items.length);
+  const groupedIds = new Set(groupedElements.flatMap((group) => group.items.map(({ index }) => index)));
+  const ungroupedElements = indexedElements.filter(({ index }) => !groupedIds.has(index));
+
   return (
     <div className="ai-layout-element-list">
       <p className="muted-line">{labels.aiLayoutElements}</p>
-      {elements.map((element, index) => {
-        const typeLabel = labels.aiLayoutElementTypes?.[element.type] || element.type;
-        const title = `${index + 1}. ${typeLabel}`;
-        return (
-          <article className="ai-layout-element-editor" key={element.id || `${element.type}-${index}`}>
-            <header>
-              <strong>{title}</strong>
-              <span>{formatElementPosition(element)}</span>
-            </header>
-            {["text", "button", "badge", "card"].includes(element.type) ? (
-              <Field label={element.type === "button" ? labels.primaryCta : labels.title}>
-                <TextInput
-                  multiline={element.type === "text" || element.type === "card"}
-                  value={element.text}
-                  onChange={(value) => patchElement(element.id, (current) => ({ ...current, text: value }))}
-                />
-              </Field>
-            ) : null}
-            {element.type === "button" ? (
-              <Field label={labels.primaryHref}>
-                <TextInput value={element.href} onChange={(value) => patchElement(element.id, (current) => ({ ...current, href: value }))} />
-              </Field>
-            ) : null}
-            {element.type === "icon" ? (
-              <div className="form-grid two">
-                <Field label={labels.icon}>
-                  <TextInput value={element.icon} onChange={(value) => patchElement(element.id, (current) => ({ ...current, icon: value }))} />
-                </Field>
-                <Field label={labels.ariaLabel}>
-                  <TextInput value={element.label} onChange={(value) => patchElement(element.id, (current) => ({ ...current, label: value }))} />
-                </Field>
-              </div>
-            ) : null}
-            {element.type === "image" ? (
-              <div className="ai-layout-image-editor">
-                <Field label={labels.heroAlt}>
-                  <TextInput value={element.alt} onChange={(value) => patchElement(element.id, (current) => ({ ...current, alt: value }))} />
-                </Field>
-                {element.imageUrl ? <img className="cms-image-preview" src={element.imageUrl} alt={element.alt || labels.heroImage} /> : <p className="muted-line">{labels.noImage}</p>}
-                <button
-                  className="button secondary compact"
-                  type="button"
-                  onClick={() => onOpenAssetPicker?.(section.id, "imagePath", "imageUrl", { aiLayoutElementId: element.id })}
-                >
-                  {labels.chooseImage}
-                </button>
-              </div>
-            ) : null}
-          </article>
-        );
-      })}
+      {[...groupedElements, ...(ungroupedElements.length ? [{ key: "other", items: ungroupedElements }] : [])].map((group) => (
+        <section className="ai-layout-element-group" key={group.key}>
+          <h4>{aiLayoutGroupLabel(labels, group.key)}</h4>
+          {group.items.map(({ element, index, role }) => {
+            const typeLabel = labels.aiLayoutElementTypes?.[element.type] || element.type;
+            const roleLabel = aiLayoutRoleLabel(labels, role, element.type);
+            const title = `${index + 1}. ${roleLabel}`;
+            const multiline = role === "body" || element.type === "card" || (element.type === "text" && String(element.text || "").length > 80);
+            return (
+              <details className="ai-layout-element-editor" key={element.id || `${element.type}-${index}`} open>
+                <summary className="ai-layout-element-summary">
+                  <span>
+                    <strong>{title}</strong>
+                    <small>{typeLabel}</small>
+                  </span>
+                  <em>{role}</em>
+                </summary>
+                {["text", "button", "badge", "card"].includes(element.type) ? (
+                  <Field label={aiLayoutFieldLabel(labels, element)}>
+                    <TextInput
+                      multiline={multiline}
+                      value={element.text}
+                      onChange={(value) => patchElement(element.id, (current) => ({ ...current, text: value }))}
+                    />
+                  </Field>
+                ) : null}
+                {element.type === "button" ? (
+                  <Field label={labels.primaryHref}>
+                    <TextInput value={element.href} onChange={(value) => patchElement(element.id, (current) => ({ ...current, href: value }))} />
+                  </Field>
+                ) : null}
+                {element.type === "icon" ? (
+                  <div className="form-grid two">
+                    <Field label={labels.icon}>
+                      <TextInput value={element.icon} onChange={(value) => patchElement(element.id, (current) => ({ ...current, icon: value }))} />
+                    </Field>
+                    <Field label={labels.ariaLabel}>
+                      <TextInput value={element.label} onChange={(value) => patchElement(element.id, (current) => ({ ...current, label: value }))} />
+                    </Field>
+                  </div>
+                ) : null}
+                {element.type === "image" ? (
+                  <div className="ai-layout-image-editor">
+                    <Field label={aiLayoutFieldLabel(labels, element)}>
+                      <TextInput value={element.alt} onChange={(value) => patchElement(element.id, (current) => ({ ...current, alt: value }))} />
+                    </Field>
+                    {element.imageUrl ? <img className="cms-image-preview" src={element.imageUrl} alt={element.alt || labels.heroImage} /> : <p className="muted-line">{labels.noImage}</p>}
+                    <button
+                      className="button secondary compact"
+                      type="button"
+                      onClick={() => onOpenAssetPicker?.(section.id, "imagePath", "imageUrl", { aiLayoutElementId: element.id })}
+                    >
+                      {labels.chooseImage}
+                    </button>
+                  </div>
+                ) : null}
+                <AiLayoutPositionDetails element={element} labels={labels} />
+              </details>
+            );
+          })}
+        </section>
+      ))}
     </div>
   );
 }

@@ -12,6 +12,7 @@ const {
   createDataUrl,
   extractChatCompletionText,
   extractResponseJson,
+  getImageDimensionsFromBuffer,
   getSectionTemplateRecognitionSettings,
   getSectionTemplateRecognitionUatMode,
   normalizeRecognitionCandidate,
@@ -372,6 +373,73 @@ test("empty AI layout output falls back to a reviewable hero composition", () =>
   assert.equal(elements[1].text, "Hero with badge and demo CTA");
   assert.equal(elements[3].text, "Try Demo");
   assert.equal(output.recognition.detectedElements.length, 5);
+});
+
+test("AI layout recognition preserves screenshot ratio and stabilizes centered hero geometry", () => {
+  const output = normalizeRecognitionCandidate(
+    createRecognitionResult({
+      template: {
+        name: "Hero with badge and demo CTA",
+        description: "A centered hero section with a headline, supporting paragraph, button, and large media slot.",
+        purpose: "feature_hero",
+        tags: ["hero", "demo"],
+        section: {
+          id: "ai-layout",
+          type: "ai_layout",
+          variant: "screenshot_composition",
+          settings: {
+            style: { textSize: "medium" },
+            layout: { contentAlign: "center" }
+          },
+          content: {
+            canvas: {
+              background: "default",
+              padding: "normal",
+              maxWidth: "content",
+              mobileMode: "scale"
+            },
+            elements: [
+              { id: "badge-1", type: "badge", text: "NEW FEATURE", box: { x: 0.49, y: 0.07, width: 0.05, height: 0.02 } },
+              { id: "title-1", type: "text", text: "Take quick action that increases your brand's regular profit.", box: { x: 0.25, y: 0.13, width: 0.5, height: 0.08 }, appearance: { weight: "800" } },
+              { id: "lead-1", type: "text", text: "If you have ever wondered how to develop your brand, this is the place for you. Take a big step forward in growing your business with this great tool.", box: { x: 0.25, y: 0.22, width: 0.5, height: 0.05 } },
+              { id: "button-1", type: "button", text: "Try Demo", box: { x: 0.49, y: 0.3, width: 0.12, height: 0.03 } },
+              { id: "image-1", type: "image", alt: "Image placeholder", box: { x: 0.58, y: 0.48, width: 0.36, height: 0.33 } }
+            ]
+          }
+        }
+      },
+      recognition: {
+        detectedElements: []
+      }
+    }),
+    normalizeRecognitionRequestFields({ locale: "zh-CN", pageKey: "home" }),
+    { filename: "section.png", mimeType: "image/png", size: 1024, width: 691, height: 482 }
+  );
+
+  const section = output.candidate.content.sections[0];
+  const image = section.content.elements.find((element) => element.role === "media");
+  const lead = section.content.elements.find((element) => element.role === "body");
+  const button = section.content.elements.find((element) => element.role === "cta");
+
+  assert.equal(section.content.canvas.sourceWidth, 691);
+  assert.equal(section.content.canvas.sourceHeight, 482);
+  assert.equal(section.content.canvas.aspectRatio, 1.4336);
+  assert.ok(image.box.x >= 0.16 && image.box.x <= 0.24);
+  assert.ok(image.box.width >= 0.58);
+  assert.equal(image.appearance.variant, "placeholder-solid");
+  assert.equal(image.appearance.fill, "purple");
+  assert.ok(lead.box.height > 0.05);
+  assert.equal(button.appearance.variant, "solid");
+  assert.equal(button.appearance.fill, "purple");
+  assert.equal(output.recognition.detectedElements.find((element) => element.role === "media").box.x, image.box.x);
+});
+
+test("recognition reads image dimensions from PNG buffers", () => {
+  const onePixelPng = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAFgwJ/lv8Z5QAAAABJRU5ErkJggg==",
+    "base64"
+  );
+  assert.deepEqual(getImageDimensionsFromBuffer(onePixelPng), { width: 1, height: 1 });
 });
 
 test("recognized settings move allowlisted flat tokens into style and layout groups", () => {

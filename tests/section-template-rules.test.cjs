@@ -94,8 +94,8 @@ test("ai layout templates normalize safe relative elements without fixed page wi
         },
         elements: [
           { id: "title", type: "text", text: "Fast onboarding", x: 0.2, y: 0.1, width: 0.6, height: 0.14 },
-          { id: "cta", type: "button", text: "Start", href: "/contact/", box: { x: 0.44, y: 0.3, width: 0.12, height: 0.07 } },
-          { id: "image", type: "image", alt: "Product placeholder", x: 0.18, y: 0.5, width: 0.64, height: 0.36 }
+          { id: "cta", type: "button", role: "cta", text: "Start", href: "/contact/", box: { x: 0.44, y: 0.3, width: 0.12, height: 0.07 }, appearance: { variant: "solid", fill: "purple", padding: "xs" } },
+          { id: "image", type: "image", role: "media", alt: "Product placeholder", x: 0.18, y: 0.5, width: 0.64, height: 0.36, appearance: { variant: "placeholder-solid", fill: "purple", fit: "contain" } }
         ]
       }
     }
@@ -108,6 +108,11 @@ test("ai layout templates normalize safe relative elements without fixed page wi
   assert.equal(section.content.canvas.width, undefined);
   assert.equal(section.content.elements[0].box.x, 0.2);
   assert.equal(section.content.elements[1].href, "/contact/");
+  assert.equal(section.content.elements[1].role, "cta");
+  assert.equal(section.content.elements[1].appearance.variant, "solid");
+  assert.equal(section.content.elements[1].appearance.fill, "purple");
+  assert.equal(section.content.elements[2].role, "media");
+  assert.equal(section.content.elements[2].appearance.variant, "placeholder-solid");
 });
 
 test("ai layout rejects unsafe elements and clamps overflowing coordinates", () => {

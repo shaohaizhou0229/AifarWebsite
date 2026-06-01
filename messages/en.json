@@ -505,6 +505,32 @@
     "badge": "Badge",
     "icon": "Icon"
   },
+  "aiLayoutGroups": {
+    "copy": "Copy",
+    "actions": "Buttons",
+    "media": "Media",
+    "structure": "Structure",
+    "other": "Other elements"
+  },
+  "aiLayoutRoles": {
+    "eyebrow": "Eyebrow",
+    "headline": "Headline",
+    "body": "Supporting copy",
+    "cta": "Main button",
+    "media": "Image slot",
+    "card": "Card",
+    "decorative": "Decorative"
+  },
+  "aiLayoutFieldLabels": {
+    "eyebrow": "Eyebrow text",
+    "headline": "Headline text",
+    "body": "Supporting copy",
+    "cta": "Button text",
+    "media": "Image description",
+    "card": "Card copy",
+    "decorative": "Label"
+  },
+  "aiLayoutPosition": "Position",
   "aiNoScreenshot": "Please upload a screenshot first.",
   "aiInvalidScreenshot": "Please upload a PNG, JPG, JPEG, or WEBP image up to 5 MB.",
   "aiManualReviewRequired": "Manual review required",

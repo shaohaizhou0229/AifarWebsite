@@ -602,6 +602,32 @@
     "badge": "Badge",
     "icon": "Icone"
   },
+  "aiLayoutGroups": {
+    "copy": "Textes",
+    "actions": "Boutons",
+    "media": "Media",
+    "structure": "Structure",
+    "other": "Autres elements"
+  },
+  "aiLayoutRoles": {
+    "eyebrow": "Sur-titre",
+    "headline": "Titre",
+    "body": "Texte d'appui",
+    "cta": "Bouton principal",
+    "media": "Emplacement image",
+    "card": "Carte",
+    "decorative": "Decoratif"
+  },
+  "aiLayoutFieldLabels": {
+    "eyebrow": "Texte du sur-titre",
+    "headline": "Texte du titre",
+    "body": "Texte d'appui",
+    "cta": "Texte du bouton",
+    "media": "Description image",
+    "card": "Texte de carte",
+    "decorative": "Libelle"
+  },
+  "aiLayoutPosition": "Position",
   "aiNoScreenshot": "Importez d'abord une capture.",
   "aiInvalidScreenshot": "Importez une image PNG, JPG, JPEG ou WEBP de 5 Mo maximum.",
   "aiManualReviewRequired": "Verification manuelle requise",

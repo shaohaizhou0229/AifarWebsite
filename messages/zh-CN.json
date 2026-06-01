@@ -485,6 +485,32 @@
     "badge": "徽标",
     "icon": "图标"
   },
+  "aiLayoutGroups": {
+    "copy": "文案",
+    "actions": "按钮",
+    "media": "图片媒体",
+    "structure": "结构",
+    "other": "其他元素"
+  },
+  "aiLayoutRoles": {
+    "eyebrow": "眉标",
+    "headline": "标题",
+    "body": "导语",
+    "cta": "主按钮",
+    "media": "图片槽位",
+    "card": "卡片",
+    "decorative": "装饰元素"
+  },
+  "aiLayoutFieldLabels": {
+    "eyebrow": "眉标文字",
+    "headline": "标题文字",
+    "body": "导语文字",
+    "cta": "按钮文字",
+    "media": "图片说明",
+    "card": "卡片文案",
+    "decorative": "标签"
+  },
+  "aiLayoutPosition": "位置",
   "aiNoScreenshot": "请先上传截图。",
   "aiInvalidScreenshot": "请上传 PNG、JPG、JPEG 或 WEBP 图片，且不超过 5 MB。",
   "aiManualReviewRequired": "需要人工复核",
