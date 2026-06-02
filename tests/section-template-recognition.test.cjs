@@ -4,13 +4,16 @@ const {
   DEFAULT_RECOGNITION_TIMEOUT_MS,
   DEFAULT_SILICONFLOW_RECOGNITION_TIMEOUT_MS,
   MAX_SCREENSHOT_SIZE,
+  buildOpenAIJsonRepairPayload,
   buildOpenAIRecognitionPayload,
   buildSiliconFlowDirectRecognitionPayload,
+  buildSiliconFlowJsonRepairPayload,
   buildSiliconFlowTemplatePayload,
   buildSiliconFlowVisionPayload,
   createUatRecognitionOutput,
   createDataUrl,
   extractChatCompletionText,
+  extractResponseText,
   extractResponseJson,
   getImageDimensionsFromBuffer,
   getSectionTemplateRecognitionSettings,
@@ -205,6 +208,7 @@ test("SiliconFlow recognition payloads use vision first and JSON text conversion
   assert.match(visionPayload.messages[1].content[0].text, /normalized box coordinates/);
   assert.match(visionPayload.messages[1].content[0].text, /ELEMENT_JSON/);
   assert.match(templatePayload.messages[1].content, /screenshot_composition/);
+  assert.match(templatePayload.messages[1].content, /pricing-card compression/);
 });
 
 test("SiliconFlow direct recognition payload can create ai layout from one vision call", () => {
@@ -217,10 +221,12 @@ test("SiliconFlow direct recognition payload can create ai layout from one visio
   assert.equal(payload.model, "Qwen/Qwen3-VL-8B-Instruct");
   assert.equal(payload.response_format.type, "json_object");
   assert.match(payload.messages[1].content[0].text, /ai_layout/);
+  assert.match(payload.messages[1].content[0].text, /one compact card element per visible plan/);
   assert.equal(payload.messages[1].content[1].image_url.url, "data:image/webp;base64,AAA");
 });
 
 test("response JSON extraction supports output_text and nested Responses content", () => {
+  assert.equal(extractResponseText({ output_text: "{\"ok\":true}" }), "{\"ok\":true}");
   assert.deepEqual(extractResponseJson({ output_text: "{\"ok\":true}" }), { ok: true });
   assert.deepEqual(
     extractResponseJson({ output: [{ content: [{ type: "output_text", text: "{\"ok\":true}" }] }] }),
@@ -234,6 +240,49 @@ test("response JSON extraction supports output_text and nested Responses content
     extractResponseJson({ choices: [{ message: { content: "Here is JSON: {\"ok\":true}" } }] }),
     { ok: true }
   );
+});
+
+test("malformed provider JSON is reported as repairable recognition JSON", () => {
+  assert.throws(
+    () => extractResponseJson({
+      choices: [
+        {
+          message: {
+            content: "{\"template\":{\"name\":\"Pricing\",\"tags\":[\"pricing\" \"plans\"]},\"recognition\":{\"confidence\":0.6}}"
+          }
+        }
+      ]
+    }),
+    (error) => {
+      assert.equal(error.code, "invalid_recognition_json");
+      assert.match(error.rawText, /Pricing/);
+      assert.match(error.parseMessage, /Expected|JSON/);
+      return true;
+    }
+  );
+});
+
+test("JSON repair payloads keep malformed pricing output compact and schema-bound", () => {
+  const fields = normalizeRecognitionRequestFields({ locale: "zh-CN", pageKey: "home", industry: "custom" });
+  const siliconFlowPayload = buildSiliconFlowJsonRepairPayload({
+    model: "Qwen/Qwen3-32B",
+    rawText: "{\"template\":{\"name\":\"Pricing\",\"section\":{\"content\":{\"elements\":[",
+    parseError: { parseMessage: "Expected ',' or ']' after array element" },
+    fields
+  });
+  const openAiPayload = buildOpenAIJsonRepairPayload({
+    model: "gpt-4.1-mini",
+    rawText: "{\"template\":{\"name\":\"Pricing\"",
+    parseError: { parseMessage: "Unexpected end of JSON input" },
+    fields
+  });
+
+  assert.equal(siliconFlowPayload.response_format.type, "json_object");
+  assert.equal(siliconFlowPayload.temperature, 0);
+  assert.match(siliconFlowPayload.messages[1].content, /one card element per plan/);
+  assert.match(siliconFlowPayload.messages[1].content, /Malformed JSON/);
+  assert.equal(openAiPayload.text.format.name, "section_template_recognition_repair");
+  assert.match(openAiPayload.input[1].content[0].text, /ai_layout/);
 });
 
 test("legal AI result becomes pending review candidate with manual risk flag", () => {

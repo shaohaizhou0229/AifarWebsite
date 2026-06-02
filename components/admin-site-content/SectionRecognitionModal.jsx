@@ -11,6 +11,8 @@ const { createTemplateMetadataDraft, createTemplatePreviewPage } = sectionTempla
 const SUPPORTED_PAGE_KEYS = new Set(["home", "product"]);
 const CLIENT_RECOGNITION_TIMEOUT_MS = 310000;
 const MAX_CLIENT_SCREENSHOT_EDGE = 1280;
+const CLIENT_COMPRESSION_EDGE_TRIGGER = 2400;
+const CLIENT_COMPRESSION_SIZE_TRIGGER = 4.5 * 1024 * 1024;
 const MAX_CLIENT_SCREENSHOT_QUALITY = 0.82;
 
 function getIndustryLabel(labels, industry) {
@@ -62,8 +64,11 @@ async function compressScreenshotFile(file) {
       img.onerror = reject;
       img.src = imageUrl;
     });
-    const scale = Math.min(1, MAX_CLIENT_SCREENSHOT_EDGE / Math.max(image.naturalWidth || 1, image.naturalHeight || 1));
-    if (scale >= 1 && file.size <= 900 * 1024) return file;
+    const longestEdge = Math.max(image.naturalWidth || 1, image.naturalHeight || 1);
+    const shouldCompress = file.size >= CLIENT_COMPRESSION_SIZE_TRIGGER || longestEdge >= CLIENT_COMPRESSION_EDGE_TRIGGER;
+    if (!shouldCompress) return file;
+    const scale = Math.min(1, MAX_CLIENT_SCREENSHOT_EDGE / longestEdge);
+    if (scale >= 1 && file.size < CLIENT_COMPRESSION_SIZE_TRIGGER) return file;
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(1, Math.round((image.naturalWidth || 1) * scale));
     canvas.height = Math.max(1, Math.round((image.naturalHeight || 1) * scale));
@@ -72,7 +77,7 @@ async function compressScreenshotFile(file) {
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
     const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/webp", MAX_CLIENT_SCREENSHOT_QUALITY));
     if (!blob || blob.size >= file.size) return file;
-    return new File([blob], file.name.replace(/\.[^.]+$/, ".webp"), { type: "image/webp" });
+    return new File([blob], file.name, { type: "image/webp", lastModified: file.lastModified });
   } catch {
     return file;
   } finally {

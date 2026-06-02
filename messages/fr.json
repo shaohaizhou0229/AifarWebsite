@@ -582,6 +582,7 @@
   "aiRecognitionFailed": "Impossible de reconnaitre cette capture.",
   "aiRecognitionUnavailable": "La reconnaissance IA n'est pas encore configuree.",
   "aiRecognitionTimeout": "La reconnaissance IA a expire. Verifiez la configuration ou le reseau, puis reessayez.",
+  "aiRecognitionInvalidJson": "L'IA a renvoye un resultat de mise en page incomplet. Relancez la tache ou utilisez une capture plus lisible.",
   "aiRecognitionConfigHint": "Configurez la cle API du fournisseur IA selectionne et le modele de reconnaissance de section avant d utiliser la reconnaissance de capture.",
   "aiRecognitionUatMode": "Candidat en mode UAT local",
   "aiRecognitionUatModeHint": "Ce candidat est genere localement pour tester le workflow et ne represente pas la qualite d une vraie reconnaissance IA.",

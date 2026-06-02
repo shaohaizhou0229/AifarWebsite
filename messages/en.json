@@ -485,6 +485,7 @@
   "aiRecognitionFailed": "Unable to recognize this screenshot.",
   "aiRecognitionUnavailable": "AI recognition is not configured yet.",
   "aiRecognitionTimeout": "AI recognition timed out. Check the configuration or network and try again.",
+  "aiRecognitionInvalidJson": "AI returned an incomplete layout result. Retry the task or use a clearer screenshot.",
   "aiRecognitionConfigHint": "Configure the selected AI provider API key and section recognition model before using screenshot recognition.",
   "aiRecognitionUatMode": "Local UAT mode candidate",
   "aiRecognitionUatModeHint": "This candidate was generated locally for workflow testing and does not represent real AI recognition quality.",

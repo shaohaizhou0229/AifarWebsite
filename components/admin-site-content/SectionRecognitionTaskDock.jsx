@@ -19,6 +19,18 @@ function formatTaskTime(task) {
   return `${seconds}s`;
 }
 
+function taskErrorMessage(labels, task) {
+  const byCode = {
+    invalid_recognition_json: labels.aiRecognitionInvalidJson,
+    recognition_timeout: labels.aiRecognitionTimeout,
+    recognitionUnavailable: labels.aiRecognitionUnavailable,
+    screenshot_type: labels.aiInvalidScreenshot,
+    screenshot_too_large: labels.aiInvalidScreenshot,
+    screenshot_required: labels.aiNoScreenshot
+  };
+  return byCode[task?.errorCode] || task?.errorMessage || "";
+}
+
 function TaskIcon({ status }) {
   if (status === "succeeded") return <CheckCircle2 size={16} aria-hidden="true" />;
   if (status === "failed") return <XCircle size={16} aria-hidden="true" />;
@@ -83,6 +95,7 @@ export function SectionRecognitionTaskDock({
               const active = ACTIVE_STATUSES.has(task.status);
               const canUseResult = task.status === "succeeded" && task.candidate;
               const busy = busyTaskId === task.id;
+              const displayError = taskErrorMessage(labels, task);
               return (
                 <article className={`section-recognition-task-row ${task.status}`} key={task.id}>
                   <div className="section-recognition-task-main">
@@ -90,7 +103,7 @@ export function SectionRecognitionTaskDock({
                     <div>
                       <strong>{task.screenshot?.filename || labels.aiScreenshot}</strong>
                       <span>{taskStatusLabel(labels, task.status)}{formatTaskTime(task) ? ` · ${formatTaskTime(task)}` : ""}</span>
-                      {task.errorMessage ? <small>{task.errorMessage}</small> : null}
+                      {displayError ? <small>{displayError}</small> : null}
                     </div>
                   </div>
                   <div className="section-recognition-task-progress" aria-hidden="true">

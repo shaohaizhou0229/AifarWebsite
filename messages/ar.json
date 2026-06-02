@@ -582,6 +582,7 @@
   "aiRecognitionFailed": "Unable to recognize this screenshot.",
   "aiRecognitionUnavailable": "AI recognition is not configured yet.",
   "aiRecognitionTimeout": "AI recognition timed out. Check the configuration or network and try again.",
+  "aiRecognitionInvalidJson": "AI returned an incomplete layout result. Retry the task or use a clearer screenshot.",
   "aiRecognitionConfigHint": "قم بتهيئة مفتاح API لمزود الذكاء الاصطناعي المحدد ونموذج التعرف على الأقسام قبل استخدام التعرف على لقطات الشاشة.",
   "aiRecognitionUatMode": "مرشح وضع UAT المحلي",
   "aiRecognitionUatModeHint": "تم إنشاء هذا المرشح محليا لاختبار سير العمل ولا يمثل جودة التعرف الحقيقي بالذكاء الاصطناعي.",

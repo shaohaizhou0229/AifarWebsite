@@ -1653,6 +1653,7 @@ h3 {
   background: rgba(255, 255, 255, 0.84);
   box-shadow: var(--shadow-tight);
   padding: 14px;
+  white-space: pre-line;
 }
 
 .ai-layout-image {
