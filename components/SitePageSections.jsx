@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowDown, ArrowUp, Copy, Image as ImageIcon, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Copy, Image as ImageIcon, Lock, Plus, RotateCcw, Trash2 } from "lucide-react";
 import { Card } from "@/components/Card";
 import { Release } from "@/components/Rows";
 import sectionSettingControls from "@/lib/section-setting-controls.cjs";
@@ -494,35 +494,60 @@ function aiElementAttributes(element = {}) {
     ["fill", "data-ai-fill"],
     ["padding", "data-ai-padding"],
     ["fit", "data-ai-fit"],
-    ["lineClamp", "data-ai-line-clamp"]
+    ["lineClamp", "data-ai-line-clamp"],
+    ["shadow", "data-ai-shadow"],
+    ["hover", "data-ai-hover"],
+    ["border", "data-ai-border"],
+    ["gap", "data-ai-gap"]
   ]) {
     if (appearance[key]) attrs[attr] = String(appearance[key]);
   }
   if (element.role) attrs["data-ai-role"] = String(element.role);
+  if (element.groupId) attrs["data-ai-group"] = String(element.groupId);
   return attrs;
 }
 
-function AiLayoutElement({ element, locale }) {
+function AiLayoutElement({ element, locale, editorActive = false, selected = false, labels = {}, onSelect, onMoveStart }) {
   const type = element?.type || "";
-  const className = `ai-layout-element ai-layout-${type}`;
+  const className = `ai-layout-element ai-layout-${type}${selected ? " selected" : ""}${element.locked ? " locked" : ""}`;
   const attrs = aiElementAttributes(element);
   const style = aiElementBoxStyle(element);
+  const editorProps = editorActive
+    ? {
+        "data-ai-editor-element": element.id || "",
+        role: "button",
+        tabIndex: 0,
+        onClick: (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          onSelect?.(element);
+        },
+        onPointerDown: (event) => onMoveStart?.(event, element),
+        onKeyDown: (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            event.stopPropagation();
+            onSelect?.(element);
+          }
+        }
+      }
+    : {};
 
   if (type === "button") {
     const label = element.text || "";
     if (!label) return null;
     const button = <span>{label}</span>;
     return element.href ? (
-      <SiteActionLink className={className} href={resolveHref(locale, element.href)} style={style} {...attrs}>{button}</SiteActionLink>
+      <SiteActionLink className={className} href={resolveHref(locale, element.href)} style={style} {...attrs} {...editorProps}>{button}</SiteActionLink>
     ) : (
-      <span className={className} style={style} {...attrs}>{button}</span>
+      <span className={className} style={style} {...attrs} {...editorProps}>{button}</span>
     );
   }
 
   if (type === "image") {
     const imageSrc = element.imageUrl || element.imagePath || "";
     return (
-      <div className={className} style={style} {...attrs}>
+      <div className={className} style={style} {...attrs} {...editorProps}>
         {imageSrc ? (
           <img src={imageSrc} alt={element.alt || ""} />
         ) : (
@@ -537,24 +562,126 @@ function AiLayoutElement({ element, locale }) {
 
   if (type === "icon") {
     return (
-      <span className={className} style={style} aria-label={element.label || undefined} {...attrs}>
+      <span className={className} style={style} aria-label={element.label || undefined} {...attrs} {...editorProps}>
         {element.icon || element.label || ""}
       </span>
     );
   }
 
   return (
-    <div className={className} style={style} {...attrs}>
+    <div className={className} style={style} {...attrs} {...editorProps}>
       {element.text || ""}
     </div>
   );
 }
 
-function AiLayoutSection({ section, locale }) {
+function normalizeEditorBox(box = {}) {
+  const x = clampNumber(box.x, 0, 0, 0.98);
+  const y = clampNumber(box.y, 0, 0, 0.98);
+  let width = clampNumber(box.width, 0.2, 0.02, 1);
+  let height = clampNumber(box.height, 0.1, 0.02, 1);
+  if (x + width > 1) width = Math.max(0.02, 1 - x);
+  if (y + height > 1) height = Math.max(0.02, 1 - y);
+  return { x, y, width, height };
+}
+
+function AiLayoutElementOverlay({ element, labels, onResizeStart, onDuplicate, onRemove, onRestore, onToggleLock }) {
+  const style = aiElementBoxStyle(element);
+  const name = element.label || labels.aiLayoutRoles?.[element.role] || labels.aiLayoutElementTypes?.[element.type] || element.type;
+
+  return (
+    <div className="ai-layout-editor-overlay" style={style} onClick={(event) => event.stopPropagation()}>
+      <span className="ai-layout-editor-tag">{name}{element.role ? ` · ${element.role}` : ""}</span>
+      <div className="ai-layout-editor-mini-toolbar">
+        <button type="button" onClick={(event) => { event.stopPropagation(); onRestore?.(element); }} title={labels.aiLayoutRestorePosition} aria-label={labels.aiLayoutRestorePosition}>
+          <RotateCcw size={13} aria-hidden="true" />
+        </button>
+        <button type="button" onClick={(event) => { event.stopPropagation(); onDuplicate?.(element); }} title={labels.aiLayoutDuplicateElement} aria-label={labels.aiLayoutDuplicateElement}>
+          <Copy size={13} aria-hidden="true" />
+        </button>
+        <button type="button" onClick={(event) => { event.stopPropagation(); onToggleLock?.(element); }} title={element.locked ? labels.aiLayoutUnlockElement : labels.aiLayoutLockElement} aria-label={element.locked ? labels.aiLayoutUnlockElement : labels.aiLayoutLockElement}>
+          <Lock size={13} aria-hidden="true" />
+        </button>
+        <button type="button" className="danger" onClick={(event) => { event.stopPropagation(); onRemove?.(element); }} title={labels.aiLayoutDeleteElement} aria-label={labels.aiLayoutDeleteElement}>
+          <Trash2 size={13} aria-hidden="true" />
+        </button>
+      </div>
+      {["nw", "ne", "sw", "se"].map((handle) => (
+        <span
+          className={`ai-layout-resize-handle ${handle}`}
+          key={handle}
+          role="presentation"
+          onPointerDown={(event) => onResizeStart?.(event, element, handle)}
+        />
+      ))}
+    </div>
+  );
+}
+
+function AiLayoutSection({
+  section,
+  locale,
+  editorActive = false,
+  labels = {},
+  selectedAiElementId = "",
+  onSelectAiElement,
+  onPatchAiElementBox,
+  onDuplicateAiElement,
+  onRemoveAiElement,
+  onRestoreAiElementBox,
+  onToggleAiElementLock
+}) {
   const content = section.content || {};
   const canvas = content.canvas || {};
   const elements = Array.isArray(content.elements) ? content.elements : [];
   const aspectRatio = clampNumber(canvas.aspectRatio, 1.6, 0.45, 3.2);
+
+  function selectElement(element) {
+    onSelectAiElement?.(section.id, element.id);
+  }
+
+  function startTransform(event, element, mode = "move", handle = "") {
+    if (!editorActive || element.locked) return;
+    const canvasNode = event.currentTarget.closest(".ai-layout-canvas");
+    if (!canvasNode) return;
+    event.preventDefault();
+    event.stopPropagation();
+    selectElement(element);
+    const rect = canvasNode.getBoundingClientRect();
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const startBox = normalizeEditorBox(element.box || {});
+
+    function patchFromPointer(pointerEvent) {
+      const deltaX = (pointerEvent.clientX - startX) / Math.max(rect.width, 1);
+      const deltaY = (pointerEvent.clientY - startY) / Math.max(rect.height, 1);
+      const nextBox = { ...startBox };
+      if (mode === "resize") {
+        if (handle.includes("e")) nextBox.width = startBox.width + deltaX;
+        if (handle.includes("s")) nextBox.height = startBox.height + deltaY;
+        if (handle.includes("w")) {
+          nextBox.x = startBox.x + deltaX;
+          nextBox.width = startBox.width - deltaX;
+        }
+        if (handle.includes("n")) {
+          nextBox.y = startBox.y + deltaY;
+          nextBox.height = startBox.height - deltaY;
+        }
+      } else {
+        nextBox.x = startBox.x + deltaX;
+        nextBox.y = startBox.y + deltaY;
+      }
+      onPatchAiElementBox?.(section.id, element.id, normalizeEditorBox(nextBox));
+    }
+
+    function stopTransform() {
+      window.removeEventListener("pointermove", patchFromPointer);
+      window.removeEventListener("pointerup", stopTransform);
+    }
+
+    window.addEventListener("pointermove", patchFromPointer);
+    window.addEventListener("pointerup", stopTransform, { once: true });
+  }
 
   return (
     <section {...sectionRootProps(section, "section ai-layout-section")}>
@@ -568,8 +695,31 @@ function AiLayoutSection({ section, locale }) {
           style={{ "--ai-layout-aspect": String(aspectRatio) }}
         >
           {elements.map((element, index) => (
-            <AiLayoutElement element={element} locale={locale} key={element.id || `${element.type}-${index}`} />
+            <AiLayoutElement
+              element={element}
+              locale={locale}
+              editorActive={editorActive}
+              selected={editorActive && element.id === selectedAiElementId}
+              labels={labels}
+              key={element.id || `${element.type}-${index}`}
+              onSelect={selectElement}
+              onMoveStart={(event, item) => startTransform(event, item, "move")}
+            />
           ))}
+          {editorActive ? elements.map((element, index) => (
+            element.id === selectedAiElementId ? (
+              <AiLayoutElementOverlay
+                element={element}
+                labels={labels}
+                key={`overlay-${element.id || index}`}
+                onResizeStart={(event, item, handle) => startTransform(event, item, "resize", handle)}
+                onDuplicate={(item) => onDuplicateAiElement?.(section.id, item.id)}
+                onRemove={(item) => onRemoveAiElement?.(section.id, item.id)}
+                onRestore={(item) => onRestoreAiElementBox?.(section.id, item.id)}
+                onToggleLock={(item) => onToggleAiElementLock?.(section.id, item.id)}
+              />
+            ) : null
+          )) : null}
         </div>
       </div>
     </section>
@@ -590,7 +740,14 @@ export function SitePageSections({
   onRemoveSection,
   onInsertAfterSection,
   onDragStartSection,
-  onDropSection
+  onDropSection,
+  selectedAiElementId = "",
+  onSelectAiElement,
+  onPatchAiElementBox,
+  onDuplicateAiElement,
+  onRemoveAiElement,
+  onRestoreAiElementBox,
+  onToggleAiElementLock
 }) {
   const sections = Array.isArray(page?.sections) ? page.sections : [];
 
@@ -609,7 +766,24 @@ export function SitePageSections({
     if (section.type === "support_entry") return <SupportEntrySection section={section} locale={locale} key={section.id} />;
     if (section.type === "updates_list") return <UpdatesSection section={section} locale={locale} key={section.id} />;
     if (section.type === "cta_band") return <CtaSection section={section} locale={locale} key={section.id} />;
-    if (section.type === "ai_layout") return <AiLayoutSection section={section} locale={locale} key={section.id} />;
+    if (section.type === "ai_layout") {
+      return (
+        <AiLayoutSection
+          section={section}
+          locale={locale}
+          editorActive={editorMode && section.id === selectedSectionId}
+          labels={labels}
+          selectedAiElementId={selectedAiElementId}
+          onSelectAiElement={onSelectAiElement}
+          onPatchAiElementBox={onPatchAiElementBox}
+          onDuplicateAiElement={onDuplicateAiElement}
+          onRemoveAiElement={onRemoveAiElement}
+          onRestoreAiElementBox={onRestoreAiElementBox}
+          onToggleAiElementLock={onToggleAiElementLock}
+          key={section.id}
+        />
+      );
+    }
     return null;
   }
 
@@ -629,7 +803,7 @@ export function SitePageSections({
             key={sectionId}
             role="button"
             tabIndex={0}
-            draggable
+            draggable={!selectedAiElementId}
             onClick={(event) => {
               event.preventDefault();
               onSelectSection?.(sectionId);

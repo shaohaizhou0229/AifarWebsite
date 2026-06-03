@@ -1,10 +1,17 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SITE_SECTION_LABELS } from "@/lib/site-page-builder";
+import aiLayoutEditor from "@/lib/ai-layout-editor.cjs";
 import sectionSettingControls from "@/lib/section-setting-controls.cjs";
 import { Field, RowEditor, TextInput } from "./EditorControls";
 import { SectionImageUpload } from "./SectionImageUpload";
+
+const {
+  BUILT_IN_STYLE_RECORDS,
+  getAiLayoutElements,
+  roleForElement
+} = aiLayoutEditor;
 
 const {
   getLayoutControlsForSection,
@@ -133,6 +140,17 @@ function formatElementPosition(element) {
     return `${key}: ${Math.round(value * 100)}%`;
   });
   return parts.join(" / ");
+}
+
+function percentValue(value) {
+  const number = Number(value || 0);
+  return Math.round(number * 100);
+}
+
+function parsePercentInput(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return 0;
+  return Math.min(100, Math.max(0, number)) / 100;
 }
 
 const AI_LAYOUT_GROUPS = [
@@ -279,6 +297,286 @@ function AiLayoutContentTab({ section, labels, onPatchSection, onOpenAssetPicker
           })}
         </section>
       ))}
+    </div>
+  );
+}
+
+function StyleSwatchGroup({ label, value, values, labels, onChange }) {
+  return (
+    <div className="ai-style-control">
+      <span>{label}</span>
+      <div className="ai-style-swatch-row">
+        {values.map((item) => (
+          <button
+            className={value === item ? "active" : ""}
+            data-token={item}
+            type="button"
+            key={item}
+            onClick={() => onChange(item)}
+            title={labels.aiLayoutStyleTokenValues?.[item] || item}
+            aria-label={labels.aiLayoutStyleTokenValues?.[item] || item}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StyleChoiceGroup({ label, value, values, labels, onChange }) {
+  return (
+    <div className="ai-style-control">
+      <span>{label}</span>
+      <div className="ai-style-choice-row">
+        {values.map((item) => (
+          <button className={value === item ? "active" : ""} type="button" key={item} onClick={() => onChange(item)}>
+            {labels.aiLayoutStyleTokenValues?.[item] || tokenLabel(labels, item)}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AiLayoutBoxEditor({ section, element, labels, onPatchAiElementBox }) {
+  if (!element) return null;
+  const box = element.box || {};
+
+  function updateBox(key, value) {
+    onPatchAiElementBox?.(section.id, element.id, { ...(element.box || {}), [key]: parsePercentInput(value) });
+  }
+
+  return (
+    <section className="ai-style-panel-section">
+      <header>
+        <strong>{labels.aiLayoutPositionAndSize}</strong>
+      </header>
+      <div className="ai-layout-position-inputs">
+        {["x", "y", "width", "height"].map((key) => (
+          <label key={key}>
+            <span>{labels.aiLayoutBoxLabels?.[key] || key}</span>
+            <input
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              value={percentValue(box[key])}
+              onChange={(event) => updateBox(key, event.target.value)}
+            />
+            <em>%</em>
+          </label>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function AiStyleRecordSavePanel({ labels, defaultName, onCancel, onSave }) {
+  const [name, setName] = useState(defaultName || "");
+  const [scope, setScope] = useState("element");
+  const [tags, setTags] = useState("AI, style");
+
+  return (
+    <section className="ai-style-save-panel">
+      <header>
+        <strong>{labels.aiLayoutSaveStyleRecord}</strong>
+        <button type="button" onClick={onCancel} aria-label={labels.closePreview}>×</button>
+      </header>
+      <Field label={labels.aiLayoutStyleRecordName}>
+        <TextInput value={name} onChange={setName} />
+      </Field>
+      <Field label={labels.aiLayoutApplyScope}>
+        <select value={scope} onChange={(event) => setScope(event.target.value)}>
+          <option value="element">{labels.aiLayoutStyleScopes?.element}</option>
+          <option value="sameType">{labels.aiLayoutStyleScopes?.sameType}</option>
+          <option value="section">{labels.aiLayoutStyleScopes?.section}</option>
+        </select>
+      </Field>
+      <div className="ai-style-save-checks">
+        {["color", "size", "radius", "shadow", "spacing", "hover", "image"].map((item) => (
+          <label key={item}>
+            <input type="checkbox" defaultChecked />
+            <span>{labels.aiLayoutStyleIncludes?.[item] || item}</span>
+          </label>
+        ))}
+      </div>
+      <Field label={labels.tags}>
+        <TextInput value={tags} onChange={setTags} />
+      </Field>
+      <p className="muted-line">{labels.aiLayoutStyleRecordHint}</p>
+      <div className="ai-style-save-actions">
+        <button className="button secondary compact" type="button" onClick={onCancel}>{labels.cancel || labels.closePreview}</button>
+        <button
+          className="button compact"
+          type="button"
+          onClick={() => onSave({ name, scope, tags: tags.split(",").map((tag) => tag.trim()).filter(Boolean) })}
+        >
+          {labels.aiLayoutSaveRecord}
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function AiLayoutStyleTab({
+  section,
+  labels,
+  selectedAiElementId,
+  aiLayoutStyleRecords = [],
+  onSelectAiElement,
+  onPatchAiElementBox,
+  onPatchAiElementAppearance,
+  onDuplicateAiElement,
+  onRemoveAiElement,
+  onRestoreAiElementBox,
+  onAddAiElement,
+  onMoveAiElementLayer,
+  onResetAiElementStyle,
+  onToggleAiElementLock,
+  onSaveAiLayoutStyleRecord,
+  onApplyAiLayoutStyleRecord
+}) {
+  const [scope, setScope] = useState("element");
+  const [savePanelOpen, setSavePanelOpen] = useState(false);
+  const elements = getAiLayoutElements(section);
+  const selectedElement = elements.find((element) => element.id === selectedAiElementId) || null;
+  const appearance = selectedElement?.appearance || {};
+  const records = [...BUILT_IN_STYLE_RECORDS, ...aiLayoutStyleRecords];
+
+  function setAppearance(key, value) {
+    if (!selectedElement) return;
+    onPatchAiElementAppearance?.(section.id, selectedElement.id, { [key]: value }, scope);
+  }
+
+  function applyRecord(record) {
+    if (!selectedElement) return;
+    onApplyAiLayoutStyleRecord?.(section.id, record, selectedElement.id, scope);
+  }
+
+  return (
+    <div className="ai-layout-style-editor">
+      <section className="ai-style-panel-section">
+        <header>
+          <strong>{labels.aiLayoutCurrentSelection}</strong>
+          {selectedElement ? <em>{labels.aiLayoutRoles?.[roleForElement(selectedElement)] || selectedElement.type}</em> : null}
+        </header>
+        {selectedElement ? (
+          <div className="ai-current-element-card">
+            <button type="button" onClick={() => onSelectAiElement?.(selectedElement.id)}>
+              <span>{selectedElement.label || labels.aiLayoutRoles?.[roleForElement(selectedElement)] || selectedElement.type}</span>
+              <small>{selectedElement.type} · {roleForElement(selectedElement)}</small>
+            </button>
+            <div className="ai-current-element-actions">
+              <button type="button" onClick={() => onRestoreAiElementBox?.(section.id, selectedElement.id)}>{labels.aiLayoutRestorePosition}</button>
+              <button type="button" onClick={() => onToggleAiElementLock?.(section.id, selectedElement.id)}>{selectedElement.locked ? labels.aiLayoutUnlockElement : labels.aiLayoutLockElement}</button>
+              <button type="button" onClick={() => onDuplicateAiElement?.(section.id, selectedElement.id)}>{labels.aiLayoutDuplicateElement}</button>
+              <button type="button" className="danger" onClick={() => onRemoveAiElement?.(section.id, selectedElement.id)}>{labels.aiLayoutDeleteElement}</button>
+            </div>
+          </div>
+        ) : (
+          <p className="muted-line">{labels.aiLayoutSelectElementFirst}</p>
+        )}
+      </section>
+
+      <section className="ai-style-panel-section">
+        <header>
+          <strong>{labels.aiLayoutApplyScope}</strong>
+        </header>
+        <div className="ai-style-segmented">
+          {["element", "sameType", "section"].map((item) => (
+            <button className={scope === item ? "active" : ""} type="button" key={item} onClick={() => setScope(item)}>
+              {labels.aiLayoutStyleScopes?.[item] || item}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="ai-style-panel-section">
+        <header>
+          <strong>{labels.aiLayoutStyleRecords}</strong>
+          <button type="button" onClick={() => setSavePanelOpen(true)} disabled={!selectedElement}>{labels.aiLayoutSaveCurrentStyle}</button>
+        </header>
+        <div className="ai-style-record-grid">
+          {records.slice(0, 6).map((record) => (
+            <article className="ai-style-record-card" key={record.id}>
+              <div>
+                <strong>{record.name}</strong>
+                <span>{labels.aiLayoutStyleScopes?.[record.scope] || record.scope}</span>
+              </div>
+              <div className="ai-style-record-swatches">
+                {["fill", "tone", "variant", "radius"].map((key) => (
+                  <i key={key} data-token={record.appearance?.[key] || "default"} />
+                ))}
+              </div>
+              <button type="button" onClick={() => applyRecord(record)} disabled={!selectedElement}>{labels.apply || labels.insertBlock}</button>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {savePanelOpen && selectedElement ? (
+        <AiStyleRecordSavePanel
+          labels={labels}
+          defaultName={selectedElement.label || labels.aiLayoutRoles?.[roleForElement(selectedElement)]}
+          onCancel={() => setSavePanelOpen(false)}
+          onSave={(draft) => {
+            onSaveAiLayoutStyleRecord?.({ ...draft, sectionId: section.id, elementId: selectedElement.id });
+            setSavePanelOpen(false);
+          }}
+        />
+      ) : null}
+
+      <section className="ai-style-panel-section">
+        <header>
+          <strong>{labels.aiLayoutVisualAdjustments}</strong>
+        </header>
+        <StyleSwatchGroup label={labels.aiLayoutFillColor} value={appearance.fill || "default"} values={["default", "purple", "blue", "neutral", "surface"]} labels={labels} onChange={(value) => setAppearance("fill", value)} />
+        <StyleSwatchGroup label={labels.aiLayoutTextTone} value={appearance.tone || "default"} values={["default", "muted", "purple", "inverted", "surface"]} labels={labels} onChange={(value) => setAppearance("tone", value)} />
+        <StyleChoiceGroup label={labels.aiLayoutTextSize} value={appearance.textSize || "md"} values={["xs", "sm", "md", "lg", "xl"]} labels={labels} onChange={(value) => setAppearance("textSize", value)} />
+        <StyleChoiceGroup label={labels.aiLayoutFontWeight} value={appearance.weight || "600"} values={["400", "500", "600", "700", "800"]} labels={labels} onChange={(value) => setAppearance("weight", value)} />
+        <StyleChoiceGroup label={labels.aiLayoutShape} value={appearance.radius || "medium"} values={["none", "small", "medium", "large"]} labels={labels} onChange={(value) => setAppearance("radius", value)} />
+        <StyleChoiceGroup label={labels.aiLayoutVariant} value={appearance.variant || "plain"} values={["plain", "solid", "soft", "outline", "pill", "placeholder-solid", "placeholder-soft"]} labels={labels} onChange={(value) => setAppearance("variant", value)} />
+        <StyleChoiceGroup label={labels.aiLayoutShadow} value={appearance.shadow || "none"} values={["none", "subtle", "medium", "strong"]} labels={labels} onChange={(value) => setAppearance("shadow", value)} />
+        <StyleChoiceGroup label={labels.aiLayoutHoverEffect} value={appearance.hover || "none"} values={["none", "lift", "glow", "dim"]} labels={labels} onChange={(value) => setAppearance("hover", value)} />
+        <StyleChoiceGroup label={labels.aiLayoutPadding} value={appearance.padding || "none"} values={["none", "xs", "sm", "md"]} labels={labels} onChange={(value) => setAppearance("padding", value)} />
+        {selectedElement?.type === "image" ? (
+          <StyleChoiceGroup label={labels.aiLayoutImageFit} value={appearance.fit || "placeholder"} values={["cover", "contain", "placeholder"]} labels={labels} onChange={(value) => setAppearance("fit", value)} />
+        ) : null}
+      </section>
+
+      <AiLayoutBoxEditor section={section} element={selectedElement} labels={labels} onPatchAiElementBox={onPatchAiElementBox} />
+
+      <section className="ai-style-panel-section">
+        <header>
+          <strong>{labels.aiLayoutLayerAndGroup}</strong>
+        </header>
+        <div className="ai-style-action-grid">
+          <button type="button" disabled={!selectedElement} onClick={() => onMoveAiElementLayer?.(section.id, selectedElement.id, "up")}>{labels.aiLayoutBringForward}</button>
+          <button type="button" disabled={!selectedElement} onClick={() => onMoveAiElementLayer?.(section.id, selectedElement.id, "down")}>{labels.aiLayoutSendBackward}</button>
+          <button type="button" disabled={!selectedElement} onClick={() => onRestoreAiElementBox?.(section.id, selectedElement.id)}>{labels.aiLayoutRestorePosition}</button>
+        </div>
+      </section>
+
+      <section className="ai-style-panel-section">
+        <header>
+          <strong>{labels.aiLayoutAddElement}</strong>
+        </header>
+        <div className="ai-style-action-grid">
+          {["text", "button", "image", "card", "badge", "icon"].map((type) => (
+            <button type="button" key={type} onClick={() => onAddAiElement?.(section.id, type)}>
+              {labels.aiLayoutElementTypes?.[type] || type}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <div className="ai-style-sticky-actions">
+        <button className="button secondary compact" type="button" disabled={!selectedElement} onClick={() => onResetAiElementStyle?.(section.id, selectedElement.id, scope)}>{labels.aiLayoutResetStyle}</button>
+        <button className="button secondary compact" type="button" disabled={!selectedElement} onClick={() => setSavePanelOpen(true)}>{labels.aiLayoutSaveStyleRecord}</button>
+        <button className="button compact" type="button" disabled={!selectedElement} onClick={() => {
+          const record = selectedElement ? { appearance: selectedElement.appearance, scope: "sameType", targetType: selectedElement.type, targetRole: roleForElement(selectedElement) } : null;
+          if (record) onApplyAiLayoutStyleRecord?.(section.id, record, selectedElement.id, "sameType");
+        }}>{labels.aiLayoutApplyToSameType}</button>
+      </div>
     </div>
   );
 }
@@ -441,7 +739,48 @@ function ContentTab({ section, labels, defaultTargetSize, onPatchSection, onPatc
   );
 }
 
-function StyleTab({ section, labels, onPatchSection }) {
+function StyleTab({
+  section,
+  labels,
+  onPatchSection,
+  selectedAiElementId,
+  aiLayoutStyleRecords,
+  onSelectAiElement,
+  onPatchAiElementBox,
+  onPatchAiElementAppearance,
+  onDuplicateAiElement,
+  onRemoveAiElement,
+  onRestoreAiElementBox,
+  onAddAiElement,
+  onMoveAiElementLayer,
+  onResetAiElementStyle,
+  onToggleAiElementLock,
+  onSaveAiLayoutStyleRecord,
+  onApplyAiLayoutStyleRecord
+}) {
+  if (section.type === "ai_layout") {
+    return (
+      <AiLayoutStyleTab
+        section={section}
+        labels={labels}
+        selectedAiElementId={selectedAiElementId}
+        aiLayoutStyleRecords={aiLayoutStyleRecords}
+        onSelectAiElement={onSelectAiElement}
+        onPatchAiElementBox={onPatchAiElementBox}
+        onPatchAiElementAppearance={onPatchAiElementAppearance}
+        onDuplicateAiElement={onDuplicateAiElement}
+        onRemoveAiElement={onRemoveAiElement}
+        onRestoreAiElementBox={onRestoreAiElementBox}
+        onAddAiElement={onAddAiElement}
+        onMoveAiElementLayer={onMoveAiElementLayer}
+        onResetAiElementStyle={onResetAiElementStyle}
+        onToggleAiElementLock={onToggleAiElementLock}
+        onSaveAiLayoutStyleRecord={onSaveAiLayoutStyleRecord}
+        onApplyAiLayoutStyleRecord={onApplyAiLayoutStyleRecord}
+      />
+    );
+  }
+
   const controls = getStyleControlsForSection(section.type);
   const styleValues = section.settings?.style || {};
 
@@ -543,13 +882,40 @@ function LayoutTab({ section, labels, onPatchSection }) {
   );
 }
 
-export function SectionEditor({ section, labels, defaultTargetSize = "1024x1024", onPatchSection, onPatchSectionContent, onOpenAssetPicker }) {
+export function SectionEditor({
+  section,
+  labels,
+  defaultTargetSize = "1024x1024",
+  selectedAiElementId = "",
+  aiLayoutStyleRecords = [],
+  onPatchSection,
+  onPatchSectionContent,
+  onOpenAssetPicker,
+  onSelectAiElement,
+  onPatchAiElementBox,
+  onPatchAiElementAppearance,
+  onDuplicateAiElement,
+  onRemoveAiElement,
+  onRestoreAiElementBox,
+  onAddAiElement,
+  onMoveAiElementLayer,
+  onResetAiElementStyle,
+  onToggleAiElementLock,
+  onSaveAiLayoutStyleRecord,
+  onApplyAiLayoutStyleRecord
+}) {
   const tabs = useMemo(() => [
     ["content", labels.settingTabs?.content || labels.inspector],
     ["style", labels.settingTabs?.style || labels.sectionTone],
     ["layout", labels.settingTabs?.layout || labels.variant]
   ], [labels]);
   const [activeTab, setActiveTab] = useState("content");
+
+  useEffect(() => {
+    if (section?.type === "ai_layout" && selectedAiElementId) {
+      setActiveTab("style");
+    }
+  }, [section?.id, section?.type, selectedAiElementId]);
 
   if (!section) {
     return <article className="builder-empty">{labels.noSectionSelected}</article>;
@@ -576,7 +942,27 @@ export function SectionEditor({ section, labels, defaultTargetSize = "1024x1024"
       {activeTab === "content" ? (
           <ContentTab section={section} labels={labels} defaultTargetSize={defaultTargetSize} onPatchSection={onPatchSection} onPatchSectionContent={onPatchSectionContent} onOpenAssetPicker={onOpenAssetPicker} />
       ) : null}
-      {activeTab === "style" ? <StyleTab section={section} labels={labels} onPatchSection={onPatchSection} /> : null}
+      {activeTab === "style" ? (
+        <StyleTab
+          section={section}
+          labels={labels}
+          onPatchSection={onPatchSection}
+          selectedAiElementId={selectedAiElementId}
+          aiLayoutStyleRecords={aiLayoutStyleRecords}
+          onSelectAiElement={onSelectAiElement}
+          onPatchAiElementBox={onPatchAiElementBox}
+          onPatchAiElementAppearance={onPatchAiElementAppearance}
+          onDuplicateAiElement={onDuplicateAiElement}
+          onRemoveAiElement={onRemoveAiElement}
+          onRestoreAiElementBox={onRestoreAiElementBox}
+          onAddAiElement={onAddAiElement}
+          onMoveAiElementLayer={onMoveAiElementLayer}
+          onResetAiElementStyle={onResetAiElementStyle}
+          onToggleAiElementLock={onToggleAiElementLock}
+          onSaveAiLayoutStyleRecord={onSaveAiLayoutStyleRecord}
+          onApplyAiLayoutStyleRecord={onApplyAiLayoutStyleRecord}
+        />
+      ) : null}
       {activeTab === "layout" ? <LayoutTab section={section} labels={labels} onPatchSection={onPatchSection} /> : null}
     </div>
   );

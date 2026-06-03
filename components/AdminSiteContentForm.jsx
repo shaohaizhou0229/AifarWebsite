@@ -14,11 +14,26 @@ import { SectionTemplateMetadataModal } from "@/components/admin-site-content/Se
 import { SeoEditor } from "@/components/admin-site-content/SeoEditor";
 import { cloneContent, ensureLayout, formatDate, moveItem, updateSectionAt, updateSeo } from "@/components/admin-site-content/form-utils";
 import promptContextRules from "@/lib/asset-prompt-context.cjs";
+import aiLayoutEditor from "@/lib/ai-layout-editor.cjs";
 import imageGenerationRules from "@/lib/image-generation-settings-core.cjs";
 import sectionTemplateUi from "@/lib/section-template-ui.cjs";
 import { localizedPath } from "@/i18n/routing";
 
 const { buildSectionImagePromptContext } = promptContextRules;
+const {
+  addAiLayoutElement,
+  applyAiLayoutStyleRecord,
+  createAiLayoutStyleRecord,
+  duplicateAiLayoutElement,
+  getAiLayoutElements,
+  moveAiLayoutElementLayer,
+  patchAiLayoutElementAppearance,
+  patchAiLayoutElementBox,
+  resetAiLayoutElementAppearance,
+  removeAiLayoutElement,
+  restoreAiLayoutElementBox,
+  toggleAiLayoutElementLock
+} = aiLayoutEditor;
 const { normalizeImageSize, resolveImageTargetSize } = imageGenerationRules;
 const {
   buildSectionTemplatesUrl,
@@ -136,6 +151,7 @@ export function AdminSiteContentForm({
   const [locale, setLocale] = useState(initialLocale);
   const [content, setContent] = useState(() => ensureLayout(initialContent));
   const [selectedSectionId, setSelectedSectionId] = useState(() => initialContent?.sections?.[0]?.id || "");
+  const [selectedAiElementId, setSelectedAiElementId] = useState("");
   const [dragIndex, setDragIndex] = useState(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -178,6 +194,17 @@ export function AdminSiteContentForm({
   );
   const sections = Array.isArray(content.sections) ? content.sections : [];
   const selectedSection = sections.find((section) => section.id === selectedSectionId) || sections[0] || null;
+  const aiLayoutStyleRecords = Array.isArray(content.aiLayoutStyleRecords) ? content.aiLayoutStyleRecords : [];
+
+  useEffect(() => {
+    if (selectedSection?.type !== "ai_layout") {
+      setSelectedAiElementId("");
+      return;
+    }
+    const elements = getAiLayoutElements(selectedSection);
+    if (selectedAiElementId && elements.some((element) => element.id === selectedAiElementId)) return;
+    setSelectedAiElementId(elements[0]?.id || "");
+  }, [selectedSection, selectedAiElementId]);
 
   useEffect(() => {
     const shell = document.querySelector(".admin-shell");
@@ -377,6 +404,7 @@ export function AdminSiteContentForm({
       setLocale(nextLocale);
       setContent(nextContent);
       setSelectedSectionId(nextContent.sections[0]?.id || "");
+      setSelectedAiElementId("");
       updateServerState(data);
     } catch (loadError) {
       setError(loadError.message || labels.loadFailed);
@@ -551,6 +579,94 @@ export function AdminSiteContentForm({
     setSelectedSectionId(section.id);
   }
 
+  function selectAiElement(sectionId, elementId) {
+    setSelectedSectionId(sectionId);
+    setSelectedAiElementId(elementId || "");
+  }
+
+  function patchAiElementBox(sectionId, elementId, boxPatch) {
+    queueDesignerScrollRestore();
+    patchSection(sectionId, (section) => patchAiLayoutElementBox(section, elementId, boxPatch));
+  }
+
+  function patchAiElementAppearance(sectionId, elementId, appearancePatch, scope = "element") {
+    queueDesignerScrollRestore();
+    patchSection(sectionId, (section) => patchAiLayoutElementAppearance(section, elementId, appearancePatch, scope));
+  }
+
+  function duplicateAiElement(sectionId, elementId) {
+    queueDesignerScrollRestore();
+    patchSection(sectionId, (section) => {
+      const result = duplicateAiLayoutElement(section, elementId);
+      if (result.element?.id) setSelectedAiElementId(result.element.id);
+      return result.section;
+    });
+  }
+
+  function removeAiElement(sectionId, elementId) {
+    queueDesignerScrollRestore();
+    patchSection(sectionId, (section) => removeAiLayoutElement(section, elementId));
+    setSelectedAiElementId("");
+  }
+
+  function restoreAiElementBox(sectionId, elementId) {
+    queueDesignerScrollRestore();
+    patchSection(sectionId, (section) => restoreAiLayoutElementBox(section, elementId));
+  }
+
+  function addAiElement(sectionId, type) {
+    queueDesignerScrollRestore();
+    patchSection(sectionId, (section) => {
+      const result = addAiLayoutElement(section, type);
+      if (result.element?.id) setSelectedAiElementId(result.element.id);
+      return result.section;
+    });
+  }
+
+  function moveAiElementLayer(sectionId, elementId, direction) {
+    queueDesignerScrollRestore();
+    patchSection(sectionId, (section) => moveAiLayoutElementLayer(section, elementId, direction));
+  }
+
+  function resetAiElementStyle(sectionId, elementId, scope = "element") {
+    queueDesignerScrollRestore();
+    patchSection(sectionId, (section) => resetAiLayoutElementAppearance(section, elementId, scope));
+  }
+
+  function toggleAiElementLock(sectionId, elementId) {
+    queueDesignerScrollRestore();
+    patchSection(sectionId, (section) => toggleAiLayoutElementLock(section, elementId));
+  }
+
+  function saveAiLayoutStyleRecord(draft = {}) {
+    const section = sections.find((item) => item.id === draft.sectionId) || selectedSection;
+    const element = getAiLayoutElements(section).find((item) => item.id === draft.elementId);
+    const record = createAiLayoutStyleRecord({
+      name: draft.name,
+      scope: draft.scope,
+      element,
+      tags: draft.tags
+    });
+    if (!record) {
+      setError(labels.aiLayoutSelectElementFirst || labels.noSectionSelected);
+      return;
+    }
+    setContent((current) => ({
+      ...current,
+      aiLayoutStyleRecords: [
+        record,
+        ...(Array.isArray(current.aiLayoutStyleRecords) ? current.aiLayoutStyleRecords : [])
+      ].slice(0, 24)
+    }));
+    setMessage(labels.aiLayoutStyleRecordSaved || labels.saved);
+  }
+
+  function applyAiStyleRecord(sectionId, record, elementId, scope) {
+    queueDesignerScrollRestore();
+    patchSection(sectionId, (section) => applyAiLayoutStyleRecord(section, record, elementId, scope));
+    setMessage(labels.aiLayoutStyleApplied || labels.saved);
+  }
+
   function reloadSectionTemplates() {
     setSectionTemplatesReloadToken((current) => current + 1);
   }
@@ -704,6 +820,7 @@ export function AdminSiteContentForm({
     const nextSections = sections.filter((section) => section.id !== sectionId);
     setContent((current) => ({ ...current, layoutVersion: SITE_LAYOUT_VERSION, sections: nextSections }));
     setSelectedSectionId((current) => current === sectionId ? nextSections[0]?.id || "" : current);
+    setSelectedAiElementId("");
   }
 
   function moveSection(fromIndex, toIndex) {
@@ -866,8 +983,12 @@ export function AdminSiteContentForm({
                     editorMode
                     labels={labels}
                     selectedSectionId={selectedSectionId}
+                    selectedAiElementId={selectedAiElementId}
                     hoveredSectionId={hoveredSectionId}
-                    onSelectSection={setSelectedSectionId}
+                    onSelectSection={(sectionId) => {
+                      setSelectedSectionId(sectionId);
+                      if (sectionId !== selectedSectionId) setSelectedAiElementId("");
+                    }}
                     onHoverSection={setHoveredSectionId}
                     onMoveSection={moveSection}
                     onDuplicateSection={duplicateSection}
@@ -875,6 +996,12 @@ export function AdminSiteContentForm({
                     onInsertAfterSection={(sectionId, type) => addSection(type, sectionId)}
                     onDragStartSection={setDragIndex}
                     onDropSection={onDropSection}
+                    onSelectAiElement={selectAiElement}
+                    onPatchAiElementBox={patchAiElementBox}
+                    onDuplicateAiElement={duplicateAiElement}
+                    onRemoveAiElement={removeAiElement}
+                    onRestoreAiElementBox={restoreAiElementBox}
+                    onToggleAiElementLock={toggleAiElementLock}
                   />
                 </div>
               ) : (
@@ -893,9 +1020,23 @@ export function AdminSiteContentForm({
                 section={selectedSection}
                 labels={labels}
                 defaultTargetSize={normalizeImageSize(imageSettings.defaultSize || "1024x1024")}
+                selectedAiElementId={selectedAiElementId}
+                aiLayoutStyleRecords={aiLayoutStyleRecords}
                 onPatchSection={patchSection}
                 onPatchSectionContent={patchSectionContent}
                 onOpenAssetPicker={openAssetPicker}
+                onSelectAiElement={(elementId) => setSelectedAiElementId(elementId || "")}
+                onPatchAiElementBox={patchAiElementBox}
+                onPatchAiElementAppearance={patchAiElementAppearance}
+                onDuplicateAiElement={duplicateAiElement}
+                onRemoveAiElement={removeAiElement}
+                onRestoreAiElementBox={restoreAiElementBox}
+                onAddAiElement={addAiElement}
+                onMoveAiElementLayer={moveAiElementLayer}
+                onResetAiElementStyle={resetAiElementStyle}
+                onToggleAiElementLock={toggleAiElementLock}
+                onSaveAiLayoutStyleRecord={saveAiLayoutStyleRecord}
+                onApplyAiLayoutStyleRecord={applyAiStyleRecord}
               />
             </section>
           </aside>
