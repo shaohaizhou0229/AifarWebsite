@@ -10325,23 +10325,33 @@ body:has(.admin-shell)::before {
   background: #fff;
 }
 
-.admin-range-tabs a {
+.admin-range-tabs button {
   min-width: 82px;
+  border: 0;
   border-right: 1px solid var(--admin-border);
+  background: transparent;
   color: var(--admin-muted);
+  cursor: pointer;
+  font: inherit;
   font-size: 13px;
   font-weight: 500;
   padding: 10px 14px;
   text-align: center;
 }
 
-.admin-range-tabs a:last-child {
+.admin-range-tabs button:last-child {
   border-right: 0;
 }
 
-.admin-range-tabs a.active {
+.admin-range-tabs button.active {
   background: var(--admin-soft);
   color: var(--admin-ink);
+}
+
+.admin-range-tabs button:disabled,
+.admin-icon-button:disabled {
+  cursor: wait;
+  opacity: 0.72;
 }
 
 .admin-traffic-controls {
@@ -10505,6 +10515,162 @@ body:has(.admin-shell)::before {
 
 .admin-traffic-panel {
   min-height: auto;
+}
+
+.admin-analysis-panel-body {
+  position: relative;
+  min-width: 0;
+}
+
+.admin-analysis-panel-content {
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.admin-analysis-panel-content.updating {
+  opacity: 0.52;
+  transform: translateY(1px);
+}
+
+.admin-analysis-panel-skeleton {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.admin-analysis-panel-skeleton span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 42%;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0), rgba(37, 99, 235, 0.72), rgba(20, 184, 166, 0));
+  animation: admin-dashboard-progress 0.88s ease-in-out infinite;
+}
+
+.admin-dashboard-inline-error {
+  margin-top: 10px;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  background: #fff7f7;
+  color: #b91c1c !important;
+  font-size: 12px;
+  padding: 8px 10px;
+}
+
+.admin-dashboard-skeleton {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-dashboard-skeleton-card {
+  justify-content: start;
+}
+
+.admin-dashboard-skeleton-line {
+  display: block;
+  overflow: hidden;
+  min-height: 12px;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, rgba(226, 232, 240, 0), rgba(255, 255, 255, 0.76), rgba(226, 232, 240, 0)) 0 0 / 220% 100%,
+    #e8eef7;
+  animation: admin-dashboard-skeleton-shimmer 1.15s ease-in-out infinite;
+}
+
+.admin-dashboard-skeleton-label {
+  width: 72%;
+}
+
+.admin-dashboard-skeleton-number {
+  width: 38%;
+  min-height: 30px;
+  margin-top: 4px;
+  border-radius: 7px;
+}
+
+.admin-dashboard-skeleton-meta {
+  width: 58%;
+}
+
+.admin-dashboard-skeleton-panel {
+  min-height: 230px;
+}
+
+.admin-dashboard-skeleton-tabs {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(58px, 1fr));
+  overflow: hidden;
+  min-width: 160px;
+  border: 1px solid var(--admin-border);
+  border-radius: 7px;
+  background: #fff;
+  gap: 1px;
+  padding: 7px;
+}
+
+.admin-dashboard-skeleton-tabs .admin-dashboard-skeleton-line {
+  min-height: 20px;
+  border-radius: 5px;
+}
+
+.admin-dashboard-skeleton-icon {
+  width: 36px;
+  min-height: 36px;
+  border-radius: 6px;
+}
+
+.admin-dashboard-skeleton-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.admin-dashboard-skeleton-summary .admin-dashboard-skeleton-line {
+  min-height: 68px;
+  border-radius: 6px;
+}
+
+.admin-dashboard-skeleton-chart {
+  min-height: 168px;
+  border-radius: 6px;
+}
+
+.admin-dashboard-skeleton-chart.compact {
+  min-height: 112px;
+}
+
+.admin-dashboard-skeleton-rows {
+  display: grid;
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.admin-dashboard-skeleton-rows .admin-dashboard-skeleton-line {
+  min-height: 14px;
+}
+
+@keyframes admin-dashboard-skeleton-shimmer {
+  0% {
+    background-position: 120% 0, 0 0;
+  }
+
+  100% {
+    background-position: -120% 0, 0 0;
+  }
+}
+
+@keyframes admin-dashboard-progress {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  100% {
+    transform: translateX(260%);
+  }
 }
 
 .admin-traffic-summary {
@@ -11814,7 +11980,8 @@ body:has(.admin-shell)::before {
   }
 
   .admin-metric-grid,
-  .admin-traffic-summary {
+  .admin-traffic-summary,
+  .admin-dashboard-skeleton-summary {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -11844,6 +12011,30 @@ body:has(.admin-shell)::before {
 
   .admin-health-row {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .admin-dashboard-skeleton-summary,
+  .admin-dashboard-skeleton-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-dashboard-skeleton-tabs {
+    min-width: 92px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-analysis-panel-content,
+  .admin-analysis-panel-skeleton span,
+  .admin-dashboard-skeleton-line {
+    transition: none;
+    animation: none;
+  }
+
+  .admin-analysis-panel-content.updating {
+    transform: none;
   }
 }
 
