@@ -32,9 +32,26 @@ function safeRangeDays(value) {
   return Number(value) === 1 ? 1 : 7;
 }
 
-function currentUrlRange() {
-  if (typeof window === "undefined") return 7;
-  return safeRangeDays(new URLSearchParams(window.location.search).get("range"));
+function currentUrlRanges() {
+  if (typeof window === "undefined") {
+    return { trafficRangeDays: 7, downloadRangeDays: 7 };
+  }
+  const params = new URLSearchParams(window.location.search);
+  return {
+    trafficRangeDays: safeRangeDays(params.get("trafficRange") ?? params.get("range")),
+    downloadRangeDays: safeRangeDays(params.get("downloadRange"))
+  };
+}
+
+function isVisibleTrendLabel(index, total) {
+  if (total <= 12) return true;
+  return index % 3 === 0 || index === total - 1;
+}
+
+function trendLabelStyle(index, total) {
+  if (index === 0) return { left: 0, transform: "none" };
+  if (index === total - 1) return { left: "auto", right: 0, transform: "none" };
+  return undefined;
 }
 
 function localizedAdminHref(locale, href) {
@@ -148,6 +165,7 @@ function AnalysisPanelBody({ loading = false, error = "", children }) {
 
 function VisitLineChart({ trend = [], labels }) {
   const max = maxTrendValue(trend, ["views"]);
+  const totalPoints = Math.max(1, trend.length);
   const points = trend.map((point, index) => {
     const x = trend.length <= 1 ? 0 : (index / (trend.length - 1)) * 100;
     const y = 100 - (Number(point.views || 0) / max) * 82 - 9;
@@ -161,12 +179,15 @@ function VisitLineChart({ trend = [], labels }) {
         {areaPoints ? <polygon points={areaPoints} /> : null}
         <polyline points={points} />
       </svg>
-      <div className="admin-traffic-bars">
-        {trend.map((point) => (
-          <div key={point.date}>
-            <small>{point.label}</small>
-          </div>
-        ))}
+      <div className="admin-traffic-bars" style={{ "--traffic-points": totalPoints }}>
+        {trend.map((point, index) => {
+          const showLabel = isVisibleTrendLabel(index, trend.length);
+          return (
+            <div className={showLabel ? "" : "is-hidden"} key={point.date}>
+              <small style={showLabel ? trendLabelStyle(index, trend.length) : undefined}>{point.label}</small>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -280,14 +301,22 @@ function CollaborationTodoList({ items = [], labels = {}, locale }) {
   );
 }
 
-export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard = null, loadingLabel, errorLabel }) {
-  const initialRangeDays = safeRangeDays(rangeDays);
-  const [activeRangeDays, setActiveRangeDays] = useState(initialRangeDays);
-  const [dashboard, setDashboard] = useState(() => initialDashboard || readCachedAdminDashboard(locale, initialRangeDays, 5 * 60 * 1000));
-  const [loading, setLoading] = useState(() => !initialDashboard && !readCachedAdminDashboard(locale, initialRangeDays, 5 * 60 * 1000));
-  const [rangeLoading, setRangeLoading] = useState(false);
+export function AdminDashboardClient({ locale, page, rangeDays, trafficRangeDays, downloadRangeDays, initialDashboard = null, loadingLabel, errorLabel }) {
+  const initialTrafficRangeDays = safeRangeDays(trafficRangeDays ?? rangeDays);
+  const initialDownloadRangeDays = safeRangeDays(downloadRangeDays);
+  const initialRanges = useMemo(() => ({
+    trafficRangeDays: initialTrafficRangeDays,
+    downloadRangeDays: initialDownloadRangeDays
+  }), [initialTrafficRangeDays, initialDownloadRangeDays]);
+  const [activeTrafficRangeDays, setActiveTrafficRangeDays] = useState(initialTrafficRangeDays);
+  const [activeDownloadRangeDays, setActiveDownloadRangeDays] = useState(initialDownloadRangeDays);
+  const [dashboard, setDashboard] = useState(() => initialDashboard || readCachedAdminDashboard(locale, initialRanges, 5 * 60 * 1000));
+  const [loading, setLoading] = useState(() => !initialDashboard && !readCachedAdminDashboard(locale, initialRanges, 5 * 60 * 1000));
+  const [trafficLoading, setTrafficLoading] = useState(false);
+  const [downloadLoading, setDownloadLoading] = useState(false);
   const [error, setError] = useState("");
-  const [rangeError, setRangeError] = useState("");
+  const [trafficError, setTrafficError] = useState("");
+  const [downloadError, setDownloadError] = useState("");
   const dashboardRef = useRef(dashboard);
   const requestIdRef = useRef(0);
 
@@ -295,94 +324,128 @@ export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard
     dashboardRef.current = dashboard;
   }, [dashboard]);
 
-  const syncRangeUrl = useCallback((nextRangeDays) => {
+  const syncRangeUrl = useCallback((nextTrafficRangeDays, nextDownloadRangeDays) => {
     if (typeof window === "undefined") return;
     const nextUrl = new URL(window.location.href);
-    nextUrl.searchParams.set("range", String(nextRangeDays));
-    window.history.pushState({ range: nextRangeDays }, "", `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
+    nextUrl.searchParams.delete("range");
+    nextUrl.searchParams.set("trafficRange", String(nextTrafficRangeDays));
+    nextUrl.searchParams.set("downloadRange", String(nextDownloadRangeDays));
+    window.history.pushState({
+      trafficRange: nextTrafficRangeDays,
+      downloadRange: nextDownloadRangeDays
+    }, "", `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`);
   }, []);
 
-  const loadRange = useCallback(async (nextRangeDays, { force = false, syncUrl = true } = {}) => {
-    const nextSafeRangeDays = safeRangeDays(nextRangeDays);
+  const loadRanges = useCallback(async (nextTrafficRangeDays, nextDownloadRangeDays, { force = false, syncUrl = true, loadingScope = "all" } = {}) => {
+    const nextRanges = {
+      trafficRangeDays: safeRangeDays(nextTrafficRangeDays),
+      downloadRangeDays: safeRangeDays(nextDownloadRangeDays)
+    };
     const requestId = requestIdRef.current + 1;
     requestIdRef.current = requestId;
-    setActiveRangeDays(nextSafeRangeDays);
-    setRangeError("");
-    if (syncUrl) syncRangeUrl(nextSafeRangeDays);
+    setActiveTrafficRangeDays(nextRanges.trafficRangeDays);
+    setActiveDownloadRangeDays(nextRanges.downloadRangeDays);
+    if (loadingScope === "traffic" || loadingScope === "all") setTrafficError("");
+    if (loadingScope === "download" || loadingScope === "all") setDownloadError("");
+    if (syncUrl) syncRangeUrl(nextRanges.trafficRangeDays, nextRanges.downloadRangeDays);
 
-    const cached = force ? null : readCachedAdminDashboard(locale, nextSafeRangeDays, 5 * 60 * 1000);
+    const cached = force ? null : readCachedAdminDashboard(locale, nextRanges, 5 * 60 * 1000);
     if (cached) {
       dashboardRef.current = cached;
       setDashboard(cached);
       setLoading(false);
-      setRangeLoading(false);
+      setTrafficLoading(false);
+      setDownloadLoading(false);
       setError("");
       return;
     }
 
     const hasDashboard = Boolean(dashboardRef.current);
     setLoading(!hasDashboard);
-    setRangeLoading(hasDashboard);
+    if (hasDashboard && (loadingScope === "traffic" || loadingScope === "all")) setTrafficLoading(true);
+    if (hasDashboard && (loadingScope === "download" || loadingScope === "all")) setDownloadLoading(true);
 
     try {
-      const nextDashboard = await loadAdminDashboard(locale, nextSafeRangeDays, { force });
+      const nextDashboard = await loadAdminDashboard(locale, nextRanges, undefined, { force });
       if (requestIdRef.current !== requestId) return;
       dashboardRef.current = nextDashboard;
       setDashboard(nextDashboard);
       setError("");
-      setRangeError("");
+      setTrafficError("");
+      setDownloadError("");
     } catch (loadError) {
       if (requestIdRef.current !== requestId) return;
       const message = loadError.message || errorLabel;
       if (hasDashboard) {
-        setRangeError(message);
+        if (loadingScope === "download") {
+          setDownloadError(message);
+        } else if (loadingScope === "traffic") {
+          setTrafficError(message);
+        } else {
+          setTrafficError(message);
+          setDownloadError(message);
+        }
       } else {
         setError(message);
       }
     } finally {
       if (requestIdRef.current === requestId) {
         setLoading(false);
-        setRangeLoading(false);
+        setTrafficLoading(false);
+        setDownloadLoading(false);
       }
     }
   }, [errorLabel, locale, syncRangeUrl]);
 
   useEffect(() => {
     if (initialDashboard) {
-      writeCachedAdminDashboard(locale, initialRangeDays, initialDashboard);
+      writeCachedAdminDashboard(locale, initialRanges, initialDashboard);
       dashboardRef.current = initialDashboard;
       setDashboard(initialDashboard);
-      setActiveRangeDays(initialRangeDays);
+      setActiveTrafficRangeDays(initialRanges.trafficRangeDays);
+      setActiveDownloadRangeDays(initialRanges.downloadRangeDays);
       setLoading(false);
-      setRangeLoading(false);
+      setTrafficLoading(false);
+      setDownloadLoading(false);
       setError("");
-      setRangeError("");
+      setTrafficError("");
+      setDownloadError("");
       return undefined;
     }
 
-    loadRange(initialRangeDays, { syncUrl: false });
+    loadRanges(initialRanges.trafficRangeDays, initialRanges.downloadRangeDays, { syncUrl: false });
     return undefined;
-  }, [initialDashboard, initialRangeDays, loadRange, locale]);
+  }, [initialDashboard, initialRanges, loadRanges, locale]);
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
     const handlePopState = () => {
-      loadRange(currentUrlRange(), { syncUrl: false });
+      const nextRanges = currentUrlRanges();
+      loadRanges(nextRanges.trafficRangeDays, nextRanges.downloadRangeDays, { syncUrl: false });
     };
     window.addEventListener("popstate", handlePopState);
     return () => {
       window.removeEventListener("popstate", handlePopState);
     };
-  }, [loadRange]);
+  }, [loadRanges]);
 
-  const handleRangeChange = useCallback((nextRangeDays) => {
-    if (nextRangeDays === activeRangeDays && !rangeError) return;
-    loadRange(nextRangeDays);
-  }, [activeRangeDays, loadRange, rangeError]);
+  const handleTrafficRangeChange = useCallback((nextRangeDays) => {
+    if (nextRangeDays === activeTrafficRangeDays && !trafficError) return;
+    loadRanges(nextRangeDays, activeDownloadRangeDays, { loadingScope: "traffic" });
+  }, [activeDownloadRangeDays, activeTrafficRangeDays, loadRanges, trafficError]);
 
-  const handleRefresh = useCallback(() => {
-    loadRange(activeRangeDays, { force: true, syncUrl: false });
-  }, [activeRangeDays, loadRange]);
+  const handleTrafficRefresh = useCallback(() => {
+    loadRanges(activeTrafficRangeDays, activeDownloadRangeDays, { force: true, syncUrl: false, loadingScope: "traffic" });
+  }, [activeDownloadRangeDays, activeTrafficRangeDays, loadRanges]);
+
+  const handleDownloadRangeChange = useCallback((nextRangeDays) => {
+    if (nextRangeDays === activeDownloadRangeDays && !downloadError) return;
+    loadRanges(activeTrafficRangeDays, nextRangeDays, { loadingScope: "download" });
+  }, [activeDownloadRangeDays, activeTrafficRangeDays, downloadError, loadRanges]);
+
+  const handleDownloadRefresh = useCallback(() => {
+    loadRanges(activeTrafficRangeDays, activeDownloadRangeDays, { force: true, syncUrl: false, loadingScope: "download" });
+  }, [activeDownloadRangeDays, activeTrafficRangeDays, loadRanges]);
 
   const metricCards = dashboard ? [
     ["todayViews", dashboard.metrics.todayViews, `${dashboard.metrics.totalViews} ${page.metrics.details.totalInRange}`, "good", "positive", UserRound],
@@ -394,16 +457,28 @@ export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard
     ["contactRequests", dashboard.metrics.contactRequests, dashboard.metrics.contactRequests ? page.metrics.details.needsReview : page.metrics.details.clear, dashboard.metrics.contactRequests ? "attention" : "neutral", dashboard.metrics.contactRequests ? "warning" : "positive", Mail]
   ] : [];
 
+  const trafficAnalytics = dashboard?.trafficAnalytics || dashboard?.analytics || {};
+  const downloadAnalytics = dashboard?.downloadAnalytics || dashboard?.analytics || {};
   const totalPageViews = dashboard?.metrics?.totalViews || 0;
-  const totalClientDownloads = dashboard?.analytics?.downloads?.client || 0;
-  const totalDocumentDownloads = dashboard?.analytics?.downloads?.document || 0;
-  const renderRangeControls = () => (
+  const totalClientDownloads = downloadAnalytics?.downloads?.client || 0;
+  const totalDocumentDownloads = downloadAnalytics?.downloads?.document || 0;
+  const hasTrafficData = Boolean(totalPageViews || trafficAnalytics?.visitedPages);
+  const renderTrafficRangeControls = () => (
     <RangeTabs
-      rangeDays={activeRangeDays}
+      rangeDays={activeTrafficRangeDays}
       labels={page.ranges}
-      loading={rangeLoading}
-      onChange={handleRangeChange}
-      onRefresh={handleRefresh}
+      loading={trafficLoading}
+      onChange={handleTrafficRangeChange}
+      onRefresh={handleTrafficRefresh}
+    />
+  );
+  const renderDownloadRangeControls = () => (
+    <RangeTabs
+      rangeDays={activeDownloadRangeDays}
+      labels={page.ranges}
+      loading={downloadLoading}
+      onChange={handleDownloadRangeChange}
+      onRefresh={handleDownloadRefresh}
     />
   );
 
@@ -426,11 +501,11 @@ export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard
               <AdminDataPanel
                 title={page.traffic.title}
                 meta={page.traffic.meta}
-                action={renderRangeControls()}
+                action={renderTrafficRangeControls()}
                 className="admin-traffic-panel"
               >
-                <AnalysisPanelBody loading={rangeLoading} error={rangeError}>
-                  {dashboard.analytics.hasData ? (
+                <AnalysisPanelBody loading={trafficLoading} error={trafficError}>
+                  {hasTrafficData ? (
                     <>
                       <div className="admin-traffic-summary">
                         <div>
@@ -439,19 +514,19 @@ export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard
                         </div>
                         <div>
                           <span>{page.traffic.visitedPages}</span>
-                          <strong>{dashboard.analytics.visitedPages || 0}</strong>
+                          <strong>{trafficAnalytics.visitedPages || 0}</strong>
                           {page.traffic.visitedPagesHelp ? <small>{page.traffic.visitedPagesHelp}</small> : null}
                         </div>
                       </div>
-                      <VisitLineChart trend={dashboard.analytics.trend} labels={page.traffic} />
+                      <VisitLineChart trend={trafficAnalytics.trend} labels={page.traffic} />
                       <div className="admin-dashboard-split admin-analysis-split">
                         <div>
                           <h3>{page.traffic.pageCategoriesTitle}</h3>
-                          <HorizontalBars items={dashboard.analytics.pageCategories} labels={page.traffic} labelMap={page.traffic.pageCategories} total={totalPageViews} emptyText={page.traffic.empty} />
+                          <HorizontalBars items={trafficAnalytics.pageCategories} labels={page.traffic} labelMap={page.traffic.pageCategories} total={totalPageViews} emptyText={page.traffic.empty} />
                         </div>
                         <div>
                           <h3>{page.traffic.languages}</h3>
-                          <DonutChart items={dashboard.analytics.languages} labels={page.traffic} labelMap={page.traffic.languageNames} total={totalPageViews} emptyText={page.traffic.empty} />
+                          <DonutChart items={trafficAnalytics.languages} labels={page.traffic} labelMap={page.traffic.languageNames} total={totalPageViews} emptyText={page.traffic.empty} />
                         </div>
                       </div>
                     </>
@@ -464,10 +539,10 @@ export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard
               <AdminDataPanel
                 title={page.downloads.title}
                 meta={page.downloads.meta}
-                action={renderRangeControls()}
+                action={renderDownloadRangeControls()}
                 className="admin-traffic-panel"
               >
-                <AnalysisPanelBody loading={rangeLoading} error={rangeError}>
+                <AnalysisPanelBody loading={downloadLoading} error={downloadError}>
                   {totalClientDownloads || totalDocumentDownloads ? (
                     <>
                       <div className="admin-traffic-summary">
@@ -480,15 +555,15 @@ export function AdminDashboardClient({ locale, page, rangeDays, initialDashboard
                           <strong>{totalDocumentDownloads}</strong>
                         </div>
                       </div>
-                      <DownloadBarChart trend={dashboard.analytics.trend} labels={page.downloads} />
+                      <DownloadBarChart trend={downloadAnalytics.trend} labels={page.downloads} />
                       <div className="admin-dashboard-split">
                         <div>
                           <h3>{page.downloads.clientBreakdown}</h3>
-                          <DataTable items={dashboard.analytics.clientDownloads} labels={page.downloads} labelMap={page.downloads.clients} total={totalClientDownloads} emptyText={page.downloads.empty} />
+                          <DataTable items={downloadAnalytics.clientDownloads} labels={page.downloads} labelMap={page.downloads.clients} total={totalClientDownloads} emptyText={page.downloads.empty} />
                         </div>
                         <div>
                           <h3>{page.downloads.documentBreakdown}</h3>
-                          <DataTable items={dashboard.analytics.documentDownloads} labels={page.downloads} labelMap={page.downloads.documentCategories} total={totalDocumentDownloads} emptyText={page.downloads.empty} />
+                          <DataTable items={downloadAnalytics.documentDownloads} labels={page.downloads} labelMap={page.downloads.documentCategories} total={totalDocumentDownloads} emptyText={page.downloads.empty} />
                         </div>
                       </div>
                     </>

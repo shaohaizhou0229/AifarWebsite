@@ -8,6 +8,10 @@ const pathname = "/admin/";
 
 export const dynamic = "force-dynamic";
 
+function safeRange(value) {
+  return Number(value) === 1 ? 1 : 7;
+}
+
 export async function generateMetadata({ params }) {
   const { locale } = await params;
   const page = await getPageMessages(locale, "adminHome");
@@ -22,7 +26,8 @@ export default async function AdminHomePage({ params, searchParams }) {
     getLocaleMessages(locale)
   ]);
   const query = await searchParams;
-  const rangeDays = Number(query?.range) === 1 ? 1 : 7;
+  const trafficRangeDays = query?.trafficRange ? safeRange(query.trafficRange) : safeRange(query?.range);
+  const downloadRangeDays = query?.downloadRange ? safeRange(query.downloadRange) : 7;
 
   return (
     <>
@@ -35,7 +40,15 @@ export default async function AdminHomePage({ params, searchParams }) {
           { label: page.title }
         ]}
       />
-      <AdminDashboardClient key={rangeDays} locale={locale} page={page} rangeDays={rangeDays} loadingLabel={messages.forms.common.pleaseWait} errorLabel={messages.forms.siteContent.loadFailed} />
+      <AdminDashboardClient
+        key={`${trafficRangeDays}-${downloadRangeDays}`}
+        locale={locale}
+        page={page}
+        trafficRangeDays={trafficRangeDays}
+        downloadRangeDays={downloadRangeDays}
+        loadingLabel={messages.forms.common.pleaseWait}
+        errorLabel={messages.forms.siteContent.loadFailed}
+      />
     </>
   );
 }

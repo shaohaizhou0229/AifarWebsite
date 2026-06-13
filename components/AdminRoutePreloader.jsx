@@ -20,8 +20,7 @@ function isAdminHomePath(pathname, locale) {
 }
 
 function safeRangeDays(value) {
-  const days = Number(value);
-  return [1, 7, 30].includes(days) ? days : 7;
+  return Number(value) === 1 ? 1 : 7;
 }
 
 function isCoolingDown(map, key, cooldownMs) {
@@ -40,15 +39,18 @@ export function AdminRoutePreloader({ locale }) {
   const dashboardWarmTimes = useRef(new Map());
   const localePrefix = `/${locale}/admin`;
 
-  const warmDashboard = useCallback((rangeDays = 7) => {
+  const warmDashboard = useCallback((trafficRangeDays = 7, downloadRangeDays = 7) => {
     if (typeof window === "undefined") return;
-    const safeRange = safeRangeDays(rangeDays);
-    const dashboardKey = `${locale}:${safeRange}`;
-    if (readCachedAdminDashboard(locale, safeRange) || isCoolingDown(dashboardWarmTimes.current, dashboardKey, DASHBOARD_WARM_COOLDOWN_MS)) return;
+    const ranges = {
+      trafficRangeDays: safeRangeDays(trafficRangeDays),
+      downloadRangeDays: safeRangeDays(downloadRangeDays)
+    };
+    const dashboardKey = `${locale}:${ranges.trafficRangeDays}:${ranges.downloadRangeDays}`;
+    if (readCachedAdminDashboard(locale, ranges) || isCoolingDown(dashboardWarmTimes.current, dashboardKey, DASHBOARD_WARM_COOLDOWN_MS)) return;
 
-    loadAdminDashboard(locale, safeRange).catch(() => {
+    loadAdminDashboard(locale, ranges).catch(() => {
       window.setTimeout(() => {
-        loadAdminDashboard(locale, safeRange, { force: true }).catch(() => {});
+        loadAdminDashboard(locale, ranges, undefined, { force: true }).catch(() => {});
       }, 1200);
     });
   }, [locale]);
@@ -75,7 +77,10 @@ export function AdminRoutePreloader({ locale }) {
 
     prefetched.current.add(key);
     if (isAdminHomePath(url.pathname, locale)) {
-      warmDashboard(Number(url.searchParams.get("range") || 7));
+      const trafficRange = url.searchParams.has("trafficRange")
+        ? url.searchParams.get("trafficRange")
+        : url.searchParams.get("range");
+      warmDashboard(trafficRange, url.searchParams.get("downloadRange"));
     }
 
     try {

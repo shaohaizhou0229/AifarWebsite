@@ -418,8 +418,8 @@ body:has(.admin-shell) > .site-footer {
   position: absolute;
   inset: auto 14px 8px;
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(var(--traffic-points, 7), minmax(0, 1fr));
+  gap: 0;
   align-items: end;
 }
 
@@ -428,6 +428,8 @@ body:has(.admin-shell) > .site-footer {
   height: 132px;
   align-items: end;
   gap: 5px;
+  min-width: 0;
+  position: relative;
 }
 
 .admin-traffic-bars span {
@@ -437,9 +439,20 @@ body:has(.admin-shell) > .site-footer {
 }
 
 .admin-traffic-bars small {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
   color: var(--admin-muted);
+  display: block;
   font-size: 11px;
+  line-height: 1;
   text-align: center;
+  white-space: nowrap;
+}
+
+.admin-traffic-bars .is-hidden small {
+  visibility: hidden;
 }
 
 .admin-dashboard-split {
