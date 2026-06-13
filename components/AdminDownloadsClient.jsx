@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { AdminAsyncState } from "@/components/AdminAsyncState";
 import { localizedPath } from "@/i18n/routing";
 
@@ -10,14 +10,21 @@ function formatStatus(release, page) {
 }
 
 export function AdminDownloadsClient({ locale, page, initialPlatforms = null, loadingLabel, errorLabel }) {
-  const skipInitialFetch = useRef(Boolean(initialPlatforms));
-  const [platforms, setPlatforms] = useState(initialPlatforms || []);
-  const [loading, setLoading] = useState(!initialPlatforms);
+  const hasInitialPlatforms = Array.isArray(initialPlatforms);
+  const [platforms, setPlatforms] = useState(hasInitialPlatforms ? initialPlatforms : []);
+  const [loading, setLoading] = useState(!hasInitialPlatforms);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (skipInitialFetch.current) {
-      skipInitialFetch.current = false;
+    if (!hasInitialPlatforms) return undefined;
+    setPlatforms(initialPlatforms);
+    setLoading(false);
+    setError("");
+    return undefined;
+  }, [hasInitialPlatforms, initialPlatforms]);
+
+  useEffect(() => {
+    if (hasInitialPlatforms) {
       return undefined;
     }
 
@@ -42,7 +49,7 @@ export function AdminDownloadsClient({ locale, page, initialPlatforms = null, lo
     return () => {
       cancelled = true;
     };
-  }, [errorLabel]);
+  }, [hasInitialPlatforms, errorLabel]);
 
   return (
     <AdminAsyncState loading={loading} error={error} loadingLabel={loadingLabel} errorLabel={errorLabel}>

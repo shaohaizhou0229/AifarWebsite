@@ -122,14 +122,20 @@ export function AdminNav({ locale, labels = {}, current = "", variant = "inline"
               const normalizedHref = normalizePath(href);
               const isActive = (current && current === key) || (key === "home" ? activePath === normalizedHref : activePath.startsWith(normalizedHref));
               const isPending = pendingHref === localizedHref;
+              const markPending = () => {
+                if (!isActive) setPendingHref(localizedHref);
+              };
               return (
                 <Link
                   key={key}
-                  className={`${isActive ? "active" : ""}${isPending ? " pending" : ""}`}
+                  className={[isActive ? "active" : "", isPending ? "pending" : ""].filter(Boolean).join(" ")}
                   href={localizedHref}
                   prefetch={false}
                   aria-current={isActive ? "page" : undefined}
-                  onClick={() => setPendingHref(localizedHref)}
+                  aria-busy={isPending ? "true" : undefined}
+                  data-pending={isPending ? "true" : undefined}
+                  onPointerDown={markPending}
+                  onClick={markPending}
                 >
                   <Icon aria-hidden="true" size={16} strokeWidth={1.8} />
                   <span>{labels[key] || FALLBACK_LABELS[key]}</span>
@@ -142,4 +148,3 @@ export function AdminNav({ locale, labels = {}, current = "", variant = "inline"
     </nav>
   );
 }
-

@@ -1,22 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { loadAdminDashboard } from "@/components/admin-dashboard-cache";
-import { localizedPath } from "@/i18n/routing";
+import { loadAdminDashboard, readCachedAdminDashboard } from "@/components/admin-dashboard-cache";
 
-const PRIMARY_ADMIN_PATHS = [
-  "/admin/",
-  "/admin/product/",
-  "/admin/assets/",
-  "/admin/downloads/",
-  "/admin/users/",
-  "/admin/docs/",
-  "/admin/support/",
-  "/admin/contact/",
-  "/admin/collaboration/",
-  "/admin/settings/ai/"
-];
+const PREFETCH_COOLDOWN_MS = 10 * 1000;
+const DASHBOARD_WARM_COOLDOWN_MS = 2 * 60 * 1000;
 
 function normalizePath(value) {
   return value.endsWith("/") ? value : `${value}/`;
@@ -30,34 +19,36 @@ function isAdminHomePath(pathname, locale) {
   return normalizePath(pathname) === `/${locale}/admin/`;
 }
 
-function idle(callback) {
-  if (typeof window === "undefined") return null;
-  if ("requestIdleCallback" in window) {
-    return window.requestIdleCallback(callback, { timeout: 1800 });
-  }
-  return window.setTimeout(callback, 300);
+function safeRangeDays(value) {
+  const days = Number(value);
+  return [1, 7, 30].includes(days) ? days : 7;
 }
 
-function cancelIdle(id) {
-  if (id == null || typeof window === "undefined") return;
-  if ("cancelIdleCallback" in window) {
-    window.cancelIdleCallback(id);
-    return;
-  }
-  window.clearTimeout(id);
+function isCoolingDown(map, key, cooldownMs) {
+  const now = Date.now();
+  const last = map.get(key) || 0;
+  if (now - last < cooldownMs) return true;
+  map.set(key, now);
+  return false;
 }
 
 export function AdminRoutePreloader({ locale }) {
   const router = useRouter();
   const pathname = usePathname();
   const prefetched = useRef(new Set());
+  const recentPrefetches = useRef(new Map());
+  const dashboardWarmTimes = useRef(new Map());
   const localePrefix = `/${locale}/admin`;
-  const primaryRoutes = useMemo(() => PRIMARY_ADMIN_PATHS.map((path) => localizedPath(locale, path)), [locale]);
 
   const warmDashboard = useCallback((rangeDays = 7) => {
-    loadAdminDashboard(locale, rangeDays).catch(() => {
+    if (typeof window === "undefined") return;
+    const safeRange = safeRangeDays(rangeDays);
+    const dashboardKey = `${locale}:${safeRange}`;
+    if (readCachedAdminDashboard(locale, safeRange) || isCoolingDown(dashboardWarmTimes.current, dashboardKey, DASHBOARD_WARM_COOLDOWN_MS)) return;
+
+    loadAdminDashboard(locale, safeRange).catch(() => {
       window.setTimeout(() => {
-        loadAdminDashboard(locale, rangeDays, { force: true }).catch(() => {});
+        loadAdminDashboard(locale, safeRange, { force: true }).catch(() => {});
       }, 1200);
     });
   }, [locale]);
@@ -80,6 +71,7 @@ export function AdminRoutePreloader({ locale }) {
     const key = routeKey(url.pathname, url.search);
     const currentKey = routeKey(pathname, window.location.search);
     if (currentKey === key || prefetched.current.has(key)) return;
+    if (isCoolingDown(recentPrefetches.current, key, PREFETCH_COOLDOWN_MS)) return;
 
     prefetched.current.add(key);
     if (isAdminHomePath(url.pathname, locale)) {
@@ -94,29 +86,9 @@ export function AdminRoutePreloader({ locale }) {
       });
     } catch {
       prefetched.current.delete(key);
+      recentPrefetches.current.delete(key);
     }
   }, [locale, localePrefix, pathname, router, warmDashboard]);
-
-  useEffect(() => {
-    const timers = [];
-    const idleId = idle(() => {
-      primaryRoutes.forEach((href, index) => {
-        const timer = window.setTimeout(() => prefetch(href), index * 140);
-        timers.push(timer);
-      });
-      if (!isAdminHomePath(pathname, locale)) {
-        const dashboardTimer = window.setTimeout(() => {
-          warmDashboard(7);
-        }, primaryRoutes.length * 140 + 180);
-        timers.push(dashboardTimer);
-      }
-    });
-
-    return () => {
-      cancelIdle(idleId);
-      timers.forEach((timer) => window.clearTimeout(timer));
-    };
-  }, [prefetch, primaryRoutes]);
 
   useEffect(() => {
     const shell = document.querySelector(".admin-shell");

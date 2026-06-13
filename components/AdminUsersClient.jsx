@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AdminAsyncState } from "@/components/AdminAsyncState";
 import { AdminInvitationActions } from "@/components/AdminInvitationActions";
@@ -19,16 +19,28 @@ function permissionSummary(user, page) {
 
 export function AdminUsersClient({ locale, page, initialQuery = "", initialStatus = "all", initialUsers = null, loadingLabel, errorLabel }) {
   const router = useRouter();
-  const skipInitialFetch = useRef(Boolean(initialUsers));
+  const hasInitialUsers = Array.isArray(initialUsers);
   const [q, setQ] = useState(initialQuery);
   const [status, setStatus] = useState(initialStatus);
-  const [users, setUsers] = useState(initialUsers || []);
-  const [loading, setLoading] = useState(!initialUsers);
+  const [users, setUsers] = useState(hasInitialUsers ? initialUsers : []);
+  const [loading, setLoading] = useState(!hasInitialUsers);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (skipInitialFetch.current) {
-      skipInitialFetch.current = false;
+    setQ(initialQuery);
+    setStatus(initialStatus);
+  }, [initialQuery, initialStatus]);
+
+  useEffect(() => {
+    if (!hasInitialUsers) return undefined;
+    setUsers(initialUsers);
+    setLoading(false);
+    setError("");
+    return undefined;
+  }, [hasInitialUsers, initialUsers]);
+
+  useEffect(() => {
+    if (hasInitialUsers) {
       return undefined;
     }
 
@@ -85,7 +97,7 @@ export function AdminUsersClient({ locale, page, initialQuery = "", initialStatu
     return () => {
       cancelled = true;
     };
-  }, [q, status, errorLabel]);
+  }, [hasInitialUsers, q, status, errorLabel]);
 
   function submitFilter(event) {
     event.preventDefault();

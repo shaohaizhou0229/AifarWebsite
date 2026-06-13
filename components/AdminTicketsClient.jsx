@@ -28,14 +28,21 @@ function buildQuery(filters = {}) {
 }
 
 export function AdminContactTicketsClient({ locale, page, messages, initialStatus = "", initialTickets = null, loadingLabel, errorLabel }) {
-  const skipInitialFetch = useRef(Boolean(initialTickets));
-  const [tickets, setTickets] = useState(initialTickets || []);
-  const [loading, setLoading] = useState(!initialTickets);
+  const hasInitialTickets = Array.isArray(initialTickets);
+  const [tickets, setTickets] = useState(hasInitialTickets ? initialTickets : []);
+  const [loading, setLoading] = useState(!hasInitialTickets);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (skipInitialFetch.current) {
-      skipInitialFetch.current = false;
+    if (!hasInitialTickets) return undefined;
+    setTickets(initialTickets);
+    setLoading(false);
+    setError("");
+    return undefined;
+  }, [hasInitialTickets, initialTickets]);
+
+  useEffect(() => {
+    if (hasInitialTickets) {
       return undefined;
     }
 
@@ -64,7 +71,7 @@ export function AdminContactTicketsClient({ locale, page, messages, initialStatu
     return () => {
       cancelled = true;
     };
-  }, [initialStatus, errorLabel]);
+  }, [hasInitialTickets, initialStatus, errorLabel]);
 
   return (
     <AdminAsyncState loading={loading} error={error} loadingLabel={loadingLabel} errorLabel={errorLabel}>
