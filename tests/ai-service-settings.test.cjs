@@ -16,12 +16,12 @@ test("AI service settings expose image generation and section recognition status
   const settings = getAiServiceSettings({
     OPENAI_API_KEY: "sk-test-secret",
     OPENAI_IMAGE_ENABLED: "true",
-    OPENAI_IMAGE_MODEL: "gpt-image-1",
+    OPENAI_IMAGE_MODEL: "gpt-image-2",
     OPENAI_IMAGE_OUTPUT_FORMAT: "webp",
     OPENAI_IMAGE_DEFAULT_SIZE: "1024x1536",
     OPENAI_IMAGE_DEFAULT_QUALITY: "high",
     OPENAI_SECTION_TEMPLATE_ENABLED: "true",
-    OPENAI_SECTION_TEMPLATE_MODEL: "gpt-4.1-mini",
+    OPENAI_SECTION_TEMPLATE_MODEL: "gpt-5.5",
     OPENAI_SECTION_TEMPLATE_TIMEOUT_MS: "32000"
   });
 
@@ -35,11 +35,11 @@ test("AI service settings expose image generation and section recognition status
 test("AI service settings treat blank quoted secrets as missing", () => {
   const imageSettings = getImageGenerationSettings({
     OPENAI_API_KEY: "\"\"",
-    OPENAI_IMAGE_MODEL: "gpt-image-1"
+    OPENAI_IMAGE_MODEL: "gpt-image-2"
   });
   const recognitionSettings = getSectionTemplateRecognitionServiceSettings({
     OPENAI_API_KEY: "''",
-    OPENAI_SECTION_TEMPLATE_MODEL: "gpt-4.1-mini"
+    OPENAI_SECTION_TEMPLATE_MODEL: "gpt-5.5"
   });
 
   assert.equal(imageSettings.configured, false);
@@ -94,7 +94,7 @@ test("AI service settings fall back to OpenAI for unknown providers", () => {
   const settings = getImageGenerationSettings({
     AI_IMAGE_PROVIDER: "unknown",
     OPENAI_API_KEY: "sk-test-secret",
-    OPENAI_IMAGE_MODEL: "gpt-image-1"
+    OPENAI_IMAGE_MODEL: "gpt-image-2"
   });
 
   assert.equal(settings.providerKey, "openai");
@@ -114,6 +114,17 @@ test("SiliconFlow image payload maps quality to stable generation knobs", () => 
   assert.equal(payload.batch_size, 1);
   assert.equal(payload.num_inference_steps, 40);
   assert.equal(payload.guidance_scale, 8);
+});
+
+test("OpenAI settings use current defaults when models are not explicitly configured", () => {
+  const settings = getAiServiceSettings({
+    OPENAI_API_KEY: "sk-test-secret"
+  });
+
+  assert.equal(settings.imageGeneration.model, "gpt-image-2");
+  assert.equal(settings.imageGeneration.configured, true);
+  assert.equal(settings.sectionTemplateRecognition.model, "gpt-5.5");
+  assert.equal(settings.sectionTemplateRecognition.configured, true);
 });
 
 test("section recognition settings expose local-only UAT mode state", () => {

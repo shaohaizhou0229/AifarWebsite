@@ -84,9 +84,11 @@ test("screenshot validation rejects missing unsupported empty and oversized file
 test("recognition settings report unavailable when disabled or missing api key", () => {
   assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_ENABLED: "false", OPENAI_API_KEY: "sk-test" }).configured, false);
   assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_ENABLED: "true", OPENAI_API_KEY: "" }).configured, false);
-  assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_ENABLED: "true", OPENAI_API_KEY: "sk-test", OPENAI_SECTION_TEMPLATE_MODEL: "" }).configured, false);
+  const defaultModelSettings = getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_ENABLED: "true", OPENAI_API_KEY: "sk-test", OPENAI_SECTION_TEMPLATE_MODEL: "" });
+  assert.equal(defaultModelSettings.model, "gpt-5.5");
+  assert.equal(defaultModelSettings.configured, true);
   assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_ENABLED: "true", OPENAI_API_KEY: "\"\"", OPENAI_SECTION_TEMPLATE_MODEL: "\"\"" }).configured, false);
-  assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_ENABLED: "true", OPENAI_API_KEY: "sk-test", OPENAI_SECTION_TEMPLATE_MODEL: "gpt-4.1-mini" }).configured, true);
+  assert.equal(getSectionTemplateRecognitionSettings({ OPENAI_SECTION_TEMPLATE_ENABLED: "true", OPENAI_API_KEY: "sk-test", OPENAI_SECTION_TEMPLATE_MODEL: "gpt-5.5" }).configured, true);
 });
 
 test("recognition settings support SiliconFlow vision and text models", () => {
@@ -173,14 +175,14 @@ test("recognition request fields stay inside existing page industry and section 
 
 test("OpenAI recognition payload uses Responses image input and structured JSON schema", () => {
   const payload = buildOpenAIRecognitionPayload({
-    model: "gpt-4.1-mini",
+    model: "gpt-5.5",
     dataUrl: "data:image/png;base64,AAAA",
     fields: normalizeRecognitionRequestFields({ locale: "en" })
   });
 
-  assert.equal(payload.model, "gpt-4.1-mini");
+  assert.equal(payload.model, "gpt-5.5");
   assert.equal(payload.input[1].content[1].type, "input_image");
-  assert.equal(payload.input[1].content[1].detail, "high");
+  assert.equal(payload.input[1].content[1].detail, "original");
   assert.equal(payload.text.format.type, "json_schema");
   assert.match(payload.input[1].content[0].text, /normalized x, y, width, height/);
   assert.match(payload.input[1].content[0].text, /Do not return an empty elements array/);
@@ -271,7 +273,7 @@ test("JSON repair payloads keep malformed pricing output compact and schema-boun
     fields
   });
   const openAiPayload = buildOpenAIJsonRepairPayload({
-    model: "gpt-4.1-mini",
+    model: "gpt-5.5",
     rawText: "{\"template\":{\"name\":\"Pricing\"",
     parseError: { parseMessage: "Unexpected end of JSON input" },
     fields
