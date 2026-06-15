@@ -8373,6 +8373,29 @@ button.section-library-preview {
   gap: 18px;
 }
 
+.ai-settings-form-group {
+  display: grid;
+  gap: 12px;
+  border-top: 1px solid var(--admin-border);
+  padding-top: 16px;
+}
+
+.ai-settings-edit-form .admin-panel-header + .ai-settings-form-group {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.ai-settings-form-group h3 {
+  margin: 0;
+  color: var(--admin-ink);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.ai-settings-form-group p {
+  margin-top: 3px;
+}
+
 .ai-settings-options {
   display: grid;
   gap: 8px;

@@ -9,6 +9,13 @@ const TEST_TARGETS = {
 };
 
 const IDLE_TEST_STATE = { status: "idle", message: "", checkedAt: "" };
+const AI_PROVIDERS = {
+  openai: "openai",
+  siliconflow: "siliconflow"
+};
+const DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1";
+const DEFAULT_OPENAI_IMAGE_MODEL = "gpt-image-2";
+const DEFAULT_OPENAI_SECTION_TEMPLATE_MODEL = "gpt-5.5";
 
 function statusClass(configured) {
   return configured ? "success" : "warning";
@@ -87,6 +94,31 @@ function FormField({ label, children }) {
   );
 }
 
+function FormGroup({ title, lead, children }) {
+  return (
+    <div className="ai-settings-form-group">
+      <div>
+        <h3>{title}</h3>
+        {lead ? <p>{lead}</p> : null}
+      </div>
+      <div className="ai-settings-grid">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function sourceLabel(labels, source) {
+  return labels.sourceLabels?.[source] || source || labels.notConfigured;
+}
+
+function secretPreviewForProvider(providerKey, imageGeneration = {}, sectionTemplateRecognition = {}) {
+  if (providerKey === AI_PROVIDERS.siliconflow) {
+    return sectionTemplateRecognition.apiKeyPreview || imageGeneration.apiKeyPreview || "";
+  }
+  return imageGeneration.apiKeyPreview || sectionTemplateRecognition.apiKeyPreview || "";
+}
+
 export function AdminAiSettingsClient({ labels, settings, draft }) {
   const [settingsState, setSettingsState] = useState(settings || {});
   const imageGeneration = settingsState?.imageGeneration || settingsState || {};
@@ -99,9 +131,29 @@ export function AdminAiSettingsClient({ labels, settings, draft }) {
     [TEST_TARGETS.sectionTemplateRecognition]: IDLE_TEST_STATE
   });
   const allConfigured = Boolean(imageGeneration?.configured && sectionTemplateRecognition?.configured);
+  const imageProvider = form.AI_IMAGE_PROVIDER || imageGeneration.providerKey || AI_PROVIDERS.openai;
+  const recognitionProvider = form.AI_SECTION_TEMPLATE_PROVIDER || sectionTemplateRecognition.providerKey || AI_PROVIDERS.openai;
+  const usesOpenAI = imageProvider === AI_PROVIDERS.openai || recognitionProvider === AI_PROVIDERS.openai;
+  const usesSiliconFlow = imageProvider === AI_PROVIDERS.siliconflow || recognitionProvider === AI_PROVIDERS.siliconflow;
 
   function updateField(name, value) {
     setForm((current) => ({ ...current, [name]: value }));
+  }
+
+  function updateProvider(name, value) {
+    setForm((current) => {
+      const next = { ...current, [name]: value };
+      if (value === AI_PROVIDERS.openai) {
+        if (!String(next.OPENAI_BASE_URL || "").trim()) next.OPENAI_BASE_URL = DEFAULT_OPENAI_BASE_URL;
+        if (name === "AI_IMAGE_PROVIDER" && !String(next.OPENAI_IMAGE_MODEL || "").trim()) {
+          next.OPENAI_IMAGE_MODEL = DEFAULT_OPENAI_IMAGE_MODEL;
+        }
+        if (name === "AI_SECTION_TEMPLATE_PROVIDER" && !String(next.OPENAI_SECTION_TEMPLATE_MODEL || "").trim()) {
+          next.OPENAI_SECTION_TEMPLATE_MODEL = DEFAULT_OPENAI_SECTION_TEMPLATE_MODEL;
+        }
+      }
+      return next;
+    });
   }
 
   function updateSecret(name, value) {
@@ -253,12 +305,37 @@ export function AdminAiSettingsClient({ labels, settings, draft }) {
               <h2>{labels.editTitle || labels.title}</h2>
               <p>{labels.editLead || labels.lead}</p>
             </div>
-            <span className="admin-status admin-status-success">{labels.environment}: {settingsState?.environmentKey || "development"}</span>
+            <span className="admin-status admin-status-success">
+              {labels.environment}: {settingsState?.environmentKey || "development"} / {labels.source}: {sourceLabel(labels, settingsState?.source)}
+            </span>
           </div>
 
-          <div className="ai-settings-grid">
+          <FormGroup title={labels.credentialsTitle} lead={labels.credentialsLead}>
+            {usesOpenAI ? (
+              <>
+                <FormField label={labels.openAiApiKey}>
+                  <input type="password" autoComplete="new-password" value={secretForm.OPENAI_API_KEY} placeholder={secretPreviewForProvider(AI_PROVIDERS.openai, imageGeneration, sectionTemplateRecognition) || labels.keepExistingSecret || ""} onChange={(event) => updateSecret("OPENAI_API_KEY", event.target.value)} />
+                </FormField>
+                <FormField label={labels.openAiBaseUrl || labels.baseUrl}>
+                  <input value={form.OPENAI_BASE_URL || DEFAULT_OPENAI_BASE_URL} onChange={(event) => updateField("OPENAI_BASE_URL", event.target.value)} />
+                </FormField>
+              </>
+            ) : null}
+            {usesSiliconFlow ? (
+              <>
+                <FormField label={labels.siliconFlowApiKey}>
+                  <input type="password" autoComplete="new-password" value={secretForm.SILICONFLOW_API_KEY} placeholder={secretPreviewForProvider(AI_PROVIDERS.siliconflow, imageGeneration, sectionTemplateRecognition) || labels.keepExistingSecret || ""} onChange={(event) => updateSecret("SILICONFLOW_API_KEY", event.target.value)} />
+                </FormField>
+                <FormField label={labels.siliconFlowBaseUrl || labels.baseUrl}>
+                  <input value={form.SILICONFLOW_BASE_URL || ""} onChange={(event) => updateField("SILICONFLOW_BASE_URL", event.target.value)} />
+                </FormField>
+              </>
+            ) : null}
+          </FormGroup>
+
+          <FormGroup title={labels.imageConfigTitle} lead={labels.imageConfigLead}>
             <FormField label={labels.imageProvider || labels.provider}>
-              <select value={form.AI_IMAGE_PROVIDER || "openai"} onChange={(event) => updateField("AI_IMAGE_PROVIDER", event.target.value)}>
+              <select value={imageProvider} onChange={(event) => updateProvider("AI_IMAGE_PROVIDER", event.target.value)}>
                 <option value="openai">OpenAI</option>
                 <option value="siliconflow">SiliconFlow</option>
               </select>
@@ -269,17 +346,12 @@ export function AdminAiSettingsClient({ labels, settings, draft }) {
                 <option value="false">{labels.enabledNo}</option>
               </select>
             </FormField>
-            <FormField label={labels.openAiApiKey}>
-              <input type="password" autoComplete="new-password" value={secretForm.OPENAI_API_KEY} placeholder={imageGeneration.apiKeyPreview || labels.keepExistingSecret || ""} onChange={(event) => updateSecret("OPENAI_API_KEY", event.target.value)} />
-            </FormField>
-            <FormField label={labels.siliconFlowApiKey}>
-              <input type="password" autoComplete="new-password" value={secretForm.SILICONFLOW_API_KEY} placeholder={sectionTemplateRecognition.apiKeyPreview || labels.keepExistingSecret || ""} onChange={(event) => updateSecret("SILICONFLOW_API_KEY", event.target.value)} />
-            </FormField>
-            <FormField label={labels.baseUrl}>
-              <input value={form.SILICONFLOW_BASE_URL || ""} onChange={(event) => updateField("SILICONFLOW_BASE_URL", event.target.value)} />
-            </FormField>
             <FormField label={labels.model}>
-              <input value={form.SILICONFLOW_IMAGE_MODEL || ""} onChange={(event) => updateField("SILICONFLOW_IMAGE_MODEL", event.target.value)} />
+              {imageProvider === AI_PROVIDERS.openai ? (
+                <input value={form.OPENAI_IMAGE_MODEL || DEFAULT_OPENAI_IMAGE_MODEL} onChange={(event) => updateField("OPENAI_IMAGE_MODEL", event.target.value)} />
+              ) : (
+                <input value={form.SILICONFLOW_IMAGE_MODEL || ""} onChange={(event) => updateField("SILICONFLOW_IMAGE_MODEL", event.target.value)} />
+              )}
             </FormField>
             <FormField label={labels.defaultSize}>
               <select value={form.AI_IMAGE_DEFAULT_SIZE || "1024x1024"} onChange={(event) => updateField("AI_IMAGE_DEFAULT_SIZE", event.target.value)}>
@@ -291,8 +363,16 @@ export function AdminAiSettingsClient({ labels, settings, draft }) {
                 {(imageGeneration.supportedQualities || ["auto", "low", "medium", "high"]).map((quality) => <option key={quality} value={quality}>{labels.qualityLabels?.[quality] || quality}</option>)}
               </select>
             </FormField>
+            <FormField label={labels.outputFormat}>
+              <select value={form.AI_IMAGE_OUTPUT_FORMAT || "webp"} onChange={(event) => updateField("AI_IMAGE_OUTPUT_FORMAT", event.target.value)}>
+                {(imageGeneration.supportedOutputFormats || ["png", "jpeg", "webp"]).map((format) => <option key={format} value={format}>{format}</option>)}
+              </select>
+            </FormField>
+          </FormGroup>
+
+          <FormGroup title={labels.recognitionConfigTitle} lead={labels.recognitionConfigLead}>
             <FormField label={labels.recognitionProvider || labels.provider}>
-              <select value={form.AI_SECTION_TEMPLATE_PROVIDER || "openai"} onChange={(event) => updateField("AI_SECTION_TEMPLATE_PROVIDER", event.target.value)}>
+              <select value={recognitionProvider} onChange={(event) => updateProvider("AI_SECTION_TEMPLATE_PROVIDER", event.target.value)}>
                 <option value="openai">OpenAI</option>
                 <option value="siliconflow">SiliconFlow</option>
               </select>
@@ -303,24 +383,27 @@ export function AdminAiSettingsClient({ labels, settings, draft }) {
                 <option value="false">{labels.enabledNo}</option>
               </select>
             </FormField>
-            <FormField label={labels.visionModel}>
-              <input value={form.SILICONFLOW_VISION_MODEL || ""} onChange={(event) => updateField("SILICONFLOW_VISION_MODEL", event.target.value)} />
-            </FormField>
-            <FormField label={labels.textModel}>
-              <input value={form.SILICONFLOW_TEXT_MODEL || ""} onChange={(event) => updateField("SILICONFLOW_TEXT_MODEL", event.target.value)} />
-            </FormField>
+            {recognitionProvider === AI_PROVIDERS.openai ? (
+              <FormField label={labels.model}>
+                <input value={form.OPENAI_SECTION_TEMPLATE_MODEL || DEFAULT_OPENAI_SECTION_TEMPLATE_MODEL} onChange={(event) => updateField("OPENAI_SECTION_TEMPLATE_MODEL", event.target.value)} />
+              </FormField>
+            ) : (
+              <>
+                <FormField label={labels.visionModel}>
+                  <input value={form.SILICONFLOW_VISION_MODEL || ""} onChange={(event) => updateField("SILICONFLOW_VISION_MODEL", event.target.value)} />
+                </FormField>
+                <FormField label={labels.textModel}>
+                  <input value={form.SILICONFLOW_TEXT_MODEL || ""} onChange={(event) => updateField("SILICONFLOW_TEXT_MODEL", event.target.value)} />
+                </FormField>
+              </>
+            )}
             <FormField label={labels.timeoutMs}>
               <input inputMode="numeric" value={form.AI_SECTION_TEMPLATE_TIMEOUT_MS || "240000"} onChange={(event) => {
                 updateField("AI_SECTION_TEMPLATE_TIMEOUT_MS", event.target.value);
                 updateField("SILICONFLOW_TIMEOUT_MS", event.target.value);
               }} />
             </FormField>
-            <FormField label={labels.outputFormat}>
-              <select value={form.AI_IMAGE_OUTPUT_FORMAT || "webp"} onChange={(event) => updateField("AI_IMAGE_OUTPUT_FORMAT", event.target.value)}>
-                {(imageGeneration.supportedOutputFormats || ["png", "jpeg", "webp"]).map((format) => <option key={format} value={format}>{format}</option>)}
-              </select>
-            </FormField>
-          </div>
+          </FormGroup>
 
           <div className="admin-actions-row">
             <button className="button primary" type="submit" disabled={saveState.status === "loading"}>

@@ -90,6 +90,24 @@ test("AI service settings expose SiliconFlow provider configuration", () => {
   assert.equal(settings.sectionTemplateRecognition.timeoutMs, 52000);
 });
 
+test("AI service settings keep image and recognition providers independent", () => {
+  const settings = getAiServiceSettings({
+    AI_IMAGE_PROVIDER: "openai",
+    AI_SECTION_TEMPLATE_PROVIDER: "siliconflow",
+    OPENAI_API_KEY: "sk-test-secret",
+    SILICONFLOW_API_KEY: "sf-test-secret",
+    OPENAI_IMAGE_MODEL: "gpt-image-2",
+    SILICONFLOW_VISION_MODEL: "Qwen/Qwen3-VL-8B-Instruct"
+  });
+
+  assert.equal(settings.imageGeneration.providerKey, "openai");
+  assert.equal(settings.imageGeneration.model, "gpt-image-2");
+  assert.equal(settings.imageGeneration.configured, true);
+  assert.equal(settings.sectionTemplateRecognition.providerKey, "siliconflow");
+  assert.equal(settings.sectionTemplateRecognition.visionModel, "Qwen/Qwen3-VL-8B-Instruct");
+  assert.equal(settings.sectionTemplateRecognition.configured, true);
+});
+
 test("AI service settings fall back to OpenAI for unknown providers", () => {
   const settings = getImageGenerationSettings({
     AI_IMAGE_PROVIDER: "unknown",
