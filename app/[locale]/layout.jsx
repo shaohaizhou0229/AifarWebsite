@@ -10,6 +10,8 @@ import { SiteAnalyticsTracker } from "@/components/SiteAnalyticsTracker";
 import { getLocaleMessages } from "@/i18n/messages";
 import { getDirection, isLocale, locales } from "@/i18n/routing";
 
+export const dynamic = "force-dynamic";
+
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }

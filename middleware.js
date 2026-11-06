@@ -1,6 +1,8 @@
 import createMiddleware from "next-intl/middleware";
 import { NextResponse } from "next/server";
 import { routing } from "./i18n/routing";
+import { createClient } from "@supabase/supabase-js";
+import siteAccess from "./lib/site-access.cjs";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -28,16 +30,48 @@ function getLocaleOAuthCallback(request) {
   return callbackUrl;
 }
 
-export default function middleware(request) {
+async function verifyToken(token) {
+  const url = process.env.SUPABASE_AUTH_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) return null;
+  const client = createClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+    global: { fetch: (url, options) => fetch(url, { ...options, signal: AbortSignal.timeout(8000), cache: "no-store" }) }
+  });
+  const { data, error } = await client.auth.getUser(token);
+  return error ? null : data.user;
+}
+
+function privateResponse(response) {
+  response.headers.set("Cache-Control", "private, no-store, max-age=0");
+  response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  return response;
+}
+
+export default async function middleware(request) {
   const callbackUrl = getLocaleOAuthCallback(request);
 
   if (callbackUrl) {
-    return NextResponse.redirect(callbackUrl);
+    return privateResponse(NextResponse.redirect(callbackUrl));
   }
 
-  return intlMiddleware(request);
+  const { pathname } = request.nextUrl;
+  const access = await siteAccess.canAccessSite(
+    pathname, request.cookies.get("aifar_access_token")?.value, verifyToken
+  );
+  if (!access.allowed) {
+    if (access.api || /\.[^/]+\/?$/.test(pathname)) {
+      return privateResponse(NextResponse.json({ errorCode: "authentication_required" }, { status: 401 }));
+    }
+    const login = new URL(`/${access.locale}/login/`, request.url);
+    return privateResponse(NextResponse.redirect(login));
+  }
+  if (pathname.startsWith("/api/") || pathname.startsWith("/_next/") || /\.[^/]+\/?$/.test(pathname)) {
+    return privateResponse(NextResponse.next());
+  }
+  return privateResponse(intlMiddleware(request));
 }
 
 export const config = {
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"]
+  matcher: ["/((?!_next/static/).*)"]
 };

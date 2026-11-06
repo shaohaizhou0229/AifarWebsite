@@ -19,7 +19,7 @@ async function createReadableStorageClient(storagePath) {
   if (await isPublicProjectAssetImage(storagePath)) {
     return {
       supabase: createPublicSupabaseClient(),
-      cacheControl: "public, max-age=300, stale-while-revalidate=3600"
+      cacheControl: "private, no-store, max-age=0"
     };
   }
 
@@ -28,7 +28,7 @@ async function createReadableStorageClient(storagePath) {
     const accessToken = await getCurrentAccessToken();
     return {
       supabase: createUserSupabaseClient(accessToken),
-      cacheControl: "private, max-age=60"
+      cacheControl: "private, no-store, max-age=0"
     };
   } catch {
     return null;

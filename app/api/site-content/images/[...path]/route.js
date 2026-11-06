@@ -24,14 +24,13 @@ export async function GET(_request, { params }) {
   }
 
   let supabase = null;
-  let cacheControl = "public, max-age=300, stale-while-revalidate=3600";
+  const cacheControl = "private, no-store, max-age=0";
   if (await isPublicProjectAssetImage(storagePath)) {
     supabase = createPublicSupabaseClient();
   } else {
     try {
       await requireAdmin(getProfile);
       supabase = createUserSupabaseClient(await getCurrentAccessToken());
-      cacheControl = "private, max-age=60";
     } catch {
       return NextResponse.json({ error: "Image not found." }, { status: 404 });
     }
