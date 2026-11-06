@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ensureProfile, isProfileActive } from "@/lib/profiles";
-import { exchangeOAuthCode, setAuthCookies } from "@/lib/auth";
+import { exchangeOAuthCode, setAuthCookies, clearAuthCookies } from "@/lib/auth";
+import approval from "@/lib/account-approval.cjs";
 import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
 
 export const runtime = "nodejs";
@@ -37,8 +38,10 @@ export async function GET(request) {
       });
       if (!isProfileActive(profile)) {
         const responseUrl = new URL(loginPathFromNext(nextPath), request.url);
-        responseUrl.searchParams.set("error", "account_inactive");
-        return NextResponse.redirect(responseUrl);
+        responseUrl.searchParams.set("error", approval.accountAccessError(profile));
+        const denied = NextResponse.redirect(responseUrl);
+        clearAuthCookies(denied);
+        return denied;
       }
       await recordUserFootprint({
         userId: user.id,

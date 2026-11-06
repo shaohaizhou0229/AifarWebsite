@@ -60,6 +60,11 @@ export async function POST(request) {
     if (user?.id) {
       profile = await ensureProfile(user, { displayName, organization });
       if (!isProfileActive(profile)) {
+        if (profile?.accountStatus === "pending_approval") {
+          const response = NextResponse.json({ ok: true, requiresApproval: true });
+          clearAuthCookies(response);
+          return response;
+        }
         return NextResponse.json({ errorCode: "account_inactive" }, { status: 403 });
       }
       await recordUserFootprint({

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ensureProfile, isProfileActive } from "@/lib/profiles";
 import { AuthConfigurationError, setAuthCookies, signInWithPassword } from "@/lib/auth";
 import { recordUserFootprint, USER_FOOTPRINT_EVENTS } from "@/lib/user-footprints";
+import approval from "@/lib/account-approval.cjs";
 
 export const runtime = "nodejs";
 
@@ -22,7 +23,7 @@ export async function POST(request) {
     const session = await signInWithPassword(email, password);
     const profile = await ensureProfile(session.user);
     if (!isProfileActive(profile)) {
-      return NextResponse.json({ errorCode: "account_inactive" }, { status: 403 });
+      return NextResponse.json({ errorCode: approval.accountAccessError(profile) }, { status: 403 });
     }
     await recordUserFootprint({
       userId: session.user.id,

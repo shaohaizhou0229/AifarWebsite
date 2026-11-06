@@ -43,6 +43,7 @@
       "register": "S’inscrire",
       "alreadyHaveAccount": "Vous avez déjà un compte ? ",
       "needAccount": "Besoin d’un compte ? ",
+      "approvalPending": "Votre inscription a été reçue. Un administrateur doit approuver votre compte avant la connexion.",
       "confirmation": "Veuillez confirmer votre compte par e-mail avant de vous connecter.",
       "failure": "Authentication failed. Please check your account information and try again.",
       "continueWithGoogle": "Continuer avec Google",
@@ -53,6 +54,7 @@
         "auth_missing_code": "Authentication callback is missing a code.",
         "auth_failed": "Sign in failed. Please check your account information and try again.",
         "auth_service_unavailable": "The account service is temporarily unavailable. Please try again later or contact the administrator.",
+        "account_pending_approval": "Votre compte est en attente de validation par un administrateur.",
         "account_inactive": "Ce compte n est pas actif. Contactez l administrateur."
       }
     },
@@ -131,6 +133,7 @@
       "securityLoadFailed": "Impossible de charger l etat de securite du compte.",
       "errors": {
         "auth_required": "Veuillez vous reconnecter.",
+        "account_pending_approval": "Votre compte est en attente de validation par un administrateur.",
         "account_inactive": "Ce compte n est pas actif. Contactez l administrateur.",
         "auth_service_unavailable": "Le service de compte est temporairement indisponible.",
         "security_load_failed": "Impossible de charger l etat de securite du compte.",
@@ -2123,6 +2126,7 @@
       "statuses": {
         "all": "Tous les statuts",
         "active": "Actif",
+        "pending_approval": "En attente de validation",
         "deactivated": "Desactive",
         "deleted": "Supprime",
         "pending": "Invitation en attente"
@@ -2246,6 +2250,7 @@
         "accountStatus": "Statut du compte",
         "statuses": {
           "active": "Actif",
+          "pending_approval": "En attente de validation",
           "deactivated": "Desactive",
           "deleted": "Supprime"
         },

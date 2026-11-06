@@ -43,6 +43,7 @@
       "register": "تسجيل",
       "alreadyHaveAccount": "لديك حساب بالفعل؟ ",
       "needAccount": "تحتاج إلى حساب؟ ",
+      "approvalPending": "تم استلام طلب التسجيل. يجب موافقة المسؤول قبل تسجيل الدخول.",
       "confirmation": "يرجى تأكيد حسابك عبر البريد قبل تسجيل الدخول.",
       "failure": "Authentication failed. Please check your account information and try again.",
       "continueWithGoogle": "المتابعة باستخدام Google",
@@ -53,6 +54,7 @@
         "auth_missing_code": "Authentication callback is missing a code.",
         "auth_failed": "Sign in failed. Please check your account information and try again.",
         "auth_service_unavailable": "The account service is temporarily unavailable. Please try again later or contact the administrator.",
+        "account_pending_approval": "حسابك بانتظار موافقة المسؤول قبل تسجيل الدخول.",
         "account_inactive": "??? ?????? ??? ???. ???? ??????? ?? ??????."
       }
     },
@@ -131,6 +133,7 @@
       "securityLoadFailed": "Unable to load account security status.",
       "errors": {
         "auth_required": "Please sign in again.",
+        "account_pending_approval": "حسابك بانتظار موافقة المسؤول قبل تسجيل الدخول.",
         "account_inactive": "This account is not active. Please contact the administrator.",
         "auth_service_unavailable": "The account service is temporarily unavailable.",
         "security_load_failed": "Unable to load account security status.",
@@ -2123,6 +2126,7 @@
       "statuses": {
         "all": "?? ???????",
         "active": "???",
+        "pending_approval": "بانتظار الموافقة",
         "deactivated": "????",
         "deleted": "?????",
         "pending": "???? ?????"
@@ -2246,6 +2250,7 @@
         "accountStatus": "???? ??????",
         "statuses": {
           "active": "???",
+          "pending_approval": "بانتظار الموافقة",
           "deactivated": "????",
           "deleted": "?????"
         },

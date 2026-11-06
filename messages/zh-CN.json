@@ -43,6 +43,7 @@
       "register": "注册",
       "alreadyHaveAccount": "已有账户？",
       "needAccount": "需要账户？",
+      "approvalPending": "注册申请已提交，管理员审批通过后才可登录。",
       "confirmation": "请先查收邮件并确认账户，然后再登录。",
       "failure": "认证失败，请检查账号信息后重试。",
       "continueWithGoogle": "使用 Google 继续",
@@ -53,6 +54,7 @@
         "auth_missing_code": "登录确认回调缺少授权码。",
         "auth_failed": "登录失败，请检查账号信息后重试。",
         "auth_service_unavailable": "账号服务暂时不可用，请稍后再试或联系管理员。",
+        "account_pending_approval": "账号正在等待管理员审批，审批通过后才可登录。",
         "account_inactive": "该账号未处于正常状态，请联系管理员。"
       }
     },
@@ -131,6 +133,7 @@
       "securityLoadFailed": "无法加载账号安全状态。",
       "errors": {
         "auth_required": "请重新登录。",
+        "account_pending_approval": "账号正在等待管理员审批，审批通过后才可登录。",
         "account_inactive": "该账号未处于正常状态，请联系管理员。",
         "auth_service_unavailable": "账号服务暂时不可用。",
         "security_load_failed": "无法加载账号安全状态。",
@@ -2123,6 +2126,7 @@
       "statuses": {
         "all": "全部状态",
         "active": "正常",
+        "pending_approval": "待审批",
         "deactivated": "已停用",
         "deleted": "已注销",
         "pending": "待激活邀请"
@@ -2246,6 +2250,7 @@
         "accountStatus": "账号状态",
         "statuses": {
           "active": "正常",
+          "pending_approval": "待审批",
           "deactivated": "已停用",
           "deleted": "已注销"
         },

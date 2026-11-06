@@ -115,6 +115,7 @@ export function AdminUsersClient({ locale, page, initialQuery = "", initialStatu
         <label className="sr-only" htmlFor="status">{page.statusFilter}</label>
         <select id="status" name="status" value={status} onChange={(event) => setStatus(event.target.value)}>
           <option value="all">{page.statuses.all}</option>
+          <option value="pending_approval">{page.statuses.pending_approval}</option>
           <option value="active">{page.statuses.active}</option>
           <option value="deactivated">{page.statuses.deactivated}</option>
           <option value="deleted">{page.statuses.deleted}</option>

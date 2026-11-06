@@ -153,6 +153,7 @@ export function AdminUserForm({ user, labels }) {
       <div className="field">
         <label htmlFor="accountStatus">{labels.accountStatus}</label>
         <select id="accountStatus" name="accountStatus" value={form.accountStatus} onChange={updateField}>
+          <option value="pending_approval">{labels.statuses.pending_approval}</option>
           <option value="active">{labels.statuses.active}</option>
           <option value="deactivated">{labels.statuses.deactivated}</option>
           <option value="deleted">{labels.statuses.deleted}</option>

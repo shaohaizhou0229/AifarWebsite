@@ -43,6 +43,7 @@
       "register": "Register",
       "alreadyHaveAccount": "Already have an account? ",
       "needAccount": "Need an account? ",
+      "approvalPending": "Registration received. Administrator approval is required before you can sign in.",
       "confirmation": "Please check your email to confirm your account before signing in.",
       "failure": "Authentication failed. Please check your account information and try again.",
       "continueWithGoogle": "Continue with Google",
@@ -53,6 +54,7 @@
         "auth_missing_code": "Authentication callback is missing a code.",
         "auth_failed": "Sign in failed. Please check your account information and try again.",
         "auth_service_unavailable": "The account service is temporarily unavailable. Please try again later or contact the administrator.",
+        "account_pending_approval": "Your account is awaiting administrator approval.",
         "account_inactive": "This account is not active. Please contact the administrator."
       }
     },
@@ -131,6 +133,7 @@
       "securityLoadFailed": "Unable to load account security status.",
       "errors": {
         "auth_required": "Please sign in again.",
+        "account_pending_approval": "Your account is awaiting administrator approval.",
         "account_inactive": "This account is not active. Please contact the administrator.",
         "auth_service_unavailable": "The account service is temporarily unavailable.",
         "security_load_failed": "Unable to load account security status.",
@@ -2123,6 +2126,7 @@
       "statuses": {
         "all": "All statuses",
         "active": "Active",
+        "pending_approval": "Awaiting approval",
         "deactivated": "Deactivated",
         "deleted": "Deleted",
         "pending": "Pending invitation"
@@ -2246,6 +2250,7 @@
         "accountStatus": "Account status",
         "statuses": {
           "active": "Active",
+          "pending_approval": "Awaiting approval",
           "deactivated": "Deactivated",
           "deleted": "Deleted"
         },

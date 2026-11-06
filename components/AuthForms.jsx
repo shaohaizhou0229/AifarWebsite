@@ -37,6 +37,11 @@ export function AuthForm({ mode, labels, accountPath, loginPath, registerPath, i
         throw new Error(labels.auth.errors?.[result.errorCode] || result.error || labels.auth.failure);
       }
 
+      if (result.requiresApproval) {
+        setStatus({ type: "success", message: labels.auth.approvalPending });
+        return;
+      }
+
       if (result.requiresConfirmation) {
         setStatus({
           type: "success",

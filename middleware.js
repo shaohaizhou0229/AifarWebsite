@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { routing } from "./i18n/routing";
 import { createClient } from "@supabase/supabase-js";
 import siteAccess from "./lib/site-access.cjs";
+import approval from "./lib/account-approval.cjs";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -39,7 +40,17 @@ async function verifyToken(token) {
     global: { fetch: (url, options) => fetch(url, { ...options, signal: AbortSignal.timeout(8000), cache: "no-store" }) }
   });
   const { data, error } = await client.auth.getUser(token);
-  return error ? null : data.user;
+  if (error || !data.user) return null;
+  const authenticated = createClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+    global: {
+      headers: { Authorization: `Bearer ${token}` },
+      fetch: (url, options) => fetch(url, { ...options, signal: AbortSignal.timeout(8000), cache: "no-store" })
+    }
+  });
+  const { data: profile, error: profileError } = await authenticated
+    .from("profiles").select("account_status").eq("id", data.user.id).single();
+  return !profileError && approval.isApprovedProfile(profile) ? data.user : null;
 }
 
 function privateResponse(response) {
